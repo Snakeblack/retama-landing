@@ -1,0 +1,12 @@
+# Security headers for every static asset (ADR 0006). Keep a single /* block:
+# a later block with the same pattern replaces this one in Cloudflare.
+# scripts/postbuild.mjs fills the CSP value with the policy built from the page hashes.
+# HSTS without preload until the definitive domain lands (M6).
+/*
+  Content-Security-Policy: __CSP__
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
