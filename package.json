@@ -16,7 +16,9 @@
     "typecheck": "astro check",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "serve:dist": "wrangler dev -c dist/client/wrangler.json"
+    "serve:dist": "wrangler dev -c dist/client/wrangler.json",
+    "design:theme": "node scripts/design-check.mjs --write",
+    "design:lint": "node scripts/design-check.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.4.1",
@@ -26,9 +28,12 @@
   "devDependencies": {
     "@astrojs/check": "0.9.11",
     "@biomejs/biome": "2.5.15",
+    "@google/design.md": "0.4.0",
     "@playwright/test": "1.64.1",
+    "@tailwindcss/vite": "4.3.3",
     "eslint": "10.13.0",
     "eslint-plugin-astro": "3.2.1",
+    "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
     "vitest": "5.0.5",
     "wrangler": "4.150.0"

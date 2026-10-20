@@ -1,6 +1,7 @@
 // @ts-check
 import cloudflare from "@astrojs/cloudflare";
 import sitemap from "@astrojs/sitemap";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 // Production origin for canonicals, hreflang and the sitemap. Workers Builds sets
@@ -10,6 +11,8 @@ const site = process.env.SITE_URL ?? "https://retama-landing.workers.dev";
 export default defineConfig({
   site,
   trailingSlash: "always",
+  // One small stylesheet: inlining it removes the render-blocking request (perf-mobile).
+  build: { inlineStylesheets: "always" },
   // ADR 0003: no session KV binding is provisioned.
   session: false,
   adapter: cloudflare({
@@ -20,6 +23,9 @@ export default defineConfig({
     locales: ["es", "en"],
     defaultLocale: "es",
     routing: { prefixDefaultLocale: false, redirectToDefaultLocale: false },
+  },
+  vite: {
+    plugins: [tailwindcss()],
   },
   integrations: [
     sitemap({
