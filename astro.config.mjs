@@ -1,0 +1,43 @@
+// @ts-check
+import cloudflare from "@astrojs/cloudflare";
+import sitemap from "@astrojs/sitemap";
+import { defineConfig } from "astro/config";
+
+// Production origin for canonicals, hreflang and the sitemap. Workers Builds sets
+// SITE_URL; the fallback is the workers.dev URL until the domain lands (M6).
+const site = process.env.SITE_URL ?? "https://retama-landing.workers.dev";
+
+export default defineConfig({
+  site,
+  trailingSlash: "always",
+  // ADR 0003: no session KV binding is provisioned.
+  session: false,
+  adapter: cloudflare({
+    // Build-time image transforms; no Cloudflare Images binding.
+    imageService: "compile",
+  }),
+  i18n: {
+    locales: ["es", "en"],
+    defaultLocale: "es",
+    routing: { prefixDefaultLocale: false, redirectToDefaultLocale: false },
+  },
+  integrations: [
+    sitemap({
+      i18n: { defaultLocale: "es", locales: { es: "es", en: "en" } },
+      filter: (page) => !/\/404\/?$/.test(new URL(page).pathname),
+    }),
+  ],
+  security: {
+    csp: {
+      directives: [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "object-src 'none'",
+        "form-action 'self'",
+        "img-src 'self' data:",
+        "font-src 'self'",
+        "connect-src 'self'",
+      ],
+    },
+  },
+});

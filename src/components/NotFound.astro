@@ -1,0 +1,19 @@
+---
+import { type Locale, localizedPath, t } from "../i18n/index";
+import Base from "../layouts/Base.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = t(locale);
+---
+
+<Base locale={locale} title={`${copy["notFound.title"]} · Retama`} description={copy["notFound.lead"]} noindex>
+  <section class="hero">
+    <h1>{copy["notFound.title"]}</h1>
+    <p class="lead">{copy["notFound.lead"]}</p>
+    <p><a href={localizedPath(locale, "/")}>{copy["notFound.back"]}</a></p>
+  </section>
+</Base>

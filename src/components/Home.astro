@@ -1,0 +1,19 @@
+---
+import { type Locale, t } from "../i18n/index";
+import Base from "../layouts/Base.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = t(locale);
+---
+
+<Base locale={locale} title={copy["meta.title"]} description={copy["meta.description"]}>
+  <section class="hero">
+    <p class="eyebrow">{copy["home.eyebrow"]}</p>
+    <h1>{copy["home.title"]}</h1>
+    <p class="lead">{copy["home.lead"]}</p>
+  </section>
+</Base>

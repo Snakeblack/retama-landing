@@ -1,0 +1,52 @@
+---
+import { defaultLocale, type Locale, localizedPath, locales, pathWithoutLocale, t } from "../i18n/index";
+import { alternates, canonicalUrl } from "../lib/seo";
+import "../styles/global.css";
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  noindex?: boolean;
+}
+
+const { locale, title, description, noindex = false } = Astro.props;
+const site = Astro.site ?? new URL(Astro.url.origin);
+const page = pathWithoutLocale(Astro.url.pathname);
+const other = locales.find((candidate) => candidate !== locale) ?? defaultLocale;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {
+      !noindex && (
+        <>
+          <link rel="canonical" href={canonicalUrl(site, Astro.url.pathname)} />
+          {alternates(site, Astro.url.pathname).map((alt) => (
+            <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+          ))}
+        </>
+      )
+    }
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#0b0d10" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href={localizedPath(locale, "/")}>Retama</a>
+      <a class="lang-switch" href={localizedPath(other, page)} hreflang={other} lang={other}>
+        {t(locale)["nav.switchLabel"]}
+      </a>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
