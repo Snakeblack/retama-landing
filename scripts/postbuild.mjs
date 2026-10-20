@@ -1,8 +1,13 @@
 // Post-build steps over the static output in dist/client.
-import { readdir, rename, rmdir } from "node:fs/promises";
+import { readdir, readFile, rename, rmdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { extractMetaCsp, mergePolicies, serializePolicy } from "./lib/csp.mjs";
 
 const root = new URL("../dist/client/", import.meta.url).pathname;
+
+// Directives a <meta> CSP ignores, so they only exist in the header.
+const HEADER_ONLY = ["frame-ancestors 'none'"];
+const PLACEHOLDER = "__CSP__";
 
 // Astro emits non-root 404 pages as <locale>/404/index.html; Workers'
 // not_found_handling looks for <locale>/404.html.
@@ -19,4 +24,20 @@ async function flattenLocale404() {
   }
 }
 
+async function cspHeader() {
+  const files = (await readdir(root, { recursive: true })).filter((file) => file.endsWith(".html"));
+  const policies = [];
+  for (const file of files) {
+    const policy = extractMetaCsp(await readFile(join(root, file), "utf8"));
+    if (!policy) throw new Error(`${file} has no CSP meta; is security.csp enabled?`);
+    policies.push(policy);
+  }
+  const header = serializePolicy(mergePolicies(policies, HEADER_ONLY));
+  const path = join(root, "_headers");
+  const rules = await readFile(path, "utf8");
+  if (!rules.includes(PLACEHOLDER)) throw new Error(`_headers has no ${PLACEHOLDER} placeholder`);
+  await writeFile(path, rules.replace(PLACEHOLDER, header));
+}
+
 await flattenLocale404();
+await cspHeader();
