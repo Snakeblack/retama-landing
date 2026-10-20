@@ -22,7 +22,8 @@ Todas las páginas se generan en build como HTML estático. La interactividad (e
 ## Fitness function
 - El HTML de cada página contiene todos los encabezados y textos sin ejecutar JS. Lo verifica un test E2E con JS desactivado.
 - El presupuesto de JS por página se comprueba en CI.
-- Ambas comprobaciones se convertirán en líneas `- Check:` cuando exista el scaffold (primer slice).
+- Check: `pnpm test:e2e --grep "ADR 0001"`
+- El presupuesto de JS por página se fija cuando la primera isla lo necesite (M2) y entonces pasa a ser un `- Check:`.
 
 ## Review trigger
 La web necesita contenido personalizado por usuario o datos en tiempo real.

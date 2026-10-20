@@ -60,7 +60,9 @@ test.describe("navegación sin violaciones de CSP ni rastreo (ADR 0006, ADR 0007
   }
 });
 
-test("las transiciones entre páginas son nativas: CSS @view-transition sin router de cliente", async ({ page }) => {
+test("las transiciones entre páginas son nativas: CSS @view-transition sin router de cliente (ADR 0006)", async ({
+  page,
+}) => {
   await page.goto("/");
   const rules = await page.evaluate(() =>
     [...document.styleSheets].flatMap((sheet) => [...sheet.cssRules].map((rule) => rule.cssText)),

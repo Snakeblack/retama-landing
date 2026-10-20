@@ -21,6 +21,7 @@ Desarrollo trunk-based. `main` es producción y solo se modifica por PR con toda
 
 ## Fitness function
 - La protección de rama de `main` exige los checks del CI. Se puede verificar con la API del repositorio.
+- Check: `node scripts/fitness.mjs branch-protection`
 
 ## Review trigger
 Entra una segunda persona en el equipo o se necesita un entorno de staging permanente.

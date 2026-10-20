@@ -2,6 +2,16 @@ allowBuilds:
   esbuild: true
   workerd: true
 
-# 1.64 pide wrangler ^4.151, más reciente que la antigüedad mínima de pnpm.
 overrides:
+  # 1.64 needs wrangler ^4.151, newer than pnpm's minimum release age.
   "@cloudflare/vite-plugin": 1.63.2
+  # @lhci/cli (no release since 06-2025) pins vulnerable transitive versions.
+  "tmp": ">=0.2.6"
+  "basic-ftp": ">=6.2.1"
+
+auditConfig:
+  ignoreGhsas:
+    # extract-zip has no patched release. Only @puppeteer/browsers uses it, to unzip
+    # downloaded browsers; Lighthouse CI runs the installed Chrome and downloads none.
+    - GHSA-jmr9-qjv8-65gv
+    - GHSA-7pqw-9j4j-h8q3

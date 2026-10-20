@@ -22,6 +22,7 @@ Las skills de agente se copian en el repositorio desde un commit fijado y se aud
 ## Fitness function
 - Un test compara el manifiesto con el contenido de las skills vendorizadas (hash por archivo).
 - Un escaneo en CI busca patrones de riesgo: URLs de las que se descargan instrucciones, scripts remotos ejecutados sin revisión y caracteres invisibles.
+- Check: `pnpm skills:scan`
 
 ## Review trigger
 Una skill aparece comprometida, su licencia cambia o surge una oficial que cubre mejor su tema.

@@ -20,7 +20,8 @@ El sistema es un solo desplegable en una plataforma de borde. Sirve los activos 
 - Prohibido: añadir rutas bajo demanda sin un ADR que lo justifique.
 
 ## Fitness function
-- Revisión del build: las rutas bajo demanda son exactamente las de la lista permitida (`/api/contact`). Se automatizará como `- Check:` en el primer slice.
+- Revisión del build: las rutas bajo demanda son exactamente las de la lista permitida (`/api/contact`).
+- Check: `node scripts/fitness.mjs on-demand-routes`
 
 ## Review trigger
 Aparece un segundo caso de uso de servidor (por ejemplo, un chat con IA en v2), o la plataforma cambia de forma que deja de cumplir `constraint:low-cost`.
