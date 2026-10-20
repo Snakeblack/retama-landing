@@ -21,6 +21,7 @@ v1 mide de forma agregada, sin cookies ni identificadores persistentes, y no mue
 
 ## Fitness function
 - Un test E2E sin consentimiento comprueba que no se crean cookies ni se hacen peticiones a dominios de seguimiento.
+- Check: `pnpm test:e2e --grep "ADR 0007"`
 
 ## Review trigger
 Se activan los heatmaps (v2) o cambia la guía de la AEPD.

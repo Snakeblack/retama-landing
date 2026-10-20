@@ -44,6 +44,11 @@ Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario
 - LICENSE de upstream copiado en cada carpeta (MIT y Apache-2.0 exigen conservar el aviso).
 - `CLAUDE.md` importa `AGENTS.md` (`@AGENTS.md`), que es la fuente única. `.claude/settings.json` fija `TASTE_SKILL_HISTORY` dentro del repo.
 - Las herramientas de escritura convierten las secuencias `\u` en caracteres reales: la regla `invisible-char` y su test se escriben con escapes, y se comprobó que el código del repo no tiene caracteres invisibles.
+- Lighthouse CI en local (preset móvil, 3 pasadas por URL): 100 en performance, accessibility, best-practices y seo en `/` y `/en/`, con LCP de unos 755 ms y CLS 0. El CI aplica `minScore: 1` en las cuatro categorías contra `wrangler dev`.
+- Las actions se fijan por SHA (checkout v7.0.1, setup-node v7.1.0, pnpm/action-setup v6.1.0, upload-artifact v7.0.2, release-please-action v5.0.0).
+- Auditoría de dependencias: `pnpm audit --audit-level high` es puerta. Todos los hallazgos vienen de `@lhci/cli`: se fuerzan `tmp >=0.2.6` y `basic-ftp >=6.2.1`, y se ignoran los dos GHSA de `extract-zip` (sin parche; solo descomprime navegadores descargados y LHCI usa el Chrome instalado), documentado en `pnpm-workspace.yaml`.
+- Las líneas `- Check:` de los ADRs sustituyen las frases que las anunciaban, sin tocar la decisión. Quedan como revisión manual el presupuesto de JS (0001, primera isla en M2), el test de logs (0003, M3), la regla de valores sueltos (0005, M1), los E2E del 3D (0004, M2) y el escaneo de cabeceras del preview (0006).
+- `scripts/fitness.mjs` respalda los checks de arquitectura: `on-demand-routes` (0002, lista permitida `src/pages/api/contact.ts`), `no-persistent-bindings` (0003, sobre el `wrangler.json` generado) y `branch-protection` (0009, vía `gh`). Se comprobó que los dos primeros detectan una violación inyectada.
 - Biome es dueño de JS/TS/JSON/CSS; ESLint solo de `.astro` (soporte experimental en Biome).
 
 ## Evidence
