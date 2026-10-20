@@ -1,0 +1,31 @@
+/* Generated from DESIGN.md by `pnpm design:theme`. Do not edit. */
+@theme {
+  --color-primary: #9ecbff;
+  --color-surface: #0b0d10;
+  --color-on-surface: #e8eaed;
+  --color-on-surface-muted: #aab1bb;
+  --color-neutral: #c9ced6;
+  --font-headline-display: "system-ui";
+  --font-body-lg: "system-ui";
+  --font-body-md: "system-ui";
+  --font-label-sm: "system-ui";
+  --text-headline-display: 64px;
+  --text-body-lg: 20px;
+  --text-body-md: 16px;
+  --text-label-sm: 14px;
+  --tracking-headline-display: -0.02em;
+  --tracking-label-sm: 0.1em;
+  --font-weight-headline-display: 700;
+  --font-weight-body-lg: 400;
+  --font-weight-body-md: 400;
+  --font-weight-label-sm: 500;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 48px;
+  --spacing-2xl: 96px;
+  --spacing-content: 768px;
+}

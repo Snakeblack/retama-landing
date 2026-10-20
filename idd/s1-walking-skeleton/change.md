@@ -11,8 +11,8 @@ Acceptance: La URL de producción sirve / (es) y /en/ con canónica, hreflang re
 Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario, 2026-10-21):
 
 1. [x] Scaffold Astro 7 + adapter Cloudflare, TypeScript estricto, Biome + eslint-plugin-astro, Vitest + Playwright; i18n es/en con paridad de claves; canónica, hreflang + x-default, sitemap; 404 por idioma.
-2. [x] CSP de `security.csp` llevada a `_headers` por ruta + resto de cabeceras; `@view-transition` nativo; E2E de cabeceras y CSP sin violaciones; cero cookies.
-3. [ ] DESIGN.md mínimo (tokens provisionales) → `@theme` de Tailwind 4; `design:lint` y comprobación de sincronía.
+2. [x] CSP de `security.csp` unificada en `_headers` + resto de cabeceras; `@view-transition` nativo; E2E de cabeceras y CSP sin violaciones; cero cookies.
+3. [x] DESIGN.md mínimo (tokens provisionales) → `@theme` de Tailwind 4; `design:lint` y comprobación de sincronía.
 4. [ ] Skills vendorizadas (ADR 0010) con manifiesto de hashes, test del manifiesto y escaneo de riesgo; `CLAUDE.md`/`AGENTS.md`.
 5. [ ] CI de GitHub Actions (lint, typecheck, test, E2E, Lighthouse CI, auditoría de dependencias), Workers Builds, repo público + protección de `main`, release-please con PAT; líneas `- Check:` en los ADRs.
 
@@ -33,6 +33,11 @@ Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario
 - `SITE_URL` fija el origen de canónicas y sitemap; el valor por defecto `https://retama-landing.workers.dev` se sustituye por la URL real cuando el usuario dé el subdominio.
 - CSP como cabecera: `scripts/postbuild.mjs` une las políticas `<meta>` de todas las páginas (sin `unsafe-inline`/`unsafe-eval`, el build falla si alguna página no tiene CSP) y añade `frame-ancestors 'none'`. Es una sola política para todo el sitio porque Cloudflare concatena con comas los valores repetidos, y eso serían varias políticas; la meta de cada página sigue limitándola a sus propios hashes.
 - `public/_headers` tiene un único bloque `/*` con el marcador `__CSP__`: verificado con E2E que un segundo bloque `/*` sustituye al primero en workerd y borra las demás cabeceras.
+- `design:lint` (`scripts/design-check.mjs`) falla también con los *warnings* del CLI, porque el contraste por debajo de WCAG AA solo es un warning y el CLI sale con 0 (verificado con un color de 1,55:1). Además compara el tema exportado con `src/styles/theme.css`; `design:theme` lo regenera. `theme.css` es generado y queda fuera de Biome.
+- El CLI exporta `fontFamily` entre comillas (`"system-ui"` no es la palabra clave genérica), así que la pila real va detrás: `var(--font-body-md), system-ui, sans-serif`. M1 traerá tipografías autoalojadas.
+- Los pesos se aplican con `font-(weight:--font-weight-*)`: Tailwind 4 no genera utilidades `font-*` a partir de `--font-weight-<nombre>` cuando ya existe `--font-<nombre>`.
+- Quedan valores provisionales de Tailwind (`text-5xl`, `leading-[1.1]`) para el titular en móvil; la regla de lint que rechaza valores sueltos llega con el sistema de diseño (M1, ADR 0005).
+- CSS inline (`build.inlineStylesheets: "always"`): unos 8 KB, sin petición que bloquee el render; su hash entra en la CSP.
 - Biome es dueño de JS/TS/JSON/CSS; ESLint solo de `.astro` (soporte experimental en Biome).
 
 ## Evidence
