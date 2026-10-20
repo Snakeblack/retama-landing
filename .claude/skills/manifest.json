@@ -368,7 +368,7 @@
       "license": "Apache-2.0",
       "topic": "platform",
       "audited": "2026-10-21",
-      "verdict": "Aceptada solo como referencia: sus scripts usan un token de la API de Cloudflare y no se ejecutan; el widget se crea a mano en el dashboard (CLAUDE.md). Su paso 11 descarga el HEAD sin fijar del repo, prohibido por el ADR 0010: persist-skill.sh y su test se excluyen.",
+      "verdict": "Aceptada solo como referencia (AGENTS.md). Sus scripts usan un token de la API de Cloudflare y no se ejecutan; el widget se crea a mano en el dashboard. Se excluyen persist-skill.sh y su test porque el paso 11 clona el HEAD sin fijar del repo (lo prohíbe el ADR 0010). Quedan como texto revisado, sin ejecutar: la instalación del prompt alojado developers.cloudflare.com/turnstile/spin/prompt.md, que sustituiría SKILL.md y descarga scripts bajo demanda (SKILL.md:131, README.md:33-43, tests/validation.md:66), y la opción de guardar el token en ~/.cf-turnstile-token (SKILL.md:54).",
       "added": [
         "LICENSE"
       ],
@@ -396,18 +396,53 @@
   "reviewed": [
     {
       "path": "taste-skill/README.md",
-      "rule": "global-config-write",
-      "reason": "Instrucciones de instalación para humanos; aquí la skill vive en el repo."
+      "rule": "home-dotfile",
+      "reason": "Ejemplo de instalación para humanos (~/.claude/skills) y ruta por defecto del historial; .claude/settings.json fija TASTE_SKILL_HISTORY dentro del repo."
     },
     {
       "path": "turnstile-spin/README.md",
       "rule": "remote-clone",
-      "reason": "Instrucciones de instalación para humanos; CLAUDE.md prohíbe clonar o persistir esta skill."
+      "reason": "Instrucciones de instalación para humanos. AGENTS.md prohíbe instalar o sincronizar esta skill desde el prompt alojado, clonarla o persistirla."
     },
     {
       "path": "turnstile-spin/README.md",
-      "rule": "global-config-write",
-      "reason": "Instrucciones de instalación para humanos; CLAUDE.md prohíbe clonar o persistir esta skill."
+      "rule": "home-dotfile",
+      "reason": "Instrucciones de instalación para humanos (~/.config, ~/.claude). AGENTS.md prohíbe instalar o sincronizar esta skill desde el prompt alojado, clonarla o persistirla."
+    },
+    {
+      "path": "turnstile-spin/README.md",
+      "rule": "hosted-prompt",
+      "reason": "Describe el prompt alojado y cómo mantenerlo sincronizado upstream. AGENTS.md prohíbe instalar o sincronizar esta skill desde el prompt alojado, clonarla o persistirla."
+    },
+    {
+      "path": "turnstile-spin/README.md",
+      "rule": "remote-download",
+      "reason": "curl del prompt alojado que sobrescribiría SKILL.md. AGENTS.md prohíbe instalar o sincronizar esta skill desde el prompt alojado, clonarla o persistirla."
+    },
+    {
+      "path": "turnstile-spin/README.md",
+      "rule": "on-demand-fetch",
+      "reason": "El prompt alojado descarga scripts bajo demanda. AGENTS.md prohíbe instalar o sincronizar esta skill desde el prompt alojado, clonarla o persistirla."
+    },
+    {
+      "path": "turnstile-spin/SKILL.md",
+      "rule": "hosted-prompt",
+      "reason": "Línea 12 (el prompt alojado replica la skill) y paso 11 (instalarlo). AGENTS.md prohíbe instalar o sincronizar esta skill desde el prompt alojado, clonarla o persistirla."
+    },
+    {
+      "path": "turnstile-spin/SKILL.md",
+      "rule": "home-dotfile",
+      "reason": "Opción de guardar el token en ~/.cf-turnstile-token. AGENTS.md prohíbe ejecutar el asistente de la skill y pedir tokens de la API: el widget se crea a mano."
+    },
+    {
+      "path": "turnstile-spin/SKILL.md",
+      "rule": "remote-download",
+      "reason": "curl a siteverify de Turnstile (API oficial) dentro del ejemplo de validación del backend; no descarga instrucciones."
+    },
+    {
+      "path": "turnstile-spin/tests/validation.md",
+      "rule": "hosted-prompt",
+      "reason": "Documentación de tests upstream que menciona el prompt alojado. AGENTS.md prohíbe instalar o sincronizar esta skill desde el prompt alojado, clonarla o persistirla."
     },
     {
       "path": "workers-best-practices/references/runtime-patterns.md",

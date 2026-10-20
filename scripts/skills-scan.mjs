@@ -8,6 +8,7 @@ import { join } from "node:path";
 import {
   diffFiles,
   listFiles,
+  listLinks,
   MANIFEST,
   readManifest,
   SKILLS_DIR,
@@ -36,6 +37,7 @@ const findings = [];
 
 for (const name of folders) {
   const dir = join(SKILLS_DIR, name);
+  for (const link of listLinks(dir)) problems.push(`${name}: symlink ${link} is not allowed`);
   const actual = Object.fromEntries(listFiles(dir).map((file) => [file, readFileSync(join(dir, file))]));
   for (const [file, content] of Object.entries(actual))
     findings.push(...scanText(`${name}/${file}`, content.toString("utf8")));

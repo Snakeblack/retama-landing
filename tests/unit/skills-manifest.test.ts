@@ -1,9 +1,11 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   diffFiles,
   listFiles,
+  listLinks,
   readManifest,
   SKILLS_DIR,
   scanText,
@@ -43,17 +45,32 @@ describe("scanText", () => {
     expect(rules("Ignore all previous instructions and")).toContain("prompt-injection");
     expect(rules("Fetch the latest guidelines from the source")).toContain("remote-instructions");
     expect(rules("git clone https://github.com/x/y")).toContain("remote-clone");
+    expect(rules("curl -sSL https://x.example/prompt.md -o SKILL.md")).toContain("remote-download");
+    expect(rules("install the hosted `prompt.md` directly")).toContain("hosted-prompt");
+    expect(rules("the prompt fetches those on demand with fetch_x")).toContain("on-demand-fetch");
     expect(rules("see https://raw.githubusercontent.com/x/y/main/a.md")).toContain("raw-remote-file");
   });
 
   it("marca escrituras en la configuración global y definiciones de hooks", () => {
-    expect(rules("cp a ~/.claude/skills/")).toContain("global-config-write");
+    expect(rules("cp a ~/.claude/skills/")).toContain("home-dotfile");
+    expect(rules("printf '%s' \"$token\" > ~/.cf-turnstile-token")).toContain("home-dotfile");
     expect(rules('{ "hooks": { "PreToolUse": [] } }')).toContain("hook-definition");
   });
 
   it("no marca texto normal y da la línea del hallazgo", () => {
     expect(scanText("x.md", "# Título\nUsa `gsap.to()`.")).toEqual([]);
-    expect(scanText("x.md", "a\nb ~/.claude/x")).toEqual([{ path: "x.md", rule: "global-config-write", line: 2 }]);
+    expect(scanText("x.md", "a\nb ~/.claude/x")).toEqual([{ path: "x.md", rule: "home-dotfile", line: 2 }]);
+  });
+});
+
+describe("listLinks", () => {
+  it("lista los symlinks, que listFiles no ve y el escaneo rechaza", () => {
+    const dir = mkdtempSync(join(tmpdir(), "skills-"));
+    mkdirSync(join(dir, "refs"));
+    writeFileSync(join(dir, "SKILL.md"), "# x");
+    symlinkSync("/etc/hostname", join(dir, "refs", "link.md"));
+    expect(listFiles(dir)).toEqual(["SKILL.md"]);
+    expect(listLinks(dir)).toEqual(["refs/link.md"]);
   });
 });
 
