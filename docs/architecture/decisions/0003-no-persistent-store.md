@@ -21,6 +21,8 @@ El sistema no guarda datos personales. La función de contacto valida, entrega a
 ## Fitness function
 - Un test de la función comprueba que los logs no contienen campos personales.
 - Revisión: no existen bindings de almacenamiento persistente en la configuración de despliegue.
+- Check: `pnpm build && node scripts/fitness.mjs no-persistent-bindings`
+- El test de logs sin campos personales llega con la función de contacto (M3).
 
 ## Review trigger
 Se necesita un CRM o seguimiento de leads dentro del sistema.

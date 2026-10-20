@@ -22,6 +22,7 @@ La CSP se genera en build con hashes de cada script y estilo. Se entrega como ca
 ## Fitness function
 - Un test E2E sobre el build comprueba que las cabeceras están presentes y que no hay violaciones de CSP en consola.
 - Escaneo de cabeceras en el preview.
+- Check: `pnpm test:e2e --grep "ADR 0006"`
 
 ## Review trigger
 Un tercero imprescindible no funciona con la CSP, o la plataforma ofrece nonces sin coste de render.

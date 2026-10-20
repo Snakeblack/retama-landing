@@ -21,6 +21,7 @@ El elemento LCP es siempre HTML o una imagen. La escena se descarga e inicia des
 
 ## Fitness function
 - Lighthouse en CI con el presupuesto de `scenario:perf-mobile`.
+- Check: `pnpm build && pnpm exec lhci autorun`
 - Un test E2E con movimiento reducido y otro con la API gráfica moderna desactivada verifican que hay un fallback visible.
 
 ## Review trigger

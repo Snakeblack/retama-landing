@@ -23,7 +23,8 @@ Un único documento en la raíz define los tokens (color, tipografía, espaciado
 - Lint del documento (estructura y contraste WCAG) en CI.
 - Comprobación de que el tema generado está sincronizado con el documento.
 - Regla de lint de estilos que rechaza valores sueltos.
-- Todo se automatiza como `- Check:` en el slice de diseño.
+- Check: `pnpm design:lint` (lint con contraste y sincronía del tema, desde el slice 1).
+- La regla de lint de estilos llega con el slice de diseño (M1).
 
 ## Review trigger
 La especificación del documento cambia de forma incompatible o se adopta una herramienta de diseño colaborativa.

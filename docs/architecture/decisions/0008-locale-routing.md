@@ -22,6 +22,8 @@ Cada idioma tiene su propia URL: el idioma por defecto en la raíz y el resto ba
 ## Fitness function
 - Un test comprueba la paridad de claves entre idiomas.
 - Un test E2E comprueba hreflang recíproco en todas las páginas del sitemap.
+- Check: `pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts`
+- Check: `pnpm test:e2e --grep "ADR 0008"`
 
 ## Review trigger
 Se añade un mercado que requiere un dominio propio.

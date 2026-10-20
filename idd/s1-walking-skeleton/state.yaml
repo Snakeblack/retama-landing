@@ -138,72 +138,86 @@
     {
       "kind": "adr",
       "id": "0001",
-      "impact": null
+      "impact": "conforms",
+      "reason": "Salida static; todo el texto está en el HTML; E2E con JS desactivado. Se añade su - Check:; el presupuesto de JS por página queda para la primera isla (M2)."
     },
     {
       "kind": "adr",
       "id": "0002",
-      "impact": null
+      "impact": "conforms",
+      "reason": "Un solo Worker de activos estáticos y cero rutas on-demand; fitness on-demand-routes con lista permitida /api/contact."
     },
     {
       "kind": "adr",
       "id": "0003",
-      "impact": null
+      "impact": "conforms",
+      "reason": "session: false e imageService compile evitan los bindings de KV e Images que el adapter provisiona por defecto; fitness no-persistent-bindings."
     },
     {
       "kind": "adr",
       "id": "0004",
-      "impact": null
+      "impact": "conforms",
+      "reason": "Todavía sin escena 3D; el LCP es HTML. Lighthouse CI con 100 ×4 en móvil es puerta obligatoria."
     },
     {
       "kind": "adr",
       "id": "0005",
-      "impact": null
+      "impact": "conforms",
+      "reason": "DESIGN.md único con tokens provisionales; tema de Tailwind generado; design:lint falla con contraste o desincronía. La regla de valores sueltos queda para M1, como dice el ADR."
     },
     {
       "kind": "adr",
       "id": "0006",
-      "impact": null
+      "impact": "conforms",
+      "reason": "CSP con hashes de build entregada como cabecera estática junto a HSTS, nosniff, Referrer-Policy, Permissions-Policy y frame-ancestors none; view transitions nativas; E2E de cabeceras y violaciones."
     },
     {
       "kind": "adr",
       "id": "0007",
-      "impact": null
+      "impact": "conforms",
+      "reason": "Sin scripts de terceros, sin cookies y sin banner; E2E de cero cookies y cero peticiones a otros orígenes."
     },
     {
       "kind": "adr",
       "id": "0008",
-      "impact": null
+      "impact": "conforms",
+      "reason": "es en la raíz y en en /en/; canónica, hreflang recíproco con x-default y sitemap; paridad de claves por tipo y test; sin redirección por idioma."
     },
     {
       "kind": "adr",
       "id": "0009",
-      "impact": null
+      "impact": "conforms",
+      "reason": "CI con lint, tipos, tests, E2E, Lighthouse y auditoría de dependencias; protección de main con esos checks (repo público por decisión del usuario); release-please; previews de Workers Builds."
     },
     {
       "kind": "adr",
       "id": "0010",
-      "impact": null
+      "impact": "conforms",
+      "reason": "Skills fijadas por commit con manifiesto de hashes, test y escaneo en CI; el script de turnstile-spin que descarga instrucciones remotas se excluye."
     },
     {
       "kind": "scenario",
       "id": "brand-impact",
-      "impact": null
+      "impact": "none",
+      "reason": "Tokens y copy provisionales; la dirección de arte es M1 y la portada con impacto M2."
     },
     {
       "kind": "scenario",
       "id": "perf-mobile",
-      "impact": null
+      "impact": "conforms",
+      "reason": "Lighthouse local en móvil: 100 en las 4 categorías y LCP de unos 755 ms en 6 pasadas; CSS inline y 0 KB de JS propio."
     },
     {
       "kind": "scenario",
       "id": "privacy-security",
-      "impact": null
+      "impact": "conforms",
+      "reason": "Sin rastreo ni cookies; CSP estricta y cabeceras activas verificadas por E2E. El formulario llega en M3."
     },
     {
       "kind": "scenario",
       "id": "seo-discovery",
-      "impact": null
+      "impact": "conforms",
+      "reason": "HTML completo sin JS, canónica y hreflang recíprocos, sitemap con alternates, SEO de Lighthouse 100. JSON-LD queda para M4 (roadmap)."
     }
   ],
   "obligations": [
