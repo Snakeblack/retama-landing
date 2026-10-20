@@ -39,8 +39,8 @@ const other = locales.find((candidate) => candidate !== locale) ?? defaultLocale
     <meta name="theme-color" content="#0b0d10" />
   </head>
   <body>
-    <header class="site-header">
-      <a class="brand" href={localizedPath(locale, "/")}>Retama</a>
+    <header class="flex items-center justify-between px-lg py-md">
+      <a class="font-(weight:--font-weight-headline-display) text-on-surface no-underline" href={localizedPath(locale, "/")}>Retama</a>
       <a class="lang-switch" href={localizedPath(other, page)} hreflang={other} lang={other}>
         {t(locale)["nav.switchLabel"]}
       </a>

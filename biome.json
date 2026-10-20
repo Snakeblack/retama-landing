@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!!**/dist", "!!.claude/skills", "!!idd", "!!**/*.astro"]
+    "includes": ["**", "!!**/dist", "!!.claude/skills", "!!idd", "!!**/*.astro", "!!src/styles/theme.css"]
   },
   "formatter": {
     "enabled": true,
@@ -19,6 +19,9 @@
     "rules": {
       "preset": "recommended"
     }
+  },
+  "css": {
+    "parser": { "tailwindDirectives": true }
   },
   "javascript": {
     "formatter": {

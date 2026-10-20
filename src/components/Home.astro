@@ -11,9 +11,9 @@ const copy = t(locale);
 ---
 
 <Base locale={locale} title={copy["meta.title"]} description={copy["meta.description"]}>
-  <section class="hero">
-    <p class="eyebrow">{copy["home.eyebrow"]}</p>
-    <h1>{copy["home.title"]}</h1>
-    <p class="lead">{copy["home.lead"]}</p>
+  <section class="mx-auto max-w-(--spacing-content) px-lg py-2xl">
+    <p class="text-label-sm tracking-label-sm font-(weight:--font-weight-label-sm) text-on-surface-muted uppercase">{copy["home.eyebrow"]}</p>
+    <h1 class="mt-sm mb-md text-5xl leading-[1.1] font-(weight:--font-weight-headline-display) tracking-headline-display sm:text-headline-display">{copy["home.title"]}</h1>
+    <p class="text-body-lg text-neutral">{copy["home.lead"]}</p>
   </section>
 </Base>
