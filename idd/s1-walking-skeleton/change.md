@@ -13,7 +13,7 @@ Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario
 1. [x] Scaffold Astro 7 + adapter Cloudflare, TypeScript estricto, Biome + eslint-plugin-astro, Vitest + Playwright; i18n es/en con paridad de claves; canónica, hreflang + x-default, sitemap; 404 por idioma.
 2. [x] CSP de `security.csp` unificada en `_headers` + resto de cabeceras; `@view-transition` nativo; E2E de cabeceras y CSP sin violaciones; cero cookies.
 3. [x] DESIGN.md mínimo (tokens provisionales) → `@theme` de Tailwind 4; `design:lint` y comprobación de sincronía.
-4. [ ] Skills vendorizadas (ADR 0010) con manifiesto de hashes, test del manifiesto y escaneo de riesgo; `CLAUDE.md`/`AGENTS.md`.
+4. [x] Skills vendorizadas (ADR 0010) con manifiesto de hashes, test del manifiesto y escaneo de riesgo; `CLAUDE.md`/`AGENTS.md`.
 5. [ ] CI de GitHub Actions (lint, typecheck, test, E2E, Lighthouse CI, auditoría de dependencias), Workers Builds, repo público + protección de `main`, release-please con PAT; líneas `- Check:` en los ADRs.
 
 ## Decisions
@@ -38,6 +38,12 @@ Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario
 - Los pesos se aplican con `font-(weight:--font-weight-*)`: Tailwind 4 no genera utilidades `font-*` a partir de `--font-weight-<nombre>` cuando ya existe `--font-<nombre>`.
 - Quedan valores provisionales de Tailwind (`text-5xl`, `leading-[1.1]`) para el titular en móvil; la regla de lint que rechaza valores sueltos llega con el sistema de diseño (M1, ADR 0005).
 - CSS inline (`build.inlineStylesheets: "always"`): unos 8 KB, sin petición que bloquee el render; su hash entra en la CSP.
+- Skills: 20 carpetas de 7 repos fijados a los commits del baseline, descargadas como tarball de GitHub en un directorio aparte del scratchpad y sin ejecutar nada. `manifest.json` guarda origen, commit, licencia, tema, veredicto, archivos añadidos o excluidos y el sha256 de cada archivo. `pnpm skills:scan` y `tests/unit/skills-manifest.test.ts` comprueban los hashes, que no sobre ni falte ningún archivo, una sola fuente por tema y los hallazgos de riesgo sin revisar.
+- Hallazgo que la auditoría de la foundation no vio: el paso 11 de `turnstile-spin` ejecuta `persist-skill.sh`, que clona el HEAD sin fijar de cloudflare/skills, es decir, descarga instrucciones en el momento de uso (lo prohíbe el ADR 0010). Se excluyen el script y su test, se añade la regla de escaneo `remote-clone` y `AGENTS.md` deja `turnstile-spin` solo como consulta.
+- web-interface-guidelines: `command.md` se copia sin tocar (la descarga remota está en `install.sh`, que no se vendoriza) y un `SKILL.md` local adapta a Astro las reglas de React/Next, así el diff con upstream sigue limpio.
+- LICENSE de upstream copiado en cada carpeta (MIT y Apache-2.0 exigen conservar el aviso).
+- `CLAUDE.md` importa `AGENTS.md` (`@AGENTS.md`), que es la fuente única. `.claude/settings.json` fija `TASTE_SKILL_HISTORY` dentro del repo.
+- Las herramientas de escritura convierten las secuencias `\u` en caracteres reales: la regla `invisible-char` y su test se escriben con escapes, y se comprobó que el código del repo no tiene caracteres invisibles.
 - Biome es dueño de JS/TS/JSON/CSS; ESLint solo de `.astro` (soporte experimental en Biome).
 
 ## Evidence

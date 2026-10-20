@@ -1,0 +1,5 @@
+{
+  "env": {
+    "TASTE_SKILL_HISTORY": ".taste-skill/history.json"
+  }
+}
