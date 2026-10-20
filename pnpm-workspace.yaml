@@ -1,0 +1,7 @@
+allowBuilds:
+  esbuild: true
+  workerd: true
+
+# 1.64 pide wrangler ^4.151, más reciente que la antigüedad mínima de pnpm.
+overrides:
+  "@cloudflare/vite-plugin": 1.63.2
