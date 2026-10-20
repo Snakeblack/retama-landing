@@ -20,6 +20,14 @@ export function listFiles(dir) {
     .sort();
 }
 
+/** Symlinks of one skill folder: never hashed or scanned, so never allowed. @param {string} dir */
+export function listLinks(dir) {
+  return readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isSymbolicLink())
+    .map((entry) => relative(dir, join(entry.parentPath, entry.name)))
+    .sort();
+}
+
 /**
  * Compares a skill folder with its manifest entry.
  * @param {Record<string, string>} expected path -> hash from the manifest
@@ -52,10 +60,14 @@ export const RULES = [
     pattern:
       /(fetch|download|load|retrieve|pull)\b[^\n]{0,60}\b(latest|current|fresh)\b[^\n]{0,40}\b(rules|instructions|guidelines|prompt)/i,
   },
-  // Cloning a repository at use time pulls unpinned instructions.
+  // Cloning a repository or downloading a file at use time pulls unpinned content.
   { id: "remote-clone", pattern: /\bgit\b[^\n]*\bclone\b/ },
+  { id: "remote-download", pattern: /\b(curl|wget)\b[^\n]*https?:\/\//i },
+  { id: "hosted-prompt", pattern: /\bhosted\b[^\n]{0,30}\bprompt\b/i },
+  { id: "on-demand-fetch", pattern: /\bfetch\w*\b[^\n]{0,60}\bon demand\b/i },
   { id: "raw-remote-file", pattern: /raw\.githubusercontent\.com|gist\.githubusercontent\.com|pastebin\.com/i },
-  { id: "global-config-write", pattern: /(~|\$HOME|\$\{HOME\})\/\.(claude|config|codex|cursor)\b/ },
+  // Any dotfile in the user's home: global agent config, credentials, caches.
+  { id: "home-dotfile", pattern: /(~|\$HOME|\$\{HOME\})\/\.[\w.-]+/ },
   { id: "hook-definition", pattern: /"hooks"\s*:\s*\{|PreToolUse|PostToolUse|UserPromptSubmit/ },
 ];
 

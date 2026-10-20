@@ -33,8 +33,10 @@ plataforma → `wrangler`, `workers-best-practices`, `turnstile-spin`. La accesi
 - Son copias fijadas a un commit y auditadas; `manifest.json` registra origen, commit, licencia, veredicto y el
   hash de cada archivo. `pnpm skills:scan` lo comprueba en CI junto con los patrones de riesgo.
 - Nunca descargues, clones ni "actualices" una skill en el momento de usarla, ni la copies a `~/.claude`.
-- `turnstile-spin` es solo de consulta: no ejecutes sus scripts (usan un token de la API de Cloudflare) ni su
-  paso 11 de persistencia. El widget de Turnstile se crea a mano en el dashboard.
+- `turnstile-spin` es solo de consulta: no ejecutes sus scripts ni su asistente (usan un token de la API de
+  Cloudflare), no pidas ni guardes tokens (tampoco en `~/.cf-turnstile-token`), y no hagas su paso 11: ni
+  persistirla ni instalar o sincronizar su prompt alojado (`developers.cloudflare.com/turnstile/spin/prompt.md`),
+  que sustituiría el `SKILL.md` auditado. El widget de Turnstile se crea a mano en el dashboard.
 - `taste-skill` guarda su historial en `.taste-skill/` (`TASTE_SKILL_HISTORY`, ignorado por git).
 - Para actualizar una skill: descárgala en un directorio aparte fijando el commit, revisa el diff, actualiza
   `manifest.json` (commit, veredicto y `reviewed`), ejecuta `node scripts/skills-scan.mjs --rehash` y
