@@ -1,0 +1,39 @@
+# IDD configuration of this project. Approved by the user on 2026-10-21 (foundation).
+# The checks run once the S1 walking skeleton creates the scaffold (docs/roadmap.md).
+
+# Team profile: one senior maintainer working with agents (docs/product/brief.md).
+team:
+  size: solo
+  experience: senior
+
+# The checks `ospec check` runs, in order.
+checks:
+  lint: pnpm lint
+  typecheck: pnpm typecheck
+  test: pnpm test
+  e2e: pnpm test:e2e
+  design: pnpm design:lint
+
+# Contract documents: the design system, the i18n keys and the contact endpoint.
+contracts:
+  documents:
+    - DESIGN.md
+    - src/i18n/**
+    - src/pages/api/**
+
+# Impact patterns for IDD signals. No persistent data by ADR 0003.
+impact:
+  public_contract:
+    - src/pages/api/**
+    - src/i18n/**
+    - astro.config.*
+    - public/robots.txt
+    - DESIGN.md
+  security_boundary:
+    - src/pages/api/**
+    - src/server/**
+    - public/_headers
+    - wrangler.jsonc
+    - .github/workflows/**
+    - .claude/skills/**
+  persistent_data: []

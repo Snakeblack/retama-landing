@@ -1,0 +1,290 @@
+{
+  "schema": "ospec-knowledge-map/v1",
+  "profile": "product",
+  "slots": [
+    {
+      "id": "business.problem",
+      "dimension": "business",
+      "state": "confirmed",
+      "decisions": [
+        "system-boundaries"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 1 (2026-10-21)"
+      }
+    },
+    {
+      "id": "business.goals",
+      "dimension": "business",
+      "state": "confirmed",
+      "decisions": [
+        "test-strategy"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 1 (2026-10-21)"
+      }
+    },
+    {
+      "id": "business.constraints",
+      "dimension": "business",
+      "state": "confirmed",
+      "decisions": [
+        "trust-boundaries",
+        "technology-choice"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 1 (2026-10-21)"
+      }
+    },
+    {
+      "id": "functional.actors",
+      "dimension": "functional",
+      "state": "confirmed",
+      "decisions": [
+        "system-boundaries"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 6 (2026-10-21)"
+      }
+    },
+    {
+      "id": "functional.capabilities",
+      "dimension": "functional",
+      "state": "confirmed",
+      "decisions": [
+        "system-boundaries"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 6 (2026-10-21)"
+      }
+    },
+    {
+      "id": "functional.exclusions",
+      "dimension": "functional",
+      "state": "confirmed",
+      "decisions": [
+        "system-boundaries"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 6 (2026-10-21)"
+      }
+    },
+    {
+      "id": "team.shape",
+      "dimension": "team",
+      "state": "confirmed",
+      "decisions": [
+        "deployment-topology",
+        "technology-choice"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 2 (2026-10-21)"
+      }
+    },
+    {
+      "id": "team.production-owner",
+      "dimension": "team",
+      "state": "confirmed",
+      "decisions": [
+        "operability"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 2 (2026-10-21)"
+      }
+    },
+    {
+      "id": "quality.drivers",
+      "dimension": "quality",
+      "state": "confirmed",
+      "decisions": [
+        "system-boundaries",
+        "deployment-topology"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 3 (2026-10-21)"
+      }
+    },
+    {
+      "id": "architecture.boundaries",
+      "dimension": "architecture",
+      "state": "confirmed",
+      "decisions": [
+        "system-boundaries",
+        "integration-style"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 4 (2026-10-21)"
+      }
+    },
+    {
+      "id": "architecture.data",
+      "dimension": "architecture",
+      "state": "confirmed",
+      "decisions": [
+        "data-ownership"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 4 (2026-10-21)"
+      }
+    },
+    {
+      "id": "architecture.integration",
+      "dimension": "architecture",
+      "state": "confirmed",
+      "decisions": [
+        "integration-style",
+        "contract-evolution"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 4 (2026-10-21)"
+      }
+    },
+    {
+      "id": "architecture.deployment",
+      "dimension": "architecture",
+      "state": "confirmed",
+      "decisions": [
+        "deployment-topology"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 4 (2026-10-21)"
+      }
+    },
+    {
+      "id": "architecture.trust",
+      "dimension": "architecture",
+      "state": "confirmed",
+      "decisions": [
+        "trust-boundaries"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 9 (2026-10-21)"
+      }
+    },
+    {
+      "id": "technology.stack",
+      "dimension": "technology",
+      "state": "confirmed",
+      "decisions": [
+        "technology-choice"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 7 (2026-10-21)"
+      }
+    },
+    {
+      "id": "technology.licenses",
+      "dimension": "technology",
+      "state": "confirmed",
+      "decisions": [
+        "technology-choice"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 7 (2026-10-21)"
+      }
+    },
+    {
+      "id": "operation.observability",
+      "dimension": "operation",
+      "state": "confirmed",
+      "decisions": [
+        "operability"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 8 (2026-10-21)"
+      }
+    },
+    {
+      "id": "operation.backup",
+      "dimension": "operation",
+      "state": "confirmed",
+      "decisions": [
+        "data-ownership",
+        "operability"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 8 (2026-10-21)"
+      }
+    },
+    {
+      "id": "delivery.environments",
+      "dimension": "delivery",
+      "state": "confirmed",
+      "decisions": [
+        "delivery-target",
+        "deployment-topology"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 5 (2026-10-21)"
+      }
+    },
+    {
+      "id": "delivery.versioning",
+      "dimension": "delivery",
+      "state": "confirmed",
+      "decisions": [
+        "contract-evolution",
+        "delivery-target"
+      ],
+      "source": {
+        "kind": "user",
+        "ref": "Usuario, ronda 5 (2026-10-21)"
+      }
+    }
+  ],
+  "quality_scenarios": [
+    {
+      "id": "perf-mobile",
+      "origin": "Visitante en móvil de gama media con red 4G",
+      "stimulus": "Abre cualquier página de la landing por primera vez",
+      "environment": "Producción, caché fría, sin WebGPU disponible",
+      "artifact": "Páginas estáticas y escena 3D",
+      "response": "El contenido principal se pinta antes que el 3D; la escena se carga diferida y degrada a WebGL2 o imagen estática sin bloquear la interacción",
+      "measure": "Lighthouse 100 en todas las categorías (móvil); LCP <= 1,8 s, INP <= 200 ms, CLS <= 0,1 en p75 de campo",
+      "measure_source": "Usuario, ronda 3 (2026-10-21)"
+    },
+    {
+      "id": "seo-discovery",
+      "origin": "Rastreador de buscador o motor de IA",
+      "stimulus": "Rastrea la web en cualquier idioma",
+      "environment": "Producción",
+      "artifact": "HTML, metadatos, sitemap, datos estructurados",
+      "response": "Recibe HTML semántico completo sin JS, canonical y hreflang recíprocos, sitemap por idioma y datos estructurados de la organización y sus servicios"
+    },
+    {
+      "id": "brand-impact",
+      "origin": "Responsable de decisión de una empresa",
+      "stimulus": "Llega a la portada",
+      "environment": "Escritorio o móvil, con o sin preferencia de movimiento reducido",
+      "artifact": "Sistema de diseño y experiencia visual",
+      "response": "Percibe una marca elegante, seria y de vanguardia mediante ayudas visuales con poco texto; con movimiento reducido la experiencia sigue siendo completa sin animación"
+    },
+    {
+      "id": "privacy-security",
+      "origin": "Visitante de la UE o atacante externo",
+      "stimulus": "Navega, rechaza cookies o envía el formulario de contacto (o lo abusa)",
+      "environment": "Producción",
+      "artifact": "Analítica, formulario, cabeceras",
+      "response": "No se carga ningún rastreador con cookies sin consentimiento previo; CSP estricta y cabeceras de seguridad activas; el formulario valida en servidor y filtra spam y abuso"
+    }
+  ]
+}

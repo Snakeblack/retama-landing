@@ -1,0 +1,26 @@
+# ospec local session state
+.ospec/
+
+# dependencies and build output
+node_modules/
+dist/
+.astro/
+.wrangler/
+
+# secrets and local env
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# test and audit artifacts
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+.taste-skill/
+
+# OS and editors
+.DS_Store
+*.log
