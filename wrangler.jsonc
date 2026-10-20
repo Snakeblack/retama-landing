@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The Astro adapter writes the deploy config (entrypoint and assets directory)
+  // into dist/; this file only holds what the adapter does not set.
+  "name": "retama-landing",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "html_handling": "force-trailing-slash",
+    // Serves the nearest 404.html walking up the path: /en/* gets /en/404.html.
+    "not_found_handling": "404-page"
+  }
+}

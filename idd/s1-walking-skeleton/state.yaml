@@ -1,0 +1,261 @@
+{
+  "schema": "idd-state/v1",
+  "change": "s1-walking-skeleton",
+  "mode": "idd",
+  "status": "open",
+  "intent": {
+    "request": "S1 — Walking skeleton (docs/roadmap.md): scaffold de Astro 7, @astrojs/cloudflare y wrangler.jsonc; pnpm y Corepack, Node 24, TypeScript estricto; Biome y eslint-plugin-astro, Vitest y Playwright; rutas i18n / y /en/ con paridad de claves; canónica, hreflang y sitemap; security.csp + _headers con todas las cabeceras; @view-transition nativo; DESIGN.md mínimo (tokens provisionales) → @theme de Tailwind; skills vendorizadas con su manifiesto y el escaneo; CLAUDE.md/AGENTS.md del repo; CI en GitHub Actions: lint, typecheck, test, E2E y Lighthouse CI; Workers Builds con preview por rama, producción en main y protección de rama; release-please.",
+    "kind": "feature",
+    "summary": "S1 walking skeleton: scaffold Astro 7 + Cloudflare Workers, i18n es/en, SEO base, CSP y cabeceras, view transitions nativas, DESIGN.md mínimo, skills vendorizadas, CI con puertas, previews y release-please",
+    "acceptance": "La URL de producción sirve / (es) y /en/ con canónica, hreflang recíproco y sitemap; Lighthouse CI da 100 en las 4 categorías; las cabeceras y la CSP están verificadas por E2E; un PR de prueba genera su preview; los ADRs con comprobación automatizable tienen líneas - Check:"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "docs/product/functional-scope.md",
+          "line": 47
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Acepta copy y tokens provisionales escritos por el agente para la página mínima es/en (definitivos en M1/M2)?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0008-locale-routing.md",
+          "line": 15
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "docs/roadmap.md",
+          "line": 26
+        }
+      },
+      {
+        "category": "errors",
+        "question": "¿Página 404 localizada (es en raíz, en bajo /en/) servida por not_found_handling=404-page de Workers?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".claude/skills/manifest.json",
+      ".claude/skills/taste-skill/SKILL.md",
+      ".github/workflows/ci.yml",
+      ".github/workflows/release-please.yml",
+      ".node-version",
+      ".release-please-manifest.json",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "DESIGN.md",
+      "astro.config.mjs",
+      "biome.json",
+      "docs/architecture/decisions/0001-static-first-with-islands.md",
+      "eslint.config.js",
+      "lighthouserc.json",
+      "package.json",
+      "playwright.config.ts",
+      "pnpm-lock.yaml",
+      "public/_headers",
+      "release-please-config.json",
+      "scripts/design-theme.mjs",
+      "scripts/skills-scan.mjs",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/i18n/index.ts",
+      "src/layouts/Base.astro",
+      "src/lib/seo.ts",
+      "src/pages/404.astro",
+      "src/pages/en/404.astro",
+      "src/pages/en/index.astro",
+      "src/pages/index.astro",
+      "src/styles/global.css",
+      "src/styles/theme.css",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/i18n.test.ts",
+      "tests/unit/seo.test.ts",
+      "tests/unit/skills-manifest.test.ts",
+      "tsconfig.json",
+      "vitest.config.ts",
+      "wrangler.jsonc"
+    ],
+    "work_units": 5,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 5 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs and 3 more (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .claude/skills/manifest.json and 4 more (matches .claude/skills/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0002, 0003, 0004, 0005, 0006, 0007, 0008, 0009, 0010 and quality scenario brand-impact, perf-mobile, privacy-security, seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0007",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0010",
+      "impact": null
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": null
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": null
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": null
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": null
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "todo lo recomendado: copy y tokens provisionales del agente (definitivos en M1/M2); 404 localizada es en raíz y en /en/ con not_found_handling 404-page",
+      "source": "user"
+    }
+  ],
+  "evidence": [],
+  "base": "aa7914c84780a93d46c8405c99a41a1c8ba2ac2b",
+  "assumptions": [
+    "Usuario (2026-10-21): hacer público el repo para disponer de protección de rama gratis (GitHub Free privado devuelve 403)",
+    "Usuario (2026-10-21): TypeScript 6.0.3 por el peer ^5||^6 de @astrojs/check 0.9.11",
+    "Usuario (2026-10-21): Lighthouse CI y E2E de cabeceras contra el build con wrangler dev en CI como puerta; escaneo de cabeceras del preview aparte, no bloqueante",
+    "Usuario (2026-10-21): release-please con PAT fine-grained limitado al repo como secreto; activar Allow GitHub Actions to create pull requests",
+    "Usuario (2026-10-21): entrega en PRs encadenados por unidad de trabajo (scaffold+i18n+SEO, CSP+cabeceras+VT, DESIGN.md+Tailwind, skills+manifiesto+escaneo, CI+Workers Builds+release-please)",
+    "Usuario (2026-10-21): packageManager pnpm@12 + .node-version 24 + pnpm/action-setup, sin depender de Corepack (Node 25+ no lo incluye)",
+    "Agente: HSTS max-age=63072000; includeSubDomains sin preload hasta dominio definitivo (M6); trailingSlash always; selector es/en como enlace a la página equivalente",
+    "Pendiente del usuario antes del despliegue: uso comercial del plan gratis de Cloudflare, cuenta y subdominio workers.dev, conexión de Workers Builds en el dashboard"
+  ]
+}
