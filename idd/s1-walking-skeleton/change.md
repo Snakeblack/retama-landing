@@ -11,7 +11,7 @@ Acceptance: La URL de producción sirve / (es) y /en/ con canónica, hreflang re
 Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario, 2026-10-21):
 
 1. [x] Scaffold Astro 7 + adapter Cloudflare, TypeScript estricto, Biome + eslint-plugin-astro, Vitest + Playwright; i18n es/en con paridad de claves; canónica, hreflang + x-default, sitemap; 404 por idioma.
-2. [ ] CSP de `security.csp` llevada a `_headers` por ruta + resto de cabeceras; `@view-transition` nativo; E2E de cabeceras y CSP sin violaciones; cero cookies.
+2. [x] CSP de `security.csp` llevada a `_headers` por ruta + resto de cabeceras; `@view-transition` nativo; E2E de cabeceras y CSP sin violaciones; cero cookies.
 3. [ ] DESIGN.md mínimo (tokens provisionales) → `@theme` de Tailwind 4; `design:lint` y comprobación de sincronía.
 4. [ ] Skills vendorizadas (ADR 0010) con manifiesto de hashes, test del manifiesto y escaneo de riesgo; `CLAUDE.md`/`AGENTS.md`.
 5. [ ] CI de GitHub Actions (lint, typecheck, test, E2E, Lighthouse CI, auditoría de dependencias), Workers Builds, repo público + protección de `main`, release-please con PAT; líneas `- Check:` en los ADRs.
@@ -31,6 +31,8 @@ Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario
 - `security.csp` de Astro solo emite `<meta http-equiv>`: el ADR 0006 exige cabecera (y `frame-ancestors` no funciona en meta), así que el post-build copiará la política de cada página a `_headers` (unidad 2).
 - E2E y Lighthouse contra `wrangler dev -c dist/client/wrangler.json` (workerd aplica `_headers`); `astro preview` en Astro 7 pasa a segundo plano fuera de un TTY.
 - `SITE_URL` fija el origen de canónicas y sitemap; el valor por defecto `https://retama-landing.workers.dev` se sustituye por la URL real cuando el usuario dé el subdominio.
+- CSP como cabecera: `scripts/postbuild.mjs` une las políticas `<meta>` de todas las páginas (sin `unsafe-inline`/`unsafe-eval`, el build falla si alguna página no tiene CSP) y añade `frame-ancestors 'none'`. Es una sola política para todo el sitio porque Cloudflare concatena con comas los valores repetidos, y eso serían varias políticas; la meta de cada página sigue limitándola a sus propios hashes.
+- `public/_headers` tiene un único bloque `/*` con el marcador `__CSP__`: verificado con E2E que un segundo bloque `/*` sustituye al primero en workerd y borra las demás cabeceras.
 - Biome es dueño de JS/TS/JSON/CSS; ESLint solo de `.astro` (soporte experimental en Biome).
 
 ## Evidence

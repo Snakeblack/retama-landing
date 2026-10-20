@@ -51,3 +51,16 @@ h1 {
   font-size: 1.25rem;
   color: #c9ced6;
 }
+
+/* ADR 0006: native cross-document view transitions, no client router. */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
