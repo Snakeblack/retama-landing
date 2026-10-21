@@ -1,0 +1,349 @@
+{
+  "schema": "idd-state/v1",
+  "change": "m2-hero-wind",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "no me gusta el efecto hover, me gustaria que se moviese como con más viento al acercar el hover",
+    "kind": "feature",
+    "summary": "El cursor sopla viento sobre la escena en vez de apartar los tallos",
+    "acceptance": "En una pantalla con puntero, los tallos cercanos al cursor se mecen con un viento más fuerte y rápido, sin inclinarse lejos de él; al salir el cursor el viento vuelve poco a poco a la brisa; táctil, movimiento reducido y póster no cambian"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "request",
+          "text": "que se moviese como con más viento al acercar el hover"
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/scene-three.ts",
+          "line": 140
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/scene-three.ts",
+          "line": 171
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 288
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/scene.ts",
+          "line": 156
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/scene.ts",
+          "line": 146
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/scene-worker.ts",
+          "line": 33
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/scripts/scene-three.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0004, 0005",
+      "source": "declaration"
+    },
+    {
+      "id": "untested-product",
+      "reason": "product code without a test: touches src/scripts/scene-three.ts",
+      "source": "diff"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "Solo cambia el desplazamiento del shader de la escena 3D; niveles, póster, carga diferida y worker quedan igual"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md (Motion and 3D) describe el nuevo viento del cursor; ningún token cambia"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint pasa tras editar DESIGN.md (solo cambia una frase de Motion and 3D); src/styles/theme.css sin tocar; lint de estilos verde en pnpm lint",
+      "recorded_at": "2026-10-21T18:53:21.188Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "boundary-tests",
+      "signal": "untested-product",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T18:55:17.538Z",
+      "detail": {
+        "tree": "sha256:c1fdc16b18218ea93be137a2070f47163d78634e7e61d8851c4edea6cd29f896",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T18:55:17.538Z",
+      "detail": {
+        "refs": [
+          "adr:0004 conforms",
+          "adr:0005 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:c1fdc16b18218ea93be137a2070f47163d78634e7e61d8851c4edea6cd29f896",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T18:57:53.365Z",
+      "detail": {
+        "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+        "runs": [
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "tested-check",
+      "obligation": "boundary-tests",
+      "recorded_at": "2026-10-21T18:57:53.365Z",
+      "detail": {
+        "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+        "run": "run-7",
+        "has_test": true
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T18:57:53.365Z",
+      "detail": {
+        "refs": [
+          "adr:0004 conforms",
+          "adr:0005 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+        "fitness": [
+          "run-12"
+        ]
+      }
+    }
+  ],
+  "base": "ab313d64a38ed675109008410b2e29cdd03c1212",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0017248124d4e8cb8d6685af5f588377d5a4c1027ecb5cea70cfa0171dd0dfae",
+      "tree": "sha256:c1fdc16b18218ea93be137a2070f47163d78634e7e61d8851c4edea6cd29f896",
+      "recorded_at": "2026-10-21T18:55:17.538Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:bb12c3809edc53048a8f037f5105121b2495f410d7b5b26adb75b299d3c9bf10",
+      "tree": "sha256:c1fdc16b18218ea93be137a2070f47163d78634e7e61d8851c4edea6cd29f896",
+      "recorded_at": "2026-10-21T18:55:17.538Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:da105a2e415058c884e616e79b1604db6616e9615c2e81052f53e9c4da5d19a1",
+      "tree": "sha256:c1fdc16b18218ea93be137a2070f47163d78634e7e61d8851c4edea6cd29f896",
+      "recorded_at": "2026-10-21T18:55:17.538Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:2d08aee952964a1fe4e74b13182b0665e6d18afb00b016a95cc6548435157556",
+      "tree": "sha256:c1fdc16b18218ea93be137a2070f47163d78634e7e61d8851c4edea6cd29f896",
+      "recorded_at": "2026-10-21T18:55:17.538Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:c1fdc16b18218ea93be137a2070f47163d78634e7e61d8851c4edea6cd29f896",
+      "recorded_at": "2026-10-21T18:55:17.538Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:5843b833f96787cb2a35549af6cf33897f22fef52fff1d5a9f7ca53462401bd0",
+      "tree": "sha256:c1fdc16b18218ea93be137a2070f47163d78634e7e61d8851c4edea6cd29f896",
+      "recorded_at": "2026-10-21T18:55:17.538Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:1708f6262360ab179c8d41385363f7e3fc61d09e96a78e6d467580c98b777634",
+      "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+      "recorded_at": "2026-10-21T18:57:53.365Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:fefc209c15a83655341de2b590782632130efc266311ddb3f4b2bacbce33750c",
+      "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+      "recorded_at": "2026-10-21T18:57:53.365Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:593236725f57b6e5a48d4729953629e5f79ce1c81b7812f02db4f6bc206a57c2",
+      "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+      "recorded_at": "2026-10-21T18:57:53.365Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:4b91deb8bc36eab4d743efdf991fd8ffb27ced481a348519ca1f44a70f0063ac",
+      "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+      "recorded_at": "2026-10-21T18:57:53.365Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+      "recorded_at": "2026-10-21T18:57:53.365Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:8cffa809079a5d6411275ef63e905bb730837b9e191f70edce774d9ecbe343f8",
+      "tree": "sha256:8efce7b17ecdba477b549fb691b2cbeb9a4e82a11b35eabcf89f20b1873f068d",
+      "recorded_at": "2026-10-21T18:57:53.365Z"
+    }
+  ],
+  "closed_at": "2026-10-21T18:57:55.784Z"
+}

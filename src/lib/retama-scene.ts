@@ -9,6 +9,14 @@ export const GROW_STEMS_START = 0.5;
 // The widest angle a stroke leans out of the picture plane, in radians.
 const LEAN = 0.85;
 
+/**
+ * How hard the pointer's wind blows on the stems, from 0 to 1, after dt seconds: it rises in about a second while the
+ * pointer is over the scene and dies down over about two once it leaves, like a gust passing.
+ */
+export function stormForce(force: number, blowing: boolean, dt: number): number {
+  return force + ((blowing ? 1 : 0) - force) * Math.min(1, dt * (blowing ? 3 : 1.5));
+}
+
 export interface PlantPoint {
   /** x as in the poster, y up from the ground, z towards the viewer. */
   position: [x: number, y: number, z: number];
