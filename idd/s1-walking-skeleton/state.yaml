@@ -287,7 +287,7 @@
       "signal": "always",
       "status": "satisfied",
       "evidence": [
-        "ev-18"
+        "ev-21"
       ]
     },
     {
@@ -301,16 +301,14 @@
       "signal": "public-contract",
       "status": "satisfied",
       "evidence": [
-        "ev-19"
+        "ev-22"
       ]
     },
     {
       "id": "trust-review",
       "signal": "security-boundary",
-      "status": "satisfied",
-      "evidence": [
-        "ev-17"
-      ]
+      "status": "pending",
+      "evidence": []
     },
     {
       "id": "adr-impact-declaration",
@@ -323,10 +321,8 @@
     {
       "id": "migration-compat-and-test",
       "signal": "persistent-data",
-      "status": "satisfied",
-      "evidence": [
-        "ev-20"
-      ]
+      "status": "pending",
+      "evidence": []
     }
   ],
   "gates": [
@@ -342,6 +338,11 @@
       "reason": "3 of 3 trust reviews used: ospec check opens the review-limit gate, and only the person's answer authorizes one more",
       "answer": "si autorizo lo que recomiendas",
       "source": "user"
+    },
+    {
+      "id": "review-limit",
+      "status": "open",
+      "reason": "4 of 4 trust reviews used: ospec check opens the review-limit gate, and only the person's answer authorizes one more"
     }
   ],
   "evidence": [
@@ -677,6 +678,47 @@
         "tree": "sha256:65530a060446a1043530ddfc87e3ab80239b69808bfb6b7f815a705e15b32232",
         "plan": "No hay datos persistentes que migrar: el sistema no tiene almacén (ADR 0003) y la señal viene de writeFile en herramientas de desarrollo (skills vendorizadas, post-build, design-check) que solo escriben artefactos de build. El comando demuestra que ni wrangler.jsonc ni el wrangler.json generado declaran bindings persistentes. Rollback: revertir el commit; no hay esquema ni datos."
       }
+    },
+    {
+      "id": "ev-21",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T10:13:20.428Z",
+      "detail": {
+        "tree": "sha256:5fbfff2bb512c7bb0ee0ec162ffbe452c7e30196b8ca3744055835a0e0631459",
+        "runs": [
+          "run-31",
+          "run-32",
+          "run-33",
+          "run-34",
+          "run-35"
+        ]
+      }
+    },
+    {
+      "id": "ev-22",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T10:13:20.428Z",
+      "detail": {
+        "tree": "sha256:5fbfff2bb512c7bb0ee0ec162ffbe452c7e30196b8ca3744055835a0e0631459",
+        "check": "ev-21",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/i18n/index.ts"
+        ],
+        "tests": [
+          ".claude/skills/turnstile-spin/tests/validation.md",
+          "tests/e2e/security.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/csp.test.ts",
+          "tests/unit/i18n.test.ts",
+          "tests/unit/seo.test.ts",
+          "tests/unit/skills-manifest.test.ts"
+        ]
+      }
     }
   ],
   "base": "aa7914c84780a93d46c8405c99a41a1c8ba2ac2b",
@@ -975,6 +1017,56 @@
       "output_sha256": "sha256:0aef8bf957a13420f090b35ed6424bb477695825be80cc1af0bd996d1a5a22ee",
       "tree": "sha256:65530a060446a1043530ddfc87e3ab80239b69808bfb6b7f815a705e15b32232",
       "recorded_at": "2026-10-21T09:29:36.764Z"
+    },
+    {
+      "id": "run-31",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:df7257db25d0ae96908c7d433db360374361a5d859c1148afc4910c2cb5a949c",
+      "tree": "sha256:5fbfff2bb512c7bb0ee0ec162ffbe452c7e30196b8ca3744055835a0e0631459",
+      "recorded_at": "2026-10-21T10:13:20.428Z"
+    },
+    {
+      "id": "run-32",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:ac86205e6114464c9f8cf2db254139e859f0bbbc3f5db62a951b2b1a2cb82224",
+      "tree": "sha256:5fbfff2bb512c7bb0ee0ec162ffbe452c7e30196b8ca3744055835a0e0631459",
+      "recorded_at": "2026-10-21T10:13:20.428Z"
+    },
+    {
+      "id": "run-33",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:c2c6f800105c10c0de063a17c1155a4f935c4d9e7eba0d73a191598e3bcb3264",
+      "tree": "sha256:5fbfff2bb512c7bb0ee0ec162ffbe452c7e30196b8ca3744055835a0e0631459",
+      "recorded_at": "2026-10-21T10:13:20.428Z"
+    },
+    {
+      "id": "run-34",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:e1f341bcf0a2828776f53bf6c5dd8630c162c31be3dd1b1a15330817e6e260d0",
+      "tree": "sha256:5fbfff2bb512c7bb0ee0ec162ffbe452c7e30196b8ca3744055835a0e0631459",
+      "recorded_at": "2026-10-21T10:13:20.428Z"
+    },
+    {
+      "id": "run-35",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:83f2c1d94327d15235a60607efb4da220309bd1838a0b369935b2a9df77eab44",
+      "tree": "sha256:5fbfff2bb512c7bb0ee0ec162ffbe452c7e30196b8ca3744055835a0e0631459",
+      "recorded_at": "2026-10-21T10:13:20.428Z"
     }
   ],
   "reviews": [

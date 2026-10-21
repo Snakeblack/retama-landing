@@ -4,6 +4,9 @@
   // into dist/; this file only holds what the adapter does not set.
   "name": "retama-landing",
   "compatibility_date": "2026-10-01",
+  // Each branch Preview gets <preview>-retama-landing.<subdomain>.workers.dev.
+  // wrangler deploy applies it, so it lives here and not in the dashboard.
+  "preview_urls": true,
   "assets": {
     "html_handling": "force-trailing-slash",
     // Serves the nearest 404.html walking up the path: /en/* gets /en/404.html.
