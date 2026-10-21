@@ -5,16 +5,15 @@ interface Props {
   locale: Locale;
   /** The header's switch carries the lang-switch hook; its copy inside the chapter index does not. */
   primary?: boolean;
-  class?: string;
 }
 
-const { locale, primary = false, class: className } = Astro.props;
+const { locale, primary = false } = Astro.props;
 const page = pathWithoutLocale(Astro.url.pathname);
 ---
 
 <!-- DESIGN.md Layout: the language switch, both codes in a fixed order. The current one is plain ink; the other links
      to the same page in its language, and says so in full to assistive technology. -->
-<span class:list={["flex items-center gap-xs type-small text-on-surface-muted", className]}>
+<span class="flex items-center gap-xs type-small text-on-surface-muted">
   {
     locales.map((code, index) => (
       <>

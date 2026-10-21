@@ -1,0 +1,311 @@
+{
+  "schema": "idd-state/v1",
+  "change": "desktop-nav-right",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "si hazlo (pasar el menú de escritorio a la derecha, junto a ES / EN)",
+    "kind": "feature",
+    "summary": "En escritorio los enlaces de capítulos pasan a la derecha, junto a ES / EN; el wordmark queda solo a la izquierda",
+    "acceptance": "Desde md el wordmark queda a la izquierda y los enlaces Servicios, Sectores y Método van a la derecha junto al selector ES / EN; en el móvil y en la 404 la cabecera no cambia; DESIGN.md lo describe y ospec check pasa"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 30
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/layouts/Base.astro",
+          "line": 52
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "pasar el menú de escritorio a la derecha"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 35
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 250
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 258
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/LangSwitch.astro",
+      "src/layouts/Base.astro",
+      "tests/e2e/header.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0005, 0006",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Solo cambia la colocación con utilidades de Tailwind sin valores; DESIGN.md describe la cabecera y design:lint está limpio"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin style ni manejadores inline"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint limpio tras mover los enlaces (mr-auto en el wordmark)",
+      "recorded_at": "2026-10-21T21:28:57.542Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T21:29:49.809Z",
+      "detail": {
+        "refs": [
+          "adr:0005 conforms",
+          "adr:0006 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:7dc7fd3715226f6ea18cdb4189e5ba7c83e5191fc710cb46fd3b05e44661e501",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T21:31:34.339Z",
+      "detail": {
+        "tree": "sha256:495225e3b4e7fbfbd4323b8d0bf4a36ef2ca5437368b635a420246a6182d5042",
+        "runs": [
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T21:31:34.339Z",
+      "detail": {
+        "refs": [
+          "adr:0005 conforms",
+          "adr:0006 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:495225e3b4e7fbfbd4323b8d0bf4a36ef2ca5437368b635a420246a6182d5042",
+        "fitness": [
+          "run-12"
+        ]
+      }
+    }
+  ],
+  "base": "763769403ac2bb1e1be21b2da3cd33892aa79591",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:4f25659a4db503b1de30625e49e1043bd63d507066d6cd76de892b9048433862",
+      "tree": "sha256:7dc7fd3715226f6ea18cdb4189e5ba7c83e5191fc710cb46fd3b05e44661e501",
+      "recorded_at": "2026-10-21T21:29:49.809Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:351db1e9250913d3dcfc41d8601454a5f2e2ebffa60255101dd468c3504c6cbe",
+      "tree": "sha256:7dc7fd3715226f6ea18cdb4189e5ba7c83e5191fc710cb46fd3b05e44661e501",
+      "recorded_at": "2026-10-21T21:29:49.809Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:bf4ae2b8548fd732b9692825dfcb90b3cf626f7bd27e3d1e7da8c9343963eba4",
+      "tree": "sha256:7dc7fd3715226f6ea18cdb4189e5ba7c83e5191fc710cb46fd3b05e44661e501",
+      "recorded_at": "2026-10-21T21:29:49.809Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:79e02ba48a7757b9123d7b8c7220ed0ec188bf48a8ef814fc4dc141f015739ea",
+      "tree": "sha256:7dc7fd3715226f6ea18cdb4189e5ba7c83e5191fc710cb46fd3b05e44661e501",
+      "recorded_at": "2026-10-21T21:29:49.809Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:7dc7fd3715226f6ea18cdb4189e5ba7c83e5191fc710cb46fd3b05e44661e501",
+      "recorded_at": "2026-10-21T21:29:49.809Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:86ac8af54e7ef03b9470bf92b7ed4047d39b88e15d4f41097cd72d7e70977523",
+      "tree": "sha256:7dc7fd3715226f6ea18cdb4189e5ba7c83e5191fc710cb46fd3b05e44661e501",
+      "recorded_at": "2026-10-21T21:29:49.809Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:c9e1e9d40c2cc50c4da05662909660cbaf218374af994961dd470d84d2bc28d7",
+      "tree": "sha256:495225e3b4e7fbfbd4323b8d0bf4a36ef2ca5437368b635a420246a6182d5042",
+      "recorded_at": "2026-10-21T21:31:34.339Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:f485cc68be93e3745c2686a975f9bf5e009a774c66451dc3604b7cb6ce31c4f7",
+      "tree": "sha256:495225e3b4e7fbfbd4323b8d0bf4a36ef2ca5437368b635a420246a6182d5042",
+      "recorded_at": "2026-10-21T21:31:34.339Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:5f1dfbb9d32bd674f24a7411096962216585ca9257b8896592e7f9a189c1de60",
+      "tree": "sha256:495225e3b4e7fbfbd4323b8d0bf4a36ef2ca5437368b635a420246a6182d5042",
+      "recorded_at": "2026-10-21T21:31:34.339Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:bf22601e00de09fb2d4fd3c832d67143c7a4d2b20b83257391be68241e9e8857",
+      "tree": "sha256:495225e3b4e7fbfbd4323b8d0bf4a36ef2ca5437368b635a420246a6182d5042",
+      "recorded_at": "2026-10-21T21:31:34.339Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:495225e3b4e7fbfbd4323b8d0bf4a36ef2ca5437368b635a420246a6182d5042",
+      "recorded_at": "2026-10-21T21:31:34.339Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:2b1528ee414c2291cac441fbe270f12fcca5541a9b4152f72a3a223b09c1e1b3",
+      "tree": "sha256:495225e3b4e7fbfbd4323b8d0bf4a36ef2ca5437368b635a420246a6182d5042",
+      "recorded_at": "2026-10-21T21:31:34.339Z"
+    }
+  ],
+  "closed_at": "2026-10-21T21:31:42.440Z"
+}
