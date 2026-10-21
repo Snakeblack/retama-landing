@@ -1,7 +1,10 @@
 ---
+import { Font } from "astro:assets";
 import { defaultLocale, type Locale, localizedPath, locales, pathWithoutLocale, t } from "../i18n/index";
 import { alternates, canonicalUrl } from "../lib/seo";
 import "../styles/global.css";
+import theme from "../styles/theme.css?raw";
+import Wordmark from "../components/Wordmark.astro";
 
 interface Props {
   locale: Locale;
@@ -14,6 +17,8 @@ const { locale, title, description, noindex = false } = Astro.props;
 const site = Astro.site ?? new URL(Astro.url.origin);
 const page = pathWithoutLocale(Astro.url.pathname);
 const other = locales.find((candidate) => candidate !== locale) ?? defaultLocale;
+// The browser chrome takes the page ground from the DESIGN.md tokens.
+const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
 ---
 
 <!doctype html>
@@ -23,6 +28,8 @@ const other = locales.find((candidate) => candidate !== locale) ?? defaultLocale
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <Font cssVariable="--font-stack-sans-headline" preload />
+    <Font cssVariable="--font-stack-sans-text" preload />
     {noindex && <meta name="robots" content="noindex" />}
     {
       !noindex && (
@@ -36,12 +43,16 @@ const other = locales.find((candidate) => candidate !== locale) ?? defaultLocale
     }
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#0b0d10" />
+    <meta name="theme-color" content={themeColor} />
   </head>
   <body>
-    <header class="flex items-center justify-between px-lg py-md">
-      <a class="font-(weight:--font-weight-headline-display) text-on-surface no-underline" href={localizedPath(locale, "/")}>Retama</a>
-      <a class="lang-switch" href={localizedPath(other, page)} hreflang={other} lang={other}>
+    <div class="h-bar bg-primary" aria-hidden="true"></div>
+    <header class="flex items-center justify-between gap-md px-margin py-md">
+      <a class="type-wordmark text-on-surface" href={localizedPath(locale, "/")}>
+        <Wordmark class="block" />
+        <span class="sr-only">Retama</span>
+      </a>
+      <a class="lang-switch type-small text-on-surface" href={localizedPath(other, page)} hreflang={other} lang={other}>
         {t(locale)["nav.switchLabel"]}
       </a>
     </header>

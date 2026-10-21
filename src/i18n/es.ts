@@ -3,7 +3,6 @@ export const es = {
   "meta.title": "Retama · Ingeniería de software",
   "meta.description":
     "Retama diseña y construye aplicaciones web, software a medida y automatizaciones para empresas. Arquitectura documentada y trabajo 100 % en remoto.",
-  "home.eyebrow": "Ingeniería de software",
   "home.title": "Software a medida, con criterio.",
   "home.lead":
     "Aplicaciones web, software a medida y automatización para empresas que necesitan un equipo técnico fiable.",

@@ -11,9 +11,11 @@ const copy = t(locale);
 ---
 
 <Base locale={locale} title={`${copy["notFound.title"]} · Retama`} description={copy["notFound.lead"]} noindex>
-  <section class="mx-auto max-w-(--spacing-content) px-lg py-2xl">
-    <h1 class="mb-md text-5xl leading-[1.1] font-(weight:--font-weight-headline-display) tracking-headline-display">{copy["notFound.title"]}</h1>
-    <p class="mb-lg text-body-lg text-neutral">{copy["notFound.lead"]}</p>
-    <p><a href={localizedPath(locale, "/")}>{copy["notFound.back"]}</a></p>
+  <section class="px-margin pt-xl pb-section">
+    <div class="max-w-(--spacing-measure) bg-surface-raised p-tile-sm md:p-tile">
+      <h1 class="type-headline-sm mb-lg text-balance md:type-headline">{copy["notFound.title"]}</h1>
+      <p class="type-statement-sm mb-xl md:type-statement">{copy["notFound.lead"]}</p>
+      <a class="type-label inline-flex min-h-(--spacing-touch) items-center bg-primary px-lg text-on-primary hover:bg-field hover:text-on-field" href={localizedPath(locale, "/")}>{copy["notFound.back"]}</a>
+    </div>
   </section>
 </Base>

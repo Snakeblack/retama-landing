@@ -24,6 +24,32 @@ for (const { path, lang, other } of pages) {
   });
 }
 
+for (const { path } of pages) {
+  test(`${path} muestra el wordmark y carga Stack Sans desde el propio sitio (DESIGN.md)`, async ({
+    page,
+    baseURL,
+  }) => {
+    const fontOrigins: string[] = [];
+    page.on("request", (request) => {
+      if (request.resourceType() === "font") fontOrigins.push(new URL(request.url()).origin);
+    });
+    await page.goto(path);
+
+    const home = page.getByRole("banner").getByRole("link", { name: "Retama" });
+    await expect(home).toBeVisible();
+    await expect(home.locator("svg")).toBeVisible();
+
+    const loaded = await page.evaluate(async () => {
+      await document.fonts.ready;
+      return [...document.fonts].filter((face) => face.status === "loaded").map((face) => face.family);
+    });
+    expect(loaded.some((family) => family.startsWith("Stack Sans Headline"))).toBe(true);
+    expect(loaded.some((family) => family.startsWith("Stack Sans Text"))).toBe(true);
+    expect(fontOrigins.length).toBeGreaterThan(0);
+    expect(new Set(fontOrigins)).toEqual(new Set([new URL(baseURL ?? "").origin]));
+  });
+}
+
 test.describe("sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false });
 

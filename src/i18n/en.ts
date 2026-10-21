@@ -5,7 +5,6 @@ export const en = {
   "meta.title": "Retama · Software engineering",
   "meta.description":
     "Retama designs and builds web applications, custom software and automation for companies. Documented architecture and fully remote work.",
-  "home.eyebrow": "Software engineering",
   "home.title": "Custom software, built with judgement.",
   "home.lead": "Web applications, custom software and automation for companies that need a reliable technical team.",
   "nav.switchLabel": "Leer en español",

@@ -1,31 +1,152 @@
 /* Generated from DESIGN.md by `pnpm design:theme`. Do not edit. */
 @theme {
-  --color-primary: #9ecbff;
-  --color-surface: #0b0d10;
-  --color-on-surface: #e8eaed;
-  --color-on-surface-muted: #aab1bb;
-  --color-neutral: #c9ced6;
-  --font-headline-display: "system-ui";
-  --font-body-lg: "system-ui";
-  --font-body-md: "system-ui";
-  --font-label-sm: "system-ui";
-  --text-headline-display: 64px;
-  --text-body-lg: 20px;
-  --text-body-md: 16px;
-  --text-label-sm: 14px;
-  --tracking-headline-display: -0.02em;
-  --tracking-label-sm: 0.1em;
-  --font-weight-headline-display: 700;
-  --font-weight-body-lg: 400;
-  --font-weight-body-md: 400;
-  --font-weight-label-sm: 500;
-  --radius-sm: 4px;
-  --radius-md: 8px;
+  --color-primary: #ff4a1f;
+  --color-on-primary: #18191b;
+  --color-surface: #18191b;
+  --color-surface-raised: #222427;
+  --color-on-surface: #eff0f1;
+  --color-on-surface-muted: #9c9ea3;
+  --color-field: #eff0f1;
+  --color-on-field: #18191b;
+  --font-display: var(--font-stack-sans-headline, "Stack Sans Headline", sans-serif);
+  --font-display-sm: var(--font-stack-sans-headline, "Stack Sans Headline", sans-serif);
+  --font-headline: var(--font-stack-sans-headline, "Stack Sans Headline", sans-serif);
+  --font-headline-sm: var(--font-stack-sans-headline, "Stack Sans Headline", sans-serif);
+  --font-statement: var(--font-stack-sans-headline, "Stack Sans Headline", sans-serif);
+  --font-statement-sm: var(--font-stack-sans-headline, "Stack Sans Headline", sans-serif);
+  --font-wordmark: var(--font-stack-sans-headline, "Stack Sans Headline", sans-serif);
+  --font-body: var(--font-stack-sans-text, "Stack Sans Text", sans-serif);
+  --font-body-strong: var(--font-stack-sans-text, "Stack Sans Text", sans-serif);
+  --font-label: var(--font-stack-sans-text, "Stack Sans Text", sans-serif);
+  --font-small: var(--font-stack-sans-text, "Stack Sans Text", sans-serif);
+  --text-display: 200px;
+  --text-display-sm: 104px;
+  --text-headline: 64px;
+  --text-headline-sm: 36px;
+  --text-statement: 32px;
+  --text-statement-sm: 22px;
+  --text-wordmark: 28px;
+  --text-body: 18px;
+  --text-body-strong: 18px;
+  --text-label: 18px;
+  --text-small: 14px;
+  --leading-display: 0.9;
+  --leading-display-sm: 0.9;
+  --leading-headline: 1.05;
+  --leading-headline-sm: 1.05;
+  --leading-statement: 1.2;
+  --leading-statement-sm: 1.25;
+  --leading-wordmark: 1;
+  --leading-body: 1.5;
+  --leading-body-strong: 1.5;
+  --leading-label: 1.2;
+  --leading-small: 1.45;
+  --tracking-display: -0.022em;
+  --tracking-display-sm: -0.022em;
+  --tracking-headline: -0.022em;
+  --tracking-headline-sm: -0.022em;
+  --tracking-statement: -0.011em;
+  --tracking-statement-sm: -0.011em;
+  --tracking-wordmark: -0.02em;
+  --font-weight-display: 300;
+  --font-weight-display-sm: 300;
+  --font-weight-headline: 300;
+  --font-weight-headline-sm: 300;
+  --font-weight-statement: 300;
+  --font-weight-statement-sm: 300;
+  --font-weight-wordmark: 500;
+  --font-weight-body: 400;
+  --font-weight-body-strong: 500;
+  --font-weight-label: 500;
+  --font-weight-small: 400;
+  --radius-tile: 0px;
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 48px;
   --spacing-2xl: 96px;
-  --spacing-content: 768px;
+  --spacing-margin: 12px;
+  --spacing-gap: 8px;
+  --spacing-tile: 24px;
+  --spacing-tile-sm: 20px;
+  --spacing-row: 96px;
+  --spacing-section: 128px;
+  --spacing-bar: 6px;
+  --spacing-focus: 2px;
+  --spacing-touch: 48px;
+  --spacing-measure: 640px;
+}
+@utility type-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: var(--font-weight-display);
+}
+@utility type-display-sm {
+  font-family: var(--font-display-sm);
+  font-size: var(--text-display-sm);
+  line-height: var(--leading-display-sm);
+  letter-spacing: var(--tracking-display-sm);
+  font-weight: var(--font-weight-display-sm);
+}
+@utility type-headline {
+  font-family: var(--font-headline);
+  font-size: var(--text-headline);
+  line-height: var(--leading-headline);
+  letter-spacing: var(--tracking-headline);
+  font-weight: var(--font-weight-headline);
+}
+@utility type-headline-sm {
+  font-family: var(--font-headline-sm);
+  font-size: var(--text-headline-sm);
+  line-height: var(--leading-headline-sm);
+  letter-spacing: var(--tracking-headline-sm);
+  font-weight: var(--font-weight-headline-sm);
+}
+@utility type-statement {
+  font-family: var(--font-statement);
+  font-size: var(--text-statement);
+  line-height: var(--leading-statement);
+  letter-spacing: var(--tracking-statement);
+  font-weight: var(--font-weight-statement);
+}
+@utility type-statement-sm {
+  font-family: var(--font-statement-sm);
+  font-size: var(--text-statement-sm);
+  line-height: var(--leading-statement-sm);
+  letter-spacing: var(--tracking-statement-sm);
+  font-weight: var(--font-weight-statement-sm);
+}
+@utility type-wordmark {
+  font-family: var(--font-wordmark);
+  font-size: var(--text-wordmark);
+  line-height: var(--leading-wordmark);
+  letter-spacing: var(--tracking-wordmark);
+  font-weight: var(--font-weight-wordmark);
+}
+@utility type-body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  font-weight: var(--font-weight-body);
+}
+@utility type-body-strong {
+  font-family: var(--font-body-strong);
+  font-size: var(--text-body-strong);
+  line-height: var(--leading-body-strong);
+  font-weight: var(--font-weight-body-strong);
+}
+@utility type-label {
+  font-family: var(--font-label);
+  font-size: var(--text-label);
+  line-height: var(--leading-label);
+  font-weight: var(--font-weight-label);
+}
+@utility type-small {
+  font-family: var(--font-small);
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+  font-weight: var(--font-weight-small);
 }

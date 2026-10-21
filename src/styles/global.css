@@ -8,16 +8,20 @@
   }
 
   body {
+    @apply type-body;
     background-color: var(--color-surface);
     color: var(--color-on-surface);
-    /* The exported family is quoted; the generic keywords follow as the real stack. */
-    font-family: var(--font-body-md), system-ui, sans-serif;
-    font-size: var(--text-body-md);
-    line-height: 1.5;
   }
 
+  /* DESIGN.md link: full ink, underlined; quiet links set their own colour. */
   a {
-    color: var(--color-primary);
+    color: inherit;
+  }
+
+  /* DESIGN.md focus-ring, on every focusable element. */
+  :focus-visible {
+    outline: var(--spacing-focus) solid var(--color-primary);
+    outline-offset: var(--spacing-focus);
   }
 }
 
