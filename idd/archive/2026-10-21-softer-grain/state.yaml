@@ -1,0 +1,362 @@
+{
+  "schema": "idd-state/v1",
+  "change": "softer-grain",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "el ruido que hay del fondo oscuro es demasiado, debe ser un poquitin menos agresivo",
+    "kind": "feature",
+    "summary": "Grano del fondo oscuro un poco menos agresivo: un 30 % menos de contraste y algo menos de oscurecimiento, igual en el CSS y en la escena",
+    "acceptance": "El grano del suelo (CSS y escena) baja su desviación medida en torno a un 30 % y oscurece algo menos; la capa ligera no cambia; el hero y el resto siguen con el mismo grano; ospec check pasa"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/assets/grain-ground.svg",
+          "line": 1
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/scene-three.ts",
+          "line": 165
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "debe ser un poquitin menos agresivo"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 30
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 205
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 258
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "src/assets/grain-ground.svg",
+      "src/scripts/scene-three.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0005",
+      "source": "declaration"
+    },
+    {
+      "id": "untested-product",
+      "reason": "product code without a test: touches src/scripts/scene-three.ts",
+      "source": "diff"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Only the grain filter values change, in the SVG asset and the scene constant that mirrors it; no colour, type or spacing token is touched and DESIGN.md's grain rule still holds"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint passes in ospec check; the change touches no token, theme.css or DESIGN.md, only the grain filter values in src/assets/grain-ground.svg and the scene constant that mirrors them",
+      "recorded_at": "2026-10-21T22:54:42.205Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "boundary-tests",
+      "signal": "untested-product",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T22:54:14.862Z",
+      "detail": {
+        "tree": "sha256:97ca5ac4b32f6bac50a7a3005be7034d05aefc1e1874038cfa61813524e50d59",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T22:54:14.862Z",
+      "detail": {
+        "refs": [
+          "adr:0005 conforms"
+        ],
+        "records": []
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "tested-check",
+      "obligation": "boundary-tests",
+      "recorded_at": "2026-10-21T22:55:30.803Z",
+      "detail": {
+        "tree": "sha256:469943ddcb4f21325754604f05bdca00b430519350d44cc5ec1b737f1920f214",
+        "run": "run-6",
+        "has_test": true
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T22:56:27.746Z",
+      "detail": {
+        "tree": "sha256:e495c525a4390d726229b16e8a1d6581efb33f493c2a8776f1e86c1d4ffbf736",
+        "runs": [
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "tested-check",
+      "obligation": "boundary-tests",
+      "recorded_at": "2026-10-21T22:56:27.746Z",
+      "detail": {
+        "tree": "sha256:e495c525a4390d726229b16e8a1d6581efb33f493c2a8776f1e86c1d4ffbf736",
+        "run": "run-11",
+        "has_test": true
+      }
+    }
+  ],
+  "base": "24d08c9ac6a81322d3329e83d12c49b659aa67d0",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:b72c55647016652c6c02be5f5b2e77279282f2774a4459dacae3eda1e364f725",
+      "tree": "sha256:97ca5ac4b32f6bac50a7a3005be7034d05aefc1e1874038cfa61813524e50d59",
+      "recorded_at": "2026-10-21T22:54:14.862Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:4fc84f328af8eeef74b9063b4b7f4482d42e21bf3572b881596dcd0aaf76a40b",
+      "tree": "sha256:97ca5ac4b32f6bac50a7a3005be7034d05aefc1e1874038cfa61813524e50d59",
+      "recorded_at": "2026-10-21T22:54:14.862Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:873e1b7936602176c4dd716f95a3ee7926c33b7e7bcc18528846cc812972a721",
+      "tree": "sha256:97ca5ac4b32f6bac50a7a3005be7034d05aefc1e1874038cfa61813524e50d59",
+      "recorded_at": "2026-10-21T22:54:14.862Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:378e399478d1654127747aad9d3766a6740a44f892dd14f64cb4bb3653d1a6b9",
+      "tree": "sha256:97ca5ac4b32f6bac50a7a3005be7034d05aefc1e1874038cfa61813524e50d59",
+      "recorded_at": "2026-10-21T22:54:14.862Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:97ca5ac4b32f6bac50a7a3005be7034d05aefc1e1874038cfa61813524e50d59",
+      "recorded_at": "2026-10-21T22:54:14.862Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:c9c359f66de6fe184d79de7222305392e01c26ae95fcfa4d22a08f3b8bd7e062",
+      "tree": "sha256:469943ddcb4f21325754604f05bdca00b430519350d44cc5ec1b737f1920f214",
+      "recorded_at": "2026-10-21T22:55:30.803Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 1,
+      "output_sha256": "sha256:fd28d8fac7bf6431f41f4778c466625ff74023cce6b44e995b74df7882664de7",
+      "tree": "sha256:469943ddcb4f21325754604f05bdca00b430519350d44cc5ec1b737f1920f214",
+      "recorded_at": "2026-10-21T22:55:30.803Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:bb16874b9604fa33152772d380c320aa3015191791f3a472b3a7302f9735e75b",
+      "tree": "sha256:469943ddcb4f21325754604f05bdca00b430519350d44cc5ec1b737f1920f214",
+      "recorded_at": "2026-10-21T22:55:30.803Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:81e936223f9bfd015451822902f06e9993b22e7062869c71401e9a090f8a977f",
+      "tree": "sha256:469943ddcb4f21325754604f05bdca00b430519350d44cc5ec1b737f1920f214",
+      "recorded_at": "2026-10-21T22:55:30.803Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:469943ddcb4f21325754604f05bdca00b430519350d44cc5ec1b737f1920f214",
+      "recorded_at": "2026-10-21T22:55:30.803Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:c9c359f66de6fe184d79de7222305392e01c26ae95fcfa4d22a08f3b8bd7e062",
+      "tree": "sha256:e495c525a4390d726229b16e8a1d6581efb33f493c2a8776f1e86c1d4ffbf736",
+      "recorded_at": "2026-10-21T22:56:27.746Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:5181ac5da75fb02a3f1a0f48bb50abbc090dd438ae914eb24eafcf2cb2ce9d99",
+      "tree": "sha256:e495c525a4390d726229b16e8a1d6581efb33f493c2a8776f1e86c1d4ffbf736",
+      "recorded_at": "2026-10-21T22:56:27.746Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:e72ac44941106824c3c6f53094cde417fb05fa0ca0967ba2d0549670b2ed1fc4",
+      "tree": "sha256:e495c525a4390d726229b16e8a1d6581efb33f493c2a8776f1e86c1d4ffbf736",
+      "recorded_at": "2026-10-21T22:56:27.746Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:835d05e90e38e3a4a772b79bfedda6d65d15378a8407962dde47213ff27afe66",
+      "tree": "sha256:e495c525a4390d726229b16e8a1d6581efb33f493c2a8776f1e86c1d4ffbf736",
+      "recorded_at": "2026-10-21T22:56:27.746Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:e495c525a4390d726229b16e8a1d6581efb33f493c2a8776f1e86c1d4ffbf736",
+      "recorded_at": "2026-10-21T22:56:27.746Z"
+    }
+  ],
+  "closed_at": "2026-10-21T22:56:32.906Z"
+}
