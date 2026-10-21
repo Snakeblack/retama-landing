@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { GLYPH_KIND, plantGlyphs, plantPlacement, RAIN_START, WORD_START, wordGlyphs } from "../../src/lib/glyph-scene";
+import {
+  FLIGHT,
+  GLYPH_KIND,
+  plantGlyphs,
+  plantPlacement,
+  RAIN_END,
+  RAIN_START,
+  WORD_START,
+  wordGlyphs,
+} from "../../src/lib/glyph-scene";
 import { retamaPlant } from "../../src/lib/retama-scene";
 import { HERO, retamaShape } from "../../src/lib/retama-shape";
 
@@ -82,7 +91,11 @@ describe("glifos de la planta", () => {
       const list = of(kind);
       return list.reduce((sum, glyph) => sum + glyph.delay, 0) / list.length;
     };
-    for (const glyph of glyphs) expect(glyph.delay).toBeGreaterThanOrEqual(RAIN_START);
+    for (const glyph of glyphs) {
+      expect(glyph.delay).toBeGreaterThanOrEqual(RAIN_START);
+      // The title turns back into letters at RAIN_END: by then every glyph of the plant has landed.
+      expect(glyph.delay + FLIGHT.plant).toBeLessThanOrEqual(RAIN_END);
+    }
     expect(meanDelay(GLYPH_KIND.root)).toBeLessThan(meanDelay(GLYPH_KIND.stem));
   });
 

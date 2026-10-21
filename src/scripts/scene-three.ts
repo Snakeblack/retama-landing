@@ -1,7 +1,7 @@
 // The 3D tier of ADR 0004, built inside scene-worker.ts on an OffscreenCanvas, off the main thread. Everything in it
 // is a glyph of the site's own code (DESIGN.md Motion and 3D): the glyphs fly in and assemble the words of the title
-// over the HTML words, then rain from "Software" and grow the retama, written along its stems and roots. Once the title
-// has assembled, its glyphs give way to the HTML letters from the left (the page sweeps the letters in at the same
+// over the HTML words, then rain from "Software" and grow the retama, written along its stems and roots. Once the
+// retama has grown, the title's glyphs give way to the HTML letters from the left (the page sweeps the letters in at the same
 // pace) and come back while the pointer is on the title. Once grown, the wind sways the stems; around the pointer the
 // gusts grow, and the glyphs stir and wake, shuffling their characters; the sap runs up in orange pulses that bloom.
 // One instanced mesh draws them all; every movement is computed on the GPU, on WebGPU or WebGL2 alike.
@@ -53,6 +53,7 @@ import {
   type Glyph,
   plantGlyphs,
   plantPlacement,
+  RAIN_END,
   RAIN_SPAN,
   RAIN_START,
   wordGlyphs,
@@ -82,9 +83,9 @@ const RISE = 40;
 const WAKE = 0.5;
 // How bright the hot glyphs and the sap are: above 1 they bloom.
 const HOT = 2.6;
-// The title's glyphs give way to its letters this long after the scene starts, and the sweep that hands one over to
+// The title's glyphs give way to its letters once the rain has grown the retama, and the sweep that hands one over to
 // the other lasts this long (t-open, as the page's transition of the letters).
-const SETTLE = 2.8;
+const SETTLE = RAIN_END;
 const SWEEP = 1.1;
 // Within this many pixels of the crown the glyphs thin out.
 const CROWN = 140;

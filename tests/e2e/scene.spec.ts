@@ -88,15 +88,42 @@ test.describe("escena 3D progresiva (ADR 0004)", () => {
     await expect(page.locator("[data-retama-poster]")).toHaveCSS("opacity", "0");
     await pause.press("Enter");
     await expect(pause).toHaveAccessibleName("Pause the retama animation");
-    // Once assembled, the title hands its glyphs back to the letters, and the pointer on it brings them back.
+    // While the scene assembles the title, its glyphs stand in for the letters.
+    await expect(page.locator('[data-chapter="hero"]')).toHaveAttribute("data-word", "code");
+    expect(violations).toEqual([]);
+  });
+
+  test("cuando la retama ha crecido el título vuelve a letras, y el puntero en él trae los glifos", async ({
+    page,
+  }) => {
+    await withoutWebGPU(page);
+    await webgl2(page, "software");
+    // A stand-in for the worker, as a real GPU would answer: running, then settled once the retama has grown. It keeps
+    // what the page asks of the title.
+    await page.addInitScript(() => {
+      const asked: boolean[] = [];
+      (window as unknown as { asked: boolean[] }).asked = asked;
+      window.Worker = class extends EventTarget {
+        postMessage(message: { type: string; on?: boolean }) {
+          if (message.type === "code") asked.push(message.on ?? false);
+          if (message.type !== "start") return;
+          const say = (type: string, after: number) =>
+            setTimeout(() => this.dispatchEvent(new MessageEvent("message", { data: { type } })), after);
+          say("running", 100);
+          say("settled", 600);
+        }
+        terminate() {}
+      } as unknown as typeof Worker;
+    });
+    await page.goto("/");
     const chapter = page.locator('[data-chapter="hero"]');
-    await expect(chapter).toHaveAttribute("data-word", "solid", { timeout: 15_000 });
+    await expect(chapter).toHaveAttribute("data-word", "solid", { timeout: 10_000 });
     const title = await page.locator("main h1").boundingBox();
     await page.mouse.move((title?.x ?? 0) + 60, (title?.y ?? 0) + (title?.height ?? 0) / 3);
     await expect(chapter).toHaveAttribute("data-word", "code");
+    expect(await page.evaluate(() => (window as unknown as { asked: boolean[] }).asked.at(-1))).toBe(true);
     await page.mouse.move(10, (title?.y ?? 0) + (title?.height ?? 0) + 300);
     await expect(chapter).toHaveAttribute("data-word", "solid");
-    expect(violations).toEqual([]);
   });
 
   test("si la escena se rinde (GPU lenta, dispositivo perdido o error), vuelve el póster", async ({ page }) => {
@@ -122,5 +149,7 @@ test.describe("escena 3D progresiva (ADR 0004)", () => {
     await expect(page.locator("[data-retama-poster]")).toHaveCSS("opacity", "1");
     await expect(page.locator("[data-scene-pause]")).toBeHidden();
     await expect(page.locator("[data-scene-canvas]")).toHaveCount(0);
+    // The title is letters again.
+    await expect(page.locator('[data-chapter="hero"]')).not.toHaveAttribute("data-word", /.*/);
   });
 });
