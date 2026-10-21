@@ -1,0 +1,30 @@
+---
+import { retamaShape, type StrokeKind } from "../../lib/retama-shape";
+
+interface Props {
+  label: string;
+  class?: string;
+}
+
+const { label, class: className } = Astro.props;
+// The static tier of ADR 0004: drawn at build time, so it is HTML and paints with the page.
+const shape = retamaShape(571009059, { width: 1600, height: 900, ground: 360 });
+const path = (kind: StrokeKind) =>
+  shape.strokes
+    .filter((stroke) => stroke.kind === kind)
+    .map((stroke) => `M${stroke.points.map((point) => point.join(" ")).join("L")}`)
+    .join("");
+---
+
+<svg
+  class={className}
+  role="img"
+  aria-label={label}
+  viewBox={`-340 0 ${shape.width} ${shape.height}`}
+  preserveAspectRatio="xMidYMin slice"
+  data-retama-poster
+>
+  <path class="fill-none stroke-on-surface-muted" d={path("root")} stroke-width="1" vector-effect="non-scaling-stroke" />
+  <path class="fill-none stroke-on-surface" d={path("stem")} stroke-width="1" vector-effect="non-scaling-stroke" />
+  <path class="fill-none stroke-primary" d={path("taproot")} stroke-width="2" vector-effect="non-scaling-stroke" />
+</svg>
