@@ -1,0 +1,369 @@
+{
+  "schema": "idd-state/v1",
+  "change": "m2-board",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "M2 — Portada con impacto, primer change de tres (m2-board)",
+    "kind": "feature",
+    "summary": "M2 (1/3): tablero estático de la portada es/en con la dirección «The well-kept board»: banda del nombre y hero con la ficha central para la escena (póster provisional), Servicios, Sectores, Método, la pieza viva sin JS (tipo de proyecto → primeras decisiones), bloque de contacto con mailto, pie con créditos, copy final redactado e imágenes reales PD/CC0 en gris",
+    "acceptance": "/ y /en/ muestran el tablero completo de DESIGN.md sin JS (un h1, grupos con su ficha de encabezado, ≥4 imágenes reales en gris acreditadas en el pie); la acción principal lleva al bloque de contacto con mailto:retamozogpt@gmail.com; la pieza viva cambia de tipo de proyecto sin JS; paridad de claves i18n; design:lint, E2E (incluido ADR 0001 y 0006) y Lighthouse 100 x4 en verde"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿Cómo elige el visitante el tipo de proyecto en la pieza viva y cuántos tipos ofrece? (respondido en parte: sin JS, con details/anclas/radios)"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 220
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Quién redacta el copy final es/en, qué imágenes ocupan los huecos y qué email muestra el contacto? (respondido: el agente redacta y el usuario revisa; imágenes mixtas PD/CC0 primero con hoja de contactos e IA con prompt exacto solo para huecos sin candidata; retamozogpt@gmail.com)"
+      },
+      {
+        "category": "url-state",
+        "question": "¿La elección de la pieza viva queda en la URL como ancla compartible, y los ids de las secciones se traducen por idioma o son iguales en es y en?"
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 246
+        }
+      },
+      {
+        "category": "errors",
+        "question": "Si el visitante no tiene cliente de correo, ¿se muestra la dirección como texto seleccionable además del enlace mailto?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/assets/board",
+      "src/components/Home.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/styles/global.css",
+      "src/styles/theme.css",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/i18n.test.ts"
+    ],
+    "work_units": 3,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0006, 0008 and quality scenario brand-impact, perf-mobile, seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Todo el tablero, la pieza viva incluida, está en el HTML y funciona sin JS (E2E 'sin JavaScript (ADR 0001)'); no se envía JS; el presupuesto de JS se fija con la primera isla en m2-hero-3d"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "El nivel estático es un SVG en línea dibujado en build; aún no se carga escena; LCP es HTML (banda del nombre) con LHCI 100x4 y LCP 1,7 s"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Componentes solo con tokens (design:lint en verde); DESIGN.md actualizado en Layout, Imagery y Motion and 3D; theme.css sin tocar"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin estilos ni scripts en línea; E2E de cabeceras y de CSP sin violaciones en / y /en/ en verde"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Claves es/en con paridad (test unitario); anclas de sección traducidas; hreflang E2E en verde"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "Tablero de la dirección elegida con imágenes reales y póster de la retama; el movimiento llega en m2-motion"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "Lighthouse móvil 100x4 en / y /en/, LCP 1,7 s, CLS 0, TBT 0"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "HTML completo sin JS con un h1 descriptivo y h2 por grupo; canónica y hreflang sin cambios"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint en verde dentro de ospec check: lint de DESIGN.md con contraste, tema sincronizado y regla de valores sueltos sobre los componentes nuevos de src/components/board",
+      "recorded_at": "2026-10-21T11:42:58.930Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Tres changes para M2 (este es m2-board); copy lo redacta el agente y el usuario revisa; imágenes mixtas, PD/CC0 primero con hoja de contactos y prompt de IA solo para huecos sin candidata; contacto con mailto:retamozogpt@gmail.com; pieza viva con <details name> exclusivo, sin estado en la URL, con 4 tipos (web o CMS, software a medida, escritorio, agentes y automatización); ids de sección traducidos por idioma; el texto del enlace mailto es la propia dirección.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T11:42:55.499Z",
+      "detail": {
+        "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T11:42:55.499Z",
+      "detail": {
+        "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/site.spec.ts",
+          "tests/unit/retama-shape.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T11:42:55.499Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T11:43:05.955Z"
+    }
+  ],
+  "base": "561b7f2905e3878c27e784d3c0decf978147f470",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:467a43452a20fb0ce048d114153b234bdcb332466ae693edaa997da8fdc641bd",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c708478ad4c5a20ca742785e7e426ef5c570e85b9d7532c98839d62ee99a76b0",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:f84c10f0a322f331b747872f56c88731f637463dc15222d10e845f02efd99e9c",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:9f6594cd71a533c920e1f10f1521b356f7c41da9ba081d4b0cf45bd2dd68b00a",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:b38115f246b759b91cb8f9799a61a5e824cc1244daad1edaa5cee0eeaf6d8e03",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:dc86a589868c502484593ba59a794b3550ae1f23bba9f483f25f121f26a6ff1d",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:3899cbcaf9ce7787c4524d49fc0b74740c3a930d073a7df97882302333347663",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:b3e7bb2a74a7092cf0c9fc93361842f8c16ef2ec68aae661ac68ff5ea3751ad5",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:6ceb935a68daa6e24aaf5d5970869f907640df4ee584b5a9e106dfa9597b82af",
+      "tree": "sha256:c27eb9557470741e8c87646ed6f8c69ba37b523b5bdfc166fcfdcc41948388bc",
+      "recorded_at": "2026-10-21T11:42:55.499Z"
+    }
+  ],
+  "closed_at": "2026-10-21T11:43:05.955Z"
+}
