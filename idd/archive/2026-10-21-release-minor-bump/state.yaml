@@ -1,0 +1,200 @@
+{
+  "schema": "idd-state/v1",
+  "change": "release-minor-bump",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "release-please sube el patch con un feat en 0.x por bump-patch-for-minor-pre-major: true; el usuario quiere feat → minor y patch solo para fix",
+    "acceptance": "release-please-config.json sin bump-patch-for-minor-pre-major; tras fusionar, el PR de release propone 0.2.0 en lugar de 0.1.1"
+  },
+  "facts": {
+    "basis": "El usuario fija la regla: minor para features, patch solo para bugs; bump-minor-pre-major se mantiene (incompatible → minor en 0.x), que es el comportamiento estándar antes de 1.0"
+  },
+  "plan": {
+    "paths": [
+      "release-please-config.json"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0009",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": "conforms",
+      "reason": "Devuelve a release-please la SemVer desde Conventional Commits del ADR: feat sube el minor y fix el patch; en 0.x un incompatible sube el minor"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-21T12:24:35.636Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T12:24:53.064Z",
+      "detail": {
+        "tree": "sha256:08428f56f7cf865874cf1cf86cca172ed1a7bbf5c0bcc8b72ceb6a62dc151065",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T12:24:53.064Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:08428f56f7cf865874cf1cf86cca172ed1a7bbf5c0bcc8b72ceb6a62dc151065",
+        "fitness": [
+          "run-8"
+        ]
+      }
+    }
+  ],
+  "base": "67648acd9de24abdd0aaba43914e39277f417de3",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec vitest run tests/unit/release-config.test.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:10f48731d7e6aa44f704c3c701e700f8baa457ffd9f5aa57097629ded77be5ad",
+      "tree": "sha256:179e0d76338f9e3ad0a5835628551ddabacffd531c98128602f0632eecd78b6e",
+      "recorded_at": "2026-10-21T12:24:35.317Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm exec vitest run tests/unit/release-config.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:a615ffa254cd5923dc45bd7c565a2834a7a432f958b30fedd5880871d57f504e",
+      "tree": "sha256:1a5cf0adffb496968b1980c248b4b13ea4894dff7efcd13067d644c27e25b108",
+      "recorded_at": "2026-10-21T12:24:35.636Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:8709e5c8fbd79ac9409032ee9d6c89888b4d3211d4fb45e96fc72bf87d10433c",
+      "tree": "sha256:08428f56f7cf865874cf1cf86cca172ed1a7bbf5c0bcc8b72ceb6a62dc151065",
+      "recorded_at": "2026-10-21T12:24:53.064Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c448de0512ac40957e2fe58dcaf08a6e94a21d52a12b8bba48a1e2c6f588a2b5",
+      "tree": "sha256:08428f56f7cf865874cf1cf86cca172ed1a7bbf5c0bcc8b72ceb6a62dc151065",
+      "recorded_at": "2026-10-21T12:24:53.064Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:486b8e9fbab36fe69c2d762011c45f907fdefa2b34621bc548899c3822b1327c",
+      "tree": "sha256:08428f56f7cf865874cf1cf86cca172ed1a7bbf5c0bcc8b72ceb6a62dc151065",
+      "recorded_at": "2026-10-21T12:24:53.064Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:ad77f5b5e4ff80e30c8047c6a2209aec5fd9af15836ed0e581efef23fbad291b",
+      "tree": "sha256:08428f56f7cf865874cf1cf86cca172ed1a7bbf5c0bcc8b72ceb6a62dc151065",
+      "recorded_at": "2026-10-21T12:24:53.064Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:08428f56f7cf865874cf1cf86cca172ed1a7bbf5c0bcc8b72ceb6a62dc151065",
+      "recorded_at": "2026-10-21T12:24:53.064Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:08428f56f7cf865874cf1cf86cca172ed1a7bbf5c0bcc8b72ceb6a62dc151065",
+      "recorded_at": "2026-10-21T12:24:53.064Z"
+    }
+  ],
+  "closed_at": "2026-10-21T12:25:05.155Z"
+}
