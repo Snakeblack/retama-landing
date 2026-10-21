@@ -1,0 +1,264 @@
+{
+  "schema": "idd-state/v1",
+  "change": "remove-code-lens",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "lo recomendado, el 1 (quitar la textura de código del todo)",
+    "kind": "feature",
+    "summary": "Quitar del todo la textura de código del título (la capa CSS con /code-lens.svg que aparecía con el puntero mientras la escena no corre); el único efecto de código queda en los glifos de la escena",
+    "acceptance": "En / y /en/ el puntero sobre el título no muestra ninguna textura de código cuando la escena no corre (carga, póster, movimiento reducido o sin JS); /code-lens.svg ya no existe; los glifos de la escena siguen igual; DESIGN.md lo refleja y ospec check pasa"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Hero.astro",
+          "line": 51
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/styles/global.css",
+          "line": 142
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "quitar la textura de código del todo"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/pages/code-lens.svg.ts",
+          "line": 4
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 281
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 258
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/board/Hero.astro",
+      "src/pages/code-lens.svg.ts",
+      "src/styles/global.css",
+      "tests/e2e/motion.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "El título sigue en el HTML en letras; se elimina una capa decorativa de CSS y su endpoint, sin JS nuevo"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "La escena y su paso de glifos a letras no cambian; sin escena el título queda en letras; Lighthouse CI lo verifica"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md (Motion) describe el título sin textura cuando no hay escena; design:lint limpio"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint limpio tras quitar el bloque [data-lens]",
+      "recorded_at": "2026-10-21T22:15:11.073Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T22:17:10.814Z",
+      "detail": {
+        "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T22:17:10.814Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8"
+        ]
+      }
+    }
+  ],
+  "base": "cc56b871a3da40d23cdf99085d83a4988e71869d",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:c83f32fc26b123b791f0bafe3b7844069a15c9d511a55c8b6564158739bd81df",
+      "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+      "recorded_at": "2026-10-21T22:17:10.814Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:04ff0c90da14d75ba1c7aa87b2d985cb350eca5a9e46e1d48aabb6e2ddeef7d6",
+      "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+      "recorded_at": "2026-10-21T22:17:10.814Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:b0acdb2fa97e4968a5f2b230751a166cf985282016c5ed1f4546c6f45760d932",
+      "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+      "recorded_at": "2026-10-21T22:17:10.814Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:7364bec35ce4b0a941aff9e0e2b3b06bdfb263713aaa7221ec969e2ec9d435ed",
+      "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+      "recorded_at": "2026-10-21T22:17:10.814Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+      "recorded_at": "2026-10-21T22:17:10.814Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:bceb08ef154f1c3104853d9617c14996403e7daa491cbfccc62ce2243ca5f586",
+      "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+      "recorded_at": "2026-10-21T22:17:10.814Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:20fb99b99b150e7e0f00b1cb0aa7bd9ac77b4f591e62aae29f01d4b82a25621d",
+      "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+      "recorded_at": "2026-10-21T22:17:10.814Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:59e4ed8d7d6992996ad095a25c1c35d348c0709d8038993e95372f2412801397",
+      "tree": "sha256:8b487c7004a94c1af8ddbe7dd2921915f274198f6e4b993cfd48c761edf828bc",
+      "recorded_at": "2026-10-21T22:17:10.814Z"
+    }
+  ],
+  "closed_at": "2026-10-21T22:17:19.462Z"
+}
