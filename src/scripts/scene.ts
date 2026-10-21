@@ -2,7 +2,9 @@
 // page; this waits for the page to load, the stage to be on screen and an idle moment, then probes the GPU and only
 // then starts the scene in a worker on an OffscreenCanvas (scene-worker.ts): its download stays out of the start
 // budget of ADR 0001 and its work off the main thread. It samples the HTML words, so the scene's glyphs land on their
-// letters, and sends the scroll of the chapter under its pinned stage. Reduced motion, data saving, a software GPU, no
+// letters, and sends the scroll of the chapter under its pinned stage. Once the title has assembled it hands it back to
+// the HTML letters (data-word on the chapter, which global.css sweeps in) and shows the glyphs again while the pointer
+// is on the title. Reduced motion, data saving, a software GPU, no
 // OffscreenCanvas or a slow first second keep or bring back the poster. The scene pauses off screen, with the tab
 // hidden and with a tap or click on it (WCAG 2.2.2).
 import { readMotion } from "../lib/motion";
@@ -64,7 +66,8 @@ function sampleWord(chapter: HTMLElement, word: HTMLElement): Word {
   canvas.width = Math.ceil(box.width) + 2;
   canvas.height = Math.ceil(box.height) + 2;
   const context = canvas.getContext("2d", { willReadFrequently: true });
-  if (!context) return { samples: [], step };
+  const accent = word.hasAttribute("data-glyph-accent");
+  if (!context) return { samples: [], step, accent };
   context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
   if ("letterSpacing" in context) context.letterSpacing = style.letterSpacing;
   const text = (word.textContent ?? "").trim();
@@ -81,7 +84,7 @@ function sampleWord(chapter: HTMLElement, word: HTMLElement): Word {
       }
     }
   }
-  return { samples, step };
+  return { samples, step, accent };
 }
 
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -109,18 +112,27 @@ async function start(tile: HTMLElement, chapter: HTMLElement, words: HTMLElement
   const motion = readMotion((name) => root.getPropertyValue(name));
   const css = (name: string) => root.getPropertyValue(name).trim();
   const button = tile.querySelector<HTMLButtonElement>("[data-scene-pause]");
+  const title = chapter.querySelector<HTMLElement>("h1");
   const canvas = document.createElement("canvas");
   canvas.className = "absolute inset-0 size-full";
   canvas.dataset.sceneCanvas = "";
   canvas.setAttribute("aria-hidden", "true");
-  // Right over the poster, under the layer that pauses it.
+  // Right over the poster, under the button that pauses it.
   tile.querySelector("[data-retama-poster]")?.after(canvas);
 
   const worker = new Worker(new URL("./scene-worker.ts", import.meta.url), { type: "module" });
   const send = (message: ToScene, transfer: Transferable[] = []) => worker.postMessage(message, transfer);
   let visible = true;
   let paused = false;
+  let settled = false;
+  let onTitle = false;
   const cleanups: (() => void)[] = [];
+  // The title shows its glyphs while the scene assembles it and while the pointer is on it, its letters otherwise.
+  const showWord = () => {
+    const code = !settled || onTitle;
+    chapter.dataset.word = code ? "code" : "solid";
+    send({ type: "code", on: onTitle });
+  };
 
   const setState = (state: State) => {
     tile.dataset.sceneState = state;
@@ -129,6 +141,7 @@ async function start(tile: HTMLElement, chapter: HTMLElement, words: HTMLElement
   const giveUp = () => {
     if (tile.dataset.sceneState === "poster") return;
     setState("poster");
+    delete chapter.dataset.word;
     for (const cleanup of cleanups) cleanup();
     // The canvas fades out over the poster before it goes.
     setTimeout(() => {
@@ -139,8 +152,13 @@ async function start(tile: HTMLElement, chapter: HTMLElement, words: HTMLElement
   const sync = () => send({ type: "run", run: visible && !paused && !document.hidden });
 
   worker.addEventListener("message", (event: MessageEvent<FromScene>) => {
-    if (event.data.type === "running") setState("running");
-    else giveUp();
+    if (event.data.type === "running") {
+      setState("running");
+      showWord();
+    } else if (event.data.type === "settled") {
+      settled = true;
+      showWord();
+    } else giveUp();
   });
   worker.addEventListener("error", giveUp);
   setState("loading");
@@ -206,6 +224,7 @@ async function start(tile: HTMLElement, chapter: HTMLElement, words: HTMLElement
       paused = !paused;
       const label = paused ? button.dataset.play : button.dataset.pause;
       if (label) button.setAttribute("aria-label", label);
+      button.toggleAttribute("data-paused", paused);
       sync();
     };
     button.addEventListener("click", toggle);
@@ -219,11 +238,21 @@ async function start(tile: HTMLElement, chapter: HTMLElement, words: HTMLElement
       send({ type: "point", at: [event.clientX - box.left, event.clientY - box.top] });
     };
     const leave = () => send({ type: "point" });
+    const hover = (on: boolean) => () => {
+      onTitle = on;
+      showWord();
+    };
+    const enter = hover(true);
+    const exit = hover(false);
     chapter.addEventListener("pointermove", follow);
     chapter.addEventListener("pointerleave", leave);
+    title?.addEventListener("pointerenter", enter);
+    title?.addEventListener("pointerleave", exit);
     cleanups.push(() => {
       chapter.removeEventListener("pointermove", follow);
       chapter.removeEventListener("pointerleave", leave);
+      title?.removeEventListener("pointerenter", enter);
+      title?.removeEventListener("pointerleave", exit);
     });
   }
   sync();

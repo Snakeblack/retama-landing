@@ -6,7 +6,8 @@ import type { Plant, PlantPoint } from "./retama-scene";
 import { HERO } from "./retama-shape";
 
 export type Vec3 = [x: number, y: number, z: number];
-export const GLYPH_KIND = { word: 0, stem: 1, root: 2, taproot: 3 } as const;
+/** A word's glyphs are `word` in the ink or `accent` in the primary colour. */
+export const GLYPH_KIND = { word: 0, stem: 1, root: 2, taproot: 3, accent: 4 } as const;
 export type GlyphKind = (typeof GLYPH_KIND)[keyof typeof GLYPH_KIND];
 
 export interface Glyph {
@@ -69,6 +70,7 @@ export function wordGlyphs(
   samples: [x: number, y: number][],
   sequence: (index: number) => number,
   seed: number,
+  kind: typeof GLYPH_KIND.word | typeof GLYPH_KIND.accent = GLYPH_KIND.word,
 ): Glyph[] {
   const next = random(seed);
   const xs = samples.map(([x]) => x);
@@ -78,7 +80,7 @@ export function wordGlyphs(
     const turn = next() * Math.PI * 2;
     const reach = 260 + next() * 900;
     return {
-      kind: GLYPH_KIND.word,
+      kind,
       origin: [x + Math.cos(turn) * reach, -y + Math.sin(turn) * reach, (next() * 2 - 1) * 900],
       target: [x, -y, 0],
       cell: sequence(index),

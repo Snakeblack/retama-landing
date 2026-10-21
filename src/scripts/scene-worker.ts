@@ -17,10 +17,14 @@ export type ToScene =
     }
   | { type: "layout"; stage: Stage; words: Word[] }
   | { type: "scroll"; top: number }
+  | { type: "code"; on: boolean }
   | { type: "point"; at?: [x: number, y: number] }
   | { type: "run"; run: boolean };
-/** "running" after the first frame; "gave-up" when the scene failed, lost its device or ran too slow. */
-export type FromScene = { type: "running" } | { type: "gave-up" };
+/**
+ * "running" after the first frame; "settled" when the title's glyphs give way to its letters; "gave-up" when the scene
+ * failed, lost its device or ran too slow.
+ */
+export type FromScene = { type: "running" } | { type: "settled" } | { type: "gave-up" };
 
 const post = (message: FromScene) => self.postMessage(message);
 
@@ -67,7 +71,9 @@ self.addEventListener("message", async (event: MessageEvent<ToScene>) => {
   const message = event.data;
   if (message.type === "start") {
     try {
-      scene = await createScene(message.canvas, message.tier, message.colors, message.pixelRatio, giveUp);
+      scene = await createScene(message.canvas, message.tier, message.colors, message.pixelRatio, giveUp, () =>
+        post({ type: "settled" }),
+      );
       scene.layout(message.stage, message.words);
     } catch {
       giveUp();
@@ -76,6 +82,8 @@ self.addEventListener("message", async (event: MessageEvent<ToScene>) => {
     scene?.layout(message.stage, message.words);
   } else if (message.type === "scroll") {
     scene?.scroll(message.top);
+  } else if (message.type === "code") {
+    scene?.code(message.on);
   } else if (message.type === "point") {
     scene?.point(message.at);
   } else {

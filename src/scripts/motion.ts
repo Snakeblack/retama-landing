@@ -19,7 +19,6 @@ const MUTED = 0.3;
 const QUERIES = {
   move: "(prefers-reduced-motion: no-preference)",
   still: "(prefers-reduced-motion: reduce)",
-  hover: "(hover: hover) and (pointer: fine)",
 };
 
 /** Inside each group the tiles enter in order, once, as the group arrives; lists arrive row by row. */
@@ -310,63 +309,12 @@ function countUp() {
   };
 }
 
-/**
- * The code lens over the word of the first chapter: with a fine pointer, a circle that follows it shows the letters
- * made of code. Touch screens have no pointer to follow; the decode on the first paint (global.css) is theirs too.
- */
-function codeLens({ move }: { move: boolean }) {
-  const lens = document.querySelector<HTMLElement>("[data-lens]");
-  const band = lens?.parentElement;
-  if (!lens || !band) return;
-  const position = { x: 0, y: 0 };
-  const paint = () => {
-    lens.style.setProperty("--lens-x", `${position.x}px`);
-    lens.style.setProperty("--lens-y", `${position.y}px`);
-  };
-  const show = (to: number, duration = motion.duration.ui) =>
-    gsap.to(lens, { "--lens": to, duration, ease: motion.ease.out, overwrite: "auto" });
-  lens.toggleAttribute("data-lens-still", !move);
-
-  const options = { duration: motion.duration.ui, ease: motion.ease.out, onUpdate: paint };
-  const toX = gsap.quickTo(position, "x", options);
-  const toY = gsap.quickTo(position, "y", options);
-  const follow = (event: PointerEvent, jump = false) => {
-    const box = lens.getBoundingClientRect();
-    const x = event.clientX - box.left;
-    const y = event.clientY - box.top;
-    if (jump) {
-      Object.assign(position, { x, y });
-      paint();
-    }
-    toX(x);
-    toY(y);
-  };
-  const enter = (event: PointerEvent) => {
-    follow(event, true);
-    show(1);
-  };
-  const leave = () => show(0);
-  band.addEventListener("pointerenter", enter);
-  band.addEventListener("pointermove", follow);
-  band.addEventListener("pointerleave", leave);
-  return () => {
-    band.removeEventListener("pointerenter", enter);
-    band.removeEventListener("pointermove", follow);
-    band.removeEventListener("pointerleave", leave);
-  };
-}
-
 const media = gsap.matchMedia();
 media.add(QUERIES, (context) => {
-  const { move = false, still = false, hover = false } = context.conditions ?? {};
+  const { move = false, still = false } = context.conditions ?? {};
   if (!move && !still) return;
   entrances(move);
-  const cleanups = [
-    sectorsSwitcher(move),
-    manifesto(),
-    move ? countUp() : undefined,
-    hover ? codeLens({ move }) : undefined,
-  ];
+  const cleanups = [sectorsSwitcher(move), manifesto(), move ? countUp() : undefined];
   return () => {
     for (const cleanup of cleanups) cleanup?.();
   };

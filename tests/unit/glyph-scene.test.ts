@@ -53,6 +53,10 @@ describe("glifos de la palabra", () => {
   it("es determinista", () => {
     expect(wordGlyphs(samples, sequence, 7)).toEqual(glyphs);
   });
+
+  it("una palabra puede ir en el color de acento", () => {
+    for (const glyph of wordGlyphs(samples, sequence, 7, GLYPH_KIND.accent)) expect(glyph.kind).toBe(GLYPH_KIND.accent);
+  });
 });
 
 describe("glifos de la planta", () => {
