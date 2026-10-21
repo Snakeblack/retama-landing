@@ -225,6 +225,62 @@
       "reason": "HTML completo sin JS, canónica y hreflang recíprocos, sitemap con alternates, SEO de Lighthouse 100. JSON-LD queda para M4 (roadmap)."
     }
   ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "evidence": "pnpm test:e2e --grep 'ADR 0001' (2/2) en local y job e2e verde en CI (PR #5, run 39519149269): h1 y texto presentes con JS desactivado en / y /en/. Hoy no hay JS propio; el presupuesto por página se fija con la primera isla (M2).",
+      "recorded_at": "2026-10-21T00:11:10.332Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0002",
+      "evidence": "node scripts/fitness.mjs on-demand-routes: ninguna ruta on-demand (salida static); se comprobó que una página con prerender=false fuera de la lista permitida lo hace fallar. Corre en el job quality.",
+      "recorded_at": "2026-10-21T00:11:10.401Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "evidence": "pnpm build && node scripts/fitness.mjs no-persistent-bindings: ningún binding persistente en wrangler.jsonc ni en el dist/client/wrangler.json generado (session:false, imageService:compile); se comprobó que un kv_namespaces inyectado lo hace fallar. El test de logs llega con la función de contacto (M3).",
+      "recorded_at": "2026-10-21T00:11:10.469Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "evidence": "Lighthouse CI con preset móvil: 100×4 en / y /en/ (3 pasadas en local; job lighthouse verde en CI). Los E2E de movimiento reducido y fallback del 3D no aplican hasta que exista la escena (M2).",
+      "recorded_at": "2026-10-21T00:11:10.540Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint: lint de DESIGN.md sin hallazgos y theme.css sincronizado; se comprobó que un contraste de 1,55:1 y un tema desincronizado lo hacen fallar. La regla de lint de estilos para valores sueltos queda para M1.",
+      "recorded_at": "2026-10-21T00:11:10.611Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0007",
+      "evidence": "pnpm test:e2e --grep 'ADR 0007': cero cookies y cero peticiones a otros orígenes en / y /en/, incluida la navegación entre idiomas; job e2e verde en CI.",
+      "recorded_at": "2026-10-21T00:11:10.679Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "evidence": "Unit tests de paridad de claves, rutas, canónica y alternates (10/10) y E2E de hreflang recíproco con x-default en todas las URLs del sitemap; en verde en local y en CI.",
+      "recorded_at": "2026-10-21T00:11:10.747Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0009",
+      "evidence": "node scripts/fitness.mjs branch-protection: main exige quality, e2e y lighthouse (strict), PR obligatorio, enforce_admins, historial lineal y sin force-push ni borrado; aplicado vía API el 2026-10-21 tras hacer público el repo.",
+      "recorded_at": "2026-10-21T00:11:10.813Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0010",
+      "evidence": "pnpm skills:scan: 20 carpetas coinciden con el manifiesto y no hay hallazgos sin revisar; las pruebas de mutación (inyección, symlink anidado y de primer nivel) lo hacen fallar; 3 generaciones de trust review, la última sin hallazgos.",
+      "recorded_at": "2026-10-21T00:11:10.882Z"
+    }
+  ],
   "obligations": [
     {
       "id": "checks-pass",
