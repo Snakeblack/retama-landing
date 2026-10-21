@@ -1,0 +1,89 @@
+---
+import { type Locale, localizedPath, t } from "../i18n/index";
+import LangSwitch from "./LangSwitch.astro";
+import Wordmark from "./Wordmark.astro";
+
+interface Props {
+  locale: Locale;
+  /** Each chapter: its translated anchor, its name and the heading that opens it. */
+  chapters: { anchor: string; name: string; title: string }[];
+}
+
+const { locale, chapters } = Astro.props;
+const copy = t(locale);
+const entries = [{ anchor: "top", name: copy["nav.home"], title: `${copy["hero.word"]} ${copy["hero.rest"]}` }, ...chapters];
+---
+
+<!-- DESIGN.md Layout, the chapter index of phones: a native modal dialog opened and closed by invoker commands, so it
+     traps the focus, closes with Escape and needs no script; header.ts adds the rest (see there). -->
+<button
+  class="feedback flex min-h-(--spacing-touch) cursor-pointer items-center gap-sm bg-surface-raised px-md type-small text-on-surface hover:bg-field hover:text-on-field md:hidden"
+  type="button"
+  commandfor="chapter-index"
+  command="show-modal"
+  aria-haspopup="dialog"
+  data-index-open
+>
+  <svg class="size-md fill-current" viewBox="0 0 16 16" aria-hidden="true">
+    <rect x="1" y="4" width="14" height="2"></rect>
+    <rect x="1" y="10" width="14" height="2"></rect>
+  </svg>
+  {copy["nav.index"]}
+</button>
+
+<dialog id="chapter-index" aria-label={copy["nav.index"]} data-index>
+  <div class="h-bar bg-primary" aria-hidden="true"></div>
+  <div class="px-margin py-md">
+    <div class="flex items-center gap-md px-tile-sm">
+      <a class="feedback mr-auto type-wordmark text-on-surface hover:text-primary" href={localizedPath(locale, "/")}>
+        <Wordmark class="block" />
+        <span class="sr-only">Retama</span>
+      </a>
+      <LangSwitch locale={locale} />
+      <button
+        class="feedback flex min-h-(--spacing-touch) cursor-pointer items-center gap-sm bg-surface-raised px-md type-small text-on-surface hover:bg-field hover:text-on-field"
+        type="button"
+        commandfor="chapter-index"
+        command="close"
+        autofocus
+        data-index-close
+      >
+        <svg class="size-md fill-current" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M2.3 3.7 3.7 2.3 8 6.6l4.3-4.3 1.4 1.4L9.4 8l4.3 4.3-1.4 1.4L8 9.4l-4.3 4.3-1.4-1.4L6.6 8Z"></path>
+        </svg>
+        {copy["nav.close"]}
+      </button>
+    </div>
+  </div>
+
+  <!-- One raised tile per chapter: its name at headline size and the heading that opens it; header.ts marks the
+       chapter on screen when the index opens. -->
+  <nav aria-label={copy["nav.label"]}>
+    <ul class="grid gap-gap px-margin">
+      {
+        entries.map(({ anchor, name, title }) => (
+          <li>
+            <a class="group feedback flex items-start justify-between gap-md bg-surface-raised p-tile-sm hover:bg-field hover:text-on-field" href={`#${anchor}`} data-index-link>
+              <span class="grid gap-xs">
+                <span class="type-headline-sm group-aria-[current=location]:text-primary">{name}</span>
+                <span class="type-small text-on-surface-muted group-hover:text-on-field">{title}</span>
+              </span>
+              <span class="hidden items-center gap-sm type-small text-on-surface-muted group-hover:text-on-field group-aria-[current=location]:flex" aria-hidden="true">
+                <span class="size-sm bg-primary"></span>
+                {copy["nav.here"]}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <!-- The one action, within reach of the thumb. -->
+  <div class="mt-auto grid gap-md p-margin">
+    <p class="max-w-(--spacing-measure) px-tile-sm type-small text-on-surface-muted">{copy["contact.lead"]}</p>
+    <a class="feedback flex min-h-(--spacing-touch) items-center bg-primary px-lg type-label text-on-primary hover:bg-field hover:text-on-field" href={`#${copy["anchor.contact"]}`} data-index-link>
+      {copy["nav.talk"]}
+    </a>
+  </div>
+</dialog>

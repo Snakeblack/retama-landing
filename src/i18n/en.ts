@@ -14,6 +14,10 @@ export const en = {
   "anchor.method": "method",
   "anchor.contact": "contact",
   "nav.talk": "Let's talk",
+  "nav.index": "Contents",
+  "nav.close": "Close",
+  "nav.home": "Home",
+  "nav.here": "You are here",
 
   "hero.word": "Software",
   "hero.rest": "made to measure",

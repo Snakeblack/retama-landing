@@ -144,6 +144,100 @@
   }
 }
 
+/* DESIGN.md Layout: the floating header. Its height is the bar, the row of touch-sized controls and their padding;
+   the first chapter clears it on phones and a chapter reached by a link stops below it. header.ts sets data-hidden while
+   the page scrolls down: the bar slides away, or fades with reduced motion, and stays focusable. */
+:root {
+  --header-height: calc(var(--spacing-bar) + var(--spacing-md) * 2 + var(--spacing-touch));
+}
+
+main section[id] {
+  scroll-margin-top: var(--header-height);
+}
+
+[data-header-bar] {
+  transition:
+    translate var(--t-ui) var(--ease-out),
+    opacity var(--t-ui) var(--ease-out);
+
+  &[data-hidden] {
+    translate: 0 -100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &[data-hidden] {
+      translate: none;
+      opacity: 0;
+    }
+  }
+}
+
+/* DESIGN.md Layout, the chapter index of phones: a modal dialog over the whole screen, on the page's ground. It wipes
+   in from the top and its tiles rise in order; with reduced motion they only fade in. The page under it stays still. */
+[data-index] {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+    animation: index-wipe var(--t-ui) var(--ease-in-out);
+  }
+
+  &[open] li {
+    animation: index-rise var(--t-ui) var(--ease-out) both;
+  }
+
+  &[open] li:nth-child(2) {
+    animation-delay: var(--stagger-item);
+  }
+
+  &[open] li:nth-child(3) {
+    animation-delay: calc(var(--stagger-item) * 2);
+  }
+
+  &[open] li:nth-child(4) {
+    animation-delay: calc(var(--stagger-item) * 3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &[open],
+    &[open] li {
+      animation-name: index-fade;
+    }
+  }
+}
+
+:root:has([data-index][open]) {
+  overflow: hidden;
+}
+
+@keyframes index-wipe {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes index-rise {
+  from {
+    opacity: 0;
+    translate: 0 var(--spacing-md);
+  }
+}
+
+@keyframes index-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 /* DESIGN.md Layout: the fixed action. Where scroll-driven animations exist it fades out while the first chapter
    (which has its own action) or the contact chapter is on screen; elsewhere, and with the keyboard on it, it stays. */
 @supports (animation-timeline: view()) and (timeline-scope: none) {
@@ -171,6 +265,20 @@
 
   [data-talk]:focus-visible {
     animation: none;
+  }
+
+  /* Over the first chapter the header has no ground of its own, so the scene runs under it; it takes the page's
+     ground as the chapter leaves, by the time the next one reaches it. */
+  :root:has([data-chapter="hero"]) [data-header-bar] {
+    animation: header-ground linear both;
+    animation-timeline: --chapter-hero;
+    animation-range: exit calc(100% - var(--header-height) * 2) exit calc(100% - var(--header-height));
+  }
+}
+
+@keyframes header-ground {
+  from {
+    background-color: transparent;
   }
 }
 

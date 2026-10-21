@@ -1,0 +1,40 @@
+---
+import { type Locale, localizedPath, locales, pathWithoutLocale, t } from "../i18n/index";
+
+interface Props {
+  locale: Locale;
+  /** The header's switch carries the lang-switch hook; its copy inside the chapter index does not. */
+  primary?: boolean;
+  class?: string;
+}
+
+const { locale, primary = false, class: className } = Astro.props;
+const page = pathWithoutLocale(Astro.url.pathname);
+---
+
+<!-- DESIGN.md Layout: the language switch, both codes in a fixed order. The current one is plain ink; the other links
+     to the same page in its language, and says so in full to assistive technology. -->
+<span class:list={["flex items-center gap-xs type-small text-on-surface-muted", className]}>
+  {
+    locales.map((code, index) => (
+      <>
+        {index > 0 && <span aria-hidden="true">/</span>}
+        {code === locale ? (
+          <span class="text-on-surface" aria-hidden="true">
+            {code.toUpperCase()}
+          </span>
+        ) : (
+          <a
+            class:list={["feedback -mx-xs flex min-h-(--spacing-touch) items-center px-xs hover:text-primary", { "lang-switch": primary }]}
+            href={localizedPath(code, page)}
+            hreflang={code}
+            lang={code}
+          >
+            {code.toUpperCase()}{" "}
+            <span class="sr-only">{t(locale)["nav.switchLabel"]}</span>
+          </a>
+        )}
+      </>
+    ))
+  }
+</span>
