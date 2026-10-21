@@ -15,13 +15,17 @@ import {
   floor,
   fract,
   hash,
+  If,
   instancedBufferAttribute,
+  luminance,
   mix,
   mod,
   mx_noise_float,
   normalize,
   pass,
   positionGeometry,
+  pow,
+  screenCoordinate,
   select,
   sin,
   smoothstep,
@@ -31,18 +35,24 @@ import {
   varying,
   vec2,
   vec3,
+  vec4,
 } from "three/tsl";
 import {
   AdditiveBlending,
   CanvasTexture,
   Color,
+  DataTexture,
   InstancedBufferAttribute,
   InstancedMesh,
+  LinearFilter,
   LinearMipmapLinearFilter,
   MeshBasicNodeMaterial,
+  type Node,
   PerspectiveCamera,
   PlaneGeometry,
+  RedFormat,
   RenderPipeline,
+  RepeatWrapping,
   Scene,
   Vector3,
   WebGPURenderer,
@@ -58,6 +68,7 @@ import {
   RAIN_START,
   wordGlyphs,
 } from "../lib/glyph-scene";
+import { grainTile } from "../lib/grain";
 import { retamaPlant, stormForce } from "../lib/retama-scene";
 import { HERO, retamaShape } from "../lib/retama-shape";
 import source from "../lib/retama-shape.ts?raw";
@@ -146,6 +157,52 @@ function atlas() {
   return { map, rows, count: characters.length, sequence };
 }
 
+// DESIGN.md Elevation & Depth, the grain: the scene paints its own ground, so it carries the page's grain itself, on
+// the GPU, never on the load: it fades in over `fade` seconds once the retama has grown, and until then the shader
+// skips it, so assembling the title costs nothing more. The same split as the page's: the ground's grain on the
+// graphite, a light layer of it, a third of the strength, over the glyphs. Both are multiplied, so the grain only
+// darkens, and still on the screen. The noise is one small tile computed once (src/lib/grain.ts), about two CSS pixels
+// a grain like the page's SVGs, so each pixel only reads it.
+// The tile's value noise spreads wider than the SVG's turbulence and centres lower, so `spread` and `centre` match it to
+// the page's grain (measured on screenshots of both grounds: the same mean and deviation of the ink).
+const GRAIN = {
+  size: 256,
+  frequency: 0.55,
+  spread: 0.26,
+  centre: 0.565,
+  ground: { slope: 0.9, intercept: 0.445 },
+  layer: 0.1,
+  fade: 0.8,
+};
+
+function grained(lit: Node<"vec4">, groundCss: string, scale: number, amount: Node<"float">) {
+  const { r, g, b } = new Color(groundCss);
+  const ground = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  const tile = new DataTexture(grainTile(GRAIN.size, GRAIN.frequency), GRAIN.size, GRAIN.size, RedFormat);
+  tile.wrapS = RepeatWrapping;
+  tile.wrapT = RepeatWrapping;
+  tile.magFilter = LinearFilter;
+  tile.minFilter = LinearFilter;
+  tile.needsUpdate = true;
+  return Fn(() => {
+    const out = vec4(lit).toVar();
+    If(amount.greaterThan(0), () => {
+      const noise = texture(tile, screenCoordinate.xy.div(scale * GRAIN.size))
+        .r.sub(0.5)
+        .mul(GRAIN.spread)
+        .add(GRAIN.centre);
+      const groundGrain = clamp(noise.mul(GRAIN.ground.slope).add(GRAIN.ground.intercept), 0, 1);
+      const layerGrain = float(1).sub(float(GRAIN.layer).mul(float(1).sub(clamp(noise.mul(2).sub(0.5), 0, 1))));
+      // A pixel is ground until a glyph lights it; the ground's grain gives way as it does.
+      const onGround = float(1).sub(smoothstep(ground * 1.5, ground * 6, luminance(out.rgb)));
+      // The page multiplies in sRGB; the pipeline works in linear light.
+      const factor = pow(mix(layerGrain, groundGrain.mul(layerGrain), onGround), 2.2);
+      out.rgb.assign(out.rgb.mul(mix(float(1), factor, amount)));
+    });
+    return out;
+  })();
+}
+
 export async function createScene(
   canvas: HTMLCanvasElement | OffscreenCanvas,
   tier: Exclude<Tier, "poster">,
@@ -167,7 +224,9 @@ export async function createScene(
   const pipeline = new RenderPipeline(renderer);
   const drawn = pass(scene, camera).getTextureNode();
   // Only what is brighter than the ink blooms: the glyphs in flight and the sap.
-  pipeline.outputNode = drawn.add(bloom(drawn, 0.9, 0.4, 0.9));
+  const lit = drawn.add(bloom(drawn, 0.9, 0.4, 0.9));
+  const grain = uniform(0);
+  pipeline.outputNode = grained(lit, colors.ground, Math.min(pixelRatio, 2), grain);
 
   const clock = uniform(0);
   const sap = uniform(0);
@@ -334,6 +393,7 @@ export async function createScene(
         settled = true;
         onSettled();
       }
+      if (settled) grain.value = Math.min(1, grain.value + dt / GRAIN.fade);
       const target = coded || !settled ? 1 : 0;
       reveal.value += Math.sign(target - reveal.value) * Math.min(Math.abs(target - reveal.value), dt / SWEEP);
       aim();
