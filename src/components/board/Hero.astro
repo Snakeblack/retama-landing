@@ -19,7 +19,8 @@ const facts = ["hero.fact1", "hero.fact2", "hero.fact3", "hero.fact4", "hero.fac
 <!-- DESIGN.md: "Name band and rails". Phone order: name, links, the action, scene, statement, then the rails in pairs. -->
 <div class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows">
   <p class="col-span-2 overflow-hidden bg-surface-raised py-tile-sm whitespace-nowrap type-display-sm md:p-tile md:type-display lg:col-span-12 lg:row-span-2" aria-hidden="true">
-    Retama
+    <!-- DESIGN.md Motion: the code lens; its layer is a copy of the name drawn by CSS from data-text. -->
+    <span class="relative inline-block" data-lens data-text="Retama">Retama</span>
   </p>
 
   <nav class="col-span-2 lg:col-span-9" aria-label={copy["nav.label"]}>
@@ -27,7 +28,7 @@ const facts = ["hero.fact1", "hero.fact2", "hero.fact3", "hero.fact4", "hero.fac
       {
         sections.map(([anchor, label]) => (
           <li>
-            <a class="flex min-h-(--spacing-row) bg-surface-raised p-tile-sm type-label text-on-surface hover:bg-field hover:text-on-field md:p-tile" href={`#${copy[anchor]}`}>
+            <a class="feedback flex min-h-(--spacing-row) bg-surface-raised p-tile-sm type-label text-on-surface hover:bg-field hover:text-on-field md:p-tile" href={`#${copy[anchor]}`}>
               {copy[label]}
             </a>
           </li>
@@ -36,11 +37,11 @@ const facts = ["hero.fact1", "hero.fact2", "hero.fact3", "hero.fact4", "hero.fac
     </ul>
   </nav>
 
-  <a class="col-span-2 flex min-h-(--spacing-row) bg-primary p-tile-sm type-label text-on-primary hover:bg-field hover:text-on-field md:p-tile lg:col-span-3" href={`#${copy["anchor.contact"]}`}>
+  <a class="feedback col-span-2 flex min-h-(--spacing-row) bg-primary p-tile-sm type-label text-on-primary hover:bg-field hover:text-on-field md:p-tile lg:col-span-3" href={`#${copy["anchor.contact"]}`}>
     {copy["hero.action"]}
   </a>
 
-  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-8 lg:col-start-3 lg:row-span-5 lg:row-start-4 lg:aspect-auto" data-scene>
+  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-8 lg:col-start-3 lg:row-span-5 lg:row-start-4 lg:aspect-auto" data-scene data-shutter>
     <Poster class="block size-full" label={copy["hero.poster"]} />
   </div>
 
@@ -49,7 +50,7 @@ const facts = ["hero.fact1", "hero.fact2", "hero.fact3", "hero.fact4", "hero.fac
   </div>
 
   <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-2 lg:col-start-11 lg:row-span-3 lg:row-start-4">
-    <p class="type-headline-sm md:type-headline">{copy["hero.figure1"]}</p>
+    <p class="type-headline-sm tabular-nums md:type-headline" data-count>{copy["hero.figure1"]}</p>
     <p class="type-small text-on-surface-muted">{copy["hero.figure1Caption"]}</p>
   </div>
 

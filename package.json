@@ -24,7 +24,8 @@
   "dependencies": {
     "@astrojs/cloudflare": "14.4.1",
     "@astrojs/sitemap": "3.7.4",
-    "astro": "7.4.1"
+    "astro": "7.4.1",
+    "gsap": "3.15.0"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.11",

@@ -68,7 +68,7 @@ const projects = [
     <p class="max-w-(--spacing-measure)">{copy["method.fieldNote"]}</p>
   </div>
 
-  <div class="col-span-2 grid gap-gap lg:col-span-12">
+  <div class="col-span-2 grid gap-gap lg:col-span-12" data-rows>
     <div class="bg-surface-raised p-tile-sm md:p-tile">
       <h3 class="text-balance type-statement-sm md:type-statement">{copy["live.title"]}</h3>
       <p class="text-on-surface-muted">{copy["live.lead"]}</p>
@@ -76,7 +76,7 @@ const projects = [
     {
       projects.map(([name, ...decisions], index) => (
         <details class="group bg-surface-raised" name="project" open={index === 0}>
-          <summary class="flex min-h-(--spacing-touch) cursor-pointer list-none items-center gap-md p-tile-sm type-statement-sm group-open:text-primary hover:bg-field hover:text-on-field md:p-tile md:type-statement [&::-webkit-details-marker]:hidden">
+          <summary class="feedback flex min-h-(--spacing-touch) cursor-pointer list-none items-center gap-md p-tile-sm type-statement-sm group-open:text-primary hover:bg-field hover:text-on-field md:p-tile md:type-statement [&::-webkit-details-marker]:hidden">
             <span class="size-md shrink-0 bg-on-surface-muted group-open:bg-primary" aria-hidden="true" />
             {copy[name]}
           </summary>
