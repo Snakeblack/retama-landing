@@ -47,19 +47,20 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
   <body>
     <!-- DESIGN.md Layout: the header floats over the page, the first chapter's scene included; header.ts sends it away
          while the page scrolls down and back as soon as it scrolls up. Its text lines up with the text inside the tiles:
-         page margin plus tile padding. A page may add its links (slot "nav", from md), its chapter index (slot "menu",
-         on phones) and its fixed action (slot "action", outside the bar that moves). -->
+         page margin plus tile padding. The wordmark stands alone on the left and the rest gathers on the right: a page
+         may add its links (slot "nav", from md), its chapter index (slot "menu", on phones) and its fixed action (slot
+         "action", outside the bar that moves). -->
     <header>
       <div class="fixed inset-x-0 top-0 z-20 bg-surface" data-header-bar>
         <div class="h-bar bg-primary" aria-hidden="true"></div>
         <div class="px-margin py-md">
           <div class="flex items-center gap-md px-tile-sm md:gap-lg md:px-tile">
-            <a class="feedback type-wordmark text-on-surface hover:text-primary" href={localizedPath(locale, "/")}>
+            <a class="feedback mr-auto type-wordmark text-on-surface hover:text-primary" href={localizedPath(locale, "/")}>
               <Wordmark class="block" />
               <span class="sr-only">Retama</span>
             </a>
             <slot name="nav" />
-            <LangSwitch class="ml-auto" locale={locale} primary />
+            <LangSwitch locale={locale} primary />
             <slot name="menu" />
           </div>
         </div>

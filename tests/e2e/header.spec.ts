@@ -105,10 +105,16 @@ test.describe("cabecera flotante e índice de capítulos en el móvil (DESIGN.md
 test.describe("cabecera en escritorio (DESIGN.md Layout)", () => {
   test.use({ viewport: desktop });
 
-  test("los enlaces siguen en la cabecera y el índice no aparece", async ({ page }) => {
+  test("los enlaces siguen en la cabecera, a la derecha junto al idioma, y el índice no aparece", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("banner").getByRole("navigation").getByRole("link")).toHaveCount(3);
+    const nav = page.getByRole("banner").getByRole("navigation");
+    await expect(nav.getByRole("link")).toHaveCount(3);
     await expect(page.getByRole("button", { name: "Índice" })).toBeHidden();
+    // The wordmark stands alone on the left; the links gather on the right, next to the language switch.
+    const links = await nav.boundingBox();
+    const switcher = await page.locator("a.lang-switch").locator("..").boundingBox();
+    expect(links?.x ?? 0).toBeGreaterThan(desktop.width / 2);
+    expect((switcher?.x ?? 0) - ((links?.x ?? 0) + (links?.width ?? 0))).toBeLessThanOrEqual(48);
   });
 
   test("el selector de idioma muestra ES / EN y enlaza el otro idioma con su nombre completo", async ({ page }) => {
