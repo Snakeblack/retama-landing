@@ -103,7 +103,7 @@ test.describe("sin JavaScript (ADR 0001)", () => {
 
     test(`${path} cambia de tipo de proyecto sin JavaScript, de uno en uno`, async ({ page }) => {
       await page.goto(path);
-      const projects = page.locator("main details");
+      const projects = page.locator(`main details[name="project"]`);
       await expect(projects).toHaveCount(4);
       await expect(projects.first()).toHaveAttribute("open", "");
       await expect(projects.first().locator("ol > li")).toHaveCount(3);

@@ -1,0 +1,434 @@
+{
+  "schema": "idd-state/v1",
+  "change": "m2-sectors-switcher",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "feature",
+    "summary": "Sectores como selector compacto en vez de escena fijada: pestañas de los 4 sectores, igual en móvil y escritorio, que avanzan solas con barra de progreso mientras se ven y se paran al tocarlas; cada sector cuenta el problema del cliente y tres cosas que construimos, junto a su fragmento de ejemplo, que cobra vida como una app real; sin pin ni scroll extra",
+    "acceptance": "En / y /en/ Sectores ocupa menos de una pantalla en escritorio, no se fija y funciona igual en el móvil; las pestañas cambian el sector con un wipe, avanzan solas mientras se ven y paran al interactuar; cada sector muestra problema, tres entregables y su fragmento, que cambia de estado mientras se ve; sin JS es un acordeón exclusivo con todo el texto; con reduced-motion no avanza ni se anima; CSP sin violaciones, presupuesto de JS y Lighthouse 100 x4"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "en el móvil, ¿las 4 pestañas van en una fila desplazable o en una rejilla de 2×2?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿se retira el pin por completo y la página queda sin escena fijada? (respondido: sí, sin pin)"
+      },
+      {
+        "category": "persistence",
+        "question": "¿cuánto se queda cada sector antes de avanzar y cuánto dura cada cambio de estado de los fragmentos?"
+      },
+      {
+        "category": "copy",
+        "question": "¿el problema y los tres entregables de cada sector los propongo yo en es/en para revisarlos en el PR? (respondido: sí)"
+      },
+      {
+        "category": "url-state",
+        "question": "¿el sector abierto se refleja en la URL? (propuesta: no, empieza siempre en Logística)"
+      },
+      {
+        "category": "accessibility",
+        "question": "el avance automático y los fragmentos vivos son contenido que se mueve más de 5 s (WCAG 2.2.2): ¿una sola vuelta y luego quieto, pausa al pasar el puntero o el foco y parada al tocar, o además un botón de pausa?"
+      },
+      {
+        "category": "errors",
+        "question": "sin JS o si GSAP no carga, ¿basta el acordeón exclusivo con todo el texto?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/board/ExampleTable.astro",
+      "src/components/board/PortalFragment.astro",
+      "src/components/board/Sectors.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/scripts/motion.ts",
+      "src/styles/global.css",
+      "tests/e2e/motion.spec.ts",
+      "tests/e2e/site.spec.ts"
+    ],
+    "work_units": 3,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0008 and quality scenario brand-impact, perf-mobile",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Todo el texto, incluidos los estados siguientes de los fragmentos (data-live), está en el HTML; sin JS es un acordeón nativo. Presupuesto de JS por página comprobado"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Tiempos y curvas de los tokens (t-reveal, ease-in-out, t-hover, t-ui); design:lint limpio; DESIGN.md describe el selector"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin style ni manejadores inline: barra, wipe y estados vía CSSOM y atributos desde la isla; e2e de CSP con workerd"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Problema, entregables y estados nuevos con las mismas claves en es.ts y en.ts"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "Cada sector cuenta un problema y tres entregables y su fragmento funciona como una app real, sin hacer pagar con scroll"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "Sin pin; los paneles cerrados guardan tamaño, así la vuelta no provoca desplazamientos; la vuelta solo corre en pantalla y no toca el primer pantallazo"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Formato: selector compacto, igual en móvil y escritorio, sin pin. Contenido: problema + tres cosas que construimos, copy propuesto por el agente en es/en y revisado en el PR. Fragmentos vivos como una app real. Pausa: una vuelta por entrada en pantalla y luego quieto, pausa con puntero o foco encima, parada al elegir una pestaña, sin botón. Móvil: pestañas en rejilla 2×2. Ritmo: 6 s por sector, cambios de estado de los fragmentos cada ~1,5 s. URL sin estado, empieza en Logística; sin JS, acordeón exclusivo con todo el texto.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T14:31:30.431Z",
+      "detail": {
+        "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+        "runs": [
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T14:31:30.431Z",
+      "detail": {
+        "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/motion.spec.ts",
+          "tests/e2e/site.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T14:31:30.431Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+        "fitness": [
+          "run-16",
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T14:32:19.422Z"
+    }
+  ],
+  "base": "fa4dcc78fe19d810c2c8635e4351102197b87018",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:15f3a9a22e6c57a9b2a14663133209e3bd0f08ab2886da83171e2ef47941ea60",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:1e4e6018c19689fffa92809c99bc9ecd461707bcdc5228e169ea2eef984fdaa2",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:f5d8cb3c30260a83437e5a558711d11fb11967b7f3a709c29d26c89856623938",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:1cd41b4a3fd93d760f4caeee896ec79d70e9148d9c347a58c202ada44b934081",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 1,
+      "output_sha256": "sha256:7686dd3f89704dbf0f52b262a868e8eefd37a771871190f14a8f5ea1ce87cf68",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:81f7556cc3fefd5fbd393997bf8314d2a8f55cd83b020c47ce7e8f6ec0d482bf",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:342491b686b376b6cc25d5d7fae3b768c8834063c5b05e3a026e0cd88bc91d4d",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:3073e8aee213311eb5f6e3ff3d2e060245909b9439bf23e02ab8d5e6396749e9",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:1f9d88fd36a9f4594fa4bed80a47aabd880691ab98c9f1d1c226ead97a0be124",
+      "tree": "sha256:41d08c41194fb0a9fc8474c9010e8da9521c3411f06e98e8a75b145e0d88eb77",
+      "recorded_at": "2026-10-21T14:29:39.927Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:15f3a9a22e6c57a9b2a14663133209e3bd0f08ab2886da83171e2ef47941ea60",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:a00bd26c6c6d0f9eb7006e5f01f158b11600f37deaac0fed9b8470ee25305e44",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:c065b553f923c0813af70f94214b78e5fa97fbb704de7e3f2ce80c69026b03ac",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:4f1c9fcf237d0b203fab63319ab0450f9f884e04f83a1aa68d6d72d3c09270c9",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:691f093eba7edd2c62a0c3f6c2393bb60ffd11841561a925e0b317ca1907308c",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:f12ccef7c298460abbb45b3ae2eeb33aa6441bbf39429006684b6839ef2dc8b5",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a645178bebdd49cd45d1a7901f61c4de152929c549f21adf7de07522ce2af537",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:3ea0ad2443430f656e7961ac160c8d05adb3b7611460384f4c6764f4f79c8f3d",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:04c17d7c9a960c2e92d3375b5218f57706c294cda16a55c2c1c788f07ec5063a",
+      "tree": "sha256:0d1a337541bab2e6b7596c6035e441b19df2f1fb9595bf82a25d1e09832bd6a3",
+      "recorded_at": "2026-10-21T14:31:30.431Z"
+    }
+  ],
+  "closed_at": "2026-10-21T14:32:19.422Z"
+}
