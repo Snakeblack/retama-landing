@@ -3,6 +3,10 @@
 // invoker commands (ChapterIndex.astro); this script closes it when one of its links is chosen, marks the chapter on
 // screen and opens it where invoker commands do not exist. Without the script the header simply stays.
 
+// DESIGN.md Elevation & Depth: the grain of the grounds comes on once the page has loaded, below the first screen, so
+// painting its noise never holds back the first one (global.css).
+addEventListener("load", () => document.documentElement.setAttribute("data-grain", ""), { once: true });
+
 // Scrolls shorter than this, in pixels, are the jitter of a finger or an inertial stop, not a direction.
 const SLACK = 8;
 
