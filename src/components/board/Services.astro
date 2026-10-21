@@ -1,7 +1,6 @@
 ---
-import { Picture } from "astro:assets";
-import photo from "../../assets/board/retama-monosperma-plant.jpg";
 import { type Locale, t } from "../../i18n/index";
+import ChecksFragment from "./ChecksFragment.astro";
 
 interface Props {
   locale: Locale;
@@ -17,15 +16,8 @@ const items = ["services.item1", "services.item2", "services.item3", "services.i
     <h2 id="services-title" class="text-balance type-headline-sm md:type-headline">{copy["services.title"]}</h2>
   </div>
 
-  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-6 lg:col-start-7 lg:row-span-5 lg:row-start-1 lg:aspect-auto">
-    <Picture
-      src={photo}
-      alt={copy["services.photoAlt"]}
-      formats={["avif", "webp"]}
-      widths={[480, 800, 1200, 1600]}
-      sizes="(min-width: 1024px) 50vw, 100vw"
-      class="absolute inset-0 size-full object-cover"
-    />
+  <div class="col-span-2 lg:col-span-6 lg:col-start-7 lg:row-span-5 lg:row-start-1">
+    <ChecksFragment locale={Astro.props.locale} />
   </div>
 
   <ul class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-2">
