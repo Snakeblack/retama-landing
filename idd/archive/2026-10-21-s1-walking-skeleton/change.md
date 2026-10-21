@@ -60,9 +60,41 @@ Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario
 - Email de autor `retamozogpt@gmail.com` (usuario, 2026-10-21) en todo el historial, también en `main`. GitHub cerró los PRs #1–#5 al reescribirlo y no permite reabrirlos; se sustituyen por #6–#10, y el usuario acepta que el email antiguo quede en esos PRs cerrados. La tag local `ospec-s1-base` conserva el commit base antiguo que usa ospec.
 - Repo público y `main` protegido vía API: checks `quality`, `e2e` y `lighthouse` (strict), PR obligatorio sin aprobaciones (equipo de una persona), enforce_admins, historial lineal y sin force-push ni borrado.
 - Merge de la pila: el workflow solo existe en #10, así que los PRs se fusionan de arriba abajo en su rama base (#10 → … → #7) y #6 entra en `main` con el CI completo y rebase-merge (el historial es lineal y release-please lee los commits).
+- Fusión hecha el 2026-10-21: #10–#7 por fast-forward de sus ramas base (sin reescribir) y #6 con rebase-merge. GitHub reescribe los commits en ese merge y pone como committer el email principal de la cuenta; el autor se conserva.
+- Producción verificada en https://retama-landing.retamozogpt.workers.dev tras el deploy de `main`: `/` (es) y `/en/` responden 200 con canónica, hreflang recíproco con `x-default` y sitemap; `/en` → 307 a `/en/`; las 404 salen en su idioma con `noindex`; HSTS, CSP con hashes, `nosniff`, Referrer-Policy, Permissions-Policy, COOP y `X-Frame-Options: DENY` llegan como cabeceras.
+- release-please abrió el PR de release con el PAT y el CI corrió en él.
+- El PR de prueba de esta rama genera su preview y en él se verifica el ADR 0006.
 - Biome es dueño de JS/TS/JSON/CSS; ESLint solo de `.astro` (soporte experimental en Biome).
 
 ## Evidence
 
 <!-- ospec:evidence:start -->
+- ev-1: check-run for checks-pass (2026-10-20T23:56:02.382Z)
+- ev-2: contract-spec-and-test for contract-spec-and-test (2026-10-20T23:56:02.382Z)
+- ev-3: adr-impact-declaration for adr-impact-declaration (2026-10-20T23:56:02.382Z)
+- ev-4: migration-test for migration-compat-and-test (2026-10-20T23:56:30.400Z)
+- ev-5: frozen-review for trust-review (2026-10-20T23:58:55.726Z)
+- ev-6: check-run for checks-pass (2026-10-21T00:00:12.539Z)
+- ev-7: contract-spec-and-test for contract-spec-and-test (2026-10-21T00:00:12.539Z)
+- ev-8: migration-test for migration-compat-and-test (2026-10-21T00:01:06.933Z)
+- ev-9: frozen-review for trust-review (2026-10-21T00:02:36.894Z)
+- ev-10: migration-test for migration-compat-and-test (2026-10-21T00:03:14.770Z)
+- ev-11: check-run for checks-pass (2026-10-21T00:03:27.489Z)
+- ev-12: contract-spec-and-test for contract-spec-and-test (2026-10-21T00:03:27.489Z)
+- ev-13: frozen-review for trust-review (2026-10-21T00:04:20.110Z)
+- ev-14: check-run for checks-pass (2026-10-21T09:22:51.351Z)
+- ev-15: contract-spec-and-test for contract-spec-and-test (2026-10-21T09:22:51.351Z)
+- ev-16: migration-test for migration-compat-and-test (2026-10-21T09:23:05.824Z)
+- ev-17: frozen-review for trust-review (2026-10-21T09:29:22.247Z)
+- ev-18: check-run for checks-pass (2026-10-21T09:29:28.699Z)
+- ev-19: contract-spec-and-test for contract-spec-and-test (2026-10-21T09:29:28.699Z)
+- ev-20: migration-test for migration-compat-and-test (2026-10-21T09:29:36.764Z)
+- ev-21: check-run for checks-pass (2026-10-21T10:13:20.428Z)
+- ev-22: contract-spec-and-test for contract-spec-and-test (2026-10-21T10:13:20.428Z)
+- ev-23: migration-test for migration-compat-and-test (2026-10-21T10:15:14.323Z)
+- ev-24: frozen-review for trust-review (2026-10-21T10:15:22.289Z)
+- ev-25: check-run for checks-pass (2026-10-21T10:23:39.583Z)
+- ev-26: contract-spec-and-test for contract-spec-and-test (2026-10-21T10:23:39.583Z)
+- ev-27: migration-test for migration-compat-and-test (2026-10-21T10:23:45.080Z)
+- ev-28: living-doc-current for living-doc (2026-10-21T10:23:45.135Z)
 <!-- ospec:evidence:end -->

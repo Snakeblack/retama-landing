@@ -2,7 +2,7 @@
   "schema": "idd-state/v1",
   "change": "s1-walking-skeleton",
   "mode": "idd",
-  "status": "open",
+  "status": "closed",
   "intent": {
     "request": "S1 — Walking skeleton (docs/roadmap.md): scaffold de Astro 7, @astrojs/cloudflare y wrangler.jsonc; pnpm y Corepack, Node 24, TypeScript estricto; Biome y eslint-plugin-astro, Vitest y Playwright; rutas i18n / y /en/ con paridad de claves; canónica, hreflang y sitemap; security.csp + _headers con todas las cabeceras; @view-transition nativo; DESIGN.md mínimo (tokens provisionales) → @theme de Tailwind; skills vendorizadas con su manifiesto y el escaneo; CLAUDE.md/AGENTS.md del repo; CI en GitHub Actions: lint, typecheck, test, E2E y Lighthouse CI; Workers Builds con preview por rama, producción en main y protección de rama; release-please.",
     "kind": "feature",
@@ -279,6 +279,12 @@
       "id": "0010",
       "evidence": "pnpm skills:scan: 20 carpetas coinciden con el manifiesto y no hay hallazgos sin revisar; las pruebas de mutación (inyección, symlink anidado y de primer nivel) lo hacen fallar; 3 generaciones de trust review, la última sin hallazgos.",
       "recorded_at": "2026-10-21T00:11:10.882Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "evidence": "E2E de cabeceras y CSP sin violaciones en el build (job e2e verde). Escaneo del preview del PR #12 (https://chore-s1-close-retama-landing.retamozogpt.workers.dev): HSTS, CSP con hashes y frame-ancestors 'none' sin unsafe-*, idéntica a producción, nosniff, Referrer-Policy, Permissions-Policy, COOP, X-Frame-Options DENY y x-robots-tag noindex; Chromium en /, /en/ y las dos 404 sin errores de CSP en consola ni cookies.",
+      "recorded_at": "2026-10-21T10:23:30.624Z"
     }
   ],
   "obligations": [
@@ -287,21 +293,23 @@
       "signal": "always",
       "status": "satisfied",
       "evidence": [
-        "ev-21"
+        "ev-25"
       ]
     },
     {
       "id": "living-doc",
       "signal": "multi-unit-or-decision",
-      "status": "pending",
-      "evidence": []
+      "status": "satisfied",
+      "evidence": [
+        "ev-28"
+      ]
     },
     {
       "id": "contract-spec-and-test",
       "signal": "public-contract",
       "status": "satisfied",
       "evidence": [
-        "ev-22"
+        "ev-26"
       ]
     },
     {
@@ -325,7 +333,7 @@
       "signal": "persistent-data",
       "status": "satisfied",
       "evidence": [
-        "ev-23"
+        "ev-27"
       ]
     }
   ],
@@ -748,6 +756,64 @@
         "candidate_tree": "f49bb9a42896be26fe77f3af85c2fe7a5f58356c",
         "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f"
       }
+    },
+    {
+      "id": "ev-25",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T10:23:39.583Z",
+      "detail": {
+        "tree": "sha256:954e3e9e97f481c5ac0eb281984e2101531b3ea75007932c73eac636cd46c92a",
+        "runs": [
+          "run-37",
+          "run-38",
+          "run-39",
+          "run-40",
+          "run-41"
+        ]
+      }
+    },
+    {
+      "id": "ev-26",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T10:23:39.583Z",
+      "detail": {
+        "tree": "sha256:954e3e9e97f481c5ac0eb281984e2101531b3ea75007932c73eac636cd46c92a",
+        "check": "ev-25",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/i18n/index.ts"
+        ],
+        "tests": [
+          ".claude/skills/turnstile-spin/tests/validation.md",
+          "tests/e2e/security.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/csp.test.ts",
+          "tests/unit/i18n.test.ts",
+          "tests/unit/seo.test.ts",
+          "tests/unit/skills-manifest.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-27",
+      "kind": "migration-test",
+      "obligation": "migration-compat-and-test",
+      "recorded_at": "2026-10-21T10:23:45.080Z",
+      "detail": {
+        "run": "run-42",
+        "tree": "sha256:c7f8f0011b1e5d9c3d248384cbc516adb24a4b05a743b0839aceddb7783c394a",
+        "plan": "No hay datos persistentes que migrar: el sistema no tiene almacén (ADR 0003) y la señal viene de writeFile en herramientas de desarrollo (skills vendorizadas, post-build, design-check) que solo escriben artefactos de build. El comando demuestra que ni wrangler.jsonc ni el wrangler.json generado declaran bindings persistentes. Rollback: revertir el commit; no hay esquema ni datos."
+      }
+    },
+    {
+      "id": "ev-28",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T10:23:45.135Z"
     }
   ],
   "base": "aa7914c84780a93d46c8405c99a41a1c8ba2ac2b",
@@ -1105,6 +1171,65 @@
       "output_sha256": "sha256:a0912d090c730f7b72f6f9bc642a6936f6a00dddff5ab62fe2d4fca5317cee59",
       "tree": "sha256:b1c8ef4d9891065855a4d95f77e8a92aa555f00e01c01842686db60536591409",
       "recorded_at": "2026-10-21T10:15:14.323Z"
+    },
+    {
+      "id": "run-37",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:df7257db25d0ae96908c7d433db360374361a5d859c1148afc4910c2cb5a949c",
+      "tree": "sha256:954e3e9e97f481c5ac0eb281984e2101531b3ea75007932c73eac636cd46c92a",
+      "recorded_at": "2026-10-21T10:23:39.583Z"
+    },
+    {
+      "id": "run-38",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:365cc4727a29da6eddfb02eef5c43bb05f38f75a5108b966633d655bfd27f857",
+      "tree": "sha256:954e3e9e97f481c5ac0eb281984e2101531b3ea75007932c73eac636cd46c92a",
+      "recorded_at": "2026-10-21T10:23:39.583Z"
+    },
+    {
+      "id": "run-39",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:28896dd783e87c5a48c24d0bf97e22c6f18a174734c116d5e3b3d6b9dea748cd",
+      "tree": "sha256:954e3e9e97f481c5ac0eb281984e2101531b3ea75007932c73eac636cd46c92a",
+      "recorded_at": "2026-10-21T10:23:39.583Z"
+    },
+    {
+      "id": "run-40",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:56ae962efb12878be79d27a60d7b356d2ec61142e12cdd865985b1ba3ae1c67e",
+      "tree": "sha256:954e3e9e97f481c5ac0eb281984e2101531b3ea75007932c73eac636cd46c92a",
+      "recorded_at": "2026-10-21T10:23:39.583Z"
+    },
+    {
+      "id": "run-41",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:83f2c1d94327d15235a60607efb4da220309bd1838a0b369935b2a9df77eab44",
+      "tree": "sha256:954e3e9e97f481c5ac0eb281984e2101531b3ea75007932c73eac636cd46c92a",
+      "recorded_at": "2026-10-21T10:23:39.583Z"
+    },
+    {
+      "id": "run-42",
+      "purpose": "migration-test",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:ddd804e94ae12a6527b31c8a97ddae9f8141860b51a70e17ad370c1be687b879",
+      "tree": "sha256:c7f8f0011b1e5d9c3d248384cbc516adb24a4b05a743b0839aceddb7783c394a",
+      "recorded_at": "2026-10-21T10:23:45.080Z"
     }
   ],
   "reviews": [
@@ -4075,5 +4200,6 @@
     "Usuario (2026-10-21): packageManager pnpm@12 + .node-version 24 + pnpm/action-setup, sin depender de Corepack (Node 25+ no lo incluye)",
     "Agente: HSTS max-age=63072000; includeSubDomains sin preload hasta dominio definitivo (M6); trailingSlash always; selector es/en como enlace a la página equivalente",
     "Pendiente del usuario antes del despliegue: uso comercial del plan gratis de Cloudflare, cuenta y subdominio workers.dev, conexión de Workers Builds en el dashboard"
-  ]
+  ],
+  "closed_at": "2026-10-21T10:23:45.135Z"
 }
