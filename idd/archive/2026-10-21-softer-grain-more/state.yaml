@@ -1,0 +1,212 @@
+{
+  "schema": "idd-state/v1",
+  "change": "softer-grain-more",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "si, aun lo veo fuerte bajale un 20%",
+    "kind": "feature",
+    "summary": "Grano del fondo oscuro un 20 % más suave: contraste y oscurecimiento, igual en el CSS y en la escena",
+    "acceptance": "El grano del suelo (CSS y escena) baja su contraste un 20 % (slope 0.63 a 0.5) y oscurece un 20 % menos (factor medio 0.93 a 0.944); la capa ligera no cambia; ospec check pasa"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/assets/grain-ground.svg",
+          "line": 1
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/scene-three.ts",
+          "line": 168
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "aun lo veo fuerte bajale un 20%"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 30
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 232
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 258
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "src/assets/grain-ground.svg",
+      "src/scripts/scene-three.ts",
+      "tests/unit/grain-ground.test.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0005",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Only the grain filter values change, in the SVG asset and the scene constant that mirrors it; no token, theme.css or DESIGN.md is touched"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint passes in ospec check; no token, theme.css or DESIGN.md changes, only the grain filter values",
+      "recorded_at": "2026-10-21T22:59:48.089Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T23:00:36.568Z",
+      "detail": {
+        "tree": "sha256:f37df5bc04f46b218dd1a7befecba1c8cd185079ac68a05588e0c6e6b91847ef",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T23:00:36.568Z",
+      "detail": {
+        "refs": [
+          "adr:0005 conforms"
+        ],
+        "records": []
+      }
+    }
+  ],
+  "base": "696421bccaeea74426e43b8540620213d9fb846f",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9ed152293ccdfb0e3059a45c71370355d4ad336810c80dcd16d57e446a506c19",
+      "tree": "sha256:f37df5bc04f46b218dd1a7befecba1c8cd185079ac68a05588e0c6e6b91847ef",
+      "recorded_at": "2026-10-21T23:00:36.568Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:8c1c296ac86f0ddd927d195d5e3fcde8a6573da864a09e55298c8b857a26baac",
+      "tree": "sha256:f37df5bc04f46b218dd1a7befecba1c8cd185079ac68a05588e0c6e6b91847ef",
+      "recorded_at": "2026-10-21T23:00:36.568Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:1d8dcb87037f6e413dd5e707cd0844c9988b77f926fd6a2e44ec3c8a3b6f3bdb",
+      "tree": "sha256:f37df5bc04f46b218dd1a7befecba1c8cd185079ac68a05588e0c6e6b91847ef",
+      "recorded_at": "2026-10-21T23:00:36.568Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:6f2d0ef1534a73b4a366faa6f36e11cc87a97ae49b61951e25c0297c376d56c2",
+      "tree": "sha256:f37df5bc04f46b218dd1a7befecba1c8cd185079ac68a05588e0c6e6b91847ef",
+      "recorded_at": "2026-10-21T23:00:36.568Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:f37df5bc04f46b218dd1a7befecba1c8cd185079ac68a05588e0c6e6b91847ef",
+      "recorded_at": "2026-10-21T23:00:36.568Z"
+    }
+  ],
+  "closed_at": "2026-10-21T23:00:40.693Z"
+}
