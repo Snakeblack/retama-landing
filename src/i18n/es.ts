@@ -14,7 +14,9 @@ export const es = {
 
   "hero.title": "Software a medida, sostenido por decisiones escritas.",
   "hero.poster": "Dibujo de una retama: tallos finos sobre el suelo y una raíz que baja mucho más hondo.",
-  "hero.plateAlt": "Lámina de Carolus Clusius (1576) con una retama entera, de las varas a las raíces.",
+  "frag.adr.status": "Aceptada",
+  "frag.adr.title": "Escena 3D como mejora progresiva que nunca bloquea",
+  "frag.adr.caption": "Una decisión real de esta web.",
   "hero.fact1": "100 % en remoto",
   "hero.fact2": "Desde España, para la UE",
   "hero.fact3": "Decisiones escritas en ADRs",
@@ -27,7 +29,15 @@ export const es = {
   "hero.action": "Cuéntanos tu proyecto",
 
   "services.title": "Lo que construimos",
-  "services.photoAlt": "Retama blanca en flor en la Dehesa Boyal de Puertollano.",
+  "frag.checks.caption": "Las puertas que pasa esta web antes de publicar cada cambio.",
+  "frag.checks.lint": "Lint y tipos",
+  "frag.checks.unit": "Tests unitarios",
+  "frag.checks.design": "Sistema de diseño y contraste",
+  "frag.checks.e2e": "E2E sin JavaScript",
+  "frag.checks.lighthouse": "Lighthouse móvil",
+  "frag.checks.preview": "Preview por rama",
+  "frag.checks.passed": "superado",
+  "frag.checks.published": "publicada",
   "services.item1": "Aplicaciones web y webs con CMS",
   "services.item2": "Software a medida",
   "services.item3": "Aplicaciones de escritorio",
@@ -40,7 +50,14 @@ export const es = {
   "services.figureCaption": "interlocutor técnico, de la primera llamada a la entrega.",
 
   "sectors.title": "Para quién trabajamos",
-  "sectors.photoAlt": "Flores blancas de retama en primer plano.",
+  "frag.example": "Ejemplo",
+  "frag.routes.caption": "Panel de despacho de rutas",
+  "frag.routes.route": "Ruta",
+  "frag.routes.stops": "Paradas",
+  "frag.routes.status": "Estado",
+  "frag.routes.onRoute": "En ruta",
+  "frag.routes.loading": "Cargando",
+  "frag.routes.incident": "Incidencia",
   "sectors.item1": "Logística",
   "sectors.item1Note": "Rutas, almacenes e integraciones que no se caen un lunes.",
   "sectors.item2": "Empresa",
@@ -53,8 +70,7 @@ export const es = {
   "sectors.field": "En remoto, desde España, para toda la UE.",
 
   "method.title": "Cómo trabajamos",
-  "method.plateAlt":
-    "Lámina de Ernest Cosson con Retama dasycarpa: ramas, flor, legumbre y semilla dibujadas por separado.",
+  "method.plateAlt": "Lámina de Carolus Clusius (1576) con una retama entera, de las varas a las raíces.",
   "method.d1": "Lo decidimos por escrito.",
   "method.d1Reason": "Cada decisión importante queda en un registro: qué elegimos, por qué y qué descartamos.",
   "method.d2": "Opciones con su coste.",
@@ -63,7 +79,9 @@ export const es = {
   "method.d3Reason": "Tests, revisiones y entregas en tu repositorio desde el primer día.",
   "method.d4": "100 % online.",
   "method.d4Reason": "Reuniones cortas, documentos claros y avances que ves en una URL.",
-  "method.field": "Cada proyecto empieza con sus primeras decisiones por escrito.",
+  "method.field": "Raíces más hondas que la planta.",
+  "method.fieldNote":
+    "Así aguanta la retama en suelo pobre, y así se sostiene nuestro software: en decisiones escritas.",
 
   "live.title": "¿Qué tienes entre manos?",
   "live.lead": "Elige un tipo de proyecto y lee las primeras decisiones que dejaríamos por escrito.",
@@ -97,9 +115,14 @@ export const es = {
   "live.agents.r3": "Automatizamos más solo lo que ya ha devuelto horas.",
 
   "contact.title": "Hablemos",
+  "frag.reply.subject": "Re: tu proyecto",
+  "frag.reply.intro": "Gracias por escribir. Antes de proponerte nada, tres preguntas:",
+  "frag.reply.q1": "¿Quién va a editar el contenido cada semana?",
+  "frag.reply.q2": "¿Qué tiene que pasar si un pedido falla?",
+  "frag.reply.q3": "¿Qué fecha no se puede mover?",
   "contact.lead": "Escríbenos con lo que tengas, aunque sea una idea a medias. Te contestamos con preguntas concretas.",
 
-  "footer.credits": "Imágenes",
+  "footer.credits": "Créditos",
   "footer.publicDomain": "dominio público",
   "footer.top": "Volver arriba",
 

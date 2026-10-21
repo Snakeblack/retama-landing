@@ -1,7 +1,6 @@
 ---
-import { Picture } from "astro:assets";
-import photo from "../../assets/board/retama-monosperma-flowers.jpg";
 import { type Locale, t } from "../../i18n/index";
+import RoutesFragment from "./RoutesFragment.astro";
 
 interface Props {
   locale: Locale;
@@ -21,15 +20,8 @@ const sectors = [
     <h2 id="sectors-title" class="text-balance type-headline-sm md:type-headline">{copy["sectors.title"]}</h2>
   </div>
 
-  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-6 lg:row-span-3 lg:aspect-auto">
-    <Picture
-      src={photo}
-      alt={copy["sectors.photoAlt"]}
-      formats={["avif", "webp"]}
-      widths={[480, 800, 1200, 1600]}
-      sizes="(min-width: 1024px) 50vw, 100vw"
-      class="absolute inset-0 size-full object-cover"
-    />
+  <div class="col-span-2 lg:col-span-6 lg:row-span-3">
+    <RoutesFragment locale={Astro.props.locale} />
   </div>
 
   <ul class="col-span-2 grid gap-md bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
