@@ -17,9 +17,9 @@ describe("el grano del suelo (DESIGN.md Elevation & Depth)", () => {
 
   it("es suave y solo oscurece: poco contraste y un multiplicador que se queda cerca del blanco", () => {
     const { slope = 1, intercept = 0 } = channels[0] ?? {};
-    expect(slope).toBeLessThanOrEqual(0.7);
-    // The turbulence centres on 0.5, so the mean factor of the multiply stays above 0.9.
-    expect(slope * 0.5 + intercept).toBeGreaterThan(0.9);
+    expect(slope).toBeLessThanOrEqual(0.55);
+    // The turbulence centres on 0.5, so the mean factor of the multiply stays above 0.94.
+    expect(slope * 0.5 + intercept).toBeGreaterThan(0.94);
   });
 
   it("la escena del primer capítulo pinta el mismo grano que el SVG de la página", () => {
