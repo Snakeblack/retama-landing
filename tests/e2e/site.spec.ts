@@ -61,7 +61,9 @@ test.describe("sin JavaScript (ADR 0001)", () => {
       await expect(page.locator("main p").first()).not.toBeEmpty();
     });
 
-    test(`${path} trae el tablero completo: grupos, imágenes acreditadas y contacto (DESIGN.md)`, async ({ page }) => {
+    test(`${path} trae el tablero completo: grupos, fragmentos, imágenes acreditadas y contacto (DESIGN.md)`, async ({
+      page,
+    }) => {
       await page.goto(path);
 
       const groups = page.locator("main section[id]");
@@ -77,8 +79,13 @@ test.describe("sin JavaScript (ADR 0001)", () => {
         await expect(page.locator(`main ${href}`)).toHaveCount(1);
       }
 
+      // DESIGN.md Imagery: the retama only as a signature, interface fragments for the rest, examples labelled.
+      await expect(page.locator("main [data-ui]")).toHaveCount(4);
+      for (const label of await page.locator("main [data-ui] [data-example]").all())
+        await expect(label).not.toBeEmpty();
+      await expect(page.locator("main [data-ui] [data-example]")).toHaveCount(2);
       const pictures = page.locator("main picture img");
-      expect(await pictures.count()).toBeGreaterThanOrEqual(4);
+      expect(await pictures.count()).toBeGreaterThanOrEqual(1);
       for (const alt of await pictures.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("alt")))) {
         expect(alt?.trim()).toBeTruthy();
       }

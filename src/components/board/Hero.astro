@@ -1,7 +1,6 @@
 ---
-import { Picture } from "astro:assets";
-import plate from "../../assets/board/clusius-1576-retama-monosperma.jpg";
 import { type Locale, t } from "../../i18n/index";
+import AdrFragment from "./AdrFragment.astro";
 import Poster from "./Poster.astro";
 
 interface Props {
@@ -19,7 +18,7 @@ const facts = ["hero.fact1", "hero.fact2", "hero.fact3", "hero.fact4", "hero.fac
 
 <!-- DESIGN.md: "Name band and rails". Phone order: name, links, the action, scene, statement, then the rails in pairs. -->
 <div class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows">
-  <p class="col-span-2 overflow-hidden bg-surface-raised p-tile-sm whitespace-nowrap type-display-sm md:p-tile md:type-display lg:col-span-12 lg:row-span-2" aria-hidden="true">
+  <p class="col-span-2 overflow-hidden bg-surface-raised py-tile-sm whitespace-nowrap type-display-sm md:p-tile md:type-display lg:col-span-12 lg:row-span-2" aria-hidden="true">
     Retama
   </p>
 
@@ -59,16 +58,8 @@ const facts = ["hero.fact1", "hero.fact2", "hero.fact3", "hero.fact4", "hero.fac
     <p class="type-small text-on-surface-muted">{copy["hero.figure2Caption"]}</p>
   </div>
 
-  <div class="relative aspect-square overflow-hidden bg-surface-raised lg:col-span-2 lg:col-start-1 lg:row-span-3 lg:row-start-4 lg:aspect-auto">
-    <Picture
-      src={plate}
-      alt={copy["hero.plateAlt"]}
-      formats={["avif", "webp"]}
-      widths={[240, 480, 720]}
-      sizes="(min-width: 1024px) 17vw, 50vw"
-      loading="eager"
-      class="absolute inset-0 size-full object-cover object-top"
-    />
+  <div class="lg:col-span-2 lg:col-start-1 lg:row-span-3 lg:row-start-4">
+    <AdrFragment locale={Astro.props.locale} />
   </div>
 
   <ul class="bg-surface-raised p-tile-sm type-small md:p-tile lg:col-span-2 lg:col-start-1 lg:row-span-2 lg:row-start-7">

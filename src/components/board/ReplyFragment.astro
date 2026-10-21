@@ -1,0 +1,31 @@
+---
+import { type Locale, t } from "../../i18n/index";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+const questions = ["frag.reply.q1", "frag.reply.q2", "frag.reply.q3"] as const;
+---
+
+<!-- An example of the first reply, labelled as one: what "we reply with specific questions" looks like. -->
+<figure class="h-full flex flex-col gap-md bg-surface-raised p-tile-sm md:p-tile" data-ui>
+  <figcaption class="flex items-center justify-between gap-md type-small text-on-surface-muted">
+    Retama · {copy["frag.reply.subject"]}
+    <span class="bg-field px-sm text-on-field" data-example>{copy["frag.example"]}</span>
+  </figcaption>
+  <div class="grid gap-md bg-surface p-md">
+    <p>{copy["frag.reply.intro"]}</p>
+    <ol class="grid gap-sm">
+      {
+        questions.map((question) => (
+          <li class="flex gap-sm">
+            <span class="mt-sm size-sm shrink-0 bg-primary" aria-hidden="true" />
+            {copy[question]}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</figure>
