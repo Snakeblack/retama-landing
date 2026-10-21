@@ -145,10 +145,11 @@
 }
 
 /* DESIGN.md Layout: the floating header. Its height is the bar, the row of touch-sized controls and their padding;
-   the first chapter clears it on phones and a chapter reached by a link stops below it. header.ts sets data-hidden while
+   the first chapter clears it on phones with lg of air, and a chapter reached by a link stops below it. header.ts sets data-hidden while
    the page scrolls down: the bar slides away, or fades with reduced motion, and stays focusable. */
 :root {
   --header-height: calc(var(--spacing-bar) + var(--spacing-md) * 2 + var(--spacing-touch));
+  --header-clearance: calc(var(--header-height) + var(--spacing-lg));
 }
 
 main section[id] {

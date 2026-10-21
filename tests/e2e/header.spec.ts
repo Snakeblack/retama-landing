@@ -22,12 +22,25 @@ test.describe("cabecera flotante e índice de capítulos en el móvil (DESIGN.md
       // The header floats over the first chapter: the stage starts at the top of the screen.
       expect(await page.locator("[data-scene]").evaluate((stage) => stage.getBoundingClientRect().top)).toBe(0);
       await expect(page.getByRole("banner").getByRole("navigation")).toBeHidden();
+      // The title keeps clear of the bar.
+      const title = await page.locator("h1").evaluate((node) => node.getBoundingClientRect().top);
+      expect(title).toBeGreaterThanOrEqual(
+        (await bar(page).evaluate((node) => node.getBoundingClientRect().bottom)) + 24,
+      );
 
-      await page.getByRole("button", { name: index }).click();
+      // Both buttons of the index are icons on a touch-sized tile, named for assistive technology only.
+      const iconOnly = async (button: import("@playwright/test").Locator) => {
+        await expect(button).toHaveText("");
+        expect(await button.boundingBox()).toMatchObject({ width: 48, height: 48 });
+      };
+      const opener = page.getByRole("button", { name: index });
+      await iconOnly(opener);
+      await opener.click();
       const dialog = page.getByRole("dialog", { name: index });
       await expect(dialog).toBeVisible();
       expect(await dialog.evaluate((node) => node.matches(":modal"))).toBe(true);
       await expect(dialog.getByRole("button", { name: close })).toBeFocused();
+      await iconOnly(dialog.getByRole("button", { name: close }));
       await expect(dialog.getByRole("navigation").getByRole("link")).toHaveCount(4);
       // Above every chapter, the first entry is the one on screen.
       await expect(dialog.locator('[aria-current="location"]')).toHaveCount(1);
