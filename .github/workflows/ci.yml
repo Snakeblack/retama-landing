@@ -67,6 +67,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: node scripts/fitness.mjs no-persistent-bindings
+      - run: node scripts/fitness.mjs js-budget
       # perf-mobile: 100 in the four categories on the mobile preset (lighthouserc.json).
       - run: pnpm exec lhci autorun
       - if: always()

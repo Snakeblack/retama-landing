@@ -42,3 +42,89 @@
 @utility board-rows {
   grid-auto-rows: minmax(var(--spacing-row), auto);
 }
+
+/* DESIGN.md Components: feedback on every control. Colour eases on hover; a press sinks by the focus width. */
+@utility feedback {
+  transition:
+    color var(--t-hover) var(--ease-out),
+    background-color var(--t-hover) var(--ease-out),
+    text-decoration-color var(--t-hover) var(--ease-out),
+    translate var(--t-press) var(--ease-out);
+
+  &:active {
+    translate: 0 var(--spacing-focus);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:active {
+      translate: none;
+    }
+  }
+}
+
+/* DESIGN.md Motion: the shutter, the first signature move. It runs in CSS on the first paint, once,
+   so it needs no script; reduced motion drops it. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-shutter] {
+    animation: shutter var(--t-open) var(--ease-expo) both;
+  }
+
+  [data-shutter] > * {
+    animation: settle var(--t-open) var(--ease-soft) both;
+  }
+}
+
+@keyframes shutter {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes settle {
+  from {
+    scale: 1.12;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+/* DESIGN.md Motion: the code lens. The layer copies the name from data-text, so it lines up with the letters,
+   fills them with the site's own code (/code-lens.svg) and shows only inside a circle the script moves.
+   Without the script --lens stays 0 and nothing is drawn. */
+[data-lens] {
+  --lens: 0;
+  --lens-x: 50%;
+  --lens-y: 50%;
+  --lens-r: var(--spacing-xl);
+
+  @media (width >= 48rem) {
+    --lens-r: var(--spacing-2xl);
+  }
+}
+
+[data-lens]::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: transparent;
+  background: url("/code-lens.svg") var(--color-surface-raised);
+  /* The texture scales with the word, so the code keeps the same grain against the letters at every size. */
+  background-size: 90% auto;
+  background-clip: text;
+  mask-image: radial-gradient(
+    circle var(--lens-r) at var(--lens-x) var(--lens-y),
+    var(--color-on-surface) 97%,
+    transparent
+  );
+  opacity: var(--lens);
+}
+
+/* With reduced motion the lens does not travel: the code fades in over the whole name. */
+[data-lens][data-lens-still]::after {
+  mask-image: none;
+}

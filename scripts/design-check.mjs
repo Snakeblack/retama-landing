@@ -5,6 +5,7 @@ import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { checkSource, parseTokens } from "./lib/design-values.mjs";
+import { motionTheme } from "./lib/motion-tokens.mjs";
 
 const CLI = "node_modules/.bin/design.md";
 const THEME = "src/styles/theme.css";
@@ -44,7 +45,8 @@ const utilities = levels.map((name) => {
   );
   return `@utility type-${name} {\n${declarations.join("\n")}\n}\n`;
 });
-const theme = HEADER + exported + utilities.join("");
+const motion = motionTheme(readFileSync("DESIGN.md", "utf8"));
+const theme = HEADER + exported + motion + utilities.join("");
 
 if (process.argv.includes("--write")) {
   writeFileSync(THEME, theme);

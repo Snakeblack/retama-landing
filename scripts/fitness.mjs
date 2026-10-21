@@ -2,9 +2,12 @@
 //   node scripts/fitness.mjs on-demand-routes        ADR 0002
 //   node scripts/fitness.mjs no-persistent-bindings  ADR 0003 (run after pnpm build)
 //   node scripts/fitness.mjs branch-protection       ADR 0009 (needs gh auth)
+//   node scripts/fitness.mjs js-budget               ADR 0001 (run after pnpm build)
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { gzipSync } from "node:zlib";
+import { initialScripts } from "./lib/js-budget.mjs";
 
 // ADR 0002: the only route rendered on demand. Adding one needs an ADR.
 const ON_DEMAND_ALLOWED = ["src/pages/api/contact.ts"];
@@ -20,6 +23,8 @@ const PERSISTENT_BINDINGS = [
   "secrets_store_secrets",
 ];
 const REQUIRED_CHECKS = ["quality", "e2e", "lighthouse"];
+// ADR 0001: JavaScript a page loads at start, gzipped. Deferred chunks (the 3D scene) are not counted.
+const JS_BUDGET = 60 * 1024;
 
 function fail(message) {
   console.error(message);
@@ -84,10 +89,28 @@ function branchProtection() {
   console.log(`main requires ${contexts.join(", ")}`);
 }
 
+function jsBudget() {
+  const root = "dist/client";
+  if (!existsSync(root)) fail("no dist/client: run pnpm build first");
+  const read = (path) => readFileSync(join(root, path), "utf8");
+  const pages = readdirSync(root, { recursive: true }).filter((file) => String(file).endsWith(".html"));
+  for (const page of pages) {
+    const scripts = initialScripts(read(String(page)), read);
+    const size = scripts.reduce(
+      (total, script) => total + gzipSync(script.startsWith("<inline>") ? script.slice(8) : read(script)).length,
+      0,
+    );
+    const line = `${page}: ${(size / 1024).toFixed(1)} KB of ${JS_BUDGET / 1024} KB gzip (${scripts.length} scripts)`;
+    if (size > JS_BUDGET) fail(`${line}: over the ADR 0001 budget`);
+    console.log(line);
+  }
+}
+
 const checks = {
   "on-demand-routes": onDemandRoutes,
   "no-persistent-bindings": noPersistentBindings,
   "branch-protection": branchProtection,
+  "js-budget": jsBudget,
 };
 const check = checks[process.argv[2] ?? ""];
 if (!check) fail(`usage: node scripts/fitness.mjs <${Object.keys(checks).join("|")}>`);

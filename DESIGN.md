@@ -211,7 +211,7 @@ Contrast on the ground: on-surface 15.4:1, on-surface-muted 6.6:1 and primary 5.
 - **Stack Sans Headline** sets everything at large size, in a light 300 weight with tight tracking: the name at display size, section headings and single statements inside tiles. The wordmark uses the same face at 500.
 - **Stack Sans Text** sets running text at 400, run-in phrases and action labels at 500, and small print.
 
-The page uses five sizes on desktop: 14 (small), 18 (body, labels), 32 (statement), 64 (headline) and 200 (display). On phones, below the `md` breakpoint (768px), the large three step down to 22, 36 and 104 (the `-sm` tokens). Each level is one utility generated with the theme, `type-<level>` (for example `type-headline-sm md:type-headline`), which sets family, size, line height, tracking and weight together. Sentence case everywhere; no uppercase labels, no monospace, no styled accent word inside a headline. A heading may be two-tone, muted then full ink.
+The page uses five sizes on desktop: 14 (small), 18 (body, labels), 32 (statement), 64 (headline) and 200 (display). On phones, below the `md` breakpoint (768px), the large three step down to 22, 36 and 104 (the `-sm` tokens). Each level is one utility generated with the theme, `type-<level>` (for example `type-headline-sm md:type-headline`), which sets family, size, line height, tracking and weight together. Sentence case everywhere; no uppercase labels, no monospace (the one exception is the texture inside the code lens, see Motion and 3D), no styled accent word inside a headline. A heading may be two-tone, muted then full ink.
 
 ## Layout
 
@@ -270,11 +270,12 @@ Motion makes the board feel alive and never carries content: every word is in th
 | stagger-line | 90ms | lines of one statement |
 | stagger-item | 70ms | tiles of one group |
 
-These tokens live in this table until the motion layer lands (M2), which defines them once in code and nowhere else.
+This table is the only place these values are written: `pnpm design:theme` generates them into `src/styles/theme.css` as custom properties (`--ease-out`, `--t-ui`, `--stagger-item`…), CSS uses them as `var()` and the motion script reads them back from the page (`src/lib/motion.ts`).
 
 The budget, per page:
 
-- **One signature move, the shutter:** the central tile of the first screen opens from its lower edge with a clip-path over `t-open` while the picture inside settles from 1.12 scale to rest. It happens once.
+- **One signature move, the shutter:** the central tile of the first screen opens from its lower edge with a clip-path over `t-open` while the picture inside settles from 1.12 scale to rest. It happens once, in CSS on the first paint, so it needs no script.
+- **A second signature move, the code lens:** over the name band, a circle that follows the pointer shows the letters made of the site's own code (`src/lib/retama-shape.ts`, the generator of the scene) in tiny system monospace, the one place monospace appears, as texture and never as content to read. The layer is a copy of the name clipped to its own letters, so it lines up exactly, and a circular mask that follows the pointer through custom properties. On touch screens the lens makes one pass across the name after loading; with reduced motion it does not travel and the code fades in over the whole name while the pointer is on it. The first screen has no other entrance, so nothing delays the largest paint.
 - **Entrances:** inside each group, the heading, then the text, then the picture, staggered by `stagger-item`, rising 16–32px with opacity, once, as the group enters. A list arrives row by row and a figure counts up once; never the same fade on every block. The hidden starting state is set by the script itself, so without it everything is simply there.
 - **Feedback on every control:** press, hover and focus on the action, links, tiles that link and the live thing.
 - **One moving picture:** the 3D scene.
@@ -292,6 +293,6 @@ The budget, per page:
 - Do take every colour and size from these tokens: `pnpm design:lint` rejects Tailwind's default scale and palette, literal arbitrary values and raw CSS colours and sizes in `src/`.
 - Do fill tiles; separate them with the gap and the tone step, never with a line.
 - Don't add a second accent colour, a gradient, a shadow at rest, glass or a glow.
-- Don't use eyebrows, small uppercase letter-spaced labels, monospace, index numbers (01, 02) or thin rules.
+- Don't use eyebrows, small uppercase letter-spaced labels, monospace outside the code lens, index numbers (01, 02) or thin rules.
 - Don't put an icon and a two-line blurb in every tile, or build rows of identical tiles.
 - Don't let a headline run past two lines at any width.

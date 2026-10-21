@@ -23,7 +23,7 @@ const copy = t(Astro.props.locale);
       {
         imageCredits.map((credit) => (
           <li>
-            {credit.author}, <a class="underline" href={credit.source}><cite>{credit.work}</cite></a>,{" "}
+            {credit.author}, <a class="feedback underline hover:text-on-surface" href={credit.source}><cite>{credit.work}</cite></a>,{" "}
             {copy["footer.publicDomain"]}.
           </li>
         ))
@@ -31,7 +31,7 @@ const copy = t(Astro.props.locale);
     </ul>
   </div>
 
-  <a class="col-span-2 bg-surface-raised p-tile-sm type-small text-on-surface-muted underline hover:bg-field hover:text-on-field md:p-tile lg:col-span-3" href="#top">
+  <a class="feedback col-span-2 bg-surface-raised p-tile-sm type-small text-on-surface-muted underline hover:bg-field hover:text-on-field md:p-tile lg:col-span-3" href="#top">
     {copy["footer.top"]}
   </a>
 </footer>

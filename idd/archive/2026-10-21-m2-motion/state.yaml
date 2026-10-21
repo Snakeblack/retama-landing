@@ -1,0 +1,1358 @@
+{
+  "schema": "idd-state/v1",
+  "change": "m2-motion",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "m2-motion (GSAP, shutter, entradas, escena fijada de sectores) y efecto de lupa en la banda «Retama» del hero con código real diminuto recortado por las letras",
+    "kind": "feature",
+    "summary": "Capa de movimiento de la portada (M2 2/3): tokens de movimiento, shutter de la escena, entradas por grupo, respuesta de cada control, escena fijada de Sectores y lupa de código sobre la banda «Retama», con presupuesto de JS por página (ADR 0001)",
+    "acceptance": "En / y /en/ la escena se abre con el shutter, cada grupo entra una vez al llegar, los controles responden, Sectores se fija en escritorio y la lupa muestra código bajo el puntero (pasada automática en táctil); con reduced-motion solo hay fundidos; sin JS todo el contenido sigue visible; CSP sin violaciones, presupuesto de JS comprobado en CI y Lighthouse 100 x4"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿Se usa Lenis (aprobado en la línea base) o scroll nativo, dado que DESIGN.md prohíbe el secuestro del scroll?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿Los tokens de movimiento se generan desde la tabla de DESIGN.md en theme.css (una sola fuente) o se definen en código aparte?"
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Method.astro",
+          "line": 17
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Qué monoespaciada usa la lupa: la del sistema (0 KB, cambia según el SO) o una autoalojada?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Hero.astro",
+          "line": 19
+        }
+      },
+      {
+        "category": "accessibility",
+        "question": "¿Qué ocurre durante la escena fijada de Sectores, en qué anchos se fija y qué queda con reduced-motion?"
+      },
+      {
+        "category": "errors",
+        "question": "¿Cuál es el presupuesto de JS por página (KB gzip) que pasa a ser el Check del ADR 0001?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/ci.yml",
+      "DESIGN.md",
+      "docs/architecture/decisions/0001-static-first-with-islands.md",
+      "lighthouserc.json",
+      "package.json",
+      "pnpm-lock.yaml",
+      "scripts/design-check.mjs",
+      "scripts/fitness.mjs",
+      "scripts/js-budget.mjs",
+      "src/components/Home.astro",
+      "src/components/board/CodeLens.astro",
+      "src/components/board/Contact.astro",
+      "src/components/board/Hero.astro",
+      "src/components/board/Method.astro",
+      "src/components/board/Sectors.astro",
+      "src/components/board/Services.astro",
+      "src/lib/motion.ts",
+      "src/scripts/motion.ts",
+      "src/styles/global.css",
+      "src/styles/theme.css",
+      "tests/e2e/motion.spec.ts",
+      "tests/unit/motion.test.ts"
+    ],
+    "work_units": 4,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 4 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/ci.yml (matches .github/workflows/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0006 and quality scenario brand-impact, perf-mobile",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Ninguna palabra depende de JS: el estado oculto de las entradas lo pone el propio script y el shutter es CSS; fija el presupuesto de JS por página que el ADR anunciaba para la primera isla de M2 y su línea - Check: sustituye a la frase que lo anunciaba, sin tocar la decisión"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "El póster sigue siendo el primer pintado y el elemento estático; el shutter solo recorta y escala su ficha con CSS, y con reduced-motion no hay shutter; la escena 3D no se toca (m2-hero-3d)"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Los tokens de movimiento salen de la tabla Motion de DESIGN.md y se generan en theme.css con pnpm design:theme; el JS los lee del CSS en lugar de duplicarlos"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Los scripts se empaquetan como módulos propios con hash de Astro; el movimiento cambia variables y estilos por CSSOM (GSAP), que la CSP sin unsafe-inline permite; sin manejadores inline ni router de cliente"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "Añade el movimiento del presupuesto de DESIGN.md (shutter, entradas, pin, lupa); con reduced-motion la experiencia queda completa solo con fundidos"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "Sin entradas en el primer pantallazo para no mover el LCP; presupuesto de JS de 60 KB gzip comprobado en CI; solo transform, opacity y clip-path; Lighthouse 100 x4 sigue como puerta"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint en verde en este change: DESIGN.md sin hallazgos, theme.css sincronizado (ahora incluye el bloque @theme static de la tabla Motion) y ningún valor suelto en src/ (global.css nuevo usa solo var() de tokens)",
+      "recorded_at": "2026-10-21T13:09:53.240Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-12"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-14"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-11"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-13"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "todas las recomendadas: (1) scroll nativo, sin Lenis; (2) Sectores se fija solo desde lg (1024px) unas 2,5 pantallas y recorre los 4 sectores (activo en tinta plena con el cuadrado naranja, el resto atenuado), scrub sin snap; por debajo de lg y con reduced-motion no se fija; (3) presupuesto de JS al inicio <= 60 KB gzip por página, el 3D diferido tendrá el suyo en m2-hero-3d; (4) monoespaciada del sistema (ui-monospace); (5) design:theme genera la tabla Motion de DESIGN.md en theme.css y GSAP la lee de CSS. Además: shutter en CSS puro, sin entradas en el primer pantallazo, solo la cifra 100 cuenta",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T13:09:48.119Z",
+      "detail": {
+        "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T13:09:48.119Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-21T13:11:25.652Z",
+      "detail": {
+        "lineage_id": "sha256:d0f24431357ed03a8300bcea157a7cf0abfe6a5034c95b0e2bbd74dda7725d02",
+        "candidate_id": "sha256:040e1d5873f2ef463732db1896efc38ab11cff6d4463c6d1f25b74229c54b45c",
+        "candidate_tree": "822afb3fd39d5c647dd3584535040d9dac0158f2",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-21T13:11:22.255Z",
+          "result_digest": "sha256:a2eccf51c747cd33986d1c7f3e71e321ec1f55a6897f12cfb45b3c4ebe927dc2"
+        }
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T13:13:19.240Z",
+      "detail": {
+        "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+        "runs": [
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12",
+          "run-13"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T13:13:19.240Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+        "fitness": [
+          "run-14",
+          "run-15",
+          "run-16"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-21T13:14:43.077Z",
+      "detail": {
+        "lineage_id": "sha256:86e83ed836e3db76f0c570923b68bad654fb554f11e1e825e00b925ac958f2f8",
+        "candidate_id": "sha256:0c5a70a7ec4f35bb72db5da6db2d5da87eeeeb49e572773fb6b8cdb1a8a66536",
+        "candidate_tree": "042598ae0b8b47fc9ce3105dcddeb66a4e45b0b7",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-21T13:14:31.992Z",
+          "result_digest": "sha256:fff1d696e96a5b586871703e57af0b812d5f0d3e10dafe07a343a7b055b12538"
+        }
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T13:16:10.107Z",
+      "detail": {
+        "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+        "runs": [
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20",
+          "run-21"
+        ]
+      }
+    },
+    {
+      "id": "ev-8",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T13:16:10.107Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+        "fitness": [
+          "run-22",
+          "run-23",
+          "run-24"
+        ]
+      }
+    },
+    {
+      "id": "ev-9",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T13:29:19.808Z",
+      "detail": {
+        "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+        "runs": [
+          "run-25",
+          "run-26",
+          "run-27",
+          "run-28",
+          "run-29"
+        ]
+      }
+    },
+    {
+      "id": "ev-10",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T13:29:19.808Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+        "fitness": [
+          "run-30",
+          "run-31",
+          "run-32"
+        ]
+      }
+    },
+    {
+      "id": "ev-11",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-21T13:31:21.668Z",
+      "detail": {
+        "lineage_id": "sha256:abc1c931031f53581ea972e83a7bcbde2a63bd3f545def44006fee9dab217a98",
+        "candidate_id": "sha256:6761deaacfad9d3c974c08a65fff24c4c523e59e7016d3820baaf4f38afd5828",
+        "candidate_tree": "110271991f56d2b0fa84694f3e748cff2ad0e9c0",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-21T13:30:33.084Z",
+          "result_digest": "sha256:d2cfa35ec036e004caf1f528b91db223424d1b69775b3678437be52939fa05c5"
+        }
+      }
+    },
+    {
+      "id": "ev-12",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T13:32:49.329Z",
+      "detail": {
+        "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+        "runs": [
+          "run-33",
+          "run-34",
+          "run-35",
+          "run-36",
+          "run-37"
+        ]
+      }
+    },
+    {
+      "id": "ev-13",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T13:32:49.329Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+        "fitness": [
+          "run-38",
+          "run-39",
+          "run-40"
+        ]
+      }
+    },
+    {
+      "id": "ev-14",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T13:32:52.725Z"
+    }
+  ],
+  "base": "c89d9a9d20dce120a5c4727bbe68ab6b569cb09a",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:15f3a9a22e6c57a9b2a14663133209e3bd0f08ab2886da83171e2ef47941ea60",
+      "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+      "recorded_at": "2026-10-21T13:09:48.119Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:23a12bf55d905bf7efde31e8f21597dd602b95acae1d9a3167870ca702506c27",
+      "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+      "recorded_at": "2026-10-21T13:09:48.119Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:14c4ec49e9d6b697c527fd9a47cb6196dc37f2136fededf5365a544262a4157a",
+      "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+      "recorded_at": "2026-10-21T13:09:48.119Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:85a3c8b3fb7b4f0b799234b9ccbb88b8d647c76859bee0f681b012ae093dee2d",
+      "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+      "recorded_at": "2026-10-21T13:09:48.119Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+      "recorded_at": "2026-10-21T13:09:48.119Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:5890e43b8f29c347e39024436c00dc1e44c5d87f206e76a8222a42cba73591d0",
+      "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+      "recorded_at": "2026-10-21T13:09:48.119Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:e170abf98bbd2245293778cfb953cfa54c4a7ff748c3c03c3e1992c168a1e552",
+      "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+      "recorded_at": "2026-10-21T13:09:48.119Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:62bcd0e950a2ee15535016e0aee3668611fd8a9b201c830b53cedd9f00d1bebc",
+      "tree": "sha256:f4980aa316d95168a89b4b5b6de156699f2425595d5fb0a4c9d4a037bcc9b71c",
+      "recorded_at": "2026-10-21T13:09:48.119Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:6eb6b5dd8b70a226f0700845ad49002c89df6a94ce99824404f4ed27efe12ee4",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:13:19.240Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:fcc59bbb0bbc5796142fb0768fbb648021a9504e21ee1f095191dc38c00b8535",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:13:19.240Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:a8159fc91b99493cc537e04ae60c1c0bf81034f4d5e4c5062323b59ef562c95b",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:13:19.240Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:5a6ac52c24739bc059a9e4302fbf92a3c7fda24a8335d0964df5435880aa97a0",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:13:19.240Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:13:19.240Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a02bcb3bc10aec2f444b193f2dc1b12fc529461e33b48dd226d8f4ec9926dece",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:13:19.240Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:8b6ce7dc61d941f3e4cd936a9f9db1b86a2d2b2f2631b7b667f89148ec26cb59",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:13:19.240Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:cd9a676232ba4f0d260edf4c4485357fbe01693d2524d89916bbae30c33e3657",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:13:19.240Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:6eb6b5dd8b70a226f0700845ad49002c89df6a94ce99824404f4ed27efe12ee4",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:16:10.107Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c62a3c0759150ca5d44f0602f01fb66d7203b2e0ff29f51ce4a9f3600f0558aa",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:16:10.107Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:5e9612014adf53325647ddbf2c77815a5796973abe86d1874862ce719d5b5287",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:16:10.107Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:18668bbe64eb975c97cd307b2120b8dd3d9ad434e52076fe777d3aa775a0c792",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:16:10.107Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:16:10.107Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:91eae0ac3ffdd37b04dea8fed12e0a3b3cd8dffd0fd1df746c4130c422ad2021",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:16:10.107Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:b8e9e056782369e8eac55f14e33a370efb2847b70e99b57051644decebb3746e",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:16:10.107Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:74121b0aa4bacd1607d541912e72d8fe32c2c243c7a1962237f8fe86ea6bcb86",
+      "tree": "sha256:4ea0d0c3dfeb4fe8c805dbebf2c9b44dd15a5a3448fe008bb0c5c16543fc91f1",
+      "recorded_at": "2026-10-21T13:16:10.107Z"
+    },
+    {
+      "id": "run-25",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3887156d79a49c583def0e3c4235ecd901bc0cbecfa0d32f620ed0b0ab22944",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:29:19.808Z"
+    },
+    {
+      "id": "run-26",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:e653121eb595eabea90e3017da81aac175701b3788a3a5a1258c0d2b61653cb7",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:29:19.808Z"
+    },
+    {
+      "id": "run-27",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:9b560e2b0efb50ee6570dda771ff0830aecf448f814f4d700530345588acfddc",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:29:19.808Z"
+    },
+    {
+      "id": "run-28",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:72b3e28fb23282e17e53da3f0c07c4ecf5d0cfd2b7534a57b9d415ce6ee1d919",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:29:19.808Z"
+    },
+    {
+      "id": "run-29",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:29:19.808Z"
+    },
+    {
+      "id": "run-30",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:bcaab78191fd65f110276fb1448b383708159dfa826c045803d3d226207c84fe",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:29:19.808Z"
+    },
+    {
+      "id": "run-31",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:e06f26f26eaeca7c941137e17265facb324a506124b6475add6a1df2d6eb975f",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:29:19.808Z"
+    },
+    {
+      "id": "run-32",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:1ff09796b5cbfba1778ac41fcb180aefca0fbe206fe5191fbe1734a27014a461",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:29:19.808Z"
+    },
+    {
+      "id": "run-33",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3887156d79a49c583def0e3c4235ecd901bc0cbecfa0d32f620ed0b0ab22944",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:32:49.329Z"
+    },
+    {
+      "id": "run-34",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:6f9ef378a1bc296023e749623cb5494f50e10c828b16916e817c5a6beb69c15a",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:32:49.329Z"
+    },
+    {
+      "id": "run-35",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:1d53e54acb821efa24e643d2f49419ef4b628039ee614890578de9a742e49d9d",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:32:49.329Z"
+    },
+    {
+      "id": "run-36",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:78d361f863490d50540e76821b151ec420e04c064685149c7e3873264812a113",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:32:49.329Z"
+    },
+    {
+      "id": "run-37",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:32:49.329Z"
+    },
+    {
+      "id": "run-38",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d39b861e2b99420913418d88f9204d0bf963a0de708cdf7be18f4674a729965c",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:32:49.329Z"
+    },
+    {
+      "id": "run-39",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:34026c4aa6fa2bf1c847b9bf8c930f34b5a0bd98222ed7bf48d52a8bbddc2074",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:32:49.329Z"
+    },
+    {
+      "id": "run-40",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:98690242b130e07001da18548c2d7879641f1e34cf26c8c824d5517a7138be4d",
+      "tree": "sha256:773c6460f62030f904401f61a47cd9d93b563572912893aff97a04eadfd1e987",
+      "recorded_at": "2026-10-21T13:32:49.329Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:d0f24431357ed03a8300bcea157a7cf0abfe6a5034c95b0e2bbd74dda7725d02",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "bf944c52954700d3b91ef2f1e4f13f76994da5ea",
+          "candidate_tree": "822afb3fd39d5c647dd3584535040d9dac0158f2",
+          "paths": [
+            ".github/workflows/ci.yml",
+            "DESIGN.md",
+            "docs/architecture/decisions/0001-static-first-with-islands.md",
+            "package.json",
+            "pnpm-lock.yaml",
+            "scripts/design-check.mjs",
+            "scripts/fitness.mjs",
+            "scripts/lib/js-budget.mjs",
+            "scripts/lib/motion-tokens.mjs",
+            "src/components/Home.astro",
+            "src/components/board/Contact.astro",
+            "src/components/board/Footer.astro",
+            "src/components/board/Hero.astro",
+            "src/components/board/Method.astro",
+            "src/components/board/Sectors.astro",
+            "src/layouts/Base.astro",
+            "src/lib/motion.ts",
+            "src/pages/code-lens.svg.ts",
+            "src/scripts/motion.ts",
+            "src/styles/global.css",
+            "src/styles/theme.css",
+            "tests/e2e/motion.spec.ts",
+            "tests/unit/js-budget.test.ts",
+            "tests/unit/motion.test.ts"
+          ],
+          "diff_hash": "sha256:cce973f9a70b55dae0b687a48de0bad4ac0be5b0593283daf20dbf9bbe38be4d",
+          "paths_digest": "sha256:af2e637a34a01fac99859936d56ac5f3d778cada0609d84d0c00d0dc505535c4",
+          "authored_lines": 751,
+          "original_changed_lines": 774
+        },
+        "candidate_id": "sha256:040e1d5873f2ef463732db1896efc38ab11cff6d4463c6d1f25b74229c54b45c",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "docs/architecture/decisions/0001-static-first-with-islands.md",
+          "package.json",
+          "pnpm-lock.yaml",
+          "scripts/design-check.mjs",
+          "scripts/fitness.mjs",
+          "scripts/lib/js-budget.mjs",
+          "scripts/lib/motion-tokens.mjs",
+          "src/components/Home.astro",
+          "src/components/board/Contact.astro",
+          "src/components/board/Footer.astro",
+          "src/components/board/Hero.astro",
+          "src/components/board/Method.astro",
+          "src/components/board/Sectors.astro",
+          "src/layouts/Base.astro",
+          "src/lib/motion.ts",
+          "src/pages/code-lens.svg.ts",
+          "src/scripts/motion.ts",
+          "src/styles/global.css",
+          "src/styles/theme.css",
+          "tests/e2e/motion.spec.ts",
+          "tests/unit/js-budget.test.ts",
+          "tests/unit/motion.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "822afb3fd39d5c647dd3584535040d9dac0158f2",
+        "original_changed_lines": 774,
+        "authored_lines": 751
+      },
+      "current_candidate_id": "sha256:040e1d5873f2ef463732db1896efc38ab11cff6d4463c6d1f25b74229c54b45c",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "bf944c52954700d3b91ef2f1e4f13f76994da5ea",
+        "candidate_tree": "822afb3fd39d5c647dd3584535040d9dac0158f2",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "docs/architecture/decisions/0001-static-first-with-islands.md",
+          "package.json",
+          "pnpm-lock.yaml",
+          "scripts/design-check.mjs",
+          "scripts/fitness.mjs",
+          "scripts/lib/js-budget.mjs",
+          "scripts/lib/motion-tokens.mjs",
+          "src/components/Home.astro",
+          "src/components/board/Contact.astro",
+          "src/components/board/Footer.astro",
+          "src/components/board/Hero.astro",
+          "src/components/board/Method.astro",
+          "src/components/board/Sectors.astro",
+          "src/layouts/Base.astro",
+          "src/lib/motion.ts",
+          "src/pages/code-lens.svg.ts",
+          "src/scripts/motion.ts",
+          "src/styles/global.css",
+          "src/styles/theme.css",
+          "tests/e2e/motion.spec.ts",
+          "tests/unit/js-budget.test.ts",
+          "tests/unit/motion.test.ts"
+        ],
+        "diff_hash": "sha256:cce973f9a70b55dae0b687a48de0bad4ac0be5b0593283daf20dbf9bbe38be4d",
+        "paths_digest": "sha256:af2e637a34a01fac99859936d56ac5f3d778cada0609d84d0c00d0dc505535c4",
+        "authored_lines": 751,
+        "original_changed_lines": 774
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "m2-motion:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "m2-motion:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:86e83ed836e3db76f0c570923b68bad654fb554f11e1e825e00b925ac958f2f8",
+      "generation": 2,
+      "predecessor_lineage_id": "sha256:d0f24431357ed03a8300bcea157a7cf0abfe6a5034c95b0e2bbd74dda7725d02",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "bf944c52954700d3b91ef2f1e4f13f76994da5ea",
+          "candidate_tree": "042598ae0b8b47fc9ce3105dcddeb66a4e45b0b7",
+          "paths": [
+            ".github/workflows/ci.yml",
+            "DESIGN.md",
+            "docs/architecture/decisions/0001-static-first-with-islands.md",
+            "package.json",
+            "pnpm-lock.yaml",
+            "scripts/design-check.mjs",
+            "scripts/fitness.mjs",
+            "scripts/lib/js-budget.mjs",
+            "scripts/lib/motion-tokens.mjs",
+            "src/components/Home.astro",
+            "src/components/board/Contact.astro",
+            "src/components/board/Footer.astro",
+            "src/components/board/Hero.astro",
+            "src/components/board/Method.astro",
+            "src/components/board/Sectors.astro",
+            "src/layouts/Base.astro",
+            "src/lib/motion.ts",
+            "src/pages/code-lens.svg.ts",
+            "src/scripts/motion.ts",
+            "src/styles/global.css",
+            "src/styles/theme.css",
+            "tests/e2e/motion.spec.ts",
+            "tests/unit/js-budget.test.ts",
+            "tests/unit/motion.test.ts"
+          ],
+          "diff_hash": "sha256:4c3fc9f3a7604ac0847175ddaa5e30a0b0410518be086123fa8e71906da85087",
+          "paths_digest": "sha256:af2e637a34a01fac99859936d56ac5f3d778cada0609d84d0c00d0dc505535c4",
+          "authored_lines": 753,
+          "original_changed_lines": 776
+        },
+        "candidate_id": "sha256:0c5a70a7ec4f35bb72db5da6db2d5da87eeeeb49e572773fb6b8cdb1a8a66536",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "docs/architecture/decisions/0001-static-first-with-islands.md",
+          "package.json",
+          "pnpm-lock.yaml",
+          "scripts/design-check.mjs",
+          "scripts/fitness.mjs",
+          "scripts/lib/js-budget.mjs",
+          "scripts/lib/motion-tokens.mjs",
+          "src/components/Home.astro",
+          "src/components/board/Contact.astro",
+          "src/components/board/Footer.astro",
+          "src/components/board/Hero.astro",
+          "src/components/board/Method.astro",
+          "src/components/board/Sectors.astro",
+          "src/layouts/Base.astro",
+          "src/lib/motion.ts",
+          "src/pages/code-lens.svg.ts",
+          "src/scripts/motion.ts",
+          "src/styles/global.css",
+          "src/styles/theme.css",
+          "tests/e2e/motion.spec.ts",
+          "tests/unit/js-budget.test.ts",
+          "tests/unit/motion.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "042598ae0b8b47fc9ce3105dcddeb66a4e45b0b7",
+        "original_changed_lines": 776,
+        "authored_lines": 753
+      },
+      "current_candidate_id": "sha256:0c5a70a7ec4f35bb72db5da6db2d5da87eeeeb49e572773fb6b8cdb1a8a66536",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "bf944c52954700d3b91ef2f1e4f13f76994da5ea",
+        "candidate_tree": "042598ae0b8b47fc9ce3105dcddeb66a4e45b0b7",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "docs/architecture/decisions/0001-static-first-with-islands.md",
+          "package.json",
+          "pnpm-lock.yaml",
+          "scripts/design-check.mjs",
+          "scripts/fitness.mjs",
+          "scripts/lib/js-budget.mjs",
+          "scripts/lib/motion-tokens.mjs",
+          "src/components/Home.astro",
+          "src/components/board/Contact.astro",
+          "src/components/board/Footer.astro",
+          "src/components/board/Hero.astro",
+          "src/components/board/Method.astro",
+          "src/components/board/Sectors.astro",
+          "src/layouts/Base.astro",
+          "src/lib/motion.ts",
+          "src/pages/code-lens.svg.ts",
+          "src/scripts/motion.ts",
+          "src/styles/global.css",
+          "src/styles/theme.css",
+          "tests/e2e/motion.spec.ts",
+          "tests/unit/js-budget.test.ts",
+          "tests/unit/motion.test.ts"
+        ],
+        "diff_hash": "sha256:4c3fc9f3a7604ac0847175ddaa5e30a0b0410518be086123fa8e71906da85087",
+        "paths_digest": "sha256:af2e637a34a01fac99859936d56ac5f3d778cada0609d84d0c00d0dc505535c4",
+        "authored_lines": 753,
+        "original_changed_lines": 776
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "m2-motion:lens-start:2:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "m2-motion:lens-result:2:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:abc1c931031f53581ea972e83a7bcbde2a63bd3f545def44006fee9dab217a98",
+      "generation": 3,
+      "predecessor_lineage_id": "sha256:86e83ed836e3db76f0c570923b68bad654fb554f11e1e825e00b925ac958f2f8",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "bf944c52954700d3b91ef2f1e4f13f76994da5ea",
+          "candidate_tree": "110271991f56d2b0fa84694f3e748cff2ad0e9c0",
+          "paths": [
+            ".github/workflows/ci.yml",
+            "DESIGN.md",
+            "docs/architecture/decisions/0001-static-first-with-islands.md",
+            "package.json",
+            "pnpm-lock.yaml",
+            "scripts/design-check.mjs",
+            "scripts/fitness.mjs",
+            "scripts/lib/js-budget.mjs",
+            "scripts/lib/motion-tokens.mjs",
+            "src/components/Home.astro",
+            "src/components/board/Contact.astro",
+            "src/components/board/Footer.astro",
+            "src/components/board/Hero.astro",
+            "src/components/board/Method.astro",
+            "src/layouts/Base.astro",
+            "src/lib/motion.ts",
+            "src/pages/code-lens.svg.ts",
+            "src/scripts/motion.ts",
+            "src/styles/global.css",
+            "src/styles/theme.css",
+            "tests/e2e/motion.spec.ts",
+            "tests/unit/js-budget.test.ts",
+            "tests/unit/motion.test.ts"
+          ],
+          "diff_hash": "sha256:358730b7055495c92da289e9e40b0dd24e100cd7821bcfd4dd74442d80890556",
+          "paths_digest": "sha256:6d32df5f228706b0426c328ac90ab029bc686136ce86e481d912d6517c7ca0d4",
+          "authored_lines": 680,
+          "original_changed_lines": 700
+        },
+        "candidate_id": "sha256:6761deaacfad9d3c974c08a65fff24c4c523e59e7016d3820baaf4f38afd5828",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "docs/architecture/decisions/0001-static-first-with-islands.md",
+          "package.json",
+          "pnpm-lock.yaml",
+          "scripts/design-check.mjs",
+          "scripts/fitness.mjs",
+          "scripts/lib/js-budget.mjs",
+          "scripts/lib/motion-tokens.mjs",
+          "src/components/Home.astro",
+          "src/components/board/Contact.astro",
+          "src/components/board/Footer.astro",
+          "src/components/board/Hero.astro",
+          "src/components/board/Method.astro",
+          "src/layouts/Base.astro",
+          "src/lib/motion.ts",
+          "src/pages/code-lens.svg.ts",
+          "src/scripts/motion.ts",
+          "src/styles/global.css",
+          "src/styles/theme.css",
+          "tests/e2e/motion.spec.ts",
+          "tests/unit/js-budget.test.ts",
+          "tests/unit/motion.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "110271991f56d2b0fa84694f3e748cff2ad0e9c0",
+        "original_changed_lines": 700,
+        "authored_lines": 680
+      },
+      "current_candidate_id": "sha256:6761deaacfad9d3c974c08a65fff24c4c523e59e7016d3820baaf4f38afd5828",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "bf944c52954700d3b91ef2f1e4f13f76994da5ea",
+        "candidate_tree": "110271991f56d2b0fa84694f3e748cff2ad0e9c0",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "docs/architecture/decisions/0001-static-first-with-islands.md",
+          "package.json",
+          "pnpm-lock.yaml",
+          "scripts/design-check.mjs",
+          "scripts/fitness.mjs",
+          "scripts/lib/js-budget.mjs",
+          "scripts/lib/motion-tokens.mjs",
+          "src/components/Home.astro",
+          "src/components/board/Contact.astro",
+          "src/components/board/Footer.astro",
+          "src/components/board/Hero.astro",
+          "src/components/board/Method.astro",
+          "src/layouts/Base.astro",
+          "src/lib/motion.ts",
+          "src/pages/code-lens.svg.ts",
+          "src/scripts/motion.ts",
+          "src/styles/global.css",
+          "src/styles/theme.css",
+          "tests/e2e/motion.spec.ts",
+          "tests/unit/js-budget.test.ts",
+          "tests/unit/motion.test.ts"
+        ],
+        "diff_hash": "sha256:358730b7055495c92da289e9e40b0dd24e100cd7821bcfd4dd74442d80890556",
+        "paths_digest": "sha256:6d32df5f228706b0426c328ac90ab029bc686136ce86e481d912d6517c7ca0d4",
+        "authored_lines": 680,
+        "original_changed_lines": 700
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "m2-motion:lens-start:3:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "m2-motion:lens-result:3:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "assumptions": [
+    "La aceptación se cumple sin la escena fijada de Sectores: el usuario la retiró el 2026-10-21 y pasa al change m2-sectors-scene"
+  ],
+  "closed_at": "2026-10-21T13:32:52.725Z"
+}
