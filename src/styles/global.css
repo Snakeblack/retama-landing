@@ -121,32 +121,9 @@
   opacity: 0;
 }
 
-/* DESIGN.md Motion: the word's code. The layer copies the word from data-text, so it lines up with the letters, and
-   fills them with the site's own code (/code-lens.svg). On the poster (no scene), the pointer on the title shows it;
-   with the scene, the scene's glyphs do. */
-[data-lens]::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  color: transparent;
-  background: url("/code-lens.svg") var(--color-surface-raised);
-  /* The texture scales with the word, so the code keeps the same grain against the letters at every size. */
-  background-size: 90% auto;
-  background-clip: text;
-  opacity: 0;
-  transition: opacity var(--t-ui) var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  [data-chapter="hero"]:not(:has([data-scene-state="running"])) h1:hover [data-lens]::after {
-    opacity: 1;
-  }
-}
-
 /* DESIGN.md Layout: the floating header. Its height is the bar, the row of touch-sized controls and their padding;
-   the first chapter clears it on phones with lg of air, and a chapter reached by a link stops below it. header.ts sets data-hidden while
-   the page scrolls down: the bar slides away, or fades with reduced motion, and stays focusable. */
+   the first chapter clears it on phones with lg of air, and a chapter reached by a link stops below it. header.ts sets
+   data-hidden while the page scrolls down: the bar slides away, or fades with reduced motion, and stays focusable. */
 :root {
   --header-height: calc(var(--spacing-bar) + var(--spacing-md) * 2 + var(--spacing-touch));
   --header-clearance: calc(var(--header-height) + var(--spacing-lg));
