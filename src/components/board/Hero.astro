@@ -1,0 +1,77 @@
+---
+import { Picture } from "astro:assets";
+import plate from "../../assets/board/clusius-1576-retama-monosperma.jpg";
+import { type Locale, t } from "../../i18n/index";
+import Poster from "./Poster.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+const sections = [
+  ["anchor.services", "nav.services"],
+  ["anchor.sectors", "nav.sectors"],
+  ["anchor.method", "nav.method"],
+] as const;
+const facts = ["hero.fact1", "hero.fact2", "hero.fact3", "hero.fact4", "hero.fact5"] as const;
+---
+
+<!-- DESIGN.md: "Name band and rails". Phone order: name, links, the action, scene, statement, then the rails in pairs. -->
+<div class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows">
+  <p class="col-span-2 overflow-hidden bg-surface-raised p-tile-sm whitespace-nowrap type-display-sm md:p-tile md:type-display lg:col-span-12 lg:row-span-2" aria-hidden="true">
+    Retama
+  </p>
+
+  <nav class="col-span-2 lg:col-span-9" aria-label={copy["nav.label"]}>
+    <ul class="grid grid-cols-3 gap-gap">
+      {
+        sections.map(([anchor, label]) => (
+          <li>
+            <a class="flex min-h-(--spacing-row) bg-surface-raised p-tile-sm type-label text-on-surface hover:bg-field hover:text-on-field md:p-tile" href={`#${copy[anchor]}`}>
+              {copy[label]}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <a class="col-span-2 flex min-h-(--spacing-row) bg-primary p-tile-sm type-label text-on-primary hover:bg-field hover:text-on-field md:p-tile lg:col-span-3" href={`#${copy["anchor.contact"]}`}>
+    {copy["hero.action"]}
+  </a>
+
+  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-8 lg:col-start-3 lg:row-span-5 lg:row-start-4 lg:aspect-auto" data-scene>
+    <Poster class="block size-full" label={copy["hero.poster"]} />
+  </div>
+
+  <div class="relative col-span-2 bg-surface p-tile-sm md:p-tile lg:col-span-5 lg:col-start-3 lg:row-span-2 lg:row-start-7">
+    <h1 class="text-balance type-statement-sm md:type-statement">{copy["hero.title"]}</h1>
+  </div>
+
+  <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-2 lg:col-start-11 lg:row-span-3 lg:row-start-4">
+    <p class="type-headline-sm md:type-headline">{copy["hero.figure1"]}</p>
+    <p class="type-small text-on-surface-muted">{copy["hero.figure1Caption"]}</p>
+  </div>
+
+  <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-2 lg:col-start-11 lg:row-span-2 lg:row-start-7">
+    <p class="type-headline-sm md:type-headline">{copy["hero.figure2"]}</p>
+    <p class="type-small text-on-surface-muted">{copy["hero.figure2Caption"]}</p>
+  </div>
+
+  <div class="relative aspect-square overflow-hidden bg-surface-raised lg:col-span-2 lg:col-start-1 lg:row-span-3 lg:row-start-4 lg:aspect-auto">
+    <Picture
+      src={plate}
+      alt={copy["hero.plateAlt"]}
+      formats={["avif", "webp"]}
+      widths={[240, 480, 720]}
+      sizes="(min-width: 1024px) 17vw, 50vw"
+      loading="eager"
+      class="absolute inset-0 size-full object-cover object-top"
+    />
+  </div>
+
+  <ul class="bg-surface-raised p-tile-sm type-small md:p-tile lg:col-span-2 lg:col-start-1 lg:row-span-2 lg:row-start-7">
+    {facts.map((fact) => <li>{copy[fact]}</li>)}
+  </ul>
+</div>

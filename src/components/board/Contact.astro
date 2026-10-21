@@ -1,0 +1,22 @@
+---
+import { type Locale, t } from "../../i18n/index";
+import { contactEmail } from "../../lib/board";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+---
+
+<!-- Until the form lands (M3) the contact is the address itself, readable and copyable without a mail client. -->
+<section id={copy["anchor.contact"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="contact-title">
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
+    <h2 id="contact-title" class="text-balance type-headline-sm md:type-headline">{copy["contact.title"]}</h2>
+  </div>
+
+  <div class="col-span-2 flex flex-col justify-between gap-xl bg-field p-tile-sm text-on-field md:p-tile lg:col-span-6 lg:row-span-3">
+    <p class="max-w-(--spacing-measure)">{copy["contact.lead"]}</p>
+    <a class="break-all type-statement-sm underline md:type-statement" href={`mailto:${contactEmail}`}>{contactEmail}</a>
+  </div>
+</section>
