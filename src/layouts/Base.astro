@@ -1,9 +1,10 @@
 ---
 import { Font } from "astro:assets";
-import { defaultLocale, type Locale, localizedPath, locales, pathWithoutLocale, t } from "../i18n/index";
+import { type Locale, localizedPath } from "../i18n/index";
 import { alternates, canonicalUrl } from "../lib/seo";
 import "../styles/global.css";
 import theme from "../styles/theme.css?raw";
+import LangSwitch from "../components/LangSwitch.astro";
 import Wordmark from "../components/Wordmark.astro";
 
 interface Props {
@@ -15,8 +16,6 @@ interface Props {
 
 const { locale, title, description, noindex = false } = Astro.props;
 const site = Astro.site ?? new URL(Astro.url.origin);
-const page = pathWithoutLocale(Astro.url.pathname);
-const other = locales.find((candidate) => candidate !== locale) ?? defaultLocale;
 // The browser chrome takes the page ground from the DESIGN.md tokens.
 const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
 ---
@@ -46,24 +45,33 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
     <meta name="theme-color" content={themeColor} />
   </head>
   <body>
-    <div class="h-bar bg-primary" aria-hidden="true"></div>
-    <!-- The header text lines up with the text inside the tiles: page margin plus tile padding. A page may add its
-         navigation between the wordmark and the language switch (slot "nav"). -->
-    <header class="px-margin py-md">
-      <div class="flex flex-wrap items-center justify-between gap-x-lg gap-y-sm px-tile-sm md:px-tile">
-        <a class="feedback type-wordmark text-on-surface hover:text-primary" href={localizedPath(locale, "/")}>
-          <Wordmark class="block" />
-          <span class="sr-only">Retama</span>
-        </a>
-        <slot name="nav" />
-        <a class="lang-switch feedback type-small text-on-surface hover:text-primary" href={localizedPath(other, page)} hreflang={other} lang={other}>
-          {t(locale)["nav.switchLabel"]}
-        </a>
+    <!-- DESIGN.md Layout: the header floats over the page, the first chapter's scene included; header.ts sends it away
+         while the page scrolls down and back as soon as it scrolls up. Its text lines up with the text inside the tiles:
+         page margin plus tile padding. A page may add its links (slot "nav", from md), its chapter index (slot "menu",
+         on phones) and its fixed action (slot "action", outside the bar that moves). -->
+    <header>
+      <div class="fixed inset-x-0 top-0 z-20 bg-surface" data-header-bar>
+        <div class="h-bar bg-primary" aria-hidden="true"></div>
+        <div class="px-margin py-md">
+          <div class="flex items-center gap-md px-tile-sm md:gap-lg md:px-tile">
+            <a class="feedback type-wordmark text-on-surface hover:text-primary" href={localizedPath(locale, "/")}>
+              <Wordmark class="block" />
+              <span class="sr-only">Retama</span>
+            </a>
+            <slot name="nav" />
+            <LangSwitch class="ml-auto" locale={locale} primary />
+            <slot name="menu" />
+          </div>
+        </div>
       </div>
+      <slot name="action" />
     </header>
     <main>
       <slot />
     </main>
     <slot name="footer" />
+    <script>
+      import "../scripts/header";
+    </script>
   </body>
 </html>

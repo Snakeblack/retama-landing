@@ -20,7 +20,8 @@ for (const { path, lang, other } of pages) {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
     await expect(page.locator("html")).toHaveAttribute("lang", lang);
-    await expect(page.locator(`a[hreflang][href="${other}"]`)).toBeVisible();
+    // The header's switch; the chapter index of phones holds a copy of it.
+    await expect(page.locator(`a.lang-switch[hreflang][href="${other}"]`)).toBeVisible();
   });
 }
 

@@ -12,6 +12,10 @@ export const es = {
   "anchor.method": "metodo",
   "anchor.contact": "contacto",
   "nav.talk": "Hablemos",
+  "nav.index": "Índice",
+  "nav.close": "Cerrar",
+  "nav.home": "Inicio",
+  "nav.here": "Estás aquí",
 
   "hero.word": "Software",
   "hero.rest": "a medida",
