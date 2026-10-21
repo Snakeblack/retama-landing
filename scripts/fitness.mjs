@@ -67,13 +67,18 @@ function branchProtection() {
   const remote = execFileSync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"], {
     encoding: "utf8",
   }).trim();
-  const contexts = JSON.parse(
-    execFileSync(
-      "gh",
-      ["api", `repos/${remote}/branches/main/protection/required_status_checks`, "--jq", "[.checks[].context]"],
-      { encoding: "utf8" },
-    ),
-  );
+  let contexts;
+  try {
+    contexts = JSON.parse(
+      execFileSync(
+        "gh",
+        ["api", `repos/${remote}/branches/main/protection/required_status_checks`, "--jq", "[.checks[].context]"],
+        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+      ),
+    );
+  } catch (error) {
+    fail(`main has no required status checks on ${remote} (ADR 0009): ${String(error.stderr).trim()}`);
+  }
   const missing = REQUIRED_CHECKS.filter((check) => !contexts.includes(check));
   if (missing.length > 0) fail(`main does not require: ${missing.join(", ")} (ADR 0009)`);
   console.log(`main requires ${contexts.join(", ")}`);
