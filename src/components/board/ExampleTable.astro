@@ -1,0 +1,56 @@
+---
+import { type Locale, t } from "../../i18n/index";
+
+interface Props {
+  locale: Locale;
+  caption: string;
+  columns: readonly string[];
+  /** The last cell of each row is a status, marked in primary when the row needs attention. */
+  rows: readonly { cells: readonly (string | number)[]; alert: boolean }[];
+}
+
+const { locale, caption, columns, rows } = Astro.props;
+const copy = t(locale);
+---
+
+<!-- DESIGN.md Imagery: Retama has no client work to show yet, so this panel is an example and says so on its face. -->
+<figure class="h-full flex flex-col gap-md bg-surface-raised p-tile-sm md:p-tile" data-ui>
+  <figcaption class="flex items-center justify-between gap-md type-small text-on-surface-muted">
+    {caption}
+    <span class="bg-field px-sm text-on-field" data-example>{copy["frag.example"]}</span>
+  </figcaption>
+  <table class="w-full border-separate border-spacing-y-(--spacing-xs) text-left type-small tabular-nums md:type-body">
+    <thead class="type-small text-on-surface-muted">
+      <tr>
+        {
+          columns.map((column) => (
+            <th class="px-sm type-small md:px-md" scope="col">
+              {column}
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map(({ cells, alert }) => (
+          <tr class="bg-surface">
+            {cells.slice(0, -1).map((cell) => (
+              <td class="px-sm py-md md:p-md">{cell}</td>
+            ))}
+            <td class="px-sm py-md md:p-md">
+              <span class="flex items-center gap-sm">
+                {alert ? (
+                  <span class="size-sm shrink-0 bg-primary" aria-hidden="true" />
+                ) : (
+                  <span class="size-sm shrink-0 bg-on-surface-muted" aria-hidden="true" />
+                )}
+                {cells.at(-1)}
+              </span>
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</figure>

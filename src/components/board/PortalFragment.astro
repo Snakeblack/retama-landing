@@ -1,0 +1,63 @@
+---
+import { type Locale, t } from "../../i18n/index";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+// One interface under three made-up brands: only the name and the tone of the header change, never a second accent.
+const brands = [
+  ["frag.portal.brand1", "bg-field text-on-field"],
+  ["frag.portal.brand2", "bg-surface text-on-surface"],
+  ["frag.portal.brand3", "bg-primary text-on-primary"],
+] as const;
+const menu = [
+  ["frag.portal.orders", 12],
+  ["frag.portal.invoices", 3],
+  ["frag.portal.support", 1],
+] as const;
+---
+
+<!-- DESIGN.md Imagery: a white-label example, labelled as one. The motion script cycles the brands while it is
+     visible; without it the first brand stays and the three names are in the list below. -->
+<figure class="h-full flex flex-col gap-md bg-surface-raised p-tile-sm md:p-tile" data-ui data-portal>
+  <figcaption class="flex items-center justify-between gap-md type-small text-on-surface-muted">
+    {copy["frag.portal.caption"]}
+    <span class="bg-field px-sm text-on-field" data-example>{copy["frag.example"]}</span>
+  </figcaption>
+  <div class="grid" aria-hidden="true">
+    {
+      brands.map(([brand, tone]) => (
+        <p class:list={["col-start-1 row-start-1 p-md type-statement-sm", tone]} data-brand>
+          {copy[brand]}
+        </p>
+      ))
+    }
+  </div>
+  <ul class="grid gap-xs tabular-nums">
+    {
+      menu.map(([item, count]) => (
+        <li class="flex items-center justify-between gap-md bg-surface p-md">
+          {copy[item]}
+          <span class="text-on-surface-muted">{count}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <ul class="flex flex-wrap gap-md type-small text-on-surface-muted">
+    {
+      brands.map(([brand], index) => (
+        <li class="flex items-center gap-sm">
+          <span
+            class="size-sm shrink-0 bg-on-surface-muted data-active:bg-primary"
+            aria-hidden="true"
+            data-brand-mark
+            data-active={index === 0 ? "" : undefined}
+          />
+          {copy[brand]}
+        </li>
+      ))
+    }
+  </ul>
+</figure>
