@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <title>Retama</title>
-  <rect width="32" height="32" rx="6" fill="#0b0d10" />
-  <text x="16" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="700" fill="#e8eaed">R</text>
+  <!-- DESIGN.md colours: surface, primary (top bar) and on-surface; R from the wordmark outline. -->
+  <rect width="32" height="32" fill="#18191b" />
+  <rect width="32" height="4" fill="#ff4a1f" />
+  <path transform="translate(9.15 9.25) scale(0.025)" fill="#eff0f1" d="M0 0L242 0Q335 0 404 22Q472 43 510 92Q547 141 547 226Q547 310 510 359Q475 405 414 427L547 700L402 700L294 450Q269 452 242 452L128 452L128 700L0 700ZM242 341Q297 341 336 331Q374 321 395 296Q415 271 415 226Q415 181 395 156Q374 131 336 121Q297 111 242 111L128 111L128 341Z" />
 </svg>

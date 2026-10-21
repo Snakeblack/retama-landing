@@ -2,7 +2,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 
 // Production origin for canonicals, hreflang and the sitemap. SITE_URL overrides
 // it; the fallback is the workers.dev URL until the domain lands (M6).
@@ -27,6 +27,39 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  // DESIGN.md typefaces, self-hosted from the pinned Fontsource packages (no third-party request; font-src 'self').
+  fonts: [
+    {
+      provider: fontProviders.local(),
+      name: "Stack Sans Headline",
+      cssVariable: "--font-stack-sans-headline",
+      fallbacks: ["sans-serif"],
+      options: {
+        variants: [
+          {
+            src: ["@fontsource-variable/stack-sans-headline/files/stack-sans-headline-latin-wght-normal.woff2"],
+            weight: "200 700",
+            style: "normal",
+          },
+        ],
+      },
+    },
+    {
+      provider: fontProviders.local(),
+      name: "Stack Sans Text",
+      cssVariable: "--font-stack-sans-text",
+      fallbacks: ["sans-serif"],
+      options: {
+        variants: [
+          {
+            src: ["@fontsource-variable/stack-sans-text/files/stack-sans-text-latin-wght-normal.woff2"],
+            weight: "200 700",
+            style: "normal",
+          },
+        ],
+      },
+    },
+  ],
   integrations: [
     sitemap({
       i18n: { defaultLocale: "es", locales: { es: "es", en: "en" } },

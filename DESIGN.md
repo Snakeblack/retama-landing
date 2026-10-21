@@ -1,39 +1,81 @@
 ---
 version: alpha
-name: Retama (provisional)
-description: Provisional tokens for the S1 walking skeleton. The art direction (M1) replaces them.
+name: Retama
+description: Graphite board of flat tiles with one safety-orange accent, set in Stack Sans. Art direction "The well-kept board" (taste-skill dense-tiles, M1).
 colors:
-  primary: "#9ECBFF"
-  surface: "#0B0D10"
-  on-surface: "#E8EAED"
-  on-surface-muted: "#AAB1BB"
-  neutral: "#C9CED6"
+  primary: "#FF4A1F"
+  on-primary: "#18191B"
+  surface: "#18191B"
+  surface-raised: "#222427"
+  on-surface: "#EFF0F1"
+  on-surface-muted: "#9C9EA3"
+  field: "#EFF0F1"
+  on-field: "#18191B"
 typography:
-  headline-display:
-    fontFamily: system-ui
+  display:
+    fontFamily: Stack Sans Headline
+    fontSize: 200px
+    fontWeight: 300
+    lineHeight: "0.9"
+    letterSpacing: -0.022em
+  display-sm:
+    fontFamily: Stack Sans Headline
+    fontSize: 104px
+    fontWeight: 300
+    lineHeight: "0.9"
+    letterSpacing: -0.022em
+  headline:
+    fontFamily: Stack Sans Headline
     fontSize: 64px
-    fontWeight: 700
-    lineHeight: 1.1
-    letterSpacing: -0.02em
-  body-lg:
-    fontFamily: system-ui
-    fontSize: 20px
-    fontWeight: 400
-    lineHeight: 1.5
-  body-md:
-    fontFamily: system-ui
-    fontSize: 16px
-    fontWeight: 400
-    lineHeight: 1.5
-  label-sm:
-    fontFamily: system-ui
-    fontSize: 14px
+    fontWeight: 300
+    lineHeight: "1.05"
+    letterSpacing: -0.022em
+  headline-sm:
+    fontFamily: Stack Sans Headline
+    fontSize: 36px
+    fontWeight: 300
+    lineHeight: "1.05"
+    letterSpacing: -0.022em
+  statement:
+    fontFamily: Stack Sans Headline
+    fontSize: 32px
+    fontWeight: 300
+    lineHeight: "1.2"
+    letterSpacing: -0.011em
+  statement-sm:
+    fontFamily: Stack Sans Headline
+    fontSize: 22px
+    fontWeight: 300
+    lineHeight: "1.25"
+    letterSpacing: -0.011em
+  wordmark:
+    fontFamily: Stack Sans Headline
+    fontSize: 28px
     fontWeight: 500
-    lineHeight: 1.4
-    letterSpacing: 0.1em
+    lineHeight: "1"
+    letterSpacing: -0.02em
+  body:
+    fontFamily: Stack Sans Text
+    fontSize: 18px
+    fontWeight: 400
+    lineHeight: "1.5"
+  body-strong:
+    fontFamily: Stack Sans Text
+    fontSize: 18px
+    fontWeight: 500
+    lineHeight: "1.5"
+  label:
+    fontFamily: Stack Sans Text
+    fontSize: 18px
+    fontWeight: 500
+    lineHeight: "1.2"
+  small:
+    fontFamily: Stack Sans Text
+    fontSize: 14px
+    fontWeight: 400
+    lineHeight: "1.45"
 rounded:
-  sm: 4px
-  md: 8px
+  tile: 0px
 spacing:
   xs: 4px
   sm: 8px
@@ -41,63 +83,213 @@ spacing:
   lg: 24px
   xl: 48px
   2xl: 96px
-  content: 768px
+  margin: 12px
+  gap: 8px
+  tile: 24px
+  tile-sm: 20px
+  row: 96px
+  section: 128px
+  bar: 6px
+  focus: 2px
+  touch: 48px
+  measure: 640px
 components:
   page:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
-    typography: "{typography.body-md}"
-  lead:
+    typography: "{typography.body}"
+  top-bar:
+    backgroundColor: "{colors.primary}"
+    height: "{spacing.bar}"
+  wordmark:
     backgroundColor: "{colors.surface}"
-    textColor: "{colors.neutral}"
-    typography: "{typography.body-lg}"
-  eyebrow:
+    textColor: "{colors.on-surface}"
+    typography: "{typography.wordmark}"
+  display:
     backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.display}"
+  display-phone:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.display-sm}"
+  heading:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.headline}"
+  heading-phone:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.headline-sm}"
+  tile:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.body}"
+    rounded: "{rounded.tile}"
+    padding: "{spacing.tile}"
+  tile-phone:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.body}"
+    rounded: "{rounded.tile}"
+    padding: "{spacing.tile-sm}"
+  tile-statement:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.statement}"
+  tile-statement-phone:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.statement-sm}"
+  tile-run-in:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.body-strong}"
+  tile-caption:
+    backgroundColor: "{colors.surface-raised}"
     textColor: "{colors.on-surface-muted}"
-    typography: "{typography.label-sm}"
+    typography: "{typography.small}"
+  tile-field:
+    backgroundColor: "{colors.field}"
+    textColor: "{colors.on-field}"
+    typography: "{typography.statement}"
+    rounded: "{rounded.tile}"
+    padding: "{spacing.tile}"
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.label}"
+    rounded: "{rounded.tile}"
+    height: "{spacing.touch}"
+    padding: "{spacing.lg}"
+  button-primary-hover:
+    backgroundColor: "{colors.field}"
+    textColor: "{colors.on-field}"
   link:
     backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.body}"
+  link-quiet:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface-muted}"
+    typography: "{typography.small}"
+  focus-ring:
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.primary}"
+    size: "{spacing.focus}"
 ---
 
 # Retama
 
 ## Overview
 
-Provisional system for the walking skeleton (S1). It only has to be dark, legible and accessible; the art direction chosen in M1 replaces every token. Retama should read as serious, elegant and technically ahead: little text, generous space, strong contrast. The motion budget and the 3D section arrive in M1.
+Retama is a remote-only software engineering firm from Spain. The page has to read as serious, elegant and technically ahead, with little text and a picture behind every claim (`docs/product/brief.md`).
+
+The art direction is **The well-kept board**, dealt by taste-skill (`dense-tiles`, seed 571009059, sector agency, tone technical) and chosen by the owner on 2026-10-21. The hero slot was redrawn once, from "Sheet with a text cell" to "Name band and rails", because the first deal filled the first screen with photographs Retama does not have and set nothing at display size, which contradicts the progressive 3D hero of ADR 0004.
+
+The whole page is one board of flat tiles fitted edge to edge with narrow gaps, like a tidy desk seen from above. Each tile holds one true thing: the name, a statement, a picture, a figure, a short list, a link. There is no sequence of bands: the board continues down the page with the same sizes, and its last row is the footer.
+
+**The idea.** A retama lives on poor, dry ground because of what nobody sees: a root system many times deeper than the shrub is tall. Retama works the same way: the visible software stands on documented decisions underneath. On this page, **the retama's deep roots and the firm's written decisions become the board's tiles**: the large central tile of the first screen holds the 3D scene of the plant's stems and roots, and the method tiles read like decision records (a number, a decision, its reason). The live thing, built in M2, comes from the same idea: the visitor picks a kind of project and reads the first decisions Retama would record for it.
 
 ## Colors
 
-- **Primary (#9ECBFF):** a cool sky blue, the only interactive accent (links and the main action).
-- **Surface (#0B0D10):** near-black base of every page.
-- **On-surface (#E8EAED):** headlines and body text.
-- **On-surface muted (#AAB1BB):** eyebrows, captions and metadata.
-- **Neutral (#C9CED6):** lead paragraphs, softer than body text.
+Graphite and safety orange. Graphite takes most of the board; one light field appears on a few chosen tiles; orange is the only accent.
 
-Every text color passes WCAG AA (4.5:1) on the surface.
+- **Surface (#18191B):** graphite, the ground of every page and the gaps between tiles.
+- **Surface raised (#222427):** one tone step lighter, the fill of ordinary tiles. Tiles are told apart from the ground by this step alone.
+- **On surface (#EFF0F1):** a soft light ink for headlines, running text and links. Running text is always in this full ink.
+- **On surface muted (#9C9EA3):** captions, small print and quiet links only; never running text.
+- **Field (#EFF0F1) and On field (#18191B):** the inverted tile, used for one or two statements per screen at most.
+- **Primary (#FF4A1F) and On primary (#18191B):** safety orange marks the main action, the thick bar across the top of the page and the highlighted item in a list. Under 5% of any screen.
+
+Contrast on the ground: on-surface 15.4:1, on-surface-muted 6.6:1 and primary 5.2:1; on a raised tile, on-surface 13.6:1 and on-surface-muted 5.8:1. Every text pair passes WCAG AA, and `pnpm design:lint` checks each component pair. Photographs are shown in greyscale so nothing competes with the accent.
 
 ## Typography
 
-The system font stack until M1 picks self-hosted typefaces: no font download, no layout shift. One display size for the hero, two body sizes and an uppercase label with wide tracking.
+**Stack Sans** (SIL Open Font License), self-hosted from the pinned `@fontsource-variable/stack-sans-headline` and `@fontsource-variable/stack-sans-text` packages through Astro's font API, which also generates metric-matched fallbacks so the swap does not shift the layout. Only the latin subset ships; it covers Spanish and English.
+
+- **Stack Sans Headline** sets everything at large size, in a light 300 weight with tight tracking: the name at display size, section headings and single statements inside tiles. The wordmark uses the same face at 500.
+- **Stack Sans Text** sets running text at 400, run-in phrases and action labels at 500, and small print.
+
+The page uses five sizes on desktop: 14 (small), 18 (body, labels), 32 (statement), 64 (headline) and 200 (display). On phones, below the `md` breakpoint (768px), the large three step down to 22, 36 and 104 (the `-sm` tokens). Each level is one utility generated with the theme, `type-<level>` (for example `type-headline-sm md:type-headline`), which sets family, size, line height, tracking and weight together. Sentence case everywhere; no uppercase labels, no monospace, no styled accent word inside a headline. A heading may be two-tone, muted then full ink.
 
 ## Layout
 
-Single column, content at most 768px wide, a 4px-based spacing scale. Pages breathe: the hero has 96px of vertical space on each side.
+A 12-column grid that fills the viewport with **12px outer margins** and **8px gaps** at every width. Tiles take only four sizes on the mosaic (6×5, 6×3, 3×3 and 3×2 columns × 96px rows), so the board stays a system and never becomes a card grid: neighbouring tiles never hold the same kind of thing. Text inside a tile is top-left aligned on 24px padding (20px on phones) and is never centred. Running text stops at 640px (`measure`).
+
+Groups of the board (services, sectors, method, questions, contact) are separated by 128px (`section`), clearly more than any gap inside a group, and each group opens with a heading tile that names it. The first screen carries the page's one `h1`.
+
+The phone is its own board: two columns with the same gaps, re-ordered so the name and the statement lead, the photograph spans both columns and pairs of small tiles sit side by side.
+
+## Elevation & Depth
+
+None. There are no shadows, glows, gradients, blurs or outlines on things at rest. Depth comes only from the tone step between surface and surface raised, and from the inverted field. A shadow is allowed on what truly floats (a menu, a dialog), and nothing floats yet.
 
 ## Shapes
 
-Small radii (4px and 8px) only; no pills until M1 defines components.
+Square corners on everything: tiles, photographs, the action and form fields (`rounded.tile` is 0). A thick bar of 6px in primary runs across the top of the page; it is the only line on the board.
 
 ## Components
 
-- **page:** base background, text and body typography.
-- **lead:** the paragraph under the hero headline.
-- **eyebrow:** the label above the headline.
-- **link:** text links and the language switch.
+- **page:** ground, ink and body type of every page.
+- **top-bar:** the 6px primary bar across the top of the page.
+- **wordmark:** "Retama" drawn from Stack Sans Headline 500, as an inline SVG that takes the ink colour; the name is also in the page text for assistive technology.
+- **display / display-phone:** the name band of the first screen.
+- **heading / heading-phone:** the heading tile that opens each group.
+- **tile / tile-phone:** an ordinary filled tile.
+- **tile-statement / tile-statement-phone:** a tile that holds one sentence at statement size.
+- **tile-run-in:** the bold run-in phrase that opens a small paragraph.
+- **tile-caption:** small muted text inside a tile.
+- **tile-field:** the inverted tile.
+- **button-primary / button-primary-hover:** the one action, a filled orange rectangle at least 48px tall; on hover and press it inverts to the light field.
+- **link / link-quiet:** text links in full ink with an underline; quiet links in muted small type.
+- **focus-ring:** a 2px primary outline with a 2px offset on every focusable element.
+
+## Imagery
+
+Retama has no photographs of its own. In order of preference: real pictures of its world from open collections with licences that allow commercial use (botanical plates and photographs of *Retama sphaerocarpa* and *Retama monosperma*, the dry ground and coastal sands of southern Spain), downloaded into the repository and credited in the footer; interface fragments of real work drawn in HTML (`data-ui`); then drawings in code in the palette's colours. Every photograph is greyscale, square-cornered and covers its tile with `object-fit: cover`. A found picture shows the world around Retama and is never presented as Retama's product, office or team. The board carries at least four real pictures.
+
+## Motion and 3D
+
+Motion makes the board feel alive and never carries content: every word is in the HTML before any script runs (ADR 0001), and animations only touch `transform`, `opacity` and `clip-path`.
+
+| Token | Value | Use |
+| --- | --- | --- |
+| ease-out | cubic-bezier(0.22, 1, 0.36, 1) | entrances, moving hovers, interface under 600ms |
+| ease-expo | cubic-bezier(0.16, 1, 0.3, 1) | reveals of 800ms or longer, the shutter |
+| ease-in-out | cubic-bezier(0.76, 0, 0.24, 1) | wipes and panels that travel while visible |
+| ease-soft | cubic-bezier(0.33, 1, 0.68, 1) | slow scale and drift on pictures |
+| ease-exit | cubic-bezier(0.55, 0.055, 0.675, 0.19) | something leaving for good, short |
+| t-press | 140ms | press feedback |
+| t-hover | 180ms | colour hovers |
+| t-ui | 240ms | hovers that move something, accordions |
+| t-reveal | 800ms | section entrances |
+| t-open | 1100ms | the shutter |
+| stagger-line | 90ms | lines of one statement |
+| stagger-item | 70ms | tiles of one group |
+
+These tokens live in this table until the motion layer lands (M2), which defines them once in code and nowhere else.
+
+The budget, per page:
+
+- **One signature move, the shutter:** the central tile of the first screen opens from its lower edge with a clip-path over `t-open` while the picture inside settles from 1.12 scale to rest. It happens once.
+- **Entrances:** inside each group, the heading, then the text, then the picture, staggered by `stagger-item`, rising 16–32px with opacity, once, as the group enters. A list arrives row by row and a figure counts up once; never the same fade on every block. The hidden starting state is set by the script itself, so without it everything is simply there.
+- **Feedback on every control:** press, hover and focus on the action, links, tiles that link and the live thing.
+- **One moving picture:** the 3D scene.
+- **At most one pinned scroll scene** (the sectors list), held for two or three screens, with its own content on every screen.
+- Between eight and sixteen elements move while the page loads and scrolls; no bounce or elastic easing; no scroll hijacking and no custom cursor.
+
+**The 3D scene** (ADR 0004) draws the retama's stems above and roots below as thin geometry in on-surface and primary on the graphite ground, turning slowly. Three tiers that look like one picture: WebGPU, then WebGL2, then the static poster image, which is the LCP element and is shown first. The scene loads after the first paint and only when its tile is visible, pauses off screen and with the tab hidden, and stays on the poster with reduced motion, data saving or a weak GPU.
+
+**Reduced motion** keeps opacity and colour changes and drops travel, scale, parallax, the shutter and the scene's rotation. The performance budget of `scenario:perf-mobile` (LCP ≤ 1.8s, INP ≤ 200ms, CLS ≤ 0.1, Lighthouse 100) wins over any move.
 
 ## Do's and Don'ts
 
 - Do read this document before any UI work, human or agent (ADR 0005).
 - Do regenerate the theme with `pnpm design:theme`; never edit `src/styles/theme.css` by hand.
-- Don't use colors or sizes outside these tokens in components.
-- Don't add a second accent color.
+- Do take every colour and size from these tokens: `pnpm design:lint` rejects Tailwind's default scale and palette, literal arbitrary values and raw CSS colours and sizes in `src/`.
+- Do fill tiles; separate them with the gap and the tone step, never with a line.
+- Don't add a second accent colour, a gradient, a shadow at rest, glass or a glow.
+- Don't use eyebrows, small uppercase letter-spaced labels, monospace, index numbers (01, 02) or thin rules.
+- Don't put an icon and a two-line blurb in every tile, or build rows of identical tiles.
+- Don't let a headline run past two lines at any width.

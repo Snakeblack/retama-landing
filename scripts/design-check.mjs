@@ -18,7 +18,31 @@ function run(args) {
   }
 }
 
-const theme = HEADER + run(["export", "DESIGN.md", "--format", "css-tailwind"]);
+// Astro's font API self-hosts each DESIGN.md family under a hashed name and exposes it, with its
+// metric-matched fallback, as `--font-<family slug>` (astro.config.mjs). The theme points at that stack.
+const selfHosted = (_, token, family) =>
+  `--font-${token}: var(--font-${family.toLowerCase().replace(/\s+/g, "-")}, "${family}", sans-serif);`;
+const exported = run(["export", "DESIGN.md", "--format", "css-tailwind"]).replace(
+  /--font-([\w-]+): "([^"]+)";/g,
+  selfHosted,
+);
+
+// One `type-<name>` utility per DESIGN.md typography level, so a component sets a level with one class.
+const TYPE_PROPERTIES = [
+  ["font", "font-family"],
+  ["text", "font-size"],
+  ["leading", "line-height"],
+  ["tracking", "letter-spacing"],
+  ["font-weight", "font-weight"],
+];
+const levels = [...exported.matchAll(/--text-([\w-]+):/g)].map(([, name]) => name);
+const utilities = levels.map((name) => {
+  const declarations = TYPE_PROPERTIES.filter(([namespace]) => exported.includes(`--${namespace}-${name}:`)).map(
+    ([namespace, property]) => `  ${property}: var(--${namespace}-${name});`,
+  );
+  return `@utility type-${name} {\n${declarations.join("\n")}\n}\n`;
+});
+const theme = HEADER + exported + utilities.join("");
 
 if (process.argv.includes("--write")) {
   writeFileSync(THEME, theme);
