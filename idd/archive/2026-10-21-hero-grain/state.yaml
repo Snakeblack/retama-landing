@@ -1,0 +1,310 @@
+{
+  "schema": "idd-state/v1",
+  "change": "hero-grain",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "es que en el hero es donde más queria el grano, hay que idear algo para mejorar esto, dale una vuelta",
+    "kind": "feature",
+    "summary": "Grano en el hero sin coste en la carga: la escena dibuja el grano de la página en su shader (fundido al crecer la retama) y el grano CSS de los fondos se activa tras load; arregla el 99 de Lighthouse del PR #22",
+    "acceptance": "Con la escena, el fondo del hero lleva el mismo grano que el resto (misma media y desviación medidas) y los glifos solo la capa ligera; Lighthouse móvil vuelve a 100 con LCP y Speed Index iguales a sin grano; el grano CSS de los fondos sigue igual tras load; con movimiento reducido el escenario del hero lleva el grano CSS; ospec check pasa"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/scene-three.ts",
+          "line": 165
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/styles/global.css",
+          "line": 176
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "en el hero es donde más queria el grano"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 30
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 301
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 258
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "idd/hero-grain/change.md",
+      "src/components/Home.astro",
+      "src/lib/grain.ts",
+      "src/scripts/header.ts",
+      "src/scripts/scene-three.ts",
+      "src/styles/global.css",
+      "tests/e2e/grain.spec.ts",
+      "tests/unit/grain.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0006",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "El texto sigue en el HTML; el grano es decoración que llega con load (isla header.ts) y sin JS simplemente no está"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "La escena sigue en el worker tras load; el grano del shader se salta hasta que la escena se asienta y Lighthouse vuelve a 100 con LCP 1,54 s y SI 1,07 s, igual que sin grano"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md describe el grano de la escena, el aplazado tras load y el caso de movimiento reducido; design:lint limpio"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin style inline: el atributo data-grain lo pone el script; las imágenes siguen incrustadas (img-src data:)"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint limpio con el grano acotado a [data-grounds], pie e índice",
+      "recorded_at": "2026-10-21T22:38:40.421Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T22:40:44.744Z",
+      "detail": {
+        "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T22:40:44.744Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T22:40:51.721Z"
+    }
+  ],
+  "base": "cc56b871a3da40d23cdf99085d83a4988e71869d",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:b72c55647016652c6c02be5f5b2e77279282f2774a4459dacae3eda1e364f725",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:b18299888aeff879a8f7407a7866dd8c266c3cf3d1487abb6edda355f6707158",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:3a34a124aed11941cb003296ce256ad985393de27f22beb4ecd1a166515a9195",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:5a44d17ee5b35fd74cc3e68e7cead39ca07c2eeec63e17ec47b6487c8d0d2330",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a57c3000c32c810ee99f660da50defa186768953c20eff901fb5305a15aca1ce",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:7d385de27d224a2928b27d6fb2e1a41f552a07570dd8fcf0730f1181b9e23f5a",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:2957a60b0cb9545fb2cd90e4e7869a39eacf1a90585e2c9ac3fbf1d2d06e6803",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:ce18dd07b2121a10225c05f24db75f7d0d06a4a2dd67e4bf35d16dbd5038d89d",
+      "tree": "sha256:b42afdb461b9fa90a0e9025bb90dbd714eea071c8c6ff5967c152c15faa792c9",
+      "recorded_at": "2026-10-21T22:40:44.744Z"
+    }
+  ],
+  "assumptions": [
+    "Sin JS no hay grano CSS en los fondos (llega con load desde header.ts); es decoración y el texto sigue en el HTML (ADR 0001)",
+    "Cuando la escena se rinde o no hay GPU (póster), el hero queda sin grano; solo con movimiento reducido el escenario lleva el grano CSS",
+    "Durante el montaje del título y el crecimiento (unos 6 s) la escena va sin grano; entra en fundido de 0,8 s al asentarse"
+  ],
+  "closed_at": "2026-10-21T22:40:51.721Z"
+}
