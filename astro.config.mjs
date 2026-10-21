@@ -4,9 +4,9 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
-// Production origin for canonicals, hreflang and the sitemap. Workers Builds sets
-// SITE_URL; the fallback is the workers.dev URL until the domain lands (M6).
-const site = process.env.SITE_URL ?? "https://retama-landing.workers.dev";
+// Production origin for canonicals, hreflang and the sitemap. SITE_URL overrides
+// it; the fallback is the workers.dev URL until the domain lands (M6).
+const site = process.env.SITE_URL ?? "https://retama-landing.retamozogpt.workers.dev";
 
 export default defineConfig({
   site,
