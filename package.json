@@ -25,7 +25,8 @@
     "@astrojs/cloudflare": "14.4.1",
     "@astrojs/sitemap": "3.7.4",
     "astro": "7.4.1",
-    "gsap": "3.15.0"
+    "gsap": "3.15.0",
+    "three": "0.186.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.11",
@@ -36,6 +37,7 @@
     "@lhci/cli": "0.15.1",
     "@playwright/test": "1.64.1",
     "@tailwindcss/vite": "4.3.3",
+    "@types/three": "0.186.0",
     "eslint": "10.13.0",
     "eslint-plugin-astro": "3.2.1",
     "tailwindcss": "4.3.3",

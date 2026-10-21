@@ -1,6 +1,6 @@
 // The retama of the hero (DESIGN.md, Motion and 3D): a broom of thin stems above the ground and a root
-// system that runs deeper than the shrub is tall. One seeded generator draws the static poster now and
-// gives the 3D scene the same plant later, so the three tiers of ADR 0004 look like one picture.
+// system that runs deeper than the shrub is tall. One seeded generator draws the static poster and gives the 3D
+// scene the same plant (retama-scene.ts), so the three tiers of ADR 0004 look like one picture.
 
 export type Point = [x: number, y: number];
 export type StrokeKind = "stem" | "root" | "taproot";
@@ -17,6 +17,9 @@ export interface Frame {
 export interface Shape extends Frame {
   strokes: Stroke[];
 }
+
+/** The plant of the hero: its seed, its frame and where the poster's view starts, left of the frame. */
+export const HERO = { seed: 571009059, frame: { width: 1600, height: 900, ground: 360 }, left: -340 } as const;
 
 // mulberry32: small, fast and the same on every platform.
 function random(seed: number): () => number {

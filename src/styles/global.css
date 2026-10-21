@@ -69,9 +69,33 @@
     animation: shutter var(--t-open) var(--ease-expo) both;
   }
 
-  [data-shutter] > * {
+  [data-shutter] > [data-retama-poster] {
     animation: settle var(--t-open) var(--ease-soft) both;
   }
+}
+
+/* ADR 0004: the 3D scene takes over from the poster once its first frame is drawn (scene.ts sets the state),
+   and hands it back the same way if it gives up. */
+[data-scene-canvas],
+[data-retama-poster] {
+  transition: opacity var(--t-reveal) var(--ease-out);
+}
+
+[data-scene-canvas] {
+  opacity: 0;
+}
+
+[data-scene-state="running"] [data-scene-canvas] {
+  opacity: 1;
+}
+
+[data-scene-state="running"] [data-retama-poster] {
+  opacity: 0;
+}
+
+/* The layer that pauses the scene fills a tile that clips its overflow, so its focus ring goes inside. */
+[data-scene-pause]:focus-visible {
+  outline-offset: calc(var(--spacing-focus) * -2);
 }
 
 @keyframes shutter {

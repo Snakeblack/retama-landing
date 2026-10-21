@@ -16,6 +16,8 @@ export const en = {
 
   "hero.title": "Custom software, held up by written decisions.",
   "hero.poster": "Drawing of a retama: thin stems above the ground and a root that goes far deeper.",
+  "hero.scenePauseLabel": "Pause the retama animation",
+  "hero.scenePlayLabel": "Play the retama animation",
   "frag.adr.status": "Accepted",
   "frag.adr.title": "3D scene as a progressive enhancement that never blocks",
   "frag.adr.caption": "A real decision of this site.",
