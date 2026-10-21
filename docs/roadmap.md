@@ -47,12 +47,13 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 **Objetivo:** una portada al grano, con una idea por pantalla y unas 300 palabras visibles, manteniendo los tokens y la esencia (dirección «Colour chapters» de taste-skill, DESIGN.md).
 
 **Entra (un change por PR, encadenados):**
-1. `chapters-hero`: «Software» a tamaño display, que se descifra desde el código, y «a medida» debajo; la retama crece bajo la palabra; cabecera con enlaces y «Hablemos» fijo. Las cifras y el fragmento ADR pasan a Método.
-2. Manifiesto fijo, como mucho 1,5 pantallas: dos frases que pasan de gris a tinta palabra a palabra con el scroll.
+1. `chapters-hero` (hecho): escena «del código a la planta». Glifos del código de la web forman «Software a medida», llueven y hacen crecer la retama; luego el título vuelve a letras y el puntero sobre él trae los glifos. Incluye la bajada fija por las raíces con el manifiesto (antes el change 2), la cabecera con enlaces, el «Hablemos» fijo y las cifras y el fragmento ADR movidos a Método.
+2. Cabecera: flota sobre el hero para que la escena ocupe toda la pantalla, selector de idioma compacto y móvil sin la segunda fila de enlaces (se decide con el usuario al empezar).
 3. Servicios: cuatro tarjetas con una trama de puntos de la retama generada en el build.
 4. Método en papel claro con sus pruebas, capítulo «Hablemos» y Sectores con más aire.
+5. Optimización de la escena de glifos (coste en GPU, número de glifos, bloom en móvil) sin perder el efecto.
 
-**Hecho cuando:** los cuatro changes están en `main`, el inspector de taste-skill no da ningún FAIL y Lighthouse sigue en 100.
+**Hecho cuando:** los cinco changes están en `main`, el inspector de taste-skill no da ningún FAIL y Lighthouse sigue en 100.
 
 ## M3 — Contacto
 
