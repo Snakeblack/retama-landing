@@ -151,27 +151,50 @@ main section[id] {
 }
 
 /* DESIGN.md Elevation & Depth, the grain (owner, 2026-10-22). The grounds carry a fine grain multiplied into their
-   colour, so it only ever darkens: the page's ground, the raised tiles and the chapter index. A light layer of the same
-   grain, a third of the strength, lies over everything (letters, actions and the scene, which paints its own ground)
-   and takes no pointer. A tile that turns to the field under the pointer drops the ground's grain, which would read as
-   dirt on the light paper. Both grains are tiny SVGs the build inlines into the stylesheet, so they cost no request
-   before the largest paint. */
-body,
-[data-index],
-.bg-surface-raised:not([class~="hover:bg-field"]:hover) {
-  background-image: url("../assets/grain-ground.svg");
-  background-blend-mode: multiply;
+   colour, so it only ever darkens: the ground of the chapters after the first, the footer, the raised tiles in them and
+   the chapter index. A light layer of the same grain, a third of the strength, lies over them (letters and actions
+   included) and takes no pointer. A tile that turns to the field under the pointer drops the ground's grain, which
+   would read as dirt on the light paper. Both grains are tiny SVGs the build inlines into the stylesheet.
+   Their noise is costly to paint, and the browser paints it on the load even off screen, so the grain only comes on
+   once the page has loaded (header.ts sets data-grain), when all of it is below the first screen. The first chapter
+   has the grain of the scene, which draws it on the GPU once it runs (scene-three.ts); with reduced motion there is no
+   scene, so its stage takes the grain here, from the start. */
+[data-grounds],
+footer,
+[data-index] {
+  background-color: var(--color-surface);
 }
 
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  pointer-events: none;
-  background-image: url("../assets/grain-layer.svg");
-  mix-blend-mode: multiply;
-  opacity: 0.1;
+:root[data-grain] {
+  & :is([data-grounds], footer, [data-index]),
+  & :is([data-grounds], footer, [data-index]) .bg-surface-raised:not([class~="hover:bg-field"]:hover) {
+    background-image: url("../assets/grain-ground.svg");
+    background-blend-mode: multiply;
+  }
+
+  & :is([data-grounds], footer) {
+    position: relative;
+    isolation: isolate;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image: url("../assets/grain-layer.svg");
+      mix-blend-mode: multiply;
+      opacity: 0.1;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scene] {
+    background-color: var(--color-surface);
+    background-image: url("../assets/grain-ground.svg");
+    background-blend-mode: multiply;
+  }
 }
 
 /* DESIGN.md Layout, the chapter index of phones: a modal dialog over the whole screen, on the page's ground. It wipes
