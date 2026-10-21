@@ -68,7 +68,10 @@ function countUp() {
   };
 }
 
-/** The code lens over the name band: a circle that follows the pointer shows the letters made of code. */
+/**
+ * The code lens over the name band. With a fine pointer, a circle that follows it shows the letters made of
+ * code; on touch screens the code sweeps once across the whole name from the left, holds and leaves to the right.
+ */
 function codeLens({ hover, move }: { hover: boolean; move: boolean }) {
   const lens = document.querySelector<HTMLElement>("[data-lens]");
   const band = lens?.parentElement;
@@ -83,24 +86,26 @@ function codeLens({ hover, move }: { hover: boolean; move: boolean }) {
   lens.toggleAttribute("data-lens-still", !move);
 
   if (!hover) {
-    // Touch screens get one pass across the name after loading; reduced motion, one fade in and out.
-    const box = lens.getBoundingClientRect();
-    const radius = Number.parseFloat(getComputedStyle(lens).getPropertyValue("--lens-r")) || 0;
-    Object.assign(position, { x: -radius, y: box.height / 2 });
-    paint();
+    // After the shutter: one sweep across the name; with reduced motion, one fade in and out.
+    lens.toggleAttribute("data-lens-wipe", move);
     const pass = gsap.timeline({ delay: motion.duration.open });
-    pass.to(lens, { "--lens": 1, duration: motion.duration.ui, ease: motion.ease.out });
     if (move) {
-      pass.to(
-        position,
-        { x: box.width + radius, duration: motion.duration.open * 2, ease: motion.ease.inOut, onUpdate: paint },
-        0,
-      );
+      const sweep = { duration: motion.duration.open, ease: motion.ease.inOut };
+      pass
+        .set(lens, { "--lens": 1, "--wipe-lead": 0, "--wipe-tail": 0 })
+        .to(lens, { "--wipe-lead": 1, ...sweep })
+        .to(lens, { "--wipe-tail": 1, ...sweep }, `+=${motion.duration.reveal}`)
+        .set(lens, { "--lens": 0 });
     } else {
-      pass.to({}, { duration: motion.duration.reveal });
+      pass
+        .to(lens, { "--lens": 1, duration: motion.duration.ui, ease: motion.ease.out })
+        .to(lens, { "--lens": 0, duration: motion.duration.ui, ease: motion.ease.out }, `+=${motion.duration.reveal}`);
     }
-    pass.to(lens, { "--lens": 0, duration: motion.duration.ui, ease: motion.ease.out });
-    return () => pass.kill();
+    return () => {
+      pass.kill();
+      lens.toggleAttribute("data-lens-wipe", false);
+      gsap.set(lens, { "--lens": 0 });
+    };
   }
 
   const options = { duration: motion.duration.ui, ease: motion.ease.out, onUpdate: paint };

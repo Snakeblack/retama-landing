@@ -128,3 +128,35 @@
 [data-lens][data-lens-still]::after {
   mask-image: none;
 }
+
+/* On touch screens the code sweeps across the name instead: a soft-edged band whose leading edge
+   (--wipe-lead) and trailing edge (--wipe-tail) the script moves from 0 to 1, from left to right. */
+[data-lens][data-lens-wipe] {
+  --wipe-lead: 0;
+  --wipe-tail: 0;
+  --wipe-feather: 12%;
+  --wipe-span: calc(100% + 2 * var(--wipe-feather));
+}
+
+[data-lens][data-lens-wipe]::after {
+  mask-image: linear-gradient(
+    to right,
+    transparent calc(var(--wipe-tail) * var(--wipe-span) - var(--wipe-feather)),
+    var(--color-on-surface) calc(var(--wipe-tail) * var(--wipe-span)),
+    var(--color-on-surface) calc(var(--wipe-lead) * var(--wipe-span) - var(--wipe-feather)),
+    transparent calc(var(--wipe-lead) * var(--wipe-span))
+  );
+}
+
+/* On touch screens a scroll or a tap never starts a text selection on the board; the contact group stays
+   selectable so the address can be copied. */
+@media (pointer: coarse) {
+  main,
+  footer {
+    user-select: none;
+  }
+
+  [data-selectable] {
+    user-select: text;
+  }
+}
