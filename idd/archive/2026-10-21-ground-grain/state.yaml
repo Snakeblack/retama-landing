@@ -1,0 +1,361 @@
+{
+  "schema": "idd-state/v1",
+  "change": "ground-grain",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "tal y como esta ahora opcion 2, elijo opción 2",
+    "kind": "feature",
+    "summary": "Textura de grano en los fondos (opción 2 elegida por el usuario): grano multiplicado en el suelo y en las teselas oscuras, y una capa ligera a un tercio de fuerza sobre todo lo demás",
+    "acceptance": "En / y /en/ el suelo, las teselas oscuras y el índice llevan el grano como fondo multiplicado; una capa fija y sin eventos de puntero, al 10 % con multiply, cubre la página sin aclarar la escena ni las letras; las teselas que pasan a field al pasar el puntero no llevan el grano fuerte; DESIGN.md recoge la excepción y ospec check pasa (Lighthouse incluido)"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/styles/global.css",
+          "line": 12
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 307
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "tal y como esta ahora opcion 2"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 30
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 205
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 258
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "idd/ground-grain/change.md",
+      "public/grain-ground.svg",
+      "public/grain-layer.svg",
+      "src/assets/grain-ground.svg",
+      "src/assets/grain-layer.svg",
+      "src/styles/global.css",
+      "tests/e2e/grain.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0004, 0005, 0006",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "El LCP sigue siendo el título HTML; el grano son dos SVG de menos de 1 KB, estáticos, sin JS ni animación; la escena no cambia; Lighthouse CI lo verifica"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md recoge el grano como la única textura (Elevation & Depth y Don'ts); el CSS usa tokens y design:lint está limpio"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Los SVG se sirven desde el propio origen (sin data: URI) y no hay style inline"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint limpio con el bloque del grano en global.css",
+      "recorded_at": "2026-10-21T22:04:33.705Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T22:06:31.854Z",
+      "detail": {
+        "tree": "sha256:c1d963d5a530e0852c3d7d96d4f772fb41be789a5574063fab77d9226c53ee50",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T22:11:24.965Z",
+      "detail": {
+        "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+        "runs": [
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T22:11:24.965Z",
+      "detail": {
+        "refs": [
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+        "fitness": [
+          "run-13",
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T22:11:35.544Z"
+    }
+  ],
+  "base": "61adc86f20686c6ee6ec60033123b20b65b9f478",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:41f14ce648e6ef42efb7181943591ea545a69e4ee3dee479f23e5200679b1a33",
+      "tree": "sha256:c1d963d5a530e0852c3d7d96d4f772fb41be789a5574063fab77d9226c53ee50",
+      "recorded_at": "2026-10-21T22:06:31.854Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:b82189b1b0914a1d0cf8031817f03011ed4db08d89750a00462d29a6c75f78e1",
+      "tree": "sha256:c1d963d5a530e0852c3d7d96d4f772fb41be789a5574063fab77d9226c53ee50",
+      "recorded_at": "2026-10-21T22:06:31.854Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:ce3cbafaa9ed90510aa05afef5617db4df797788b76b8243b904666302e1c9b8",
+      "tree": "sha256:c1d963d5a530e0852c3d7d96d4f772fb41be789a5574063fab77d9226c53ee50",
+      "recorded_at": "2026-10-21T22:06:31.854Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3ed62c087f16d3bef07b690600560c81ad08667ca65ec5b3b7d404caaaf57d2b",
+      "tree": "sha256:c1d963d5a530e0852c3d7d96d4f772fb41be789a5574063fab77d9226c53ee50",
+      "recorded_at": "2026-10-21T22:06:31.854Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:c1d963d5a530e0852c3d7d96d4f772fb41be789a5574063fab77d9226c53ee50",
+      "recorded_at": "2026-10-21T22:06:31.854Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 1,
+      "output_sha256": "sha256:99f907a0a040f877eded680732dd852f46f2b8a0b5189e7b850ccc82ab7ecf75",
+      "tree": "sha256:c1d963d5a530e0852c3d7d96d4f772fb41be789a5574063fab77d9226c53ee50",
+      "recorded_at": "2026-10-21T22:06:31.854Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:8a8d53c6c081aeffd1bcff664c71710af39ce9c3bfc6f565bf18e5d6cbada17f",
+      "tree": "sha256:c1d963d5a530e0852c3d7d96d4f772fb41be789a5574063fab77d9226c53ee50",
+      "recorded_at": "2026-10-21T22:06:31.854Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:41f14ce648e6ef42efb7181943591ea545a69e4ee3dee479f23e5200679b1a33",
+      "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+      "recorded_at": "2026-10-21T22:11:24.965Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:1aa7ab3ea3d6b291d39ebff10c98017ebdb33d3d6adf17ad8d837271687fc524",
+      "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+      "recorded_at": "2026-10-21T22:11:24.965Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:2ad0a15dad44f528a357aad3a03c250491abe22b46938d54e5d891d25df3f0a0",
+      "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+      "recorded_at": "2026-10-21T22:11:24.965Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:fcc9b90b662c9993b23f1ff7cc2947f001863330f16d0119dc0a80409cdf58e7",
+      "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+      "recorded_at": "2026-10-21T22:11:24.965Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+      "recorded_at": "2026-10-21T22:11:24.965Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:24dd7213767d044a249c301e63c43101cb59b4200ed2ba0f6bb8b7bc8addb87f",
+      "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+      "recorded_at": "2026-10-21T22:11:24.965Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:70ea034080b0eadd58f38a58811b7ed2af5ea88d23eae1331a47519965317945",
+      "tree": "sha256:b184728fd952d6ff07d6f8116fea2c9f60de20cb9fb4387bee4a53282a2562bc",
+      "recorded_at": "2026-10-21T22:11:24.965Z"
+    }
+  ],
+  "closed_at": "2026-10-21T22:11:35.544Z"
+}

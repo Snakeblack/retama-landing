@@ -229,6 +229,8 @@ The first chapter is a stage the height of the screen, pinned while the chapter 
 
 None. There are no shadows, glows, gradients, blurs or outlines on things at rest. Depth comes only from the tone step between surface and surface raised, and from the inverted field. A shadow is allowed on what truly floats (a menu, a dialog). The header floats flat, and the chapter index covers the whole screen on the page's ground, so neither needs one. The one exception is inside the 3D scene of the first chapter (owner, 2026-10-21): its glyphs fade with depth, and what is brighter than the ink (the glyphs in flight and the sap) blooms. The rest of the page stays flat.
 
+**The grain** (owner, 2026-10-22) is the one texture: a fine monochrome grain, still and coarse enough to read on a phone, multiplied into the colour of the grounds so it only ever darkens: the page's ground, the raised tiles and the chapter index. A light layer of the same grain, a third of the strength, lies over everything else (letters, actions, pictures, the field tiles and the scene, which paints its own ground), so the ink stays clean and the scene never gets lighter. A tile that turns to the field under the pointer drops the ground's grain. The grain is a texture, not depth: it never separates tiles, which the tone step still does.
+
 ## Shapes
 
 Square corners on everything: tiles, photographs, the action and form fields (`rounded.tile` is 0). A thick bar of 6px in primary runs across the top of the page; it is the only line on the board.
@@ -304,7 +306,7 @@ Three tiers that look like one picture: WebGPU, then WebGL2, then the static pos
 - Do regenerate the theme with `pnpm design:theme`; never edit `src/styles/theme.css` by hand.
 - Do take every colour and size from these tokens: `pnpm design:lint` rejects Tailwind's default scale and palette, literal arbitrary values and raw CSS colours and sizes in `src/`.
 - Do fill tiles; separate them with the gap and the tone step, never with a line.
-- Don't add a second accent colour, a gradient, a shadow at rest, glass or a glow (the bloom of the 3D scene is the one exception, see Elevation & Depth).
+- Don't add a second accent colour, a gradient, a shadow at rest, glass or a glow (the bloom of the 3D scene is the one exception, see Elevation & Depth), or a texture other than the grain.
 - Don't use eyebrows, small uppercase letter-spaced labels, monospace outside the code of the first chapter, index numbers (01, 02) or thin rules.
 - Don't put an icon and a two-line blurb in every tile, or build rows of identical tiles.
 - Don't let a heading run past two lines at any width. The manifesto, which has a screen of its own, may take three on phones.
