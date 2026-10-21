@@ -14,35 +14,47 @@ const manifesto = [copy["manifesto.line1"], copy["manifesto.line2"]];
      holds the scene; over it, the title that says what Retama makes with the lead and the action under it (in the
      middle of the left side from lg, at the top on phones), then the manifesto,
      which rises over the roots as the camera goes down them. The text layer lets the pointer through to the scene, but
-     for the word, which has its code lens; scene.ts follows the pointer over the whole chapter. -->
+     for the title, which shows its code under the pointer; scene.ts follows the pointer over the whole chapter. -->
 <div class="relative grid" data-chapter="hero">
   <div class="sticky top-0 col-start-1 row-start-1 h-svh self-start overflow-hidden" data-scene>
     <Poster label={copy["hero.poster"]} />
-    <!-- ADR 0004 and WCAG 2.2.2: a tap or click on the running scene pauses it. scene.ts shows this layer over the
-         canvas while the scene runs and swaps its label; it has no visible text, only the focus ring. -->
+    <!-- ADR 0004 and WCAG 2.2.2: a quiet button in the corner of the stage pauses and resumes the scene. scene.ts shows
+         it while the scene runs and swaps its label; it leaves with the stage once the chapter has scrolled by. -->
     <button
-      class="absolute inset-0 size-full cursor-pointer"
+      class="group feedback absolute right-margin bottom-2xl flex size-(--spacing-touch) cursor-pointer items-center justify-center text-on-surface-muted hover:text-on-surface"
       type="button"
       aria-label={copy["hero.scenePauseLabel"]}
       data-scene-pause
       data-pause={copy["hero.scenePauseLabel"]}
       data-play={copy["hero.scenePlayLabel"]}
       hidden
-    ></button>
+    >
+      <svg class="size-md fill-current group-data-paused:hidden" viewBox="0 0 16 16" aria-hidden="true">
+        <rect x="3" y="2" width="3" height="12"></rect>
+        <rect x="10" y="2" width="3" height="12"></rect>
+      </svg>
+      <svg class="hidden size-md fill-current group-data-paused:block" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M4 2 14 8 4 14Z"></path>
+      </svg>
+    </button>
   </div>
 
   <div class="pointer-events-none relative col-start-1 row-start-1 px-margin">
     <div class="grid min-h-svh grid-cols-2 content-start gap-gap lg:grid-cols-12 lg:content-center">
       <h1 class="pointer-events-auto col-span-2 grid p-tile-sm md:p-tile lg:col-span-8">
-        <span class="whitespace-nowrap type-display-sm lg:type-display">
-          <!-- DESIGN.md Motion: the word is decoded from the site's own code, then the code lens follows the pointer;
-               once the scene runs, its glyphs take the word's place. The layer is a copy drawn by CSS from data-text. -->
+        <!-- The face's side bearing is 0.03em at every size: at display size that is xs more than at headline size, so the
+             S of "Software" pulls back by xs to start its ink on the column of the "a" below. -->
+        <span class="whitespace-nowrap type-display-sm lg:-ml-xs lg:type-display">
+          <!-- DESIGN.md Motion: the word is decoded from the site's own code on the first paint; once the scene runs, its
+               glyphs assemble the title and hand it back. The code layer is a copy drawn by CSS from data-text. -->
           <span class="relative inline-block" data-lens data-decode data-glyph-word data-text={copy["hero.word"]}>
             {copy["hero.word"]}
           </span>
         </span>
         {" "}
-        <span class="justify-self-start type-headline-sm md:type-headline" data-glyph-word>{copy["hero.rest"]}</span>
+        <span class="justify-self-start text-primary type-headline-sm md:type-headline" data-glyph-word data-glyph-accent>
+          {copy["hero.rest"]}
+        </span>
       </h1>
 
       <div class="col-span-2 flex flex-col items-start gap-lg px-tile-sm md:px-tile lg:col-span-5">

@@ -1,8 +1,10 @@
 // The 3D tier of ADR 0004, built inside scene-worker.ts on an OffscreenCanvas, off the main thread. Everything in it
 // is a glyph of the site's own code (DESIGN.md Motion and 3D): the glyphs fly in and assemble the words of the title
-// over the HTML words, then rain from "Software" and grow the retama, written along its stems and roots. Once grown,
-// the wind sways the stems; around the pointer the gusts grow, and the glyphs stir and wake, shuffling their
-// characters; the sap runs up in orange pulses that bloom. One instanced mesh draws them all; every movement is computed on the GPU, on WebGPU or WebGL2 alike.
+// over the HTML words, then rain from "Software" and grow the retama, written along its stems and roots. Once the title
+// has assembled, its glyphs give way to the HTML letters from the left (the page sweeps the letters in at the same
+// pace) and come back while the pointer is on the title. Once grown, the wind sways the stems; around the pointer the
+// gusts grow, and the glyphs stir and wake, shuffling their characters; the sap runs up in orange pulses that bloom.
+// One instanced mesh draws them all; every movement is computed on the GPU, on WebGPU or WebGL2 alike.
 import { bloom } from "three/addons/tsl/display/BloomNode.js";
 import {
   clamp,
@@ -45,7 +47,16 @@ import {
   Vector3,
   WebGPURenderer,
 } from "three/webgpu";
-import { FLIGHT, type Glyph, plantGlyphs, plantPlacement, RAIN_SPAN, RAIN_START, wordGlyphs } from "../lib/glyph-scene";
+import {
+  FLIGHT,
+  GLYPH_KIND,
+  type Glyph,
+  plantGlyphs,
+  plantPlacement,
+  RAIN_SPAN,
+  RAIN_START,
+  wordGlyphs,
+} from "../lib/glyph-scene";
 import { retamaPlant, stormForce } from "../lib/retama-scene";
 import { HERO, retamaShape } from "../lib/retama-shape";
 import source from "../lib/retama-shape.ts?raw";
@@ -71,6 +82,10 @@ const RISE = 40;
 const WAKE = 0.5;
 // How bright the hot glyphs and the sap are: above 1 they bloom.
 const HOT = 2.6;
+// The title's glyphs give way to its letters this long after the scene starts, and the sweep that hands one over to
+// the other lasts this long (t-open, as the page's transition of the letters).
+const SETTLE = 2.8;
+const SWEEP = 1.1;
 // Within this many pixels of the crown the glyphs thin out.
 const CROWN = 140;
 // A narrow lens, so depth reads without bending the drawing.
@@ -86,10 +101,11 @@ export interface Stage {
   width: number;
   height: number;
 }
-/** The samples of an HTML word, in pixels from the chapter's top left, and how far apart they were taken. */
+/** The samples of an HTML word, in pixels from the chapter's top left, how far apart they were taken and its colour. */
 export interface Word {
   samples: [x: number, y: number][];
   step: number;
+  accent: boolean;
 }
 export interface GlyphScene {
   /** Advances the animation by dt seconds and draws a frame. */
@@ -100,6 +116,8 @@ export interface GlyphScene {
   scroll(top: number): void;
   /** The pointer over the stage, in CSS pixels from its top left; undefined when it leaves. */
   point(at?: [x: number, y: number]): void;
+  /** Whether the pointer is on the title, which shows its glyphs again. */
+  code(on: boolean): void;
   dispose(): void;
 }
 
@@ -133,6 +151,7 @@ export async function createScene(
   colors: Colors,
   pixelRatio: number,
   onLost: () => void,
+  onSettled: () => void,
 ): Promise<GlyphScene> {
   const renderer = new WebGPURenderer({ canvas, antialias: true, forceWebGL: tier === "webgl2" });
   renderer.onDeviceLost = onLost;
@@ -155,6 +174,9 @@ export async function createScene(
   const storm = uniform(0);
   // Every stem and root leaves the crown, so the glyphs crowd there: they thin out near it.
   const crown = uniform(new Vector3());
+  // How much of the title is glyphs, from 1 (all) to 0 (all letters), swept from the left, and where the title spans.
+  const reveal = uniform(1);
+  const title = uniform(new Vector3(0, 1, 0));
   const rgb = (css: string) => {
     const { r, g, b } = new Color(css);
     return vec3(r, g, b);
@@ -170,6 +192,8 @@ export async function createScene(
   let blowing = false;
   let at: [number, number] | undefined;
   let elapsed = 0;
+  let settled = false;
+  let coded = false;
 
   /** One mesh for every group of glyphs, each group drawn at its own size in pixels. */
   function build(groups: { glyphs: Glyph[]; size: number }[]) {
@@ -191,7 +215,7 @@ export async function createScene(
 
     const material = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: AdditiveBlending });
     const kind = info.w;
-    const word = kind.lessThan(0.5);
+    const word = kind.lessThan(0.5).or(kind.greaterThan(3.5));
     const seed = life.z;
     const progress = clamp(clock.sub(info.z).div(select(word, float(FLIGHT.word), float(FLIGHT.plant))), 0, 1);
     // Ease in and out for the word, which assembles; ease in for the rain, which falls.
@@ -247,9 +271,12 @@ export async function createScene(
     const appear = varying(
       smoothstep(0, 0.12, clock.sub(info.z)).mul(select(word, float(1), smoothstep(0, 0.2, progress))),
     );
+    // The title's glyphs show only where its letters are not: the hand-over edge moves with `reveal`.
+    const edge = float(1).sub(reveal).mul(1.25);
+    const shown = smoothstep(edge.sub(0.25), edge, to.x.sub(title.x).div(title.y));
     const depth = varying(
       clamp(to.z.div(1200).add(1), 0.35, 1).mul(
-        select(word, float(1), smoothstep(0, CROWN, to.xy.sub(crown.xy).length()).mul(0.85).add(0.15)),
+        select(word, shown, smoothstep(0, CROWN, to.xy.sub(crown.xy).length()).mul(0.85).add(0.15)),
       ),
     );
     const flow = varying(life.x);
@@ -259,12 +286,16 @@ export async function createScene(
       const base = select(
         sort.lessThan(0.5),
         ink,
-        select(sort.lessThan(1.5), ink.mul(0.85), select(sort.lessThan(2.5), muted, primary.mul(1.4))),
+        select(
+          sort.lessThan(1.5),
+          ink.mul(0.85),
+          select(sort.lessThan(2.5), muted, select(sort.lessThan(3.5), primary.mul(1.4), primary)),
+        ),
       );
       const phase = fract(flow.sub(clock.mul(SAP_SPEED)).div(SAP_SPACING));
       const lit = smoothstep(1 - SAP_TAIL / SAP_SPACING, 1, phase)
         .mul(sap)
-        .mul(select(sort.lessThan(0.5), float(0), float(1)));
+        .mul(select(sort.lessThan(0.5).or(sort.greaterThan(3.5)), float(0), float(1)));
       const pulse = select(sort.greaterThan(2.5), ink.mul(HOT), primary.mul(HOT));
       return mix(mix(base.mul(wake), primary.mul(HOT), heat), pulse, lit);
     })();
@@ -298,6 +329,12 @@ export async function createScene(
       sap.value = Math.min(1, Math.max(0, (elapsed - (RAIN_START + RAIN_SPAN + 0.6)) / 1.5));
       force = stormForce(force, blowing, dt);
       storm.value = force;
+      if (!settled && elapsed >= SETTLE) {
+        settled = true;
+        onSettled();
+      }
+      const target = coded || !settled ? 1 : 0;
+      reveal.value += Math.sign(target - reveal.value) * Math.min(Math.abs(target - reveal.value), dt / SWEEP);
       aim();
       pipeline.render();
     },
@@ -310,9 +347,12 @@ export async function createScene(
       crown.value.set(placement.x, -placement.ground, 0);
       const spacing = Math.min(10, Math.max(5, placement.scale * 11));
       const rain = words[0]?.samples ?? [];
+      const xs = words.flatMap(({ samples }) => samples.map(([x]) => x));
+      const left = Math.min(...xs);
+      title.value.set(left, Math.max(1, Math.max(...xs) - left), 0);
       const groups = [
-        ...words.map(({ samples, step }, index) => ({
-          glyphs: wordGlyphs(samples, glyphs.sequence, HERO.seed + index),
+        ...words.map(({ samples, step, accent }, index) => ({
+          glyphs: wordGlyphs(samples, glyphs.sequence, HERO.seed + index, accent ? GLYPH_KIND.accent : GLYPH_KIND.word),
           size: step * 2.2,
         })),
         { glyphs: plantGlyphs(plant, placement, spacing, rain, glyphs.sequence, HERO.seed), size: spacing * 1.35 },
@@ -334,6 +374,9 @@ export async function createScene(
       at = next;
       blowing = next !== undefined;
       if (next) pointer.value.set(next[0], -(top + next[1]), 0);
+    },
+    code(on) {
+      coded = on;
     },
     dispose() {
       mesh?.geometry.dispose();

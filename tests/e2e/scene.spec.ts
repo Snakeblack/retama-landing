@@ -80,14 +80,22 @@ test.describe("escena 3D progresiva (ADR 0004)", () => {
     const pause = page.locator("[data-scene-pause]");
     await expect(pause).toHaveAccessibleName("Pause the retama animation");
     await expect(pause).toHaveText("");
-    // The title lies over the middle of the stage; a free corner of it takes the tap.
-    const box = await pause.boundingBox();
-    await pause.click({ position: { x: (box?.width ?? 0) - 40, y: (box?.height ?? 0) - 40 } });
+    await expect(pause).toBeVisible();
+    await pause.click();
+    await expect(pause).toHaveAttribute("data-paused", "");
     await expect(pause).toHaveAccessibleName("Play the retama animation");
     await expect(page.locator("[data-scene-canvas]")).toHaveCSS("opacity", "1");
     await expect(page.locator("[data-retama-poster]")).toHaveCSS("opacity", "0");
     await pause.press("Enter");
     await expect(pause).toHaveAccessibleName("Pause the retama animation");
+    // Once assembled, the title hands its glyphs back to the letters, and the pointer on it brings them back.
+    const chapter = page.locator('[data-chapter="hero"]');
+    await expect(chapter).toHaveAttribute("data-word", "solid", { timeout: 15_000 });
+    const title = await page.locator("main h1").boundingBox();
+    await page.mouse.move((title?.x ?? 0) + 60, (title?.y ?? 0) + (title?.height ?? 0) / 3);
+    await expect(chapter).toHaveAttribute("data-word", "code");
+    await page.mouse.move(10, (title?.y ?? 0) + (title?.height ?? 0) + 300);
+    await expect(chapter).toHaveAttribute("data-word", "solid");
     expect(violations).toEqual([]);
   });
 

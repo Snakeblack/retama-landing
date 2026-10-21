@@ -80,20 +80,32 @@
   }
 }
 
-/* Once the scene runs, its glyphs assemble the words of the title over the HTML words, which give way (they stay for
-   assistive technology and search). */
-[data-glyph-word] {
-  transition: opacity var(--t-reveal) var(--ease-out);
+/* The hand-over between the scene's glyphs and the title's letters (scene.ts sets data-word on the chapter): the
+   letters sweep in from the left over t-open, at the pace the glyphs give way, and out the same way when the glyphs
+   come back under the pointer. --solid is how much of the word is letters; the soft edge is a quarter of the word. */
+@property --solid {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
 }
 
-[data-chapter="hero"]:has([data-scene-state="running"]) [data-glyph-word] {
-  opacity: 0;
+[data-glyph-word] {
+  mask-image: linear-gradient(
+    to right,
+    var(--color-on-surface) calc(var(--solid) * 125% - 25%),
+    transparent calc(var(--solid) * 125%)
+  );
+  transition: --solid var(--t-open) linear;
+}
+
+[data-chapter="hero"][data-word="code"] [data-glyph-word] {
+  --solid: 0;
 }
 
 /* ADR 0004: the 3D scene takes over from the poster once its first frame is drawn (scene.ts sets the state),
    and hands it back the same way if it gives up. */
 [data-scene-canvas],
-[data-retama-poster] {
+[data-chapter="hero"] [data-retama-poster] {
   transition: opacity var(--t-reveal) var(--ease-out);
 }
 
@@ -109,25 +121,9 @@
   opacity: 0;
 }
 
-/* The layer that pauses the scene fills a stage that clips its overflow, so its focus ring goes inside. */
-[data-scene-pause]:focus-visible {
-  outline-offset: calc(var(--spacing-focus) * -2);
-}
-
-/* DESIGN.md Motion: the code lens. The layer copies the word from data-text, so it lines up with the letters,
-   fills them with the site's own code (/code-lens.svg) and shows only inside a circle the script moves.
-   Without the script --lens stays 0 and nothing is drawn. */
-[data-lens] {
-  --lens: 0;
-  --lens-x: 50%;
-  --lens-y: 50%;
-  --lens-r: var(--spacing-xl);
-
-  @media (width >= 48rem) {
-    --lens-r: var(--spacing-2xl);
-  }
-}
-
+/* DESIGN.md Motion: the word's code. The layer copies the word from data-text, so it lines up with the letters, and
+   fills them with the site's own code (/code-lens.svg). The decode shows it on the first paint; on the poster (no
+   scene) the pointer on the title shows it again. */
 [data-lens]::after {
   content: attr(data-text);
   position: absolute;
@@ -138,24 +134,21 @@
   /* The texture scales with the word, so the code keeps the same grain against the letters at every size. */
   background-size: 90% auto;
   background-clip: text;
-  mask-image: radial-gradient(
-    circle var(--lens-r) at var(--lens-x) var(--lens-y),
-    var(--color-on-surface) 97%,
-    transparent
-  );
-  opacity: var(--lens);
+  opacity: 0;
+  transition: opacity var(--t-ui) var(--ease-out);
 }
 
-/* With reduced motion the lens does not travel: the code fades in over the whole name. */
-[data-lens][data-lens-still]::after {
-  mask-image: none;
+@media (hover: hover) and (pointer: fine) {
+  [data-chapter="hero"]:not(:has([data-scene-state="running"])) h1:hover [data-lens]::after {
+    opacity: 1;
+  }
 }
 
 /* DESIGN.md Motion: the decode. On the first paint the word is made of the site's code; it holds for t-reveal and
    then settles into solid ink from the left over t-open, as a soft edge sweeps the code layer off to the right.
    It is CSS, so it needs no script and the word is painted from the first frame; reduced motion drops it. The mask
    is two and a half words wide: at 100% its opaque half covers the word, at 0% its clear half does. It fills
-   backwards only, so once it ends the layer is the lens again. */
+   backwards only, so once it ends the layer is hidden again. */
 @media (prefers-reduced-motion: no-preference) {
   [data-decode]::after {
     animation: decode var(--t-open) var(--ease-in-out) var(--t-reveal) backwards;

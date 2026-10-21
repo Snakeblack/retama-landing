@@ -8,9 +8,6 @@ const tileOpacities = (page: Page) =>
     .locator("main section[id] > *")
     .evaluateAll((tiles) => tiles.map((tile) => Number(getComputedStyle(tile).opacity)));
 
-const lensValue = (page: Page, name: string) =>
-  page.locator("[data-lens]").evaluate((lens, property) => getComputedStyle(lens).getPropertyValue(property), name);
-
 /** The code layer over the word of the first chapter: its animation and how much of it shows. */
 const codeLayer = (page: Page) =>
   page.locator("[data-lens]").evaluate((lens) => {
@@ -84,16 +81,23 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
     await expect(page.locator("[data-talk]")).toBeHidden();
   });
 
-  test("la lupa aparece bajo el puntero, lo sigue y se va al salir", async ({ page }) => {
+  test("la S de «Software» empieza en la columna de la «a» de «a medida»", async ({ page }) => {
     await page.goto("/");
-    const box = await page.locator("[data-lens]").boundingBox();
-    if (!box) throw new Error("no lens");
-    await page.mouse.move(box.x + 40, box.y + box.height / 2);
-    await page.mouse.move(box.x + 200, box.y + box.height / 2, { steps: 4 });
-    await expect.poll(() => lensValue(page, "--lens")).toBe("1");
-    await expect.poll(async () => Number.parseFloat(await lensValue(page, "--lens-x"))).toBeCloseTo(200, -1);
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 200);
-    await expect.poll(() => lensValue(page, "--lens")).toBe("0");
+    const ink = (selector: string) =>
+      page.locator(selector).evaluate((node) => {
+        const style = getComputedStyle(node);
+        const context = document.createElement("canvas").getContext("2d");
+        if (!context) return 0;
+        context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        const text = (node.textContent ?? "").trim();
+        return node.getBoundingClientRect().left - context.measureText(text).actualBoundingBoxLeft;
+      });
+    await page.evaluate(() => document.fonts.ready);
+    const [word, rest] = await Promise.all([
+      ink("[data-glyph-word]:not([data-glyph-accent])"),
+      ink("[data-glyph-accent]"),
+    ]);
+    expect(Math.abs(word - rest)).toBeLessThanOrEqual(1);
   });
 
   test("Sectores cabe en una pantalla, sin pin, y la vuelta avanza sola con fragmentos vivos", async ({ page }) => {
@@ -172,7 +176,6 @@ test.describe("con movimiento reducido (DESIGN.md Motion, ADR 0004)", () => {
     await page.goto("/");
     expect((await codeLayer(page)).animation).toBe("none");
     await expect(page.locator("[data-count]")).toHaveText("100");
-    await expect(page.locator("[data-lens]")).toHaveAttribute("data-lens-still", "");
 
     await scrollThrough(page);
     await expect.poll(async () => (await tileOpacities(page)).every((opacity) => opacity === 1)).toBe(true);
@@ -190,6 +193,21 @@ test.describe("con movimiento reducido (DESIGN.md Motion, ADR 0004)", () => {
 
 test.describe("sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false, viewport: desktop });
+
+  // Without the script the scene never starts, so the title shows its own code under the pointer, in CSS.
+  test("sobre el póster el puntero en el título muestra el código de la palabra y lo quita al salir", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    // Past the decode, the layer rests hidden.
+    await expect.poll(async () => (await codeLayer(page)).opacity, { timeout: 5000 }).toBe("0");
+    const box = await page.locator("main h1").boundingBox();
+    if (!box) throw new Error("no title");
+    await page.mouse.move(box.x + 60, box.y + box.height / 3);
+    await expect.poll(async () => (await codeLayer(page)).opacity).toBe("1");
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 300);
+    await expect.poll(async () => (await codeLayer(page)).opacity).toBe("0");
+  });
 
   test("todo el tablero queda visible, la cifra dice su valor y la lupa no dibuja nada", async ({ page }) => {
     await page.goto("/");
