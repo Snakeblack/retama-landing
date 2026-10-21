@@ -1,6 +1,6 @@
 // The 3D tier of ADR 0004, built inside scene-worker.ts on an OffscreenCanvas, off the main thread. It draws the poster's
 // plant (DESIGN.md Motion and 3D) as thin ribbons and animates three things on the GPU, on WebGPU or WebGL2 alike:
-// the plant grows (taproot, roots, then stems), the wind sways the stems (the pointer pushes them on desktop) and
+// the plant grows (taproot, roots, then stems), the wind sways the stems (harder around the pointer on desktop) and
 // the sap runs up in orange pulses from the deepest roots to the tips.
 import {
   attribute,
@@ -28,7 +28,7 @@ import {
   Vector3,
   WebGPURenderer,
 } from "three/webgpu";
-import { type Plant, type PlantStroke, retamaPlant } from "../lib/retama-scene";
+import { type Plant, type PlantStroke, retamaPlant, stormForce } from "../lib/retama-scene";
 import { HERO, retamaShape, type StrokeKind } from "../lib/retama-shape";
 import type { Tier } from "../lib/scene-tier";
 
@@ -38,11 +38,13 @@ const GROW_SECONDS = 4;
 const SAP_SPEED = 260;
 const SAP_SPACING = 520;
 const SAP_TAIL = 90;
-// Wind: the reach of the stem tips, the scale of the gusts and the pointer's push and radius, in poster units.
+// Wind: the reach of the stem tips and the scale of the gusts, in poster units.
 const WIND = 16;
 const GUST = 0.0035;
-const PUSH = 70;
-const PUSH_RADIUS = 220;
+// Around the pointer the gusts grow this many times wider and a quicker flutter of this reach joins them.
+const STORM = 2.5;
+const FLUTTER = 9;
+const STORM_RADIUS = 260;
 // A narrow lens, so depth reads without bending the poster's drawing.
 const FOV = 20;
 
@@ -124,7 +126,7 @@ export async function createScene(
   // Half a CSS pixel in poster units, so a ribbon of width 2 is one pixel wide on the ground plane.
   const pixel = uniform(0.5);
   const pointer = uniform(new Vector3());
-  const push = uniform(0);
+  const storm = uniform(0);
 
   const material = (base: string, pulse: string, width: number) => {
     // Ribbons turn their back to the camera on half their segments, so both faces draw.
@@ -132,16 +134,21 @@ export async function createScene(
     const sway = attribute<"float">("sway");
     node.positionNode = Fn(() => {
       const rest = positionLocal;
+      const near = float(1)
+        .sub(smoothstep(0, STORM_RADIUS, rest.xy.sub(pointer.xy).length()))
+        .mul(storm);
       const gust = vec3(
         mx_noise_float(vec3(rest.x.mul(GUST), rest.y.mul(GUST), clock.mul(0.35))),
         0,
         mx_noise_float(vec3(rest.y.mul(GUST), rest.x.mul(GUST), clock.mul(0.35).add(17))),
-      ).mul(sway.mul(WIND));
-      const away = rest.xy.sub(pointer.xy);
-      const near = float(1).sub(smoothstep(0, PUSH_RADIUS, away.length()));
-      const shove = vec3(away.normalize().mul(near.mul(push).mul(sway).mul(PUSH)), 0);
+      ).mul(sway.mul(WIND).mul(near.mul(STORM).add(1)));
+      const flutter = vec3(
+        mx_noise_float(vec3(rest.x.mul(GUST * 5), rest.y.mul(GUST * 5), clock.mul(2.4))),
+        0,
+        mx_noise_float(vec3(rest.y.mul(GUST * 5), rest.x.mul(GUST * 5), clock.mul(2.4).add(29))),
+      ).mul(near.mul(sway).mul(FLUTTER));
       const across = attribute<"vec2">("across").mul(pixel.mul(width));
-      return rest.add(gust).add(shove).add(vec3(across, 0));
+      return rest.add(gust).add(flutter).add(vec3(across, 0));
     })();
     const flow = varying(attribute<"float">("flow"));
     const grow = varying(attribute<"float">("grow"));
@@ -169,7 +176,7 @@ export async function createScene(
   // The poster's view: "xMidYMin slice" of its viewBox, rebuilt with a camera looking at the ground plane.
   let view = { scale: 1, left: 0, top: 0 };
   let force = 0;
-  let pressing = false;
+  let blowing = false;
   let elapsed = 0;
 
   return {
@@ -179,8 +186,8 @@ export async function createScene(
       const growth = Math.min(1, elapsed / GROW_SECONDS);
       grown.value = 1 - (1 - growth) ** 3;
       sap.value = Math.min(1, Math.max(0, elapsed - GROW_SECONDS));
-      force += ((pressing ? 1 : 0) - force) * Math.min(1, dt * 4);
-      push.value = force;
+      force = stormForce(force, blowing, dt);
+      storm.value = force;
       renderer.render(scene, camera);
     },
     resize(width, height) {
@@ -196,7 +203,7 @@ export async function createScene(
       pixel.value = 0.5 / scale;
     },
     point(at) {
-      pressing = at !== undefined;
+      blowing = at !== undefined;
       if (at) pointer.value.set(view.left + at[0] / view.scale, view.top - at[1] / view.scale, 0);
     },
     dispose() {
