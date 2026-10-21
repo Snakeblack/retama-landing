@@ -1,0 +1,37 @@
+---
+import { type Locale, t } from "../../i18n/index";
+import { imageCredits } from "../../lib/board";
+import Wordmark from "../Wordmark.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+---
+
+<!-- DESIGN.md: the board's last row is the footer; every found picture is credited here. -->
+<footer class="grid grid-cols-2 gap-gap px-margin pt-section pb-margin lg:grid-cols-12">
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-3">
+    <Wordmark class="block type-wordmark" />
+    <p class="type-small text-on-surface-muted">© {new Date().getFullYear()} Retama</p>
+  </div>
+
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6">
+    <h2 class="type-body-strong">{copy["footer.credits"]}</h2>
+    <ul class="type-small text-on-surface-muted">
+      {
+        imageCredits.map((credit) => (
+          <li>
+            {credit.author}, <a class="underline" href={credit.source}><cite>{credit.work}</cite></a>,{" "}
+            {copy["footer.publicDomain"]}.
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <a class="col-span-2 bg-surface-raised p-tile-sm type-small text-on-surface-muted underline hover:bg-field hover:text-on-field md:p-tile lg:col-span-3" href="#top">
+    {copy["footer.top"]}
+  </a>
+</footer>

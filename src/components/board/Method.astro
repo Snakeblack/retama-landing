@@ -1,0 +1,92 @@
+---
+import { Picture } from "astro:assets";
+import plate from "../../assets/board/cosson-retama-dasycarpa.jpg";
+import { type Locale, t } from "../../i18n/index";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+const records = [
+  ["method.d1", "method.d1Reason"],
+  ["method.d2", "method.d2Reason"],
+  ["method.d3", "method.d3Reason"],
+  ["method.d4", "method.d4Reason"],
+] as const;
+// The live piece (DESIGN.md Overview): a native exclusive accordion, so it works without JS.
+const projects = [
+  ["live.web", ["live.web.d1", "live.web.r1"], ["live.web.d2", "live.web.r2"], ["live.web.d3", "live.web.r3"]],
+  [
+    "live.custom",
+    ["live.custom.d1", "live.custom.r1"],
+    ["live.custom.d2", "live.custom.r2"],
+    ["live.custom.d3", "live.custom.r3"],
+  ],
+  [
+    "live.desktop",
+    ["live.desktop.d1", "live.desktop.r1"],
+    ["live.desktop.d2", "live.desktop.r2"],
+    ["live.desktop.d3", "live.desktop.r3"],
+  ],
+  [
+    "live.agents",
+    ["live.agents.d1", "live.agents.r1"],
+    ["live.agents.d2", "live.agents.r2"],
+    ["live.agents.d3", "live.agents.r3"],
+  ],
+] as const;
+---
+
+<section id={copy["anchor.method"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="method-title">
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
+    <h2 id="method-title" class="text-balance type-headline-sm md:type-headline">{copy["method.title"]}</h2>
+  </div>
+
+  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-6 lg:col-start-7 lg:row-span-5 lg:row-start-1 lg:aspect-auto">
+    <Picture
+      src={plate}
+      alt={copy["method.plateAlt"]}
+      formats={["avif", "webp"]}
+      widths={[480, 800, 1186]}
+      sizes="(min-width: 1024px) 50vw, 100vw"
+      class="absolute inset-0 size-full object-cover"
+    />
+  </div>
+
+  {
+    records.map(([decision, reason]) => (
+      <p class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-2">
+        <strong class="type-body-strong">{copy[decision]}</strong> {copy[reason]}
+      </p>
+    ))
+  }
+
+  <p class="col-span-2 bg-field p-tile-sm text-on-field type-statement-sm md:p-tile md:type-statement lg:col-span-6 lg:row-span-2">
+    {copy["method.field"]}
+  </p>
+
+  <div class="col-span-2 grid gap-gap lg:col-span-12">
+    <div class="bg-surface-raised p-tile-sm md:p-tile">
+      <h3 class="text-balance type-statement-sm md:type-statement">{copy["live.title"]}</h3>
+      <p class="text-on-surface-muted">{copy["live.lead"]}</p>
+    </div>
+    {
+      projects.map(([name, ...decisions], index) => (
+        <details class="group bg-surface-raised" name="project" open={index === 0}>
+          <summary class="flex min-h-(--spacing-touch) cursor-pointer list-none items-center gap-md p-tile-sm type-statement-sm group-open:text-primary hover:bg-field hover:text-on-field md:p-tile md:type-statement [&::-webkit-details-marker]:hidden">
+            <span class="size-md shrink-0 bg-on-surface-muted group-open:bg-primary" aria-hidden="true" />
+            {copy[name]}
+          </summary>
+          <ol class="grid gap-lg px-tile-sm pb-tile-sm md:grid-cols-3 md:px-tile md:pb-tile">
+            {decisions.map(([decision, reason]) => (
+              <li class="max-w-(--spacing-measure)">
+                <strong class="type-body-strong">{copy[decision]}</strong> {copy[reason]}
+              </li>
+            ))}
+          </ol>
+        </details>
+      ))
+    }
+  </div>
+</section>

@@ -1,6 +1,12 @@
 ---
 import { type Locale, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
+import Contact from "./board/Contact.astro";
+import Footer from "./board/Footer.astro";
+import Hero from "./board/Hero.astro";
+import Method from "./board/Method.astro";
+import Sectors from "./board/Sectors.astro";
+import Services from "./board/Services.astro";
 
 interface Props {
   locale: Locale;
@@ -10,11 +16,14 @@ const { locale } = Astro.props;
 const copy = t(locale);
 ---
 
+<!-- DESIGN.md: one board of tiles; groups are 128px apart, more than any gap inside a group. -->
 <Base locale={locale} title={copy["meta.title"]} description={copy["meta.description"]}>
-  <section class="px-margin pt-xl pb-section">
-    <div class="max-w-(--spacing-measure) bg-surface-raised p-tile-sm md:p-tile">
-      <h1 class="type-headline-sm mb-lg text-balance md:type-headline">{copy["home.title"]}</h1>
-      <p class="type-statement-sm md:type-statement">{copy["home.lead"]}</p>
-    </div>
-  </section>
+  <div class="grid gap-section px-margin">
+    <Hero locale={locale} />
+    <Services locale={locale} />
+    <Sectors locale={locale} />
+    <Method locale={locale} />
+    <Contact locale={locale} />
+  </div>
+  <Footer slot="footer" locale={locale} />
 </Base>

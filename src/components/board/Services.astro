@@ -1,0 +1,51 @@
+---
+import { Picture } from "astro:assets";
+import photo from "../../assets/board/retama-monosperma-plant.jpg";
+import { type Locale, t } from "../../i18n/index";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+const items = ["services.item1", "services.item2", "services.item3", "services.item4", "services.item5"] as const;
+---
+
+<!-- DESIGN.md: mosaic of unlike tiles; no two neighbours hold the same kind of thing. -->
+<section id={copy["anchor.services"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="services-title">
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
+    <h2 id="services-title" class="text-balance type-headline-sm md:type-headline">{copy["services.title"]}</h2>
+  </div>
+
+  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-6 lg:col-start-7 lg:row-span-5 lg:row-start-1 lg:aspect-auto">
+    <Picture
+      src={photo}
+      alt={copy["services.photoAlt"]}
+      formats={["avif", "webp"]}
+      widths={[480, 800, 1200, 1600]}
+      sizes="(min-width: 1024px) 50vw, 100vw"
+      class="absolute inset-0 size-full object-cover"
+    />
+  </div>
+
+  <ul class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-2">
+    {items.map((item) => <li>{copy[item]}</li>)}
+  </ul>
+
+  <p class="col-span-2 bg-surface-raised p-tile-sm type-statement-sm md:p-tile md:type-statement lg:col-span-3 lg:row-span-2">
+    {copy["services.statement1"]}
+  </p>
+
+  <p class="col-span-2 bg-field p-tile-sm text-on-field type-statement-sm md:p-tile md:type-statement lg:col-span-6 lg:row-span-3">
+    {copy["services.statement2"]}
+  </p>
+
+  <p class="bg-surface-raised p-tile-sm type-statement-sm md:p-tile md:type-statement lg:col-span-3 lg:row-span-3">
+    {copy["services.statement3"]}
+  </p>
+
+  <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-3">
+    <p class="type-display-sm">{copy["services.figure"]}</p>
+    <p class="type-small text-on-surface-muted">{copy["services.figureCaption"]}</p>
+  </div>
+</section>

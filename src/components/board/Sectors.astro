@@ -1,0 +1,53 @@
+---
+import { Picture } from "astro:assets";
+import photo from "../../assets/board/retama-monosperma-flowers.jpg";
+import { type Locale, t } from "../../i18n/index";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+const sectors = [
+  ["sectors.item1", "sectors.item1Note"],
+  ["sectors.item2", "sectors.item2Note"],
+  ["sectors.item3", "sectors.item3Note"],
+  ["sectors.item4", "sectors.item4Note"],
+] as const;
+---
+
+<section id={copy["anchor.sectors"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="sectors-title">
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
+    <h2 id="sectors-title" class="text-balance type-headline-sm md:type-headline">{copy["sectors.title"]}</h2>
+  </div>
+
+  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-6 lg:row-span-3 lg:aspect-auto">
+    <Picture
+      src={photo}
+      alt={copy["sectors.photoAlt"]}
+      formats={["avif", "webp"]}
+      widths={[480, 800, 1200, 1600]}
+      sizes="(min-width: 1024px) 50vw, 100vw"
+      class="absolute inset-0 size-full object-cover"
+    />
+  </div>
+
+  <ul class="col-span-2 grid gap-md bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
+    {
+      sectors.map(([name, note]) => (
+        <li>
+          <p class="type-statement-sm md:type-statement">{copy[name]}</p>
+          <p class="type-small text-on-surface-muted">{copy[note]}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="col-span-2 bg-surface-raised p-tile-sm type-statement-sm md:p-tile md:type-statement lg:col-span-3 lg:row-span-3">
+    {copy["sectors.statement"]}
+  </p>
+
+  <p class="col-span-2 bg-field p-tile-sm text-on-field type-statement-sm md:p-tile md:type-statement lg:col-span-3 lg:row-span-3">
+    {copy["sectors.field"]}
+  </p>
+</section>

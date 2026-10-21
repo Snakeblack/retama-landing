@@ -37,3 +37,8 @@
     animation: none;
   }
 }
+
+/* DESIGN.md Layout: board rows are 96px and grow when a tile's content needs more. */
+@utility board-rows {
+  grid-auto-rows: minmax(var(--spacing-row), auto);
+}
