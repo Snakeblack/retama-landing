@@ -170,7 +170,7 @@ const GRAIN = {
   frequency: 0.55,
   spread: 0.26,
   centre: 0.565,
-  ground: { slope: 0.9, intercept: 0.445 },
+  ground: { slope: 0.63, intercept: 0.615 },
   layer: 0.1,
   fade: 0.8,
 };
