@@ -43,6 +43,17 @@ const facts = ["hero.fact1", "hero.fact2", "hero.fact3", "hero.fact4", "hero.fac
 
   <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-8 lg:col-start-3 lg:row-span-5 lg:row-start-4 lg:aspect-auto" data-scene data-shutter>
     <Poster class="block size-full" label={copy["hero.poster"]} />
+    <!-- ADR 0004 and WCAG 2.2.2: a tap or click on the running scene pauses it. scene.ts shows this layer over the
+         canvas while the scene runs and swaps its label; it has no visible text, only the focus ring. -->
+    <button
+      class="absolute inset-0 size-full cursor-pointer"
+      type="button"
+      aria-label={copy["hero.scenePauseLabel"]}
+      data-scene-pause
+      data-pause={copy["hero.scenePauseLabel"]}
+      data-play={copy["hero.scenePlayLabel"]}
+      hidden
+    ></button>
   </div>
 
   <div class="relative col-span-2 bg-surface p-tile-sm md:p-tile lg:col-span-5 lg:col-start-3 lg:row-span-2 lg:row-start-7">

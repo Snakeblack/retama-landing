@@ -1,0 +1,369 @@
+{
+  "schema": "idd-state/v1",
+  "change": "m2-hero-3d",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "continua (M2 3/3: m2-hero-3d, Three, póster, fallbacks, presupuesto de JS del ADR 0001)",
+    "kind": "feature",
+    "summary": "Escena 3D progresiva del hero (ADR 0004): la retama del póster en Three.js (WebGPU, luego WebGL2, luego el póster), cargada tras el primer pintado y solo si su ficha es visible",
+    "acceptance": "En / y /en/ el póster SVG sigue siendo lo que se pinta primero; tras la carga, con la ficha visible, una escena Three.js de la misma planta (mismo generador y semilla) sustituye al póster sin salto y gira despacio; se pausa fuera de pantalla y con la pestaña oculta; con reduced-motion, ahorro de datos o GPU débil no se descarga y queda el póster; sin WebGPU usa WebGL2; ningún texto depende de ella; CSP sin violaciones, presupuesto de JS inicial y Lighthouse 100 x4"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿La escena responde al puntero (inclinación hacia el cursor o arrastrar para girar) o solo gira sola, y gira 360° en bucle u oscila alrededor de la vista del póster?"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Hero.astro",
+          "line": 44
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/es.ts",
+          "line": 16
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0004-progressive-3d.md",
+          "line": 20
+        }
+      },
+      {
+        "category": "accessibility",
+        "question": "WCAG 2.2.2 pide poder pausar el movimiento automático de más de 5 s: ¿botón visible de pausa en la ficha, o pausa con el puntero o el foco como en Sectores?"
+      },
+      {
+        "category": "errors",
+        "question": "¿La GPU débil se descarta solo por sondeo (adaptador de respaldo, failIfMajorPerformanceCaveat) o también por los fps medidos en los primeros frames?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "package.json",
+      "pnpm-lock.yaml",
+      "src/components/Home.astro",
+      "src/components/board/Hero.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/retama-scene.ts",
+      "src/lib/scene-tier.ts",
+      "src/scripts/scene-three.ts",
+      "src/scripts/scene.ts",
+      "src/styles/global.css",
+      "tests/e2e/scene.spec.ts",
+      "tests/unit/retama-scene.test.ts",
+      "tests/unit/scene-tier.test.ts"
+    ],
+    "work_units": 3,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0006, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Ningún texto depende de la escena; la escena es un chunk de worker fuera del presupuesto inicial (46,6 KB de 60 KB gzip)"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "Implementa los tres niveles: póster HTML como primer pintado, escena cargada tras la carga y solo visible, degradación por movimiento reducido, ahorro de datos y GPU débil, pausa fuera de pantalla y con la pestaña oculta; E2E de movimiento reducido y sin API moderna"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Colores de la escena leídos de los tokens del tema; DESIGN.md (Motion and 3D) actualizado; design:lint limpio"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin estilos ni manejadores inline; el worker es de self y la CSP de script-src lo cubre; E2E sin violaciones con la escena corriendo"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Las etiquetas de la capa de pausa están en es.ts y en.ts con las mismas claves"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint limpio: DESIGN.md sin errores de lint ni contraste, tema sincronizado y componentes solo con tokens (la capa de pausa usa utilidades de token y el anillo de foco hacia dentro usa var(--spacing-focus))",
+      "recorded_at": "2026-10-21T16:58:53.405Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Movimiento: 'la animación solo sera girar? no una animacion real como tal? algo más complejo?' y después elige 'Viento en los tallos', 'Savia que sube' y 'Crecimiento al entrar' (no el giro lento + inclinación). Pausa: 'Botón discreto'. GPU débil: 'Sondeo + fps'.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T16:58:48.310Z",
+      "detail": {
+        "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T16:58:48.310Z",
+      "detail": {
+        "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/scene.spec.ts",
+          "tests/unit/retama-scene.test.ts",
+          "tests/unit/scene-tier.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T16:58:48.310Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T16:58:53.525Z"
+    }
+  ],
+  "base": "7ae7ae4a061391e3bbd8fb00e6cff591bdd0d18a",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:c3814443004cb5047d04a92fdaf6aa295ee6e48dff8de7925956bf9799767bed",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:6b231623098dd91391d80797e920a8eb73ab534ce2f0cd04dd128e293393e0d7",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:74e833fc154c9e3b8bab19e1907264ef7e96a401c866015891ea28916ade2b0d",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:510f754afddb7baef2e262ed59de9ff8edfcb24a329a93ddbf52d6e78cde5653",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:f643e7a27c67b592b96903803ec9778a053b220e214389a1af5227c6b500984e",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:2e55aad0140404e9ef546d946da968bf830348c10121376872002f7caab373c8",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:23306aae4d511dac8909021c3a579521a0f8c003b174fea9e936f3a7069fef09",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:2cf0d2b19b299651bd0af29248e9ad397cfbc49e1885c54459e085b5dce26a2b",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:ca9ec85fa246d7a4bf005d991ae0e9e83b5a8f149469c5e1ca832560317704a5",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d6c891be047aec8698ccd1570736f79fb91e94430150cc2dab80e0389a3d9476",
+      "tree": "sha256:cae2a458f10df5ed9b7c572c893c8d87039a539244451d2e43670d51047a904c",
+      "recorded_at": "2026-10-21T16:58:48.310Z"
+    }
+  ],
+  "closed_at": "2026-10-21T16:58:53.525Z"
+}

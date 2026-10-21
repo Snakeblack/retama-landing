@@ -14,6 +14,8 @@ export const es = {
 
   "hero.title": "Software a medida, sostenido por decisiones escritas.",
   "hero.poster": "Dibujo de una retama: tallos finos sobre el suelo y una raíz que baja mucho más hondo.",
+  "hero.scenePauseLabel": "Pausar la animación de la retama",
+  "hero.scenePlayLabel": "Reanudar la animación de la retama",
   "frag.adr.status": "Aceptada",
   "frag.adr.title": "Escena 3D como mejora progresiva que nunca bloquea",
   "frag.adr.caption": "Una decisión real de esta web.",
