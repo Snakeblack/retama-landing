@@ -1,0 +1,490 @@
+{
+  "schema": "idd-state/v1",
+  "change": "chapters-hero",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "feature",
+    "summary": "Portada por capítulos (1/4): DESIGN.md y roadmap del hito, estructura de capítulos, cabecera con Hablemos fijo y hero «Software / a medida» con efecto de código sobre la escena 3D",
+    "acceptance": "En / y /en/ el primer capítulo muestra «Software» a tamaño display con «a medida» debajo, la retama 3D crece bajo la palabra, el h1 dice qué es Retama, «Retama» solo aparece como logo, el tablero del hero desaparece y un «Hablemos» fijo lleva al contacto; DESIGN.md describe los capítulos y pnpm design:lint, lint, test y e2e pasan"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿qué efecto exacto tiene la palabra al cargar (descifrado desde el código, glifos que ciclan o lluvia tipo matrix) y qué hace el cursor después?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿adónde van las cifras (100, 0), los cinco datos y el fragmento ADR que hoy viven en el hero (src/components/board/Hero.astro:56)?"
+      },
+      {
+        "category": "persistence",
+        "question": "¿cómo se reparte el hito en changes y PRs encadenados y dónde va en el roadmap (docs/roadmap.md)?"
+      },
+      {
+        "category": "copy",
+        "question": "¿el h1 es «Software a medida» con una frase de qué hacemos o sigue el manifiesto actual (src/i18n/es.ts:15), y se aprueba el copy es/en recortado por capítulos (unas 300 palabras visibles)?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿los enlaces de sección (anclas traducidas) pasan a la cabecera o desaparecen?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿dónde vive el «Hablemos» fijo, cuándo se oculta y qué pasa sin JS o en navegadores sin scroll-driven animations?"
+      },
+      {
+        "category": "errors",
+        "question": "¿qué se ve con movimiento reducido, sin WebGPU/WebGL o sin JS en el hero?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/roadmap.md",
+      "src/components/Home.astro",
+      "src/components/board/Hero.astro",
+      "src/components/board/Method.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/scripts/motion.ts",
+      "src/styles/global.css",
+      "src/styles/theme.css",
+      "tests/e2e/motion.spec.ts",
+      "tests/e2e/site.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0006, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Todo el texto sigue en el HTML (título, manifiesto, copy); la escena y el scrub del manifiesto son mejoras: sin JS el título es letras y el manifiesto está en tinta plena. La escena es un import diferido en worker, fuera del presupuesto de JS de inicio"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "El LCP sigue siendo el título HTML; la escena de glifos se carga tras load, en worker, solo si es visible, con WebGPU→WebGL2→póster, se rinde por debajo de 30 fps, se queda en póster con movimiento reducido o ahorro de datos y se pausa fuera de pantalla, con la pestaña oculta y con el botón de pausa (WCAG 2.2.2). Lighthouse 100×4 en / y /en/"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md sigue siendo la única fuente: cambia display-sm (104→72 px) y se describen capítulos, escena de glifos y las excepciones aprobadas por el usuario (bloom solo en la escena, «a medida» en primario, bajada fija); theme.css regenerado con pnpm design:theme y design:lint limpio"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin style ni manejadores inline: la escena usa CSSOM y custom properties, el botón de pausa es un SVG con atributos de presentación; el e2e de la escena WebGL2 comprueba cero violaciones de CSP"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Claves nuevas (hero.word, hero.rest, hero.lead, nav.talk, manifesto.line1/2) y retiradas (hero.title, hero.fact1-5, method.field/fieldNote) iguales en es y en; el test de paridad de i18n pasa y las anclas siguen traducidas"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Efecto: descifrado (la palabra nace hecha del código de la web y se asienta en tinta sólida de izquierda a derecha en ~1,1 s, solo CSS, luego la lupa con el cursor). Manifiesto: dos frases grandes a tamaño headline que pasan de gris a tinta palabra a palabra. Servicios: trama de puntos de la retama generada en build. Sí, todo: hito M2.5 en 4 PRs encadenados (chapters-hero; manifiesto; servicios; método en papel + Hablemos + sectores), cabecera con logo + 3 enlaces con anclas traducidas + English, Hablemos fijo abajo a la derecha que se oculta sobre hero y contacto y queda visible sin JS o sin scroll-driven, h1 «Software a medida» con frase de qué hacemos, cifras 100/0 y fragmento ADR a Método, lista de cinco datos fuera, copy del archivo copy-capitulos.md, con movimiento reducido o sin GPU la palabra quieta y el póster.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T20:34:19.689Z",
+      "detail": {
+        "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T20:34:19.689Z",
+      "detail": {
+        "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/motion.spec.ts",
+          "tests/e2e/scene.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/glyph-scene.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T20:36:45.197Z",
+      "detail": {
+        "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+        "runs": [
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15",
+          "run-16"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T20:36:45.197Z",
+      "detail": {
+        "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+        "check": "ev-3",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/motion.spec.ts",
+          "tests/e2e/scene.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/glyph-scene.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T20:36:45.197Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+        "fitness": [
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20",
+          "run-21",
+          "run-22"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T20:36:50.364Z"
+    }
+  ],
+  "base": "1d392caf434dac514ff85e17f439a7be58fcd209",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:424fafee8b06c54cf7b8247c1ccdde1b8693f5ba4355bc008ba3b657c1276c9e",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c3495715f6dc19fb0dfaf854a438d2b535c38633cb3a7b77756dd9f377f1b4b9",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:87089e755710521a44c94541fd1ffdddc959698981bad4364ec000990b3d003a",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:a5759aa56dfcdde68a5a7439b9e55a259ae147eb35bf9012b80d07bb195aec32",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:b79c22ad2da688ceece80227b63c9074fb1069c2b5205d1de037f999a9830267",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:259ab69a8e164ee8889d0fb3c90a6504a0948dfca9d5a9d46febda493713879f",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 1,
+      "output_sha256": "sha256:4db9e15c7c013f8eaa526edeb5c00ef09d50bbd961109a8275644464ea375034",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:6dc9f91e60144ff7a4c376eea88d601da6927edd33609e166f6499e50c864591",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:609a46f58cf813c7e01784cb6ffeda6e9031a01192bfa7289b6ece1ecc6a949a",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:facb484e13a0deb0c1b3056ba98fd07808ce83056aeb4e41ae54891feb1965cd",
+      "tree": "sha256:0e706f4d3ad24347502e7ae9ac9a243e4fbbf1ef7d85ddd5af45f3b5be9cd3d8",
+      "recorded_at": "2026-10-21T20:34:19.689Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:670872a2ce4da907af9203ae039494072a8bc9bfe8f433cd8a3d07e8a183f645",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:d72d48f23ff0af2ee7f0a6ea66145036342a035bcae2ae6075ef25afd9e42bb2",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:6ffa9697a956bcef765df14343f9f62c611787c41f5bcdf2ec7e876589fa2b4f",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:b33e7442938bebd41106b111a904163258f4103164a9ea75bc9eb38d7cda6853",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:8afd85cd6d5791b459967a3dd3d473a12b9308a1bc15dd2da0d2d0a06d668003",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:2bbd6a34ec8d6e7f87567c219258c31a06d7981a6d03419eebf9f68af0956223",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:151193d3bb90e6c7fef7bcb364a455723656eef58e1e1f018c95d476572c3e60",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:933a1fcb7246d99af6743c652876b9f41f8b4b7e9008bd5746dfad2647acacd9",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:6fc16f5b1c0c95b5a1c92185412319ab84935f731030e1d94ce703d807a0d97b",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:cbae58826b4fcbaa4149367f3cbc02acac406f1843373bee7fac18a413abc940",
+      "tree": "sha256:46dfc8e1796c7b98ae861e790bc1833b84491310d195ebcf8e124fdaf193ac9e",
+      "recorded_at": "2026-10-21T20:36:45.197Z"
+    }
+  ],
+  "closed_at": "2026-10-21T20:36:50.364Z"
+}

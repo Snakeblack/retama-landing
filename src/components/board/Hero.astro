@@ -67,10 +67,12 @@ const manifesto = [copy["manifesto.line1"], copy["manifesto.line2"]];
     </div>
 
     <!-- DESIGN.md Motion: the manifesto, two lines that go from muted to full ink word by word as they rise. -->
-    <div class="flex min-h-svh flex-col justify-center gap-2xl p-tile-sm md:p-tile">
+    <!-- Each line holds to two lines: at statement size below lg, at headline size on eight columns from lg. The lines
+         take the pointer, so nothing reads as lying over them; scene.ts follows it over the whole chapter. -->
+    <div class="grid min-h-svh content-center gap-x-gap gap-y-2xl p-tile-sm md:p-tile lg:grid-cols-12">
       {
         manifesto.map((line) => (
-          <p class="max-w-(--spacing-measure) text-balance type-headline-sm md:type-headline" data-manifesto>
+          <p class="pointer-events-auto text-balance type-statement-sm md:type-statement lg:col-span-8 lg:type-headline" data-manifesto>
             {line.split(" ").map((word, index) => (
               <>
                 {index > 0 && " "}
