@@ -35,6 +35,10 @@ export const RAIN_START = 1.6;
 export const RAIN_SPAN = 3.6;
 /** How long one glyph flies, in seconds. */
 export const FLIGHT = { word: 1.4, plant: 1.3 } as const;
+/** A plant glyph leaves up to this long after its turn, so the stroke does not arrive in a line. */
+const RAIN_JITTER = 0.3;
+/** When the last glyph of the rain lands: the retama has grown. */
+export const RAIN_END = RAIN_START + RAIN_SPAN + RAIN_JITTER + FLIGHT.plant;
 
 /**
  * Where the retama stands in a chapter of this size, the same as the poster (global.css): its crown at 70% of the
@@ -139,7 +143,7 @@ export function plantGlyphs(
           target: [lerp(from[0], to[0]), lerp(from[1], to[1]), lerp(from[2], to[2])],
           cell: sequence(index++),
           angle: Math.atan2(dy, dx),
-          delay: RAIN_START + lerp(a.grow, b.grow) * RAIN_SPAN + next() * 0.3,
+          delay: RAIN_START + lerp(a.grow, b.grow) * RAIN_SPAN + next() * RAIN_JITTER,
           flow: lerp(a.flow, b.flow),
           sway: lerp(a.sway, b.sway),
           seed: next(),

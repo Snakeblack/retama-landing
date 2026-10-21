@@ -41,13 +41,14 @@ const manifesto = [copy["manifesto.line1"], copy["manifesto.line2"]];
 
   <div class="pointer-events-none relative col-start-1 row-start-1 px-margin">
     <div class="grid min-h-svh grid-cols-2 content-start gap-gap lg:grid-cols-12 lg:content-center">
-      <h1 class="pointer-events-auto col-span-2 grid p-tile-sm md:p-tile lg:col-span-8">
-        <!-- The face's side bearing is 0.03em at every size: at display size that is xs more than at headline size, so the
+      <h1 class="pointer-events-auto col-span-2 grid p-tile-sm select-none md:p-tile lg:col-span-8">
+        <!-- The title is not selectable: dragging over it would cut through the hand-over between glyphs and letters.
+             The face's side bearing is 0.03em at every size: at display size that is xs more than at headline size, so the
              S of "Software" pulls back by xs to start its ink on the column of the "a" below. -->
         <span class="whitespace-nowrap type-display-sm lg:-ml-xs lg:type-display">
-          <!-- DESIGN.md Motion: the word is decoded from the site's own code on the first paint; once the scene runs, its
-               glyphs assemble the title and hand it back. The code layer is a copy drawn by CSS from data-text. -->
-          <span class="relative inline-block" data-lens data-decode data-glyph-word data-text={copy["hero.word"]}>
+          <!-- DESIGN.md Motion: the title paints in letters; once the scene runs, its glyphs assemble it and hand it back
+               when the retama has grown. The code layer is a copy drawn by CSS from data-text. -->
+          <span class="relative inline-block" data-lens data-glyph-word data-text={copy["hero.word"]}>
             {copy["hero.word"]}
           </span>
         </span>

@@ -45,17 +45,22 @@ async function scrollThrough(page: Page) {
 test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
   test.use({ viewport: desktop });
 
-  test("la cifra cuenta y el texto se puede seleccionar", async ({ page }) => {
+  test("la cifra cuenta y el texto se puede seleccionar, salvo el título", async ({ page }) => {
     await page.goto("/");
-    expect(await page.locator("main h1").evaluate((node) => getComputedStyle(node).userSelect)).not.toBe("none");
+    const select = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((node) => getComputedStyle(node).userSelect);
+    expect(await select("main h1")).toBe("none");
+    expect(await select('[data-chapter="hero"] p')).not.toBe("none");
     await page.locator("[data-count]").scrollIntoViewIfNeeded();
     await expect(page.locator("[data-count]")).toHaveText("100");
   });
 
-  test("la palabra nace hecha de código, se asienta en tinta y deja la lupa en reposo", async ({ page }) => {
+  test("el título se pinta en letras, sin la textura de código", async ({ page }) => {
     await page.goto("/");
-    expect(await codeLayer(page)).toEqual({ animation: "decode", opacity: "1" });
-    await expect.poll(async () => (await codeLayer(page)).opacity, { timeout: 5000 }).toBe("0");
+    expect(await codeLayer(page)).toEqual({ animation: "none", opacity: "0" });
   });
 
   test("el manifiesto pasa de gris a tinta palabra a palabra al subir", async ({ page }) => {
@@ -134,10 +139,8 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
 test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
   test.use({ viewport: phone, hasTouch: true, isMobile: true });
 
-  test("la palabra se descifra también en el táctil y cabe en la pantalla", async ({ page }) => {
+  test("la palabra cabe en la pantalla", async ({ page }) => {
     await page.goto("/");
-    expect(await codeLayer(page)).toEqual({ animation: "decode", opacity: "1" });
-    await expect.poll(async () => (await codeLayer(page)).opacity, { timeout: 5000 }).toBe("0");
     const word = await page.locator("[data-lens]").boundingBox();
     expect((word?.x ?? 0) + (word?.width ?? 0)).toBeLessThanOrEqual(phone.width);
   });
@@ -199,8 +202,7 @@ test.describe("sin JavaScript (ADR 0001)", () => {
     page,
   }) => {
     await page.goto("/");
-    // Past the decode, the layer rests hidden.
-    await expect.poll(async () => (await codeLayer(page)).opacity, { timeout: 5000 }).toBe("0");
+    expect((await codeLayer(page)).opacity).toBe("0");
     const box = await page.locator("main h1").boundingBox();
     if (!box) throw new Error("no title");
     await page.mouse.move(box.x + 60, box.y + box.height / 3);
@@ -218,8 +220,8 @@ test.describe("sin JavaScript (ADR 0001)", () => {
       .locator("[data-manifesto] [data-word]")
       .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).opacity));
     expect(new Set(words)).toEqual(new Set(["1"]));
-    // The decode is CSS and runs anyway; once it ends, the lens layer draws nothing.
-    await expect.poll(async () => (await codeLayer(page)).opacity, { timeout: 5000 }).toBe("0");
+    // The code layer draws nothing until the pointer is on the title.
+    expect((await codeLayer(page)).opacity).toBe("0");
     // The switcher is a native exclusive accordion: every sector is in the HTML and opens one at a time.
     await expect(page.locator(TABS)).toHaveCount(4);
     expect(await openSector(page)).toBe(0);

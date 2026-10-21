@@ -122,8 +122,8 @@
 }
 
 /* DESIGN.md Motion: the word's code. The layer copies the word from data-text, so it lines up with the letters, and
-   fills them with the site's own code (/code-lens.svg). The decode shows it on the first paint; on the poster (no
-   scene) the pointer on the title shows it again. */
+   fills them with the site's own code (/code-lens.svg). On the poster (no scene), the pointer on the title shows it;
+   with the scene, the scene's glyphs do. */
 [data-lens]::after {
   content: attr(data-text);
   position: absolute;
@@ -141,34 +141,6 @@
 @media (hover: hover) and (pointer: fine) {
   [data-chapter="hero"]:not(:has([data-scene-state="running"])) h1:hover [data-lens]::after {
     opacity: 1;
-  }
-}
-
-/* DESIGN.md Motion: the decode. On the first paint the word is made of the site's code; it holds for t-reveal and
-   then settles into solid ink from the left over t-open, as a soft edge sweeps the code layer off to the right.
-   It is CSS, so it needs no script and the word is painted from the first frame; reduced motion drops it. The mask
-   is two and a half words wide: at 100% its opaque half covers the word, at 0% its clear half does. It fills
-   backwards only, so once it ends the layer is hidden again. */
-@media (prefers-reduced-motion: no-preference) {
-  [data-decode]::after {
-    animation: decode var(--t-open) var(--ease-in-out) var(--t-reveal) backwards;
-  }
-}
-
-@keyframes decode {
-  from {
-    opacity: 1;
-    mask-image: linear-gradient(to right, transparent 40%, var(--color-on-surface) 60%);
-    mask-size: 250% 100%;
-    mask-repeat: no-repeat;
-    mask-position: 100% 0;
-  }
-  to {
-    opacity: 1;
-    mask-image: linear-gradient(to right, transparent 40%, var(--color-on-surface) 60%);
-    mask-size: 250% 100%;
-    mask-repeat: no-repeat;
-    mask-position: 0 0;
   }
 }
 
