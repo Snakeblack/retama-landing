@@ -8,12 +8,14 @@ const tileOpacities = (page: Page) =>
     .locator("main section[id] > *")
     .evaluateAll((tiles) => tiles.map((tile) => Number(getComputedStyle(tile).opacity)));
 
-/** The code layer over the word of the first chapter: its animation and how much of it shows. */
-const codeLayer = (page: Page) =>
-  page.locator("[data-lens]").evaluate((lens) => {
-    const layer = getComputedStyle(lens, "::after");
-    return { animation: layer.animationName, opacity: layer.opacity };
-  });
+/** Whether anything draws over the words of the title but their own letters: a layer or a texture. */
+const titleTexture = (page: Page) =>
+  page.locator("[data-glyph-word]").evaluateAll((words) =>
+    words.some((word) => {
+      const after = getComputedStyle(word, "::after");
+      return after.content !== "none" || getComputedStyle(word).backgroundImage !== "none";
+    }),
+  );
 
 const talkOpacity = (page: Page) =>
   page.locator("[data-talk]").evaluate((talk) => Number(getComputedStyle(talk).opacity));
@@ -60,7 +62,8 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
 
   test("el título se pinta en letras, sin la textura de código", async ({ page }) => {
     await page.goto("/");
-    expect(await codeLayer(page)).toEqual({ animation: "none", opacity: "0" });
+    expect(await titleTexture(page)).toBe(false);
+    expect((await page.request.get("/code-lens.svg")).status()).toBe(404);
   });
 
   test("el manifiesto pasa de gris a tinta palabra a palabra al subir", async ({ page }) => {
@@ -141,7 +144,7 @@ test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
 
   test("la palabra cabe en la pantalla", async ({ page }) => {
     await page.goto("/");
-    const word = await page.locator("[data-lens]").boundingBox();
+    const word = await page.locator("[data-glyph-word]").first().boundingBox();
     expect((word?.x ?? 0) + (word?.width ?? 0)).toBeLessThanOrEqual(phone.width);
   });
 
@@ -195,9 +198,9 @@ test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
 test.describe("con movimiento reducido (DESIGN.md Motion, ADR 0004)", () => {
   test.use({ viewport: desktop, reducedMotion: "reduce" });
 
-  test("sin descifrado ni cuenta; las entradas solo funden y la lupa no viaja", async ({ page }) => {
+  test("sin cuenta; las entradas solo funden y el título se queda en letras", async ({ page }) => {
     await page.goto("/");
-    expect((await codeLayer(page)).animation).toBe("none");
+    expect(await titleTexture(page)).toBe(false);
     await expect(page.locator("[data-count]")).toHaveText("100");
 
     await scrollThrough(page);
@@ -217,21 +220,16 @@ test.describe("con movimiento reducido (DESIGN.md Motion, ADR 0004)", () => {
 test.describe("sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false, viewport: desktop });
 
-  // Without the script the scene never starts, so the title shows its own code under the pointer, in CSS.
-  test("sobre el póster el puntero en el título muestra el código de la palabra y lo quita al salir", async ({
-    page,
-  }) => {
+  // Without the script the scene never starts: the title stays in its letters, the pointer on it included.
+  test("sobre el póster el puntero en el título no trae ninguna textura de código", async ({ page }) => {
     await page.goto("/");
-    expect((await codeLayer(page)).opacity).toBe("0");
     const box = await page.locator("main h1").boundingBox();
     if (!box) throw new Error("no title");
     await page.mouse.move(box.x + 60, box.y + box.height / 3);
-    await expect.poll(async () => (await codeLayer(page)).opacity).toBe("1");
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 300);
-    await expect.poll(async () => (await codeLayer(page)).opacity).toBe("0");
+    expect(await titleTexture(page)).toBe(false);
   });
 
-  test("todo el tablero queda visible, la cifra dice su valor y la lupa no dibuja nada", async ({ page }) => {
+  test("todo el tablero queda visible y la cifra dice su valor", async ({ page }) => {
     await page.goto("/");
     expect((await tileOpacities(page)).every((opacity) => opacity === 1)).toBe(true);
     await expect(page.locator("[data-count]")).toHaveText("100");
@@ -240,8 +238,6 @@ test.describe("sin JavaScript (ADR 0001)", () => {
       .locator("[data-manifesto] [data-word]")
       .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).opacity));
     expect(new Set(words)).toEqual(new Set(["1"]));
-    // The code layer draws nothing until the pointer is on the title.
-    expect((await codeLayer(page)).opacity).toBe("0");
     // The switcher is a native exclusive accordion: every sector is in the HTML and opens one at a time.
     await expect(page.locator(TABS)).toHaveCount(4);
     expect(await openSector(page)).toBe(0);
