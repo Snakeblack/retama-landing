@@ -3,12 +3,13 @@
 //   node scripts/skills-scan.mjs            check (CI)
 //   node scripts/skills-scan.mjs --findings print every finding, reviewed or not
 //   node scripts/skills-scan.mjs --rehash   record the current hashes, only after a reviewed update
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   diffFiles,
   listFiles,
   listLinks,
+  listSkillEntries,
   MANIFEST,
   readManifest,
   SKILLS_DIR,
@@ -28,11 +29,9 @@ if (process.argv.includes("--rehash")) {
   console.log(`rehashed ${Object.keys(manifest.skills).length} skills into ${MANIFEST}`);
   process.exit(0);
 }
-const folders = readdirSync(SKILLS_DIR, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name);
+const { folders, rejected } = listSkillEntries(SKILLS_DIR);
 
-const problems = [];
+const problems = rejected.map((reason) => `${SKILLS_DIR}: ${reason}`);
 const findings = [];
 
 for (const name of folders) {
