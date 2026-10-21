@@ -287,7 +287,7 @@
       "signal": "always",
       "status": "satisfied",
       "evidence": [
-        "ev-11"
+        "ev-14"
       ]
     },
     {
@@ -301,16 +301,14 @@
       "signal": "public-contract",
       "status": "satisfied",
       "evidence": [
-        "ev-12"
+        "ev-15"
       ]
     },
     {
       "id": "trust-review",
       "signal": "security-boundary",
-      "status": "satisfied",
-      "evidence": [
-        "ev-13"
-      ]
+      "status": "pending",
+      "evidence": []
     },
     {
       "id": "adr-impact-declaration",
@@ -325,7 +323,7 @@
       "signal": "persistent-data",
       "status": "satisfied",
       "evidence": [
-        "ev-10"
+        "ev-16"
       ]
     }
   ],
@@ -335,6 +333,11 @@
       "status": "resolved",
       "answer": "todo lo recomendado: copy y tokens provisionales del agente (definitivos en M1/M2); 404 localizada es en raíz y en /en/ con not_found_handling 404-page",
       "source": "user"
+    },
+    {
+      "id": "review-limit",
+      "status": "open",
+      "reason": "3 of 3 trust reviews used: ospec check opens the review-limit gate, and only the person's answer authorizes one more"
     }
   ],
   "evidence": [
@@ -554,6 +557,58 @@
         "candidate_tree": "ed1801cd56ac3ad1d5dd73121408069a6115f9eb",
         "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f"
       }
+    },
+    {
+      "id": "ev-14",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T09:22:51.351Z",
+      "detail": {
+        "tree": "sha256:bfeb6b48d26fe2e16e5c81ab51a3976413d0e61b7f4b23067ffbc3e3d63e990a",
+        "runs": [
+          "run-19",
+          "run-20",
+          "run-21",
+          "run-22",
+          "run-23"
+        ]
+      }
+    },
+    {
+      "id": "ev-15",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T09:22:51.351Z",
+      "detail": {
+        "tree": "sha256:bfeb6b48d26fe2e16e5c81ab51a3976413d0e61b7f4b23067ffbc3e3d63e990a",
+        "check": "ev-14",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/i18n/index.ts"
+        ],
+        "tests": [
+          ".claude/skills/turnstile-spin/tests/validation.md",
+          "tests/e2e/security.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/csp.test.ts",
+          "tests/unit/i18n.test.ts",
+          "tests/unit/seo.test.ts",
+          "tests/unit/skills-manifest.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-16",
+      "kind": "migration-test",
+      "obligation": "migration-compat-and-test",
+      "recorded_at": "2026-10-21T09:23:05.824Z",
+      "detail": {
+        "run": "run-24",
+        "tree": "sha256:f765f7811d8d822100bd93f777137f9bdab55303ade79bf1d6c4b705452857a6",
+        "plan": "No hay datos persistentes que migrar: el sistema no tiene almacén (ADR 0003) y la señal viene de writeFile en herramientas de desarrollo (skills vendorizadas, post-build, design-check) que solo escriben artefactos de build. El comando demuestra que ni wrangler.jsonc ni el wrangler.json generado declaran bindings persistentes. Rollback: revertir el commit; no hay esquema ni datos."
+      }
     }
   ],
   "base": "aa7914c84780a93d46c8405c99a41a1c8ba2ac2b",
@@ -734,6 +789,65 @@
       "output_sha256": "sha256:83f2c1d94327d15235a60607efb4da220309bd1838a0b369935b2a9df77eab44",
       "tree": "sha256:694b2c8b1aa07ee4273738a7cd9f547806ea5166e5665dc0635da01f41ee7f44",
       "recorded_at": "2026-10-21T00:03:27.489Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:3c2c8fb181a7ae44052b786e701b905f69e143b610887d0d14678078ef10c5c5",
+      "tree": "sha256:bfeb6b48d26fe2e16e5c81ab51a3976413d0e61b7f4b23067ffbc3e3d63e990a",
+      "recorded_at": "2026-10-21T09:22:51.351Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:4c94336ee1cb155a58520b9bb1b08c03652e7f95dd5845cb55c8e43be0ce5bb4",
+      "tree": "sha256:bfeb6b48d26fe2e16e5c81ab51a3976413d0e61b7f4b23067ffbc3e3d63e990a",
+      "recorded_at": "2026-10-21T09:22:51.351Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:709493ef3c01703e6a6ecee4cc29fce81efa43a8fe0ff0cec433c51c44fca727",
+      "tree": "sha256:bfeb6b48d26fe2e16e5c81ab51a3976413d0e61b7f4b23067ffbc3e3d63e990a",
+      "recorded_at": "2026-10-21T09:22:51.351Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:53d2681d6fd711be30bd55f3a7b18e687f4cb096af291d8c5f19c658ee4c5efc",
+      "tree": "sha256:bfeb6b48d26fe2e16e5c81ab51a3976413d0e61b7f4b23067ffbc3e3d63e990a",
+      "recorded_at": "2026-10-21T09:22:51.351Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:83f2c1d94327d15235a60607efb4da220309bd1838a0b369935b2a9df77eab44",
+      "tree": "sha256:bfeb6b48d26fe2e16e5c81ab51a3976413d0e61b7f4b23067ffbc3e3d63e990a",
+      "recorded_at": "2026-10-21T09:22:51.351Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "migration-test",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:2905ae6bcaaa47241925c18765dfc50e78932d1b1f14bb9b7c141db73f25c35b",
+      "tree": "sha256:f765f7811d8d822100bd93f777137f9bdab55303ade79bf1d6c4b705452857a6",
+      "recorded_at": "2026-10-21T09:23:05.824Z"
     }
   ],
   "reviews": [
