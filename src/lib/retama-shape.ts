@@ -18,8 +18,18 @@ export interface Shape extends Frame {
   strokes: Stroke[];
 }
 
-/** The plant of the hero: its seed, its frame and where the poster's view starts, left of the frame. */
-export const HERO = { seed: 571009059, frame: { width: 1600, height: 900, ground: 360 }, left: -340 } as const;
+/**
+ * The plant of the first chapter: its seed, its frame (roots much deeper than the stems are tall, for the descent of
+ * DESIGN.md Motion and 3D), how many stems it has and how much of the frame from the top the poster shows: the stems
+ * and the upper roots.
+ */
+export const HERO = {
+  seed: 571009059,
+  frame: { width: 1600, height: 1900, ground: 520 },
+  stems: 110,
+  roots: 16,
+  crop: 780,
+} as const;
 
 // mulberry32: small, fast and the same on every platform.
 function random(seed: number): () => number {
@@ -49,7 +59,7 @@ function walk(start: Point, angle: number, bend: number, length: number, steps: 
   return points;
 }
 
-export function retamaShape(seed: number, frame: Frame): Shape {
+export function retamaShape(seed: number, frame: Frame, stems = 44, roots = 9): Shape {
   const next = random(seed);
   const spread = (amount: number) => (next() * 2 - 1) * amount;
   const { width, height, ground } = frame;
@@ -58,7 +68,7 @@ export function retamaShape(seed: number, frame: Frame): Shape {
 
   // Stems: rods fanning out from one crown, the outer ones arching over like a broom.
   const stemReach = ground * 0.92;
-  for (let index = 0; index < 44; index++) {
+  for (let index = 0; index < stems; index++) {
     const angle = spread(0.95);
     const length = stemReach * (0.5 + next() * 0.5) * (1 - Math.abs(angle) * 0.3);
     const bend = angle * (0.5 + next() * 0.6) + spread(0.12);
@@ -91,11 +101,13 @@ export function retamaShape(seed: number, frame: Frame): Shape {
       if (fork && next() < 0.8) branch(fork, angle + spread(0.7), length * 0.55, depth - 1);
     }
   };
-  for (let index = 1; index <= 9; index++) {
-    const from = taproot[index] ?? base;
+  // The laterals leave the taproot from its top down to its ninth point, however many there are.
+  for (let index = 1; index <= roots; index++) {
+    const along = Math.ceil((index * 9) / roots);
+    const from = taproot[along] ?? base;
     const side = index % 2 === 0 ? 1 : -1;
-    const length = (bottom - ground) * (0.55 - index * 0.035) * (0.8 + next() * 0.4);
-    branch(from, side * (0.55 + next() * 0.7), length, index < 6 ? 2 : 1);
+    const length = (bottom - ground) * (0.55 - along * 0.035) * (0.8 + next() * 0.4);
+    branch(from, side * (0.55 + next() * 0.7), length, along < 6 ? 2 : 1);
   }
 
   for (const stroke of strokes) {

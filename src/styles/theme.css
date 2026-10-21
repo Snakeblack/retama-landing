@@ -20,7 +20,7 @@
   --font-label: var(--font-stack-sans-text, "Stack Sans Text", sans-serif);
   --font-small: var(--font-stack-sans-text, "Stack Sans Text", sans-serif);
   --text-display: 200px;
-  --text-display-sm: 104px;
+  --text-display-sm: 72px;
   --text-headline: 64px;
   --text-headline-sm: 36px;
   --text-statement: 32px;

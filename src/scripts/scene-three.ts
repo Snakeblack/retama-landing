@@ -1,106 +1,130 @@
-// The 3D tier of ADR 0004, built inside scene-worker.ts on an OffscreenCanvas, off the main thread. It draws the poster's
-// plant (DESIGN.md Motion and 3D) as thin ribbons and animates three things on the GPU, on WebGPU or WebGL2 alike:
-// the plant grows (taproot, roots, then stems), the wind sways the stems (harder around the pointer on desktop) and
-// the sap runs up in orange pulses from the deepest roots to the tips.
+// The 3D tier of ADR 0004, built inside scene-worker.ts on an OffscreenCanvas, off the main thread. Everything in it
+// is a glyph of the site's own code (DESIGN.md Motion and 3D): the glyphs fly in and assemble the words of the title
+// over the HTML words, then rain from "Software" and grow the retama, written along its stems and roots. Once grown,
+// the wind sways the stems; around the pointer the gusts grow, and the glyphs stir and wake, shuffling their
+// characters; the sap runs up in orange pulses that bloom. One instanced mesh draws them all; every movement is computed on the GPU, on WebGPU or WebGL2 alike.
+import { bloom } from "three/addons/tsl/display/BloomNode.js";
 import {
-  attribute,
-  color,
+  clamp,
+  cos,
+  exp,
   Fn,
   float,
+  floor,
   fract,
+  hash,
+  instancedBufferAttribute,
   mix,
+  mod,
   mx_noise_float,
-  positionLocal,
+  normalize,
+  pass,
+  positionGeometry,
+  select,
+  sin,
   smoothstep,
+  texture,
   uniform,
+  uv,
   varying,
+  vec2,
   vec3,
 } from "three/tsl";
 import {
-  BufferGeometry,
+  AdditiveBlending,
+  CanvasTexture,
   Color,
-  DoubleSide,
-  Float32BufferAttribute,
-  Mesh,
+  InstancedBufferAttribute,
+  InstancedMesh,
+  LinearMipmapLinearFilter,
   MeshBasicNodeMaterial,
   PerspectiveCamera,
+  PlaneGeometry,
+  RenderPipeline,
   Scene,
   Vector3,
   WebGPURenderer,
 } from "three/webgpu";
-import { type Plant, type PlantStroke, retamaPlant, stormForce } from "../lib/retama-scene";
-import { HERO, retamaShape, type StrokeKind } from "../lib/retama-shape";
+import { FLIGHT, type Glyph, plantGlyphs, plantPlacement, RAIN_SPAN, RAIN_START, wordGlyphs } from "../lib/glyph-scene";
+import { retamaPlant, stormForce } from "../lib/retama-scene";
+import { HERO, retamaShape } from "../lib/retama-shape";
+import source from "../lib/retama-shape.ts?raw";
 import type { Tier } from "../lib/scene-tier";
 
-// The growth lasts this long, in seconds, then the sap fades in over the next one.
-const GROW_SECONDS = 4;
+// The glyph atlas: the distinct characters of the source, in cells of this many pixels, this many to a row.
+const CELL = 64;
+const COLUMNS = 16;
+const FONTS = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 // Sap pulses: how fast they climb, how far apart they run and how long their tail is, in poster units.
 const SAP_SPEED = 260;
 const SAP_SPACING = 520;
-const SAP_TAIL = 90;
-// Wind: the reach of the stem tips and the scale of the gusts, in poster units.
-const WIND = 16;
-const GUST = 0.0035;
-// Around the pointer the gusts grow this many times wider and a quicker flutter of this reach joins them.
+const SAP_TAIL = 120;
+// Wind: the reach of the stem tips and the scale of the gusts, in pixels; around the pointer the gusts grow this many
+// times wider, and within its radius the glyphs stir this far aside, rise this far towards the viewer and wake: they
+// shuffle their characters and brighten.
+const WIND = 22;
+const GUST = 0.003;
 const STORM = 2.5;
-const FLUTTER = 9;
-const STORM_RADIUS = 260;
-// A narrow lens, so depth reads without bending the poster's drawing.
+const STORM_RADIUS = 160;
+const STIR = 8;
+const RISE = 40;
+const WAKE = 0.5;
+// How bright the hot glyphs and the sap are: above 1 they bloom.
+const HOT = 2.6;
+// Within this many pixels of the crown the glyphs thin out.
+const CROWN = 140;
+// A narrow lens, so depth reads without bending the drawing.
 const FOV = 20;
 
 export interface Colors {
+  ground: string;
   ink: string;
   muted: string;
   primary: string;
 }
-export interface PlantScene {
+export interface Stage {
+  width: number;
+  height: number;
+}
+/** The samples of an HTML word, in pixels from the chapter's top left, and how far apart they were taken. */
+export interface Word {
+  samples: [x: number, y: number][];
+  step: number;
+}
+export interface GlyphScene {
   /** Advances the animation by dt seconds and draws a frame. */
   frame(dt: number): void;
-  resize(width: number, height: number): void;
-  /** The pointer over the tile, in CSS pixels from its top left; undefined when it leaves. */
+  /** Sizes the canvas and lays the words and the plant out for a chapter of this size; the rain falls from the first. */
+  layout(stage: Stage, words: Word[]): void;
+  /** How far the chapter has scrolled under its pinned stage, in pixels: the camera goes down as far. */
+  scroll(top: number): void;
+  /** The pointer over the stage, in CSS pixels from its top left; undefined when it leaves. */
   point(at?: [x: number, y: number]): void;
   dispose(): void;
 }
 
-/** Each segment of each stroke as two triangles around its centre line; the vertex shader widens them. */
-function ribbon(strokes: PlantStroke[]) {
-  const position: number[] = [];
-  const across: number[] = [];
-  const flow: number[] = [];
-  const grow: number[] = [];
-  const sway: number[] = [];
-  for (const { points } of strokes) {
-    for (let at = 1; at < points.length; at++) {
-      const a = points[at - 1];
-      const b = points[at];
-      if (!a || !b) continue;
-      const dx = b.position[0] - a.position[0];
-      const dy = b.position[1] - a.position[1];
-      const length = Math.hypot(dx, dy) || 1;
-      const normal = [-dy / length, dx / length];
-      for (const [point, side] of [
-        [a, -1],
-        [a, 1],
-        [b, 1],
-        [a, -1],
-        [b, 1],
-        [b, -1],
-      ] as const) {
-        position.push(...point.position);
-        across.push((normal[0] ?? 0) * side, (normal[1] ?? 0) * side);
-        flow.push(point.flow);
-        grow.push(point.grow);
-        sway.push(point.sway);
-      }
-    }
-  }
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new Float32BufferAttribute(position, 3));
-  geometry.setAttribute("across", new Float32BufferAttribute(across, 2));
-  geometry.setAttribute("flow", new Float32BufferAttribute(flow, 1));
-  geometry.setAttribute("grow", new Float32BufferAttribute(grow, 1));
-  geometry.setAttribute("sway", new Float32BufferAttribute(sway, 1));
-  return geometry;
+/** The atlas of every character of the source, drawn once in light ink, and the cell of each character in order. */
+function atlas() {
+  const flow = source.replace(/\s+/g, " ").trim();
+  const characters = [...new Set(flow)];
+  const rows = Math.ceil(characters.length / COLUMNS);
+  const canvas = new OffscreenCanvas(COLUMNS * CELL, rows * CELL);
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("no 2d context");
+  context.font = `500 ${CELL * 0.8}px ${FONTS}`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillStyle = "#fff";
+  const cells = new Map<string, number>();
+  characters.forEach((character, index) => {
+    cells.set(character, index);
+    context.fillText(character, (index % COLUMNS) * CELL + CELL / 2, Math.floor(index / COLUMNS) * CELL + CELL / 2);
+  });
+  const map = new CanvasTexture(canvas);
+  map.minFilter = LinearMipmapLinearFilter;
+  map.generateMipmaps = true;
+  const sequence = (index: number) => cells.get(flow[index % flow.length] ?? " ") ?? 0;
+  return { map, rows, count: characters.length, sequence };
 }
 
 export async function createScene(
@@ -109,109 +133,214 @@ export async function createScene(
   colors: Colors,
   pixelRatio: number,
   onLost: () => void,
-) {
-  const renderer = new WebGPURenderer({ canvas, antialias: true, alpha: true, forceWebGL: tier === "webgl2" });
+): Promise<GlyphScene> {
+  const renderer = new WebGPURenderer({ canvas, antialias: true, forceWebGL: tier === "webgl2" });
   renderer.onDeviceLost = onLost;
   await renderer.init();
   renderer.setPixelRatio(Math.min(pixelRatio, 2));
 
-  const { frame: box, left, seed } = HERO;
-  const plant: Plant = retamaPlant(retamaShape(seed, box), seed);
+  const glyphs = atlas();
+  const plant = retamaPlant(retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots), HERO.seed);
   const scene = new Scene();
-  const camera = new PerspectiveCamera(FOV, 1, 1, 10000);
+  scene.background = new Color(colors.ground);
+  const camera = new PerspectiveCamera(FOV, 1, 1, 20000);
+  const pipeline = new RenderPipeline(renderer);
+  const drawn = pass(scene, camera).getTextureNode();
+  // Only what is brighter than the ink blooms: the glyphs in flight and the sap.
+  pipeline.outputNode = drawn.add(bloom(drawn, 0.9, 0.4, 0.9));
 
   const clock = uniform(0);
-  const grown = uniform(0);
   const sap = uniform(0);
-  // Half a CSS pixel in poster units, so a ribbon of width 2 is one pixel wide on the ground plane.
-  const pixel = uniform(0.5);
   const pointer = uniform(new Vector3());
   const storm = uniform(0);
-
-  const material = (base: string, pulse: string, width: number) => {
-    // Ribbons turn their back to the camera on half their segments, so both faces draw.
-    const node = new MeshBasicNodeMaterial({ side: DoubleSide });
-    const sway = attribute<"float">("sway");
-    node.positionNode = Fn(() => {
-      const rest = positionLocal;
-      const near = float(1)
-        .sub(smoothstep(0, STORM_RADIUS, rest.xy.sub(pointer.xy).length()))
-        .mul(storm);
-      const gust = vec3(
-        mx_noise_float(vec3(rest.x.mul(GUST), rest.y.mul(GUST), clock.mul(0.35))),
-        0,
-        mx_noise_float(vec3(rest.y.mul(GUST), rest.x.mul(GUST), clock.mul(0.35).add(17))),
-      ).mul(sway.mul(WIND).mul(near.mul(STORM).add(1)));
-      const flutter = vec3(
-        mx_noise_float(vec3(rest.x.mul(GUST * 5), rest.y.mul(GUST * 5), clock.mul(2.4))),
-        0,
-        mx_noise_float(vec3(rest.y.mul(GUST * 5), rest.x.mul(GUST * 5), clock.mul(2.4).add(29))),
-      ).mul(near.mul(sway).mul(FLUTTER));
-      const across = attribute<"vec2">("across").mul(pixel.mul(width));
-      return rest.add(gust).add(flutter).add(vec3(across, 0));
-    })();
-    const flow = varying(attribute<"float">("flow"));
-    const grow = varying(attribute<"float">("grow"));
-    node.colorNode = Fn(() => {
-      grow.greaterThan(grown).discard();
-      const phase = fract(flow.sub(clock.mul(SAP_SPEED)).div(SAP_SPACING));
-      const lit = smoothstep(1 - SAP_TAIL / SAP_SPACING, 1, phase).mul(sap);
-      return mix(color(new Color(base)), color(new Color(pulse)), lit);
-    })();
-    return node;
+  // Every stem and root leaves the crown, so the glyphs crowd there: they thin out near it.
+  const crown = uniform(new Vector3());
+  const rgb = (css: string) => {
+    const { r, g, b } = new Color(css);
+    return vec3(r, g, b);
   };
+  const ink = rgb(colors.ink);
+  const muted = rgb(colors.muted);
+  const primary = rgb(colors.primary);
 
-  const group = (kinds: StrokeKind[]) => plant.strokes.filter((stroke) => kinds.includes(stroke.kind));
-  const meshes = [
-    new Mesh(ribbon(group(["root"])), material(colors.muted, colors.primary, 1)),
-    new Mesh(ribbon(group(["stem"])), material(colors.ink, colors.primary, 1)),
-    new Mesh(ribbon(group(["taproot"])), material(colors.primary, colors.ink, 2)),
-  ];
-  for (const mesh of meshes) {
-    // The wind moves vertices outside the geometry's bounds, and the plant is always in view.
-    mesh.frustumCulled = false;
-    scene.add(mesh);
-  }
-
-  // The poster's view: "xMidYMin slice" of its viewBox, rebuilt with a camera looking at the ground plane.
-  let view = { scale: 1, left: 0, top: 0 };
+  let mesh: InstancedMesh | undefined;
+  let stage: Stage = { width: 1, height: 1 };
+  let top = 0;
   let force = 0;
   let blowing = false;
+  let at: [number, number] | undefined;
   let elapsed = 0;
+
+  /** One mesh for every group of glyphs, each group drawn at its own size in pixels. */
+  function build(groups: { glyphs: Glyph[]; size: number }[]) {
+    const list = groups.flatMap(({ glyphs: group, size }) => group.map((glyph) => ({ glyph, size })));
+    const origin = new Float32Array(list.length * 3);
+    const target = new Float32Array(list.length * 3);
+    const meta = new Float32Array(list.length * 4);
+    const plantData = new Float32Array(list.length * 4);
+    list.forEach(({ glyph, size }, index) => {
+      origin.set(glyph.origin, index * 3);
+      target.set(glyph.target, index * 3);
+      meta.set([glyph.cell, glyph.angle, glyph.delay, glyph.kind], index * 4);
+      plantData.set([glyph.flow, glyph.sway, glyph.seed, size], index * 4);
+    });
+    const from = instancedBufferAttribute<"vec3">(new InstancedBufferAttribute(origin, 3));
+    const to = instancedBufferAttribute<"vec3">(new InstancedBufferAttribute(target, 3));
+    const info = instancedBufferAttribute<"vec4">(new InstancedBufferAttribute(meta, 4));
+    const life = instancedBufferAttribute<"vec4">(new InstancedBufferAttribute(plantData, 4));
+
+    const material = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: AdditiveBlending });
+    const kind = info.w;
+    const word = kind.lessThan(0.5);
+    const seed = life.z;
+    const progress = clamp(clock.sub(info.z).div(select(word, float(FLIGHT.word), float(FLIGHT.plant))), 0, 1);
+    // Ease in and out for the word, which assembles; ease in for the rain, which falls.
+    const eased = select(word, progress.mul(progress).mul(float(3).sub(progress.mul(2))), progress.mul(progress));
+    const flying = eased.mul(float(1).sub(eased)).mul(4);
+    const landed = progress.greaterThanEqual(1);
+    // How close the pointer is to where the glyph rests, from 0 to 1, while it blows.
+    const away = to.xy.sub(pointer.xy);
+    const near = exp(
+      away
+        .dot(away)
+        .div(STORM_RADIUS * STORM_RADIUS)
+        .negate(),
+    ).mul(storm);
+
+    const place = Fn(() => {
+      const rest = to.toVar();
+      const travel = mix(from, to, eased);
+      const swirl = vec3(
+        mx_noise_float(vec3(seed.mul(53), clock.mul(0.7), 0)),
+        mx_noise_float(vec3(seed.mul(53).add(7), clock.mul(0.7), 3)),
+        mx_noise_float(vec3(seed.mul(53).add(13), clock.mul(0.7), 5)),
+      ).mul(flying.mul(180));
+      // The pointer's wind: gusts grow wider around it, and the glyphs within its reach stir and rise a little.
+      const gust = vec3(
+        mx_noise_float(vec3(rest.x.mul(GUST), rest.y.mul(GUST), clock.mul(0.35))),
+        mx_noise_float(vec3(rest.y.mul(GUST), rest.x.mul(GUST), clock.mul(0.35).add(31))).mul(0.3),
+        mx_noise_float(vec3(rest.y.mul(GUST), rest.x.mul(GUST), clock.mul(0.35).add(17))),
+      ).mul(life.y.mul(WIND).mul(near.mul(STORM).add(1)));
+      const stir = vec3(normalize(away.add(vec2(0.001, 0))).mul(STIR), seed.mul(RISE)).mul(near);
+      // Each glyph turns with its stroke and swells a little while it flies.
+      const scale = life.w.mul(flying.mul(0.5).add(1));
+      const corner = positionGeometry.xy.mul(scale);
+      const turn = vec2(
+        corner.x.mul(cos(info.y)).sub(corner.y.mul(sin(info.y))),
+        corner.x.mul(sin(info.y)).add(corner.y.mul(cos(info.y))),
+      );
+      return travel
+        .add(swirl)
+        .add(gust.mul(select(landed, float(1), float(0))))
+        .add(stir)
+        .add(vec3(turn, 0));
+    });
+    material.positionNode = place();
+
+    // While it flies a glyph cycles through characters; at rest it shows its own, and now and then one flickers.
+    const shuffled = floor(hash(seed.mul(1000).add(floor(clock.mul(22)))).mul(glyphs.count));
+    const flicker = hash(seed.mul(733).add(floor(clock.mul(2.5)))).greaterThan(0.994);
+    const awake = near.greaterThan(0.3);
+    const cell = varying(select(landed.and(flicker.not()).and(awake.not()), info.x, shuffled));
+    const heat = varying(flying);
+    const wake = varying(near.mul(WAKE).add(1));
+    const appear = varying(
+      smoothstep(0, 0.12, clock.sub(info.z)).mul(select(word, float(1), smoothstep(0, 0.2, progress))),
+    );
+    const depth = varying(
+      clamp(to.z.div(1200).add(1), 0.35, 1).mul(
+        select(word, float(1), smoothstep(0, CROWN, to.xy.sub(crown.xy).length()).mul(0.85).add(0.15)),
+      ),
+    );
+    const flow = varying(life.x);
+    const sort = varying(kind);
+
+    material.colorNode = Fn(() => {
+      const base = select(
+        sort.lessThan(0.5),
+        ink,
+        select(sort.lessThan(1.5), ink.mul(0.85), select(sort.lessThan(2.5), muted, primary.mul(1.4))),
+      );
+      const phase = fract(flow.sub(clock.mul(SAP_SPEED)).div(SAP_SPACING));
+      const lit = smoothstep(1 - SAP_TAIL / SAP_SPACING, 1, phase)
+        .mul(sap)
+        .mul(select(sort.lessThan(0.5), float(0), float(1)));
+      const pulse = select(sort.greaterThan(2.5), ink.mul(HOT), primary.mul(HOT));
+      return mix(mix(base.mul(wake), primary.mul(HOT), heat), pulse, lit);
+    })();
+    material.opacityNode = Fn(() => {
+      const column = mod(cell, COLUMNS);
+      const row = floor(cell.div(COLUMNS));
+      const spot = vec2(column.add(uv().x), float(glyphs.rows).sub(row).sub(1).add(uv().y)).div(
+        vec2(COLUMNS, glyphs.rows),
+      );
+      return texture(glyphs.map, spot).a.mul(appear).mul(depth);
+    })();
+
+    const next = new InstancedMesh(new PlaneGeometry(1, 1), material, list.length);
+    // The glyphs move far from where the mesh starts, and they are always in view.
+    next.frustumCulled = false;
+    return next;
+  }
+
+  function aim() {
+    const distance = stage.height / 2 / Math.tan(((FOV / 2) * Math.PI) / 180);
+    const drift = Math.sin(elapsed * 0.13) * 24 + (at ? (at[0] / stage.width - 0.5) * -40 : 0);
+    const centre = { x: stage.width / 2, y: -(top + stage.height / 2) };
+    camera.position.set(centre.x + drift, centre.y, distance);
+    camera.lookAt(centre.x, centre.y, 0);
+  }
 
   return {
     frame(dt) {
       elapsed += dt;
       clock.value = elapsed;
-      const growth = Math.min(1, elapsed / GROW_SECONDS);
-      grown.value = 1 - (1 - growth) ** 3;
-      sap.value = Math.min(1, Math.max(0, elapsed - GROW_SECONDS));
+      sap.value = Math.min(1, Math.max(0, (elapsed - (RAIN_START + RAIN_SPAN + 0.6)) / 1.5));
       force = stormForce(force, blowing, dt);
       storm.value = force;
-      renderer.render(scene, camera);
+      aim();
+      pipeline.render();
     },
-    resize(width, height) {
-      renderer.setSize(width, height, false);
-      const scale = Math.max(width / box.width, height / box.height);
-      const visible = { width: width / scale, height: height / scale };
-      const centre = { x: left + box.width / 2, y: box.ground - visible.height / 2 };
-      view = { scale, left: centre.x - visible.width / 2, top: box.ground };
-      camera.aspect = width / height;
-      camera.position.set(centre.x, centre.y, visible.height / 2 / Math.tan(((FOV / 2) * Math.PI) / 180));
-      camera.lookAt(centre.x, centre.y, 0);
+    layout(next, words) {
+      stage = next;
+      renderer.setSize(stage.width, stage.height, false);
+      camera.aspect = stage.width / stage.height;
       camera.updateProjectionMatrix();
-      pixel.value = 0.5 / scale;
+      const placement = plantPlacement(stage);
+      crown.value.set(placement.x, -placement.ground, 0);
+      const spacing = Math.min(10, Math.max(5, placement.scale * 11));
+      const rain = words[0]?.samples ?? [];
+      const groups = [
+        ...words.map(({ samples, step }, index) => ({
+          glyphs: wordGlyphs(samples, glyphs.sequence, HERO.seed + index),
+          size: step * 2.2,
+        })),
+        { glyphs: plantGlyphs(plant, placement, spacing, rain, glyphs.sequence, HERO.seed), size: spacing * 1.35 },
+      ];
+      if (mesh) {
+        scene.remove(mesh);
+        mesh.geometry.dispose();
+        (mesh.material as MeshBasicNodeMaterial).dispose();
+      }
+      mesh = build(groups);
+      scene.add(mesh);
+      aim();
     },
-    point(at) {
-      blowing = at !== undefined;
-      if (at) pointer.value.set(view.left + at[0] / view.scale, view.top - at[1] / view.scale, 0);
+    scroll(next) {
+      top = next;
+      if (at) pointer.value.set(at[0], -(top + at[1]), 0);
+    },
+    point(next) {
+      at = next;
+      blowing = next !== undefined;
+      if (next) pointer.value.set(next[0], -(top + next[1]), 0);
     },
     dispose() {
-      for (const mesh of meshes) {
-        mesh.geometry.dispose();
-        mesh.material.dispose();
-      }
+      mesh?.geometry.dispose();
+      (mesh?.material as MeshBasicNodeMaterial | undefined)?.dispose();
+      glyphs.map.dispose();
+      pipeline.dispose();
       renderer.dispose();
     },
-  } satisfies PlantScene;
+  };
 }

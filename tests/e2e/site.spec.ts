@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 const pages = [
-  { path: "/", lang: "es", other: "/en/" },
-  { path: "/en/", lang: "en", other: "/" },
+  { path: "/", lang: "es", other: "/en/", title: "Software a medida" },
+  { path: "/en/", lang: "en", other: "/", title: "Software made to measure" },
 ];
 
 async function sitemapUrls(request: import("@playwright/test").APIRequestContext): Promise<string[]> {
@@ -53,12 +53,22 @@ for (const { path } of pages) {
 test.describe("sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false });
 
-  for (const { path } of pages) {
+  for (const { path, title } of pages) {
     test(`${path} tiene encabezado y texto en el HTML`, async ({ page }) => {
       await page.goto(path);
       await expect(page.locator("h1")).toHaveCount(1);
-      await expect(page.locator("h1")).not.toBeEmpty();
+      // DESIGN.md Layout: the first chapter says what Retama makes; "Retama" is only the wordmark.
+      await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+      await expect(page.locator('[data-chapter="hero"]')).not.toContainText("Retama");
       await expect(page.locator("main p").first()).not.toBeEmpty();
+    });
+
+    test(`${path} lleva a contacto desde la acción fija de la cabecera`, async ({ page }) => {
+      await page.goto(path);
+      // It may be faded out over the first chapter, but it is always in the header.
+      const talk = page.locator("header a[data-talk]");
+      await expect(talk).toHaveCount(1);
+      await expect(page.locator(`main ${await talk.getAttribute("href")}`)).toHaveCount(1);
     });
 
     test(`${path} trae el tablero completo: grupos, fragmentos, imágenes acreditadas y contacto (DESIGN.md)`, async ({

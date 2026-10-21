@@ -47,13 +47,15 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
   </head>
   <body>
     <div class="h-bar bg-primary" aria-hidden="true"></div>
-    <!-- The header text lines up with the text inside the tiles: page margin plus tile padding. -->
+    <!-- The header text lines up with the text inside the tiles: page margin plus tile padding. A page may add its
+         navigation between the wordmark and the language switch (slot "nav"). -->
     <header class="px-margin py-md">
-      <div class="flex items-center justify-between gap-md px-tile-sm md:px-tile">
+      <div class="flex flex-wrap items-center justify-between gap-x-lg gap-y-sm px-tile-sm md:px-tile">
         <a class="feedback type-wordmark text-on-surface hover:text-primary" href={localizedPath(locale, "/")}>
           <Wordmark class="block" />
           <span class="sr-only">Retama</span>
         </a>
+        <slot name="nav" />
         <a class="lang-switch feedback type-small text-on-surface hover:text-primary" href={localizedPath(other, page)} hreflang={other} lang={other}>
           {t(locale)["nav.switchLabel"]}
         </a>

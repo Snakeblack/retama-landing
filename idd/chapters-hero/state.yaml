@@ -1,0 +1,148 @@
+{
+  "schema": "idd-state/v1",
+  "change": "chapters-hero",
+  "mode": "idd",
+  "status": "open",
+  "intent": {
+    "kind": "feature",
+    "summary": "Portada por capítulos (1/4): DESIGN.md y roadmap del hito, estructura de capítulos, cabecera con Hablemos fijo y hero «Software / a medida» con efecto de código sobre la escena 3D",
+    "acceptance": "En / y /en/ el primer capítulo muestra «Software» a tamaño display con «a medida» debajo, la retama 3D crece bajo la palabra, el h1 dice qué es Retama, «Retama» solo aparece como logo, el tablero del hero desaparece y un «Hablemos» fijo lleva al contacto; DESIGN.md describe los capítulos y pnpm design:lint, lint, test y e2e pasan"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿qué efecto exacto tiene la palabra al cargar (descifrado desde el código, glifos que ciclan o lluvia tipo matrix) y qué hace el cursor después?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿adónde van las cifras (100, 0), los cinco datos y el fragmento ADR que hoy viven en el hero (src/components/board/Hero.astro:56)?"
+      },
+      {
+        "category": "persistence",
+        "question": "¿cómo se reparte el hito en changes y PRs encadenados y dónde va en el roadmap (docs/roadmap.md)?"
+      },
+      {
+        "category": "copy",
+        "question": "¿el h1 es «Software a medida» con una frase de qué hacemos o sigue el manifiesto actual (src/i18n/es.ts:15), y se aprueba el copy es/en recortado por capítulos (unas 300 palabras visibles)?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿los enlaces de sección (anclas traducidas) pasan a la cabecera o desaparecen?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿dónde vive el «Hablemos» fijo, cuándo se oculta y qué pasa sin JS o en navegadores sin scroll-driven animations?"
+      },
+      {
+        "category": "errors",
+        "question": "¿qué se ve con movimiento reducido, sin WebGPU/WebGL o sin JS en el hero?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/roadmap.md",
+      "src/components/Home.astro",
+      "src/components/board/Hero.astro",
+      "src/components/board/Method.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/scripts/motion.ts",
+      "src/styles/global.css",
+      "src/styles/theme.css",
+      "tests/e2e/motion.spec.ts",
+      "tests/e2e/site.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0006, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": null
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": null
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Efecto: descifrado (la palabra nace hecha del código de la web y se asienta en tinta sólida de izquierda a derecha en ~1,1 s, solo CSS, luego la lupa con el cursor). Manifiesto: dos frases grandes a tamaño headline que pasan de gris a tinta palabra a palabra. Servicios: trama de puntos de la retama generada en build. Sí, todo: hito M2.5 en 4 PRs encadenados (chapters-hero; manifiesto; servicios; método en papel + Hablemos + sectores), cabecera con logo + 3 enlaces con anclas traducidas + English, Hablemos fijo abajo a la derecha que se oculta sobre hero y contacto y queda visible sin JS o sin scroll-driven, h1 «Software a medida» con frase de qué hacemos, cifras 100/0 y fragmento ADR a Método, lista de cinco datos fuera, copy del archivo copy-capitulos.md, con movimiento reducido o sin GPU la palabra quieta y el póster.",
+      "source": "user"
+    }
+  ],
+  "evidence": [],
+  "base": "1d392caf434dac514ff85e17f439a7be58fcd209"
+}

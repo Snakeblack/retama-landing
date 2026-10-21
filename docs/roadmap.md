@@ -42,6 +42,18 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 - Secciones Servicios, Sectores y Método con apoyo visual y poco texto.
 - Parallax y microanimaciones con GSAP/Lenis dentro del presupuesto.
 
+## M2.5 — Portada por capítulos
+
+**Objetivo:** una portada al grano, con una idea por pantalla y unas 300 palabras visibles, manteniendo los tokens y la esencia (dirección «Colour chapters» de taste-skill, DESIGN.md).
+
+**Entra (un change por PR, encadenados):**
+1. `chapters-hero`: «Software» a tamaño display, que se descifra desde el código, y «a medida» debajo; la retama crece bajo la palabra; cabecera con enlaces y «Hablemos» fijo. Las cifras y el fragmento ADR pasan a Método.
+2. Manifiesto fijo, como mucho 1,5 pantallas: dos frases que pasan de gris a tinta palabra a palabra con el scroll.
+3. Servicios: cuatro tarjetas con una trama de puntos de la retama generada en el build.
+4. Método en papel claro con sus pruebas, capítulo «Hablemos» y Sectores con más aire.
+
+**Hecho cuando:** los cuatro changes están en `main`, el inspector de taste-skill no da ningún FAIL y Lighthouse sigue en 100.
+
 ## M3 — Contacto
 
 - Formulario y función `/api/contact` con TDD: Turnstile, honeypot, rate limit, Resend y bandeja de respaldo.

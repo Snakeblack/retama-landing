@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Retama
-description: Graphite board of flat tiles with one safety-orange accent, set in Stack Sans. Art direction "The well-kept board" (taste-skill dense-tiles, M1).
+description: Graphite chapters of flat tiles with one safety-orange accent, set in Stack Sans. Art direction "Colour chapters" (taste-skill colour-chapters, M2.5) over the tiles of "The well-kept board" (dense-tiles, M1).
 colors:
   primary: "#FF4A1F"
   on-primary: "#18191B"
@@ -20,7 +20,7 @@ typography:
     letterSpacing: -0.022em
   display-sm:
     fontFamily: Stack Sans Headline
-    fontSize: 104px
+    fontSize: 72px
     fontWeight: 300
     lineHeight: "0.9"
     letterSpacing: -0.022em
@@ -185,11 +185,11 @@ components:
 
 Retama is a remote-only software engineering firm from Spain. The page has to read as serious, elegant and technically ahead, with little text and a picture behind every claim (`docs/product/brief.md`).
 
-The art direction is **The well-kept board**, dealt by taste-skill (`dense-tiles`, seed 571009059, sector agency, tone technical) and chosen by the owner on 2026-10-21. The hero slot was redrawn once, from "Sheet with a text cell" to "Name band and rails", because the first deal filled the first screen with photographs Retama does not have and set nothing at display size, which contradicts the progressive 3D hero of ADR 0004.
+The art direction is **Colour chapters**, dealt by taste-skill (`colour-chapters`, seed 716104575, sector agency, tone technical, palette and type kept) for the M2.5 redesign the owner chose on 2026-10-21. It follows **The well-kept board** (`dense-tiles`, seed 571009059, M1), whose tiles, tokens and fragments it keeps: the board packed six to ten tiles into every screen, so the page read dense rather than direct.
 
-The whole page is one board of flat tiles fitted edge to edge with narrow gaps, like a tidy desk seen from above. Each tile holds one true thing: the name, a statement, a picture, a figure, a short list, a link. There is no sequence of bands: the board continues down the page with the same sizes, and its last row is the footer.
+The home is a sequence of chapters, one idea per screen, and the scroll tells it: the word of what Retama makes with the retama growing under it, the manifesto, the services, the sectors, the method and the contact. Inside a chapter the content still sits on flat tiles fitted edge to edge with narrow gaps; between chapters the ground may change, but never inside one. The page stays graphite, and the method chapter turns to the light paper of the field. The redesign lands chapter by chapter (docs/roadmap.md, M2.5); a group not rebuilt yet keeps its board tiles.
 
-**The idea.** A retama lives on poor, dry ground because of what nobody sees: a root system many times deeper than the shrub is tall. Retama works the same way: the visible software stands on documented decisions underneath. On this page, **the retama's deep roots and the firm's written decisions become the board's tiles**: the large central tile of the first screen holds the 3D scene of the plant's stems and roots, and the method tiles read like decision records (a number, a decision, its reason). The live thing comes from the same idea: in the method group the visitor picks one of four kinds of project and reads the first three decisions Retama would record for it. It is a native exclusive accordion (`<details name>`), so it works without JavaScript and keeps nothing in the URL.
+**The idea.** A retama lives on poor, dry ground because of what nobody sees: a root system many times deeper than the shrub is tall. Retama works the same way: the visible software stands on documented decisions underneath. On this page, **the retama's deep roots and the firm's written decisions become the page's chapters**: the scene of the first chapter grows the plant's stems and roots under the word of what Retama makes, and the method tiles read like decision records (a number, a decision, its reason). The live thing comes from the same idea: in the method group the visitor picks one of four kinds of project and reads the first three decisions Retama would record for it. It is a native exclusive accordion (`<details name>`), so it works without JavaScript and keeps nothing in the URL.
 
 ## Colors
 
@@ -208,20 +208,22 @@ Contrast on the ground: on-surface 15.4:1, on-surface-muted 6.6:1 and primary 5.
 
 **Stack Sans** (SIL Open Font License), self-hosted from the pinned `@fontsource-variable/stack-sans-headline` and `@fontsource-variable/stack-sans-text` packages through Astro's font API, which also generates metric-matched fallbacks so the swap does not shift the layout. Only the latin subset ships; it covers Spanish and English.
 
-- **Stack Sans Headline** sets everything at large size, in a light 300 weight with tight tracking: the name at display size, section headings and single statements inside tiles. The wordmark uses the same face at 500.
+- **Stack Sans Headline** sets everything at large size, in a light 300 weight with tight tracking: the word of the first chapter at display size, section headings and single statements inside tiles. The wordmark uses the same face at 500.
 - **Stack Sans Text** sets running text at 400, run-in phrases and action labels at 500, and small print.
 
-The page uses five sizes on desktop: 14 (small), 18 (body, labels), 32 (statement), 64 (headline) and 200 (display). On phones, below the `md` breakpoint (768px), the large three step down to 22, 36 and 104 (the `-sm` tokens). Each level is one utility generated with the theme, `type-<level>` (for example `type-headline-sm md:type-headline`), which sets family, size, line height, tracking and weight together. Sentence case everywhere; no uppercase labels, no monospace (the one exception is the texture inside the code lens, see Motion and 3D), no styled accent word inside a headline. A heading may be two-tone, muted then full ink.
+The page uses five sizes on desktop: 14 (small), 18 (body, labels), 32 (statement), 64 (headline) and 200 (display). On phones, below the `md` breakpoint (768px), the large three step down to 22, 36 and 72 (the `-sm` tokens); the display word keeps its phone size up to `lg` (1024px), because at 200px it needs the width of the 12-column grid. Each level is one utility generated with the theme, `type-<level>` (for example `type-headline-sm md:type-headline`), which sets family, size, line height, tracking and weight together. Sentence case everywhere; no uppercase labels, no monospace (the one exception is the texture inside the code lens, see Motion and 3D), no styled accent word inside a headline. A heading may be two-tone, muted then full ink.
 
 ## Layout
 
 A 12-column grid that fills the viewport with **12px outer margins** and **8px gaps** at every width. Tiles take only four sizes on the mosaic (6×5, 6×3, 3×3 and 3×2 columns × 96px rows), so the board stays a system and never becomes a card grid: neighbouring tiles never hold the same kind of thing. Text inside a tile is top-left aligned on 24px padding (20px on phones) and is never centred. Running text stops at 640px (`measure`).
 
-Groups of the board (services, sectors, method, questions, contact) are separated by 128px (`section`), clearly more than any gap inside a group, and each group opens with a heading tile that names it. The first screen carries the page's one `h1`.
+Chapters (services, sectors, method, questions, contact) are separated by 128px (`section`), clearly more than any gap inside one, and each opens with a heading that names it. The first chapter carries the page's one `h1`.
 
-The phone is its own board: two columns with the same gaps, re-ordered so the name and the statement lead, the scene spans both columns and pairs of small tiles sit side by side. On touch screens the board's text is not selectable, so a scroll or a tap never starts a selection; the contact group stays selectable so the address can be copied. The two-column board holds up to the `lg` breakpoint (1024px); the 12-column mosaic starts there, because below it a 3-column tile is too narrow for a statement. Rows are 96px and grow when a tile's content needs more (the `board-rows` utility), and a picture never sizes its row: it fills its tile absolutely.
+The header is a plain bar: the wordmark, the links to the services, sectors and method chapters (their anchors are translated per language) and the language switch; on phones the links take a row of their own under the other two. The one action, **Hablemos**, is a button-primary fixed to the lower right corner on the page margin. It fades out while the first chapter (which has its own action) or the contact chapter is on screen, through scroll-driven animations; where those do not exist, or with the keyboard on it, it simply stays.
 
-The first screen follows "Name band and rails": the name band; a row of three link tiles to the groups (their anchors are translated per language) beside the one action, an orange tile that leads to the contact group; and three columns: on the left the decision record of the scene (a `data-ui` fragment of ADR 0004) over a list of five facts, in the centre the scene tile with the `h1` statement tile in the ground tone laid over its lower left, and on the right two figures.
+The phone is its own board: two columns with the same gaps, re-ordered so the word and the lead come first, the scene spans both columns and pairs of small tiles sit side by side. On touch screens the board's text is not selectable, so a scroll or a tap never starts a selection; the contact group stays selectable so the address can be copied. The two-column board holds up to the `lg` breakpoint (1024px); the 12-column mosaic starts there, because below it a 3-column tile is too narrow for a statement. Rows are 96px and grow when a tile's content needs more (the `board-rows` utility), and a picture never sizes its row: it fills its tile absolutely.
+
+The first chapter says what Retama makes in one word: "Software" at display size with "a medida" (made to measure) at headline size under it, together the page's `h1`, on the ground and not on a tile; beside it, from `lg`, the lead sentence and the action, an orange button that leads to the contact chapter; and across the whole width the scene tile, 16:9, where the retama grows under the word. "Retama" is only the wordmark in the header. On phones the word, the lead, the action and the scene follow each other.
 
 ## Elevation & Depth
 
@@ -236,7 +238,7 @@ Square corners on everything: tiles, photographs, the action and form fields (`r
 - **page:** ground, ink and body type of every page.
 - **top-bar:** the 6px primary bar across the top of the page.
 - **wordmark:** "Retama" drawn from Stack Sans Headline 500, as an inline SVG that takes the ink colour; the name is also in the page text for assistive technology.
-- **display / display-phone:** the name band of the first screen.
+- **display / display-phone:** the word of the first chapter.
 - **heading / heading-phone:** the heading tile that opens each group.
 - **tile / tile-phone:** an ordinary filled tile.
 - **tile-statement / tile-statement-phone:** a tile that holds one sentence at statement size.
@@ -249,7 +251,7 @@ Square corners on everything: tiles, photographs, the action and form fields (`r
 
 ## Imagery
 
-The retama is the brand's signature, not its subject: a visitor has to read a software firm within five seconds, and a board full of plants reads as a nursery. So the plant appears only twice: the scene of the first screen, and the Clusius plate in the method group, where the field tile beside it spells the idea out (roots deeper than the plant, decisions under the software). Every other picture slot holds an interface fragment drawn in HTML and marked `data-ui`: real work of this site where there is some (the decision record behind the hero scene, the quality gates every change passes), and otherwise an example that carries a visible "Example" label, never presented as a client's work (one per sector in the sectors group: a route dispatch panel, an approvals queue, a game economy editor and one client portal under three made-up brands). Fragments use the board's tokens: tiles in surface-raised, rows in surface, small type, the primary square as status mark, no borders or shadows. A found picture comes from an open collection with a licence that allows commercial use, is downloaded into the repository and credited in the footer. It is greyscale and baked that way into the file; an engraved plate is inverted onto the graphite, its paper turned into the raised tile tone and its lines into the light ink, so it reads as part of the board. Every picture is square-cornered and covers its tile with `object-fit: cover`, and a found picture shows the world around Retama, never Retama's product, office or team.
+The retama is the brand's signature, not its subject: a visitor has to read a software firm within five seconds, and a board full of plants reads as a nursery. So the plant appears only twice: the scene of the first chapter, and the Clusius plate in the method group, where the field tile beside it spells the idea out (roots deeper than the plant, decisions under the software). Every other picture slot holds an interface fragment drawn in HTML and marked `data-ui`: real work of this site where there is some (the decision record behind the 3D scene, shown in the method chapter, and the quality gates every change passes), and otherwise an example that carries a visible "Example" label, never presented as a client's work (one per sector in the sectors group: a route dispatch panel, an approvals queue, a game economy editor and one client portal under three made-up brands). Fragments use the board's tokens: tiles in surface-raised, rows in surface, small type, the primary square as status mark, no borders or shadows. A found picture comes from an open collection with a licence that allows commercial use, is downloaded into the repository and credited in the footer. It is greyscale and baked that way into the file; an engraved plate is inverted onto the graphite, its paper turned into the raised tile tone and its lines into the light ink, so it reads as part of the board. Every picture is square-cornered and covers its tile with `object-fit: cover`, and a found picture shows the world around Retama, never Retama's product, office or team.
 
 ## Motion and 3D
 
@@ -274,8 +276,8 @@ This table is the only place these values are written: `pnpm design:theme` gener
 
 The budget, per page:
 
-- **One signature move, the shutter:** the central tile of the first screen opens from its lower edge with a clip-path over `t-open` while the picture inside settles from 1.12 scale to rest. It happens once, in CSS on the first paint, so it needs no script.
-- **A second signature move, the code lens:** over the name band, a circle that follows the pointer shows the letters made of the site's own code (`src/lib/retama-shape.ts`, the generator of the scene) in tiny system monospace, the one place monospace appears, as texture and never as content to read. The layer is a copy of the name clipped to its own letters, so it lines up exactly, and a circular mask that follows the pointer through custom properties. On touch screens there is no pointer to follow, so after the shutter the code sweeps once across the whole name from the left over `t-open`, holds for `t-reveal` and leaves to the right, a soft-edged band rather than a circle; with reduced motion it does not travel and the code fades in over the whole name while the pointer is on it. The first screen has no other entrance, so nothing delays the largest paint.
+- **One signature move, the shutter:** the scene tile of the first chapter opens from its lower edge with a clip-path over `t-open` while the picture inside settles from 1.12 scale to rest. It happens once, in CSS on the first paint, so it needs no script.
+- **A second signature move, the code:** the word of the first chapter is made of the site's own code (`src/lib/retama-shape.ts`, the generator of the scene) in tiny system monospace, the one place monospace appears, as texture and never as content to read. The layer is a copy of the word clipped to its own letters, so it lines up exactly. **The decode:** on the first paint the word is all code; it holds for `t-reveal` and settles into solid ink from the left over `t-open`, as a soft edge sweeps the code off to the right. It is CSS, on every screen, and the ink word underneath is painted from the first frame, so it never delays the largest paint. **The lens:** afterwards, on a pointer screen, a circle that follows the pointer shows the code again through a circular mask moved by custom properties. With reduced motion there is no decode, and the lens does not travel: the code fades in over the whole word while the pointer is on it. The first chapter has no other entrance.
 - **Entrances:** inside each group, the heading, then the text, then the picture, staggered by `stagger-item`, rising 16–32px with opacity, once, as the group enters. A list arrives row by row and a figure counts up once; never the same fade on every block. The hidden starting state is set by the script itself, so without it everything is simply there.
 - **Feedback on every control:** press, hover and focus on the action, links, tiles that link and the live thing.
 - **One moving picture:** the 3D scene, which grows, sways in the wind and carries sap (below).

@@ -62,16 +62,32 @@
   }
 }
 
-/* DESIGN.md Motion: the shutter, the first signature move. It runs in CSS on the first paint, once,
-   so it needs no script; reduced motion drops it. */
-@media (prefers-reduced-motion: no-preference) {
-  [data-shutter] {
-    animation: shutter var(--t-open) var(--ease-expo) both;
-  }
+/* DESIGN.md Layout: the poster stands where the scene grows the plant (plantPlacement in glyph-scene.ts): its crown
+   at 70% of the width from lg and centred below it, the drawing 72% of the stage high resting 8% above its
+   bottom (50% and 6% on phones). */
+[data-chapter="hero"] [data-retama-poster] {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  height: 50%;
+  width: auto;
+  translate: -50% 0;
 
-  [data-shutter] > [data-retama-poster] {
-    animation: settle var(--t-open) var(--ease-soft) both;
+  @media (width >= 64rem) {
+    left: 70%;
+    bottom: 8%;
+    height: 72%;
   }
+}
+
+/* Once the scene runs, its glyphs assemble the words of the title over the HTML words, which give way (they stay for
+   assistive technology and search). */
+[data-glyph-word] {
+  transition: opacity var(--t-reveal) var(--ease-out);
+}
+
+[data-chapter="hero"]:has([data-scene-state="running"]) [data-glyph-word] {
+  opacity: 0;
 }
 
 /* ADR 0004: the 3D scene takes over from the poster once its first frame is drawn (scene.ts sets the state),
@@ -93,30 +109,12 @@
   opacity: 0;
 }
 
-/* The layer that pauses the scene fills a tile that clips its overflow, so its focus ring goes inside. */
+/* The layer that pauses the scene fills a stage that clips its overflow, so its focus ring goes inside. */
 [data-scene-pause]:focus-visible {
   outline-offset: calc(var(--spacing-focus) * -2);
 }
 
-@keyframes shutter {
-  from {
-    clip-path: inset(100% 0 0 0);
-  }
-  to {
-    clip-path: inset(0);
-  }
-}
-
-@keyframes settle {
-  from {
-    scale: 1.12;
-  }
-  to {
-    scale: 1;
-  }
-}
-
-/* DESIGN.md Motion: the code lens. The layer copies the name from data-text, so it lines up with the letters,
+/* DESIGN.md Motion: the code lens. The layer copies the word from data-text, so it lines up with the letters,
    fills them with the site's own code (/code-lens.svg) and shows only inside a circle the script moves.
    Without the script --lens stays 0 and nothing is drawn. */
 [data-lens] {
@@ -153,23 +151,76 @@
   mask-image: none;
 }
 
-/* On touch screens the code sweeps across the name instead: a soft-edged band whose leading edge
-   (--wipe-lead) and trailing edge (--wipe-tail) the script moves from 0 to 1, from left to right. */
-[data-lens][data-lens-wipe] {
-  --wipe-lead: 0;
-  --wipe-tail: 0;
-  --wipe-feather: 12%;
-  --wipe-span: calc(100% + 2 * var(--wipe-feather));
+/* DESIGN.md Motion: the decode. On the first paint the word is made of the site's code; it holds for t-reveal and
+   then settles into solid ink from the left over t-open, as a soft edge sweeps the code layer off to the right.
+   It is CSS, so it needs no script and the word is painted from the first frame; reduced motion drops it. The mask
+   is two and a half words wide: at 100% its opaque half covers the word, at 0% its clear half does. It fills
+   backwards only, so once it ends the layer is the lens again. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-decode]::after {
+    animation: decode var(--t-open) var(--ease-in-out) var(--t-reveal) backwards;
+  }
 }
 
-[data-lens][data-lens-wipe]::after {
-  mask-image: linear-gradient(
-    to right,
-    transparent calc(var(--wipe-tail) * var(--wipe-span) - var(--wipe-feather)),
-    var(--color-on-surface) calc(var(--wipe-tail) * var(--wipe-span)),
-    var(--color-on-surface) calc(var(--wipe-lead) * var(--wipe-span) - var(--wipe-feather)),
-    transparent calc(var(--wipe-lead) * var(--wipe-span))
-  );
+@keyframes decode {
+  from {
+    opacity: 1;
+    mask-image: linear-gradient(to right, transparent 40%, var(--color-on-surface) 60%);
+    mask-size: 250% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 100% 0;
+  }
+  to {
+    opacity: 1;
+    mask-image: linear-gradient(to right, transparent 40%, var(--color-on-surface) 60%);
+    mask-size: 250% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 0 0;
+  }
+}
+
+/* DESIGN.md Layout: the fixed action. Where scroll-driven animations exist it fades out while the first chapter
+   (which has its own action) or the contact chapter is on screen; elsewhere, and with the keyboard on it, it stays. */
+@supports (animation-timeline: view()) and (timeline-scope: none) {
+  :root {
+    timeline-scope: --chapter-hero, --chapter-contact;
+  }
+
+  [data-chapter="hero"] {
+    view-timeline: --chapter-hero;
+  }
+
+  [data-chapter="contact"] {
+    view-timeline: --chapter-contact;
+  }
+
+  [data-talk] {
+    animation:
+      talk-arrive linear both,
+      talk-leave linear both;
+    animation-timeline: --chapter-hero, --chapter-contact;
+    animation-range:
+      exit 40% exit 70%,
+      entry 20% entry 60%;
+  }
+
+  [data-talk]:focus-visible {
+    animation: none;
+  }
+}
+
+@keyframes talk-arrive {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes talk-leave {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 /* On touch screens a scroll or a tap never starts a text selection on the board; the contact group stays
