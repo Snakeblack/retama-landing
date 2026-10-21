@@ -1,45 +1,92 @@
 ---
 import { type Locale, t } from "../../i18n/index";
-import RoutesFragment from "./RoutesFragment.astro";
+import ExampleTable from "./ExampleTable.astro";
+import PortalFragment from "./PortalFragment.astro";
 
 interface Props {
   locale: Locale;
 }
 
-const copy = t(Astro.props.locale);
+const { locale } = Astro.props;
+const copy = t(locale);
+// DESIGN.md Imagery: one example fragment per sector. Every one is in the HTML: without the scene the sectors stack,
+// each with its fragment; the motion script turns them into the pinned scene of DESIGN.md Motion.
+const tables = {
+  logistics: {
+    caption: copy["frag.routes.caption"],
+    columns: [copy["frag.routes.route"], copy["frag.routes.stops"], copy["frag.routes.status"]],
+    rows: [
+      { cells: ["R-12", 14, copy["frag.routes.onRoute"]], alert: false },
+      { cells: ["R-07", 9, copy["frag.routes.loading"]], alert: false },
+      { cells: ["R-21", 11, copy["frag.routes.incident"]], alert: true },
+    ],
+  },
+  business: {
+    caption: copy["frag.approvals.caption"],
+    columns: [copy["frag.approvals.request"], copy["frag.approvals.team"], copy["frag.approvals.status"]],
+    rows: [
+      {
+        cells: [copy["frag.approvals.laptops"], copy["frag.approvals.finance"], copy["frag.approvals.pending"]],
+        alert: false,
+      },
+      {
+        cells: [copy["frag.approvals.supplier"], copy["frag.approvals.legal"], copy["frag.approvals.approved"]],
+        alert: false,
+      },
+      {
+        cells: [copy["frag.approvals.trip"], copy["frag.approvals.management"], copy["frag.approvals.returned"]],
+        alert: true,
+      },
+    ],
+  },
+  gaming: {
+    caption: copy["frag.economy.caption"],
+    columns: [copy["frag.economy.item"], copy["frag.economy.price"], copy["frag.economy.change"]],
+    rows: [
+      { cells: [copy["frag.economy.sword"], 140, copy["frag.economy.up"]], alert: false },
+      { cells: [copy["frag.economy.potion"], 30, copy["frag.economy.same"]], alert: false },
+      { cells: [copy["frag.economy.armour"], 380, copy["frag.economy.review"]], alert: true },
+    ],
+  },
+} as const;
 const sectors = [
-  ["sectors.item1", "sectors.item1Note"],
-  ["sectors.item2", "sectors.item2Note"],
-  ["sectors.item3", "sectors.item3Note"],
-  ["sectors.item4", "sectors.item4Note"],
+  ["sectors.item1", "sectors.item1Note", tables.logistics],
+  ["sectors.item2", "sectors.item2Note", tables.business],
+  ["sectors.item3", "sectors.item3Note", tables.gaming],
+  ["sectors.item4", "sectors.item4Note", undefined],
 ] as const;
 ---
 
 <section id={copy["anchor.sectors"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="sectors-title">
-  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
-    <h2 id="sectors-title" class="text-balance type-headline-sm md:type-headline">{copy["sectors.title"]}</h2>
+  <div class="col-span-2 grid grid-cols-1 gap-gap lg:col-span-12 lg:grid-cols-12" data-sectors>
+    <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-6" data-sectors-title>
+      <h2 id="sectors-title" class="text-balance type-headline-sm md:type-headline">{copy["sectors.title"]}</h2>
+    </div>
+
+    <ul class="grid grid-cols-1 gap-gap lg:col-span-12" data-sectors-steps>
+      {
+        sectors.map(([name, note, table]) => (
+          <li class="grid grid-cols-1 gap-gap lg:grid-cols-2">
+            <div class="grid content-start gap-sm bg-surface-raised p-tile-sm md:p-tile" data-sectors-name>
+              <p class="type-statement-sm md:type-statement">{copy[name]}</p>
+              <p class="type-small text-on-surface-muted" data-sectors-note>
+                {copy[note]}
+              </p>
+            </div>
+            <div data-sectors-frame>
+              {table ? <ExampleTable locale={locale} {...table} /> : <PortalFragment locale={locale} />}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 
-  <div class="col-span-2 lg:col-span-6 lg:row-span-3">
-    <RoutesFragment locale={Astro.props.locale} />
-  </div>
-
-  <ul class="col-span-2 grid gap-md bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
-    {
-      sectors.map(([name, note]) => (
-        <li>
-          <p class="type-statement-sm md:type-statement">{copy[name]}</p>
-          <p class="type-small text-on-surface-muted">{copy[note]}</p>
-        </li>
-      ))
-    }
-  </ul>
-
-  <p class="col-span-2 bg-surface-raised p-tile-sm type-statement-sm md:p-tile md:type-statement lg:col-span-3 lg:row-span-3">
+  <p class="col-span-2 bg-surface-raised p-tile-sm type-statement-sm md:p-tile md:type-statement lg:col-span-6 lg:row-span-2">
     {copy["sectors.statement"]}
   </p>
 
-  <p class="col-span-2 bg-field p-tile-sm text-on-field type-statement-sm md:p-tile md:type-statement lg:col-span-3 lg:row-span-3">
+  <p class="col-span-2 bg-field p-tile-sm text-on-field type-statement-sm md:p-tile md:type-statement lg:col-span-6 lg:row-span-2">
     {copy["sectors.field"]}
   </p>
 </section>

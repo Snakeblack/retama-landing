@@ -160,3 +160,47 @@
     user-select: text;
   }
 }
+
+/* DESIGN.md Motion: the pinned sectors scene. Without it the four sectors stack, each with its fragment. From lg with
+   motion the script sets data-pinned and holds the group: the heading and the four names stay on the left, the
+   active one in full ink with its note, and the four fragments stack on the right, the active one wiped in on top. */
+[data-sectors][data-pinned] {
+  /* Explicit rows, so the fragments can span from the heading to the last name. */
+  grid-template-rows: repeat(5, auto);
+
+  & [data-sectors-steps],
+  & [data-sectors-steps] > li {
+    display: contents;
+  }
+
+  & [data-sectors-title],
+  & [data-sectors-name] {
+    grid-column: 1 / span 6;
+  }
+
+  & [data-sectors-frame] {
+    grid-column: 7 / span 6;
+    grid-row: 1 / -1;
+  }
+
+  & [data-sectors-name] {
+    transition: color var(--t-hover) var(--ease-out);
+  }
+
+  & [data-sectors-name]:not([data-active]) {
+    color: var(--color-on-surface-muted);
+  }
+
+  & [data-sectors-note] {
+    transition: opacity var(--t-hover) var(--ease-out);
+  }
+
+  & [data-sectors-name]:not([data-active]) [data-sectors-note] {
+    opacity: 0;
+  }
+}
+
+/* The white-label example shows its first brand until the script cycles them. */
+[data-brand]:first-child {
+  z-index: 1;
+}
