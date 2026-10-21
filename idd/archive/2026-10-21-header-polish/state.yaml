@@ -1,0 +1,411 @@
+{
+  "schema": "idd-state/v1",
+  "change": "header-polish",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "lo de Software  a medida esta como demasiado pegado a la barra, y el botón indice, creo que simplemente sería el icono, que no ponga Indice",
+    "kind": "feature",
+    "summary": "Ajustes de la cabecera vistos en el móvil: más aire entre la barra y el título del hero, y botones Índice y Cerrar solo con icono",
+    "acceptance": "En el móvil el título «Software a medida» deja un hueco claro bajo la cabecera; los botones del índice muestran solo el icono en un objetivo táctil de 48×48 y conservan su nombre accesible (Índice/Contents, Cerrar/Close); los e2e y ospec check pasan"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Hero.astro",
+          "line": 42
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/ChapterIndex.astro",
+          "line": 19
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "simplemente sería el icono, que no ponga Indice"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 30
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 250
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 258
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "idd/header-polish/change.md",
+      "src/components/ChapterIndex.astro",
+      "src/components/board/Hero.astro",
+      "src/styles/global.css",
+      "tests/e2e/header.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0006",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Los nombres de los botones siguen en el HTML como aria-label; el índice sigue abriendo sin JS"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "Solo cambia el aire del título en el móvil; la escena muestrea el título desde el DOM y sus e2e pasan"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "El aire sale de tokens (header-height + lg) y los botones usan spacing-touch; design:lint limpio"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin style ni manejadores inline"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint limpio: theme sincronizado, --header-clearance y size-(--spacing-touch) solo con tokens",
+      "recorded_at": "2026-10-21T21:19:53.706Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T21:21:57.228Z",
+      "detail": {
+        "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T21:21:57.228Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T21:24:06.700Z",
+      "detail": {
+        "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+        "runs": [
+          "run-10",
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T21:24:06.700Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+        "fitness": [
+          "run-15",
+          "run-16",
+          "run-17",
+          "run-18"
+        ]
+      }
+    }
+  ],
+  "base": "b2eb21d26d0478e60e43b5c06455e8e439da587f",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:4f25659a4db503b1de30625e49e1043bd63d507066d6cd76de892b9048433862",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:cf5685b34e9be0f98c0fa386616785a249d8f910718d81595dc8d2a7f337a4f3",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:7b892e28a7218a5938ed919a7e422347f1c5c60e16b0c91265fe67bfb4125660",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:d648af07d72647db78039e2d42f7cdaabb0810c81f1a40c95ed70f8a9f824f9c",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:90b09bdd9c9006f2c7ffa5b17f27e7ef5e6a06f7441ea578de740c7ba846d494",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:a9dfe28a5ed9c37c2bf955c41b9c2b59e456bbc815b2546af2010740ae41c36d",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:e085501799cce671c107aca68bcdfee13e811e2ad7eac80cdb3374c9295d9893",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:eaf5af86f3623fd71dc00fdce347eb6cb1abc4a1333f27e2b0eb95df3db3316e",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:21:57.228Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:c9e1e9d40c2cc50c4da05662909660cbaf218374af994961dd470d84d2bc28d7",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:e1bc49acea4c12cc2f0837985926a28c57912127f822fc19f3037d053c4fb3f8",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:5a730d0b16985a64c9ca490535ac100c25c82ec527b42d4119132ce9a9293d41",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:bddeddc7216f474f6854b3368533c2aa43ca9d7d14a57bdcb10c1ad84b05ef4e",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:3cf08a1b3ce38340fd9891e332b293660129481dccf81f369f73478e604aa41a",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:b0d73f40b3c474235869706a18c99da43208b461e09f9758b3e92de200010719",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:c1ba29ab8693c2a05660ec7a0fe1c2183f428717c79fbac7e72d5bbf8d88d089",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:511b1f102461ac9caaa76f6ff0a1443bffecf91a741a51a086d75b375a914535",
+      "tree": "sha256:4b0eea10be722566708ebacc3009360b0eff4997c55a0d03d7994c508991f900",
+      "recorded_at": "2026-10-21T21:24:06.700Z"
+    }
+  ],
+  "closed_at": "2026-10-21T21:24:18.459Z"
+}

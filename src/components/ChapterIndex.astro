@@ -15,20 +15,21 @@ const entries = [{ anchor: "top", name: copy["nav.home"], title: `${copy["hero.w
 ---
 
 <!-- DESIGN.md Layout, the chapter index of phones: a native modal dialog opened and closed by invoker commands, so it
-     traps the focus, closes with Escape and needs no script; header.ts adds the rest (see there). -->
+     traps the focus, closes with Escape and needs no script; header.ts adds the rest (see there). Its two buttons are
+     icons on a touch-sized raised tile, named for assistive technology. -->
 <button
-  class="feedback flex min-h-(--spacing-touch) cursor-pointer items-center gap-sm bg-surface-raised px-md type-small text-on-surface hover:bg-field hover:text-on-field md:hidden"
+  class="feedback flex size-(--spacing-touch) cursor-pointer items-center justify-center bg-surface-raised text-on-surface hover:bg-field hover:text-on-field md:hidden"
   type="button"
   commandfor="chapter-index"
   command="show-modal"
   aria-haspopup="dialog"
+  aria-label={copy["nav.index"]}
   data-index-open
 >
   <svg class="size-md fill-current" viewBox="0 0 16 16" aria-hidden="true">
     <rect x="1" y="4" width="14" height="2"></rect>
     <rect x="1" y="10" width="14" height="2"></rect>
   </svg>
-  {copy["nav.index"]}
 </button>
 
 <dialog id="chapter-index" aria-label={copy["nav.index"]} data-index>
@@ -41,17 +42,17 @@ const entries = [{ anchor: "top", name: copy["nav.home"], title: `${copy["hero.w
       </a>
       <LangSwitch locale={locale} />
       <button
-        class="feedback flex min-h-(--spacing-touch) cursor-pointer items-center gap-sm bg-surface-raised px-md type-small text-on-surface hover:bg-field hover:text-on-field"
+        class="feedback flex size-(--spacing-touch) cursor-pointer items-center justify-center bg-surface-raised text-on-surface hover:bg-field hover:text-on-field"
         type="button"
         commandfor="chapter-index"
         command="close"
+        aria-label={copy["nav.close"]}
         autofocus
         data-index-close
       >
         <svg class="size-md fill-current" viewBox="0 0 16 16" aria-hidden="true">
           <path d="M2.3 3.7 3.7 2.3 8 6.6l4.3-4.3 1.4 1.4L9.4 8l4.3 4.3-1.4 1.4L8 9.4l-4.3 4.3-1.4-1.4L6.6 8Z"></path>
         </svg>
-        {copy["nav.close"]}
       </button>
     </div>
   </div>
