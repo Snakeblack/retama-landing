@@ -5,8 +5,15 @@ interface Props {
   locale: Locale;
   caption: string;
   columns: readonly string[];
-  /** The last cell of each row is a status, marked in primary when the row needs attention. */
-  rows: readonly { cells: readonly (string | number)[]; alert: boolean }[];
+  /**
+   * The last cell of each row is a status, marked in primary when the row needs attention. A row may carry the
+   * status it moves to while the fragment is on screen; it is written in the HTML, the motion script only swaps it.
+   */
+  rows: readonly {
+    cells: readonly (string | number)[];
+    alert: boolean;
+    next?: { text: string; alert: boolean };
+  }[];
 }
 
 const { locale, caption, columns, rows } = Astro.props;
@@ -33,19 +40,20 @@ const copy = t(locale);
     </thead>
     <tbody>
       {
-        rows.map(({ cells, alert }) => (
-          <tr class="bg-surface">
+        rows.map(({ cells, alert, next }) => (
+          <tr class="bg-surface" data-live={next?.text} data-live-alert={next ? String(next.alert) : undefined}>
             {cells.slice(0, -1).map((cell) => (
               <td class="px-sm py-md md:p-md">{cell}</td>
             ))}
             <td class="px-sm py-md md:p-md">
               <span class="flex items-center gap-sm">
-                {alert ? (
-                  <span class="size-sm shrink-0 bg-primary" aria-hidden="true" />
-                ) : (
-                  <span class="size-sm shrink-0 bg-on-surface-muted" aria-hidden="true" />
-                )}
-                {cells.at(-1)}
+                <span
+                  class="size-sm shrink-0 bg-on-surface-muted data-alert:bg-primary"
+                  aria-hidden="true"
+                  data-live-mark
+                  data-alert={alert ? "" : undefined}
+                />
+                <span data-live-text>{cells.at(-1)}</span>
               </span>
             </td>
           </tr>

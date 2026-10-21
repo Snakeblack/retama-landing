@@ -11,30 +11,23 @@ const tileOpacities = (page: Page) =>
 const lensValue = (page: Page, name: string) =>
   page.locator("[data-lens]").evaluate((lens, property) => getComputedStyle(lens).getPropertyValue(property), name);
 
-const SECTORS = "[data-sectors]";
+const TABS = "[data-sectors] > details";
 
-/** Index of the active sector name and of the fragment on top of the stack. */
-const sceneState = (page: Page) =>
-  page.locator(SECTORS).evaluate((scene) => {
-    const names = [...scene.querySelectorAll("[data-sectors-name]")];
-    const frames = [...scene.querySelectorAll<HTMLElement>("[data-sectors-frame]")].map((frame) =>
-      Number(frame.style.zIndex),
-    );
-    return {
-      name: names.findIndex((name) => name.hasAttribute("data-active")),
-      frame: frames.indexOf(Math.max(...frames)),
-    };
-  });
+/** Index of the open sector of the switcher. */
+const openSector = (page: Page) =>
+  page.locator(TABS).evaluateAll((tabs) => tabs.findIndex((tab) => (tab as HTMLDetailsElement).open));
 
-/** Every sector keeps its own fragment, labelled as an example, in the page. */
-async function expectStackedSectors(page: Page) {
-  await expect(page.locator(`${SECTORS}[data-pinned]`)).toHaveCount(0);
-  const steps = page.locator("[data-sectors-steps] > li");
-  await expect(steps).toHaveCount(4);
-  for (const step of await steps.all()) {
-    await expect(step.locator("[data-ui] [data-example]")).toBeVisible();
-    await expect(step.locator("[data-sectors-note]")).toBeVisible();
-  }
+/** Status texts of the live rows of the open sector. */
+const liveStatuses = (page: Page) =>
+  page
+    .locator(`${TABS}[open] [data-live] [data-live-text]`)
+    .evaluateAll((cells) => cells.map((cell) => cell.textContent));
+
+async function showSectors(page: Page) {
+  await page
+    .locator("#sectores, #sectors")
+    .first()
+    .evaluate((group) => group.scrollIntoView());
 }
 
 async function scrollThrough(page: Page) {
@@ -64,27 +57,26 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
     await expect.poll(() => lensValue(page, "--lens")).toBe("0");
   });
 
-  test("Sectores se fija y cada cuarto del tramo trae el nombre y el fragmento de un sector", async ({ page }) => {
+  test("Sectores cabe en una pantalla, sin pin, y la vuelta avanza sola con fragmentos vivos", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(SECTORS)).toHaveAttribute("data-pinned", "");
-    // The pin is held for two and a half screens from the moment the scene is centred in the window.
-    const { start, hold } = await page.locator(SECTORS).evaluate((scene) => {
-      const box = scene.getBoundingClientRect();
-      return { start: box.top + scrollY - (innerHeight - box.height) / 2, hold: innerHeight * 2.5 };
-    });
-    for (const step of [0, 1, 2, 3]) {
-      await page.evaluate((y) => scrollTo(0, y), start + ((step + 0.5) * hold) / 4);
-      await expect.poll(() => sceneState(page)).toEqual({ name: step, frame: step });
-      // Held whole inside the window while its quarter lasts.
-      await expect
-        .poll(async () => {
-          const box = await page.locator(SECTORS).boundingBox();
-          return Boolean(box && box.y >= 0 && box.y + box.height <= desktop.height);
-        })
-        .toBe(true);
-    }
-    await page.evaluate((y) => scrollTo(0, y), start + hold + 400);
-    await expect.poll(async () => (await page.locator(SECTORS).boundingBox())?.y ?? 0).toBeLessThan(0);
+    await expect(page.locator(".pin-spacer")).toHaveCount(0);
+    expect((await page.locator("#sectores").boundingBox())?.height).toBeLessThan(desktop.height);
+    const before = await liveStatuses(page);
+    await showSectors(page);
+    // The open fragment comes alive: a row moves to its next status.
+    await expect.poll(() => liveStatuses(page), { timeout: 4000 }).not.toEqual(before);
+    await expect.poll(() => openSector(page), { timeout: 9000 }).toBe(1);
+  });
+
+  test("elegir un sector detiene la vuelta y la pestaña abierta no se cierra", async ({ page }) => {
+    await page.goto("/");
+    await showSectors(page);
+    const summaries = page.locator(`${TABS} > summary`);
+    await summaries.nth(2).click();
+    await expect.poll(() => openSector(page)).toBe(2);
+    await summaries.nth(2).click();
+    await page.waitForTimeout(7000);
+    expect(await openSector(page)).toBe(2);
   });
 
   test("cada grupo entra una vez al llegar y al final todo queda visible", async ({ page }) => {
@@ -112,14 +104,18 @@ test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
     await expect.poll(() => lensValue(page, "--lens"), { timeout: 5000 }).toBe("0");
   });
 
-  test("Sectores no se fija: cada sector trae su fragmento y la marca blanca cambia de marca", async ({ page }) => {
+  test("Sectores lleva las pestañas en 2×2, la vuelta avanza y la marca blanca cambia de marca", async ({ page }) => {
     await page.goto("/");
-    await expectStackedSectors(page);
+    const tabs = page.locator(`${TABS} > summary`);
+    const [first, second, third] = await Promise.all([0, 1, 2].map((index) => tabs.nth(index).boundingBox()));
+    expect(second?.y).toBe(first?.y);
+    expect(third?.x).toBe(first?.x);
+    expect(third?.y).toBeGreaterThan(first?.y ?? 0);
+    await showSectors(page);
+    await expect.poll(() => openSector(page), { timeout: 9000 }).toBe(1);
+    await tabs.nth(3).click();
     const marks = page.locator("[data-portal] [data-brand-mark]");
-    await expect(marks.nth(0)).toHaveAttribute("data-active", "");
-    await page.locator("[data-portal]").scrollIntoViewIfNeeded();
-    await expect(marks.nth(1)).toHaveAttribute("data-active", "", { timeout: 5000 });
-    await expect(page.locator("[data-portal] [data-brand-mark][data-active]")).toHaveCount(1);
+    await expect(marks.nth(1)).toHaveAttribute("data-active", "", { timeout: 4000 });
   });
 
   test("el texto del tablero no se selecciona, salvo el contacto", async ({ page }) => {
@@ -150,7 +146,11 @@ test.describe("con movimiento reducido (DESIGN.md Motion, ADR 0004)", () => {
       .locator("main section[id] > *")
       .evaluateAll((tiles) => tiles.filter((tile) => getComputedStyle(tile).transform !== "none").length);
     expect(moved).toBe(0);
-    await expectStackedSectors(page);
+    // No tour and no live fragments: the first sector stays as written.
+    const before = await liveStatuses(page);
+    await page.waitForTimeout(7000);
+    expect(await openSector(page)).toBe(0);
+    expect(await liveStatuses(page)).toEqual(before);
   });
 });
 
@@ -163,6 +163,11 @@ test.describe("sin JavaScript (ADR 0001)", () => {
     await expect(page.locator("[data-count]")).toHaveText("100");
     const layer = await page.locator("[data-lens]").evaluate((lens) => getComputedStyle(lens, "::after").opacity);
     expect(layer).toBe("0");
-    await expectStackedSectors(page);
+    // The switcher is a native exclusive accordion: every sector is in the HTML and opens one at a time.
+    await expect(page.locator(TABS)).toHaveCount(4);
+    expect(await openSector(page)).toBe(0);
+    await page.locator(`${TABS} > summary`).nth(3).click();
+    expect(await openSector(page)).toBe(3);
+    await expect(page.locator(`${TABS}[open] [data-portal]`)).toBeVisible();
   });
 });
