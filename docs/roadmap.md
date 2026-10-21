@@ -48,7 +48,7 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 
 **Entra (un change por PR, encadenados):**
 1. `chapters-hero` (hecho): escena «del código a la planta». Glifos del código de la web forman «Software a medida», llueven y hacen crecer la retama; luego el título vuelve a letras y el puntero sobre él trae los glifos. Incluye la bajada fija por las raíces con el manifiesto (antes el change 2), la cabecera con enlaces, el «Hablemos» fijo y las cifras y el fragmento ADR movidos a Método.
-2. Cabecera: flota sobre el hero para que la escena ocupe toda la pantalla, selector de idioma compacto y móvil sin la segunda fila de enlaces (se decide con el usuario al empezar).
+2. `chapters-header` (hecho): la cabecera flota sobre el hero, que queda a pantalla completa, y se esconde al bajar. Lleva el selector `ES / EN`. En el móvil, el botón «Índice» abre un diálogo modal con los capítulos, el actual marcado y «Hablemos».
 3. Servicios: cuatro tarjetas con una trama de puntos de la retama generada en el build.
 4. Método en papel claro con sus pruebas, capítulo «Hablemos» y Sectores con más aire.
 5. Optimización de la escena de glifos (coste en GPU, número de glifos, bloom en móvil) sin perder el efecto.
