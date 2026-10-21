@@ -12,7 +12,7 @@ const copy = t(Astro.props.locale);
 
 <!-- Until the form lands (M3) the contact is the address itself, readable and copyable without a mail client.
      Phone order: heading, address, then the example reply. -->
-<section id={copy["anchor.contact"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="contact-title">
+<section id={copy["anchor.contact"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="contact-title" data-selectable>
   <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
     <h2 id="contact-title" class="text-balance type-headline-sm md:type-headline">{copy["contact.title"]}</h2>
   </div>

@@ -19,8 +19,9 @@ async function scrollThrough(page: Page) {
 test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
   test.use({ viewport: desktop });
 
-  test("la escena abre con el shutter en CSS y la cifra cuenta hasta su valor", async ({ page }) => {
+  test("la escena abre con el shutter en CSS, la cifra cuenta y el texto se puede seleccionar", async ({ page }) => {
     await page.goto("/");
+    expect(await page.locator("main h1").evaluate((node) => getComputedStyle(node).userSelect)).not.toBe("none");
     await expect(page.locator("[data-shutter]")).toHaveCSS("animation-name", "shutter");
     await expect(page.locator("[data-count]")).toHaveText("100");
   });
@@ -49,10 +50,29 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
 test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
   test.use({ viewport: phone, hasTouch: true, isMobile: true });
 
-  test("la lupa hace una pasada sola al cargar", async ({ page }) => {
+  test("el código barre la palabra entera de izquierda a derecha y sale por la derecha", async ({ page }) => {
     await page.goto("/");
-    await expect.poll(() => lensValue(page, "--lens"), { timeout: 5000 }).toBe("1");
+    await expect(page.locator("[data-lens]")).toHaveAttribute("data-lens-wipe", "");
+    const edge = async (name: string) => Number.parseFloat(await lensValue(page, name));
+    // Covered: the leading edge has crossed the word while the trailing edge has not moved yet.
+    await expect.poll(() => edge("--wipe-lead"), { timeout: 5000 }).toBe(1);
+    expect(await edge("--wipe-tail")).toBe(0);
+    expect(await lensValue(page, "--lens")).toBe("1");
+    // Then the trailing edge follows it out to the right and the layer is gone.
+    await expect.poll(() => edge("--wipe-tail"), { timeout: 5000 }).toBe(1);
     await expect.poll(() => lensValue(page, "--lens"), { timeout: 5000 }).toBe("0");
+  });
+
+  test("el texto del tablero no se selecciona, salvo el contacto", async ({ page }) => {
+    await page.goto("/");
+    const select = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((node) => getComputedStyle(node).userSelect);
+    expect(await select("main h1")).toBe("none");
+    expect(await select("footer li")).toBe("none");
+    expect(await select('main a[href^="mailto:"]')).not.toBe("none");
   });
 });
 

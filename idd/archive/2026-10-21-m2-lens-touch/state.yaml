@@ -1,0 +1,270 @@
+{
+  "schema": "idd-state/v1",
+  "change": "m2-lens-touch",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "en el movil el efecto para ver la textura de codigo en RETAMA no me gustaria que fuese un circulo, que se vea una transicion elegante no muy rapida que se mueva desde un lado haciendo que todo el texto se vea con esa textura y que luego acabe con una animación volviendolo a su estado original, ademas en el movil que no puedas seleccionar texto",
+    "kind": "feature",
+    "summary": "En táctil, la textura de código de «Retama» deja el círculo por un barrido: entra desde la izquierda cubriendo toda la palabra, se mantiene y sale por la derecha; y en táctil el texto del tablero no se selecciona salvo el grupo de contacto",
+    "acceptance": "En un móvil, tras cargar, la textura de código barre «Retama» de izquierda a derecha (unos 1,1 s), cubre la palabra entera, se mantiene y sale por la derecha; con reduced-motion solo funde; con puntero fino sigue la lupa circular; en táctil el texto de main y footer no se selecciona salvo la sección de contacto, y en escritorio todo se selecciona como antes"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿El barrido termina siguiendo hacia la derecha o se recoge hacia la izquierda?"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/styles/global.css",
+          "line": 3
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/motion.ts",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "una transicion elegante no muy rapida"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Hero.astro",
+          "line": 19
+        }
+      },
+      {
+        "category": "accessibility",
+        "question": "¿Qué parte de la página deja de poder seleccionarse en táctil: solo la banda, todo el tablero salvo el contacto o toda la página?"
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/motion.ts",
+          "line": 2
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/board/Contact.astro",
+      "src/scripts/motion.ts",
+      "src/styles/global.css",
+      "tests/e2e/motion.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006 and quality scenario brand-impact",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "La capa de la lupa sigue siendo decorativa y sin JS no dibuja nada; no seleccionar texto no oculta ni retira contenido del HTML"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "El barrido usa los tokens t-open, t-reveal y ease-in-out leídos del tema; el CSS nuevo solo usa var() de tokens"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "El barrido mueve variables CSS por CSSOM, permitido sin unsafe-inline; no hay estilos ni manejadores inline"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "El gesto firma en táctil cubre la palabra entera con una transición más lenta; con reduced-motion sigue siendo un fundido"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint en verde: el CSS nuevo del barrido y de la selección solo usa var() de tokens y porcentajes",
+      "recorded_at": "2026-10-21T13:35:45.330Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Selección: «Todo el tablero salvo el contacto». Salida: «Sigue y sale por la derecha (Recomendado)»: entra desde la izquierda, cubre toda la palabra, se mantiene un momento y sigue hacia la derecha hasta desaparecer",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T13:35:37.920Z",
+      "detail": {
+        "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T13:35:37.920Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "scenario:brand-impact conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8"
+        ]
+      }
+    }
+  ],
+  "base": "ad4225de1cc9a24efc68503bc0c535ae7398f729",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3887156d79a49c583def0e3c4235ecd901bc0cbecfa0d32f620ed0b0ab22944",
+      "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+      "recorded_at": "2026-10-21T13:35:37.920Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:ba37943f898ef40bbd0fafc9cb73eb9e1643bbad8230ec58e6fb04cda6d111e2",
+      "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+      "recorded_at": "2026-10-21T13:35:37.920Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:dbd36848a0e95632c79c13a4dfee13d74137a39867c51be0e15e4480d937b547",
+      "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+      "recorded_at": "2026-10-21T13:35:37.920Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:e4349fe87707a931fb378b6e8c27412b7ce7a4e31b9bb5c7e669f401a26fcd82",
+      "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+      "recorded_at": "2026-10-21T13:35:37.920Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+      "recorded_at": "2026-10-21T13:35:37.920Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:ba93bb1540096565b9b4588aa0fcbf83c48b7672817177e3b6693c7f0bcfba3e",
+      "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+      "recorded_at": "2026-10-21T13:35:37.920Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:d1c3b901eab4206e5d6f83291da228160115169770ef94f2545114ce6d3cd90b",
+      "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+      "recorded_at": "2026-10-21T13:35:37.920Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:fac1608114551369f276645e7cefe41c899910d1226bece7343cb0670c86edd2",
+      "tree": "sha256:0ad34f386f32490ffaa6d23babc1f1fab05de20e9a9eb6e63c279c657978f584",
+      "recorded_at": "2026-10-21T13:35:37.920Z"
+    }
+  ],
+  "closed_at": "2026-10-21T13:35:45.385Z"
+}
