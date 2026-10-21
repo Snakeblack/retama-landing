@@ -12,13 +12,12 @@ const root = getComputedStyle(document.documentElement);
 const motion = readMotion((name) => root.getPropertyValue(name));
 // DESIGN.md: entrances rise 16–32px; the spacing token lg sits in that range.
 const RISE = Number.parseFloat(root.getPropertyValue("--spacing-lg"));
-// The pinned sectors scene holds the group for two and a half screens, one quarter per sector.
-const SCENE_SCREENS = 2.5;
+// The sectors switcher holds each sector this long, in seconds, while its tour runs; the fragment moves four times.
+const SECTOR_HOLD = 6;
 const QUERIES = {
   move: "(prefers-reduced-motion: no-preference)",
   still: "(prefers-reduced-motion: reduce)",
   hover: "(hover: hover) and (pointer: fine)",
-  wide: "(min-width: 64rem)",
 };
 
 /** Inside each group the tiles enter in order, once, as the group arrives; lists arrive row by row. */
@@ -34,12 +33,8 @@ function entrances(move: boolean) {
         timeline.from(tile, { opacity: 0 }, at);
       } else if (tile.querySelector(":scope > picture, :scope > [data-ui]")) {
         timeline.from(tile, { clipPath: "inset(0 0 100% 0)", ease: motion.ease.expo }, at);
-      } else if (tile.matches("ul, ol, [data-rows], [data-sectors]")) {
-        // The sectors scene enters by its visible pieces, which stay boxes when it is pinned.
-        const rows = tile.matches("[data-sectors]")
-          ? tile.querySelectorAll("[data-sectors-title], [data-sectors-name], [data-sectors-frame]")
-          : tile.children;
-        timeline.from(rows, { opacity: 0, y: RISE, stagger: motion.stagger.line }, at);
+      } else if (tile.matches("ul, ol, [data-rows]")) {
+        timeline.from(tile.children, { opacity: 0, y: RISE, stagger: motion.stagger.line }, at);
       } else {
         timeline.from(tile, { opacity: 0, y: RISE }, at);
       }
@@ -74,74 +69,192 @@ function stack(tiles: HTMLElement[]) {
 }
 
 /**
- * The pinned sectors scene, from lg with motion: the group holds and each quarter of the hold belongs to one sector.
- * Crossing into a quarter marks its name and wipes its fragment in; the wipe is timed, not scrubbed. Without this the
- * four sectors simply stack, each with its fragment.
+ * A live example fragment: its rows move to the status written in their data-live, one by one with a flash, or the
+ * white-label portal changes brand. It starts from the HTML state every time, so each showing tells the same story.
  */
-function sectorsScene() {
-  const scene = document.querySelector<HTMLElement>("[data-sectors]");
-  if (!scene) return;
-  const names = [...scene.querySelectorAll<HTMLElement>("[data-sectors-name]")];
-  const frames = stack([...scene.querySelectorAll<HTMLElement>("[data-sectors-frame]")]);
-  let active = 0;
-  const show = (index: number) => {
-    if (index === active) return;
-    for (const [i, name] of names.entries()) name.toggleAttribute("data-active", i === index);
-    frames.show(index);
-    active = index;
-  };
-  scene.toggleAttribute("data-pinned", true);
-  // A scene taller than the window cannot be held whole: it stays stacked.
-  if (scene.offsetHeight > window.innerHeight) {
-    scene.toggleAttribute("data-pinned", false);
-    return;
-  }
-  names[0]?.toggleAttribute("data-active", true);
-  frames.show(0, false);
-  const pin = ScrollTrigger.create({
-    trigger: scene,
-    start: "center center",
-    end: () => `+=${window.innerHeight * SCENE_SCREENS}`,
-    pin: true,
-    refreshPriority: 1,
-    onUpdate: ({ progress }) => show(Math.min(names.length - 1, Math.floor(progress * names.length))),
+function liveFragment(panel: HTMLElement, interval: number) {
+  const rows = [...panel.querySelectorAll<HTMLElement>("[data-live]")].map((row) => {
+    const text = row.querySelector<HTMLElement>("[data-live-text]");
+    const mark = row.querySelector<HTMLElement>("[data-live-mark]");
+    const from = { text: text?.textContent ?? "", alert: mark?.hasAttribute("data-alert") ?? false };
+    const to = { text: row.dataset.live ?? "", alert: row.dataset.liveAlert === "true" };
+    const show = (state: typeof from) => {
+      if (text) text.textContent = state.text;
+      mark?.toggleAttribute("data-alert", state.alert);
+    };
+    return { row, from, to, show };
   });
-  return () => {
-    pin.kill();
-    frames.revert();
-    scene.toggleAttribute("data-pinned", false);
-    for (const name of names) name.toggleAttribute("data-active", false);
+  const portal = panel.querySelector<HTMLElement>("[data-portal]");
+  const headers = portal ? stack([...portal.querySelectorAll<HTMLElement>("[data-brand]")]) : undefined;
+  const marks = [...(portal?.querySelectorAll<HTMLElement>("[data-brand-mark]") ?? [])];
+  const brand = (index: number) => {
+    for (const [i, mark] of marks.entries()) mark.toggleAttribute("data-active", i === index);
+  };
+  const reset = () => {
+    for (const { row, from, show } of rows) {
+      show(from);
+      row.toggleAttribute("data-live-flash", false);
+    }
+    headers?.revert();
+    brand(0);
+  };
+  return {
+    reset,
+    /** One showing: every step at its own interval, from the HTML state. */
+    play() {
+      const timeline = gsap.timeline().call(reset);
+      if (portal) {
+        for (const [step, index] of [1, 2, 0].entries()) {
+          timeline.call(
+            () => {
+              headers?.show(index);
+              brand(index);
+            },
+            [],
+            (step + 1) * interval,
+          );
+        }
+      }
+      for (const [step, { row, to, show }] of rows.entries()) {
+        const at = (step + 1) * interval;
+        timeline
+          .call(
+            () => {
+              show(to);
+              row.toggleAttribute("data-live-flash", true);
+            },
+            [],
+            at,
+          )
+          .call(() => row.toggleAttribute("data-live-flash", false), [], at + motion.duration.ui);
+      }
+      return timeline;
+    },
   };
 }
 
-/** The white-label example cycles its brands while it is on screen: the header wipes to the next and the list marks it. */
-function portalCycle() {
-  const portal = document.querySelector<HTMLElement>("[data-portal]");
-  if (!portal) return;
-  const headers = stack([...portal.querySelectorAll<HTMLElement>("[data-brand]")]);
-  const marks = [...portal.querySelectorAll<HTMLElement>("[data-brand-mark]")];
-  const mark = (index: number) => {
-    for (const [i, brand] of marks.entries()) brand.toggleAttribute("data-active", i === index);
+/**
+ * The sectors switcher (DESIGN.md Motion): an exclusive accordion laid out as tabs. A tab stays open when pressed
+ * again. With motion, each time the group comes on screen the tour runs once through the four sectors, filling the
+ * bar under each tab for SECTOR_HOLD while its fragment comes alive; a new sector wipes in from the left. The pointer
+ * or the focus on the switcher pauses the tour (WCAG 2.2.2) and choosing a tab ends it for good.
+ */
+function sectorsSwitcher(move: boolean) {
+  const switcher = document.querySelector<HTMLElement>("[data-sectors]");
+  if (!switcher) return;
+  const parts = [...switcher.querySelectorAll<HTMLDetailsElement>(":scope > details")].flatMap((tab) => {
+    const summary = tab.querySelector<HTMLElement>(":scope > summary");
+    const panel = tab.querySelector<HTMLElement>("[data-sectors-panel]");
+    const bar = tab.querySelector<HTMLElement>("[data-sectors-progress]");
+    const interval = SECTOR_HOLD / 4;
+    return summary && panel && bar ? [{ tab, summary, panel, bar, live: liveFragment(panel, interval) }] : [];
+  });
+  const bars = parts.map(({ bar }) => bar);
+  const listeners: [EventTarget, string, EventListener][] = [];
+  const on = (target: EventTarget, type: string, listener: EventListener) => {
+    target.addEventListener(type, listener);
+    listeners.push([target, type, listener]);
   };
-  let current = 0;
-  const cycle = gsap.timeline({ repeat: -1, paused: true }).call(
-    () => {
-      current = (current + 1) % marks.length;
-      headers.show(current);
-      mark(current);
-    },
-    [],
-    motion.duration.open * 2,
-  );
+  let stopped = false;
+  let held = false;
+  let visible = false;
+  let showing: gsap.core.Timeline | undefined;
+  let wipe: gsap.core.Tween | undefined;
+
+  const tour = gsap.timeline({ paused: true });
+  for (const [index, { tab, bar, live }] of parts.entries()) {
+    const at = index * SECTOR_HOLD;
+    tour
+      .call(
+        () => {
+          gsap.set(bars, { "--progress": 0 });
+          tab.open = true;
+        },
+        [],
+        at,
+      )
+      .fromTo(
+        bar,
+        { "--progress": 0 },
+        { "--progress": 1, duration: SECTOR_HOLD, ease: "none", immediateRender: false },
+        at,
+      )
+      .add(() => {
+        showing?.kill();
+        showing = live.play();
+      }, at);
+  }
+  const run = () => {
+    if (!stopped && visible && !held) tour.resume();
+  };
+
+  for (const { tab, summary, panel, bar, live } of parts) {
+    on(summary, "click", (event) => {
+      if (tab.open) event.preventDefault();
+      if (!move) return;
+      stopped = true;
+      tour.pause();
+      gsap.set(bars, { "--progress": 0 });
+      gsap.set(bar, { "--progress": 1 });
+      showing?.kill();
+      showing = live.play();
+    });
+    if (!move) continue;
+    on(tab, "toggle", () => {
+      if (!tab.open) return;
+      wipe?.progress(1);
+      wipe = gsap.fromTo(
+        panel,
+        { clipPath: "inset(0 100% 0 0)" },
+        { clipPath: "inset(0 0% 0 0)", duration: motion.duration.reveal, ease: motion.ease.inOut },
+      );
+    });
+  }
+  if (!move) {
+    return () => {
+      for (const [target, type, listener] of listeners) target.removeEventListener(type, listener);
+    };
+  }
+
+  const hold = (value: boolean) => () => {
+    held = value;
+    if (held) tour.pause();
+    else run();
+  };
+  on(switcher, "pointerenter", hold(true));
+  on(switcher, "pointerleave", hold(false));
+  on(switcher, "focusin", hold(true));
+  on(switcher, "focusout", (event) => {
+    if (!switcher.contains((event as FocusEvent).relatedTarget as Node | null)) hold(false)();
+  });
+  gsap.set(bars, { "--progress": 0 });
+  const enter = () => {
+    visible = true;
+    if (stopped) return;
+    tour.restart();
+    if (held) tour.pause();
+  };
+  const leave = () => {
+    visible = false;
+    tour.pause();
+  };
   const watch = ScrollTrigger.create({
-    trigger: portal,
-    onToggle: ({ isActive }) => void (isActive ? cycle.play() : cycle.pause()),
+    trigger: switcher,
+    start: "top 75%",
+    end: "bottom 25%",
+    onEnter: enter,
+    onEnterBack: enter,
+    onLeave: leave,
+    onLeaveBack: leave,
   });
   return () => {
     watch.kill();
-    cycle.kill();
-    headers.revert();
-    mark(0);
+    tour.kill();
+    showing?.kill();
+    wipe?.kill();
+    for (const [target, type, listener] of listeners) target.removeEventListener(type, listener);
+    for (const { live } of parts) live.reset();
+    gsap.set([...bars, ...parts.map(({ panel }) => panel)], { clearProps: "--progress,clipPath" });
   };
 }
 
@@ -243,13 +356,10 @@ function codeLens({ hover, move }: { hover: boolean; move: boolean }) {
 
 const media = gsap.matchMedia();
 media.add(QUERIES, (context) => {
-  const { move = false, still = false, hover = false, wide = false } = context.conditions ?? {};
+  const { move = false, still = false, hover = false } = context.conditions ?? {};
   if (!move && !still) return;
-  // Entrances go first: once pinned, the group's child is the pin spacer, and a transform on it would undo the pin.
-  // The pin refreshes first anyway (refreshPriority), so the entrances below it measure the height of the hold.
   entrances(move);
-  const scene = move && wide ? sectorsScene() : undefined;
-  const cleanups = [scene, move ? portalCycle() : undefined, move ? countUp() : undefined, codeLens({ hover, move })];
+  const cleanups = [sectorsSwitcher(move), move ? countUp() : undefined, codeLens({ hover, move })];
   return () => {
     for (const cleanup of cleanups) cleanup?.();
   };

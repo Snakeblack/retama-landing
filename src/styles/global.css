@@ -161,42 +161,96 @@
   }
 }
 
-/* DESIGN.md Motion: the pinned sectors scene. Without it the four sectors stack, each with its fragment. From lg with
-   motion the script sets data-pinned and holds the group: the heading and the four names stay on the left, the
-   active one in full ink with its note, and the four fragments stack on the right, the active one wiped in on top. */
-[data-sectors][data-pinned] {
-  /* Explicit rows, so the fragments can span from the heading to the last name. */
-  grid-template-rows: repeat(5, auto);
+/* DESIGN.md Motion, the sectors switcher: the exclusive accordion of the sectors laid out as tabs. The four
+   summaries are the tabs, two by two on phones and in one row from md, and the open sector's content spans the row
+   below them. Every details shares the whole grid through subgrid, so only its summary and content take clicks.
+   Where details cannot be laid out, it stays a plain accordion. */
+@supports selector(::details-content) {
+  [data-sectors] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    gap: var(--spacing-gap);
 
-  & [data-sectors-steps],
-  & [data-sectors-steps] > li {
-    display: contents;
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: repeat(2, auto);
+    }
   }
 
-  & [data-sectors-title],
-  & [data-sectors-name] {
-    grid-column: 1 / span 6;
-  }
-
-  & [data-sectors-frame] {
-    grid-column: 7 / span 6;
+  [data-sectors] > details {
+    display: grid;
+    grid-column: 1 / -1;
     grid-row: 1 / -1;
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
+    pointer-events: none;
   }
 
-  & [data-sectors-name] {
-    transition: color var(--t-hover) var(--ease-out);
+  [data-sectors] > details > summary {
+    pointer-events: auto;
   }
 
-  & [data-sectors-name]:not([data-active]) {
-    color: var(--color-on-surface-muted);
+  [data-sectors] > details:nth-child(2) > summary {
+    grid-column: 2;
   }
 
-  & [data-sectors-note] {
-    transition: opacity var(--t-hover) var(--ease-out);
+  [data-sectors] > details:nth-child(3) > summary {
+    grid-column: 1;
+    grid-row: 2;
   }
 
-  & [data-sectors-name]:not([data-active]) [data-sectors-note] {
-    opacity: 0;
+  [data-sectors] > details:nth-child(4) > summary {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  @media (width >= 48rem) {
+    [data-sectors] > details:nth-child(3) > summary {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    [data-sectors] > details:nth-child(4) > summary {
+      grid-column: 4;
+      grid-row: 1;
+    }
+  }
+
+  [data-sectors] > details::details-content {
+    grid-column: 1 / -1;
+    grid-row: -2 / -1;
+    pointer-events: auto;
+  }
+
+  /* Closed sectors keep their size but stay hidden, so the row is as tall as the tallest sector and nothing below
+     moves when the tour changes sector. */
+  [data-sectors] > details:not([open])::details-content {
+    content-visibility: visible;
+    visibility: hidden;
+  }
+}
+
+/* The progress of the tour under each tab; without the script the open tab is simply full. */
+[data-sectors-progress] {
+  --progress: 0;
+  scale: var(--progress) 1;
+  transform-origin: left;
+
+  details[open] > summary > & {
+    --progress: 1;
+  }
+}
+
+/* A row of a live fragment flashes when its status changes. */
+[data-live] {
+  transition:
+    background-color var(--t-hover) var(--ease-out),
+    color var(--t-hover) var(--ease-out);
+
+  &[data-live-flash] {
+    background-color: var(--color-field);
+    color: var(--color-on-field);
   }
 }
 
