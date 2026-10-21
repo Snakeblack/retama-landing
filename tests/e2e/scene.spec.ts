@@ -80,7 +80,9 @@ test.describe("escena 3D progresiva (ADR 0004)", () => {
     const pause = page.locator("[data-scene-pause]");
     await expect(pause).toHaveAccessibleName("Pause the retama animation");
     await expect(pause).toHaveText("");
-    await pause.click();
+    // The title lies over the middle of the stage; a free corner of it takes the tap.
+    const box = await pause.boundingBox();
+    await pause.click({ position: { x: (box?.width ?? 0) - 40, y: (box?.height ?? 0) - 40 } });
     await expect(pause).toHaveAccessibleName("Play the retama animation");
     await expect(page.locator("[data-scene-canvas]")).toHaveCSS("opacity", "1");
     await expect(page.locator("[data-retama-poster]")).toHaveCSS("opacity", "0");

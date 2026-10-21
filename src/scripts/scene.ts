@@ -1,11 +1,13 @@
-// Whether and when the 3D scene of ADR 0004 replaces the poster. The poster is HTML and paints with the page; this
-// waits for the page to load, the tile to be on screen, an idle moment and the shutter, then probes the GPU and only
+// Whether and when the 3D scene of ADR 0004 replaces the poster. The poster and the word are HTML and paint with the
+// page; this waits for the page to load, the stage to be on screen and an idle moment, then probes the GPU and only
 // then starts the scene in a worker on an OffscreenCanvas (scene-worker.ts): its download stays out of the start
-// budget of ADR 0001 and its work off the main thread. Reduced motion, data saving, a software GPU, no OffscreenCanvas
-// or a slow first second keep or bring back the poster. The scene pauses off screen, with the tab hidden and with a
-// tap or click on it (WCAG 2.2.2).
+// budget of ADR 0001 and its work off the main thread. It samples the HTML words, so the scene's glyphs land on their
+// letters, and sends the scroll of the chapter under its pinned stage. Reduced motion, data saving, a software GPU, no
+// OffscreenCanvas or a slow first second keep or bring back the poster. The scene pauses off screen, with the tab
+// hidden and with a tap or click on it (WCAG 2.2.2).
 import { readMotion } from "../lib/motion";
 import { type Probe, sceneTier } from "../lib/scene-tier";
+import type { Word } from "./scene-three";
 import type { FromScene, ToScene } from "./scene-worker";
 
 type State = "loading" | "running" | "poster";
@@ -48,15 +50,49 @@ async function webgpu(): Promise<Probe["webgpu"]> {
   }
 }
 
+/**
+ * The ink of the HTML word as points, `step` pixels apart, in pixels from the chapter's top left. The word is drawn
+ * again on a canvas with its own font, size and tracking, on the baseline the line box gives it.
+ */
+function sampleWord(chapter: HTMLElement, word: HTMLElement): Word {
+  const box = word.getBoundingClientRect();
+  const origin = chapter.getBoundingClientRect();
+  const style = getComputedStyle(word);
+  const fontSize = Number.parseFloat(style.fontSize);
+  const step = Math.max(2.5, fontSize / 34);
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(box.width) + 2;
+  canvas.height = Math.ceil(box.height) + 2;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) return { samples: [], step };
+  context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+  if ("letterSpacing" in context) context.letterSpacing = style.letterSpacing;
+  const text = (word.textContent ?? "").trim();
+  const metrics = context.measureText(text);
+  const ascent = metrics.fontBoundingBoxAscent;
+  const leading = (box.height - ascent - metrics.fontBoundingBoxDescent) / 2;
+  context.fillText(text, 0, leading + ascent);
+  const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
+  const samples: Word["samples"] = [];
+  for (let y = step / 2; y < canvas.height; y += step) {
+    for (let x = step / 2; x < canvas.width; x += step) {
+      if ((data[(Math.floor(y) * canvas.width + Math.floor(x)) * 4 + 3] ?? 0) > 128) {
+        samples.push([box.left - origin.left + x, box.top - origin.top + y]);
+      }
+    }
+  }
+  return { samples, step };
+}
+
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 const saveData = () => (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
 
-async function start(tile: HTMLElement) {
+async function start(tile: HTMLElement, chapter: HTMLElement, words: HTMLElement[]) {
   if (reducedMotion() || saveData()) return;
   await loaded();
   await onScreen(tile);
   await idle();
-  await Promise.all(tile.getAnimations({ subtree: true }).map((animation) => animation.finished.catch(() => {})));
+  await document.fonts.ready;
 
   const gpu = await webgpu();
   const tier = sceneTier({
@@ -115,21 +151,44 @@ async function start(tile: HTMLElement) {
       canvas: offscreen,
       tier,
       colors: {
+        ground: css("--color-surface"),
         ink: css("--color-on-surface"),
         muted: css("--color-on-surface-muted"),
         primary: css("--color-primary"),
       },
       pixelRatio: devicePixelRatio,
-      width: tile.clientWidth,
-      height: tile.clientHeight,
+      stage: { width: tile.clientWidth, height: tile.clientHeight },
+      words: words.map((word) => sampleWord(chapter, word)),
     },
     [offscreen],
   );
 
-  const resize = new ResizeObserver(([entry]) => {
-    if (entry) send({ type: "resize", width: entry.contentRect.width, height: entry.contentRect.height });
+  // The camera follows the chapter as it scrolls under the pinned stage, one frame at a time.
+  let scrolling = 0;
+  const scroll = () => {
+    if (scrolling) return;
+    scrolling = requestAnimationFrame(() => {
+      scrolling = 0;
+      const top = -chapter.getBoundingClientRect().top;
+      send({ type: "scroll", top: Math.min(Math.max(0, top), chapter.offsetHeight - tile.offsetHeight) });
+    });
+  };
+  scroll();
+  addEventListener("scroll", scroll, { passive: true });
+  let laying = 0;
+  const resize = new ResizeObserver(() => {
+    clearTimeout(laying);
+    laying = window.setTimeout(() => {
+      send({
+        type: "layout",
+        stage: { width: tile.clientWidth, height: tile.clientHeight },
+        words: words.map((word) => sampleWord(chapter, word)),
+      });
+      scroll();
+    }, 150);
   });
   resize.observe(tile);
+  cleanups.push(() => removeEventListener("scroll", scroll));
   const sight = new IntersectionObserver(([entry]) => {
     visible = entry?.isIntersecting ?? false;
     sync();
@@ -154,20 +213,24 @@ async function start(tile: HTMLElement) {
   }
 
   if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    // Over the whole chapter, the word included: the text over the stage would hide the pointer from it.
     const follow = (event: PointerEvent) => {
       const box = tile.getBoundingClientRect();
       send({ type: "point", at: [event.clientX - box.left, event.clientY - box.top] });
     };
     const leave = () => send({ type: "point" });
-    tile.addEventListener("pointermove", follow);
-    tile.addEventListener("pointerleave", leave);
+    chapter.addEventListener("pointermove", follow);
+    chapter.addEventListener("pointerleave", leave);
     cleanups.push(() => {
-      tile.removeEventListener("pointermove", follow);
-      tile.removeEventListener("pointerleave", leave);
+      chapter.removeEventListener("pointermove", follow);
+      chapter.removeEventListener("pointerleave", leave);
     });
   }
   sync();
 }
 
 const tile = document.querySelector<HTMLElement>("[data-scene]");
-if (tile) void start(tile);
+const chapter = tile?.closest<HTMLElement>("[data-chapter]");
+// The words the scene draws in glyphs, the first one the word the rain falls from.
+const words = [...(chapter?.querySelectorAll<HTMLElement>("[data-glyph-word]") ?? [])];
+if (tile && chapter && words.length > 0) void start(tile, chapter, words);

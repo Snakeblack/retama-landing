@@ -11,6 +11,16 @@ const tileOpacities = (page: Page) =>
 const lensValue = (page: Page, name: string) =>
   page.locator("[data-lens]").evaluate((lens, property) => getComputedStyle(lens).getPropertyValue(property), name);
 
+/** The code layer over the word of the first chapter: its animation and how much of it shows. */
+const codeLayer = (page: Page) =>
+  page.locator("[data-lens]").evaluate((lens) => {
+    const layer = getComputedStyle(lens, "::after");
+    return { animation: layer.animationName, opacity: layer.opacity };
+  });
+
+const talkOpacity = (page: Page) =>
+  page.locator("[data-talk]").evaluate((talk) => Number(getComputedStyle(talk).opacity));
+
 const TABS = "[data-sectors] > details";
 
 /** Index of the open sector of the switcher. */
@@ -38,11 +48,40 @@ async function scrollThrough(page: Page) {
 test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
   test.use({ viewport: desktop });
 
-  test("la escena abre con el shutter en CSS, la cifra cuenta y el texto se puede seleccionar", async ({ page }) => {
+  test("la cifra cuenta y el texto se puede seleccionar", async ({ page }) => {
     await page.goto("/");
     expect(await page.locator("main h1").evaluate((node) => getComputedStyle(node).userSelect)).not.toBe("none");
-    await expect(page.locator("[data-shutter]")).toHaveCSS("animation-name", "shutter");
+    await page.locator("[data-count]").scrollIntoViewIfNeeded();
     await expect(page.locator("[data-count]")).toHaveText("100");
+  });
+
+  test("la palabra nace hecha de código, se asienta en tinta y deja la lupa en reposo", async ({ page }) => {
+    await page.goto("/");
+    expect(await codeLayer(page)).toEqual({ animation: "decode", opacity: "1" });
+    await expect.poll(async () => (await codeLayer(page)).opacity, { timeout: 5000 }).toBe("0");
+  });
+
+  test("el manifiesto pasa de gris a tinta palabra a palabra al subir", async ({ page }) => {
+    await page.goto("/");
+    const words = page.locator("[data-manifesto] [data-word]");
+    const opacities = () => words.evaluateAll((nodes) => nodes.map((node) => Number(getComputedStyle(node).opacity)));
+    expect(Math.max(...(await opacities()))).toBeLessThan(1);
+    await page.locator("[data-manifesto]").last().scrollIntoViewIfNeeded();
+    await page.mouse.wheel(0, 600);
+    await expect.poll(async () => Math.min(...(await opacities()))).toBe(1);
+  });
+
+  test("«Hablemos» fijo se esconde sobre el hero y el contacto y aparece entre medias", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("[data-talk]")).toHaveAttribute("href", "#contacto");
+    // The scroll timeline resolves on the first frames after load.
+    await expect.poll(() => talkOpacity(page)).toBe(0);
+    await page.locator("#servicios").scrollIntoViewIfNeeded();
+    await expect.poll(() => talkOpacity(page)).toBe(1);
+    await page.locator("#contacto").scrollIntoViewIfNeeded();
+    await expect.poll(() => talkOpacity(page)).toBe(0);
+    // Faded out it is hidden too, so the keyboard never lands on an invisible button.
+    await expect(page.locator("[data-talk]")).toBeHidden();
   });
 
   test("la lupa aparece bajo el puntero, lo sigue y se va al salir", async ({ page }) => {
@@ -91,17 +130,12 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
 test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
   test.use({ viewport: phone, hasTouch: true, isMobile: true });
 
-  test("el código barre la palabra entera de izquierda a derecha y sale por la derecha", async ({ page }) => {
+  test("la palabra se descifra también en el táctil y cabe en la pantalla", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("[data-lens]")).toHaveAttribute("data-lens-wipe", "");
-    const edge = async (name: string) => Number.parseFloat(await lensValue(page, name));
-    // Covered: the leading edge has crossed the word while the trailing edge has not moved yet.
-    await expect.poll(() => edge("--wipe-lead"), { timeout: 5000 }).toBe(1);
-    expect(await edge("--wipe-tail")).toBe(0);
-    expect(await lensValue(page, "--lens")).toBe("1");
-    // Then the trailing edge follows it out to the right and the layer is gone.
-    await expect.poll(() => edge("--wipe-tail"), { timeout: 5000 }).toBe(1);
-    await expect.poll(() => lensValue(page, "--lens"), { timeout: 5000 }).toBe("0");
+    expect(await codeLayer(page)).toEqual({ animation: "decode", opacity: "1" });
+    await expect.poll(async () => (await codeLayer(page)).opacity, { timeout: 5000 }).toBe("0");
+    const word = await page.locator("[data-lens]").boundingBox();
+    expect((word?.x ?? 0) + (word?.width ?? 0)).toBeLessThanOrEqual(phone.width);
   });
 
   test("Sectores lleva las pestañas en 2×2, la vuelta avanza y la marca blanca cambia de marca", async ({ page }) => {
@@ -134,9 +168,9 @@ test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
 test.describe("con movimiento reducido (DESIGN.md Motion, ADR 0004)", () => {
   test.use({ viewport: desktop, reducedMotion: "reduce" });
 
-  test("sin shutter ni cuenta; las entradas solo funden y la lupa no viaja", async ({ page }) => {
+  test("sin descifrado ni cuenta; las entradas solo funden y la lupa no viaja", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("[data-shutter]")).toHaveCSS("animation-name", "none");
+    expect((await codeLayer(page)).animation).toBe("none");
     await expect(page.locator("[data-count]")).toHaveText("100");
     await expect(page.locator("[data-lens]")).toHaveAttribute("data-lens-still", "");
 
@@ -161,8 +195,13 @@ test.describe("sin JavaScript (ADR 0001)", () => {
     await page.goto("/");
     expect((await tileOpacities(page)).every((opacity) => opacity === 1)).toBe(true);
     await expect(page.locator("[data-count]")).toHaveText("100");
-    const layer = await page.locator("[data-lens]").evaluate((lens) => getComputedStyle(lens, "::after").opacity);
-    expect(layer).toBe("0");
+    // The manifesto is in full ink: only the script sets the muted start.
+    const words = await page
+      .locator("[data-manifesto] [data-word]")
+      .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).opacity));
+    expect(new Set(words)).toEqual(new Set(["1"]));
+    // The decode is CSS and runs anyway; once it ends, the lens layer draws nothing.
+    await expect.poll(async () => (await codeLayer(page)).opacity, { timeout: 5000 }).toBe("0");
     // The switcher is a native exclusive accordion: every sector is in the HTML and opens one at a time.
     await expect(page.locator(TABS)).toHaveCount(4);
     expect(await openSector(page)).toBe(0);

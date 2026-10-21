@@ -7,8 +7,9 @@ interface Props {
 }
 
 const { label, class: className } = Astro.props;
-// The static tier of ADR 0004: drawn at build time, so it is HTML and paints with the page.
-const shape = retamaShape(HERO.seed, HERO.frame);
+// The static tier of ADR 0004: drawn at build time, so it is HTML and paints with the page. It shows the stems and the
+// upper roots (HERO.crop); global.css stands it where the scene grows the plant (plantPlacement in glyph-scene.ts).
+const shape = retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots);
 const path = (kind: StrokeKind) =>
   shape.strokes
     .filter((stroke) => stroke.kind === kind)
@@ -20,8 +21,7 @@ const path = (kind: StrokeKind) =>
   class={className}
   role="img"
   aria-label={label}
-  viewBox={`${HERO.left} 0 ${shape.width} ${shape.height}`}
-  preserveAspectRatio="xMidYMin slice"
+  viewBox={`0 0 ${shape.width} ${HERO.crop}`}
   data-retama-poster
 >
   <path class="fill-none stroke-on-surface-muted" d={path("root")} stroke-width="1" vector-effect="non-scaling-stroke" />

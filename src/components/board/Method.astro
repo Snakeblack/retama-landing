@@ -2,6 +2,7 @@
 import { Picture } from "astro:assets";
 import plate from "../../assets/board/clusius-1576-retama-monosperma.jpg";
 import { type Locale, t } from "../../i18n/index";
+import AdrFragment from "./AdrFragment.astro";
 
 interface Props {
   locale: Locale;
@@ -62,10 +63,19 @@ const projects = [
     ))
   }
 
-  <!-- The one place the board explains its idea: the retama's roots are the written decisions. -->
-  <div class="col-span-2 bg-field p-tile-sm text-on-field md:p-tile lg:col-span-6 lg:row-span-2">
-    <p class="type-statement-sm md:type-statement">{copy["method.field"]}</p>
-    <p class="max-w-(--spacing-measure)">{copy["method.fieldNote"]}</p>
+  <!-- The proof of the method: a real decision record of this site and two figures it checks on every release. -->
+  <div class="col-span-2 lg:col-span-6 lg:row-span-3">
+    <AdrFragment locale={Astro.props.locale} />
+  </div>
+
+  <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-3">
+    <p class="type-headline-sm tabular-nums md:type-headline" data-count>{copy["hero.figure1"]}</p>
+    <p class="type-small text-on-surface-muted">{copy["hero.figure1Caption"]}</p>
+  </div>
+
+  <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-3">
+    <p class="type-headline-sm md:type-headline">{copy["hero.figure2"]}</p>
+    <p class="type-small text-on-surface-muted">{copy["hero.figure2Caption"]}</p>
   </div>
 
   <div class="col-span-2 grid gap-gap lg:col-span-12" data-rows>

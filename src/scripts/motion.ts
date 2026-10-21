@@ -14,6 +14,8 @@ const motion = readMotion((name) => root.getPropertyValue(name));
 const RISE = Number.parseFloat(root.getPropertyValue("--spacing-lg"));
 // The sectors switcher holds each sector this long, in seconds, while its tour runs; the fragment moves four times.
 const SECTOR_HOLD = 6;
+// A manifesto word not reached yet: about the muted ink on the graphite.
+const MUTED = 0.3;
 const QUERIES = {
   move: "(prefers-reduced-motion: no-preference)",
   still: "(prefers-reduced-motion: reduce)",
@@ -258,6 +260,29 @@ function sectorsSwitcher(move: boolean) {
   };
 }
 
+/**
+ * The manifesto (DESIGN.md Motion): as each line rises over the roots, its words go from muted to full ink one after
+ * the other, tied to the scroll. Opacity only, so it holds with reduced motion too.
+ */
+function manifesto() {
+  const lines = [...document.querySelectorAll<HTMLElement>("[data-manifesto]")];
+  const tweens = lines.map((line) =>
+    gsap.fromTo(
+      line.querySelectorAll("[data-word]"),
+      { opacity: MUTED },
+      {
+        opacity: 1,
+        ease: "none",
+        stagger: 0.5,
+        scrollTrigger: { trigger: line, start: "top 80%", end: "bottom 45%", scrub: true },
+      },
+    ),
+  );
+  return () => {
+    for (const tween of tweens) tween.revert();
+  };
+}
+
 /** A figure counts up once from zero to the value written in the HTML, which it puts back when reverted. */
 function countUp() {
   const figures = [...document.querySelectorAll<HTMLElement>("[data-count]")].map((figure) => ({
@@ -286,10 +311,10 @@ function countUp() {
 }
 
 /**
- * The code lens over the name band. With a fine pointer, a circle that follows it shows the letters made of
- * code; on touch screens the code sweeps once across the whole name from the left, holds and leaves to the right.
+ * The code lens over the word of the first chapter: with a fine pointer, a circle that follows it shows the letters
+ * made of code. Touch screens have no pointer to follow; the decode on the first paint (global.css) is theirs too.
  */
-function codeLens({ hover, move }: { hover: boolean; move: boolean }) {
+function codeLens({ move }: { move: boolean }) {
   const lens = document.querySelector<HTMLElement>("[data-lens]");
   const band = lens?.parentElement;
   if (!lens || !band) return;
@@ -301,29 +326,6 @@ function codeLens({ hover, move }: { hover: boolean; move: boolean }) {
   const show = (to: number, duration = motion.duration.ui) =>
     gsap.to(lens, { "--lens": to, duration, ease: motion.ease.out, overwrite: "auto" });
   lens.toggleAttribute("data-lens-still", !move);
-
-  if (!hover) {
-    // After the shutter: one sweep across the name; with reduced motion, one fade in and out.
-    lens.toggleAttribute("data-lens-wipe", move);
-    const pass = gsap.timeline({ delay: motion.duration.open });
-    if (move) {
-      const sweep = { duration: motion.duration.open, ease: motion.ease.inOut };
-      pass
-        .set(lens, { "--lens": 1, "--wipe-lead": 0, "--wipe-tail": 0 })
-        .to(lens, { "--wipe-lead": 1, ...sweep })
-        .to(lens, { "--wipe-tail": 1, ...sweep }, `+=${motion.duration.reveal}`)
-        .set(lens, { "--lens": 0 });
-    } else {
-      pass
-        .to(lens, { "--lens": 1, duration: motion.duration.ui, ease: motion.ease.out })
-        .to(lens, { "--lens": 0, duration: motion.duration.ui, ease: motion.ease.out }, `+=${motion.duration.reveal}`);
-    }
-    return () => {
-      pass.kill();
-      lens.toggleAttribute("data-lens-wipe", false);
-      gsap.set(lens, { "--lens": 0 });
-    };
-  }
 
   const options = { duration: motion.duration.ui, ease: motion.ease.out, onUpdate: paint };
   const toX = gsap.quickTo(position, "x", options);
@@ -359,7 +361,12 @@ media.add(QUERIES, (context) => {
   const { move = false, still = false, hover = false } = context.conditions ?? {};
   if (!move && !still) return;
   entrances(move);
-  const cleanups = [sectorsSwitcher(move), move ? countUp() : undefined, codeLens({ hover, move })];
+  const cleanups = [
+    sectorsSwitcher(move),
+    manifesto(),
+    move ? countUp() : undefined,
+    hover ? codeLens({ move }) : undefined,
+  ];
   return () => {
     for (const cleanup of cleanups) cleanup?.();
   };
