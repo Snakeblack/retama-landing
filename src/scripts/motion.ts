@@ -14,8 +14,8 @@ const motion = readMotion((name) => root.getPropertyValue(name));
 const RISE = Number.parseFloat(root.getPropertyValue("--spacing-lg"));
 // The sectors switcher holds each sector this long, in seconds, while its tour runs; the fragment moves four times.
 const SECTOR_HOLD = 6;
-// A manifesto word not reached yet: grey on the graphite, still 4.5:1 (WCAG 1.4.3; on phones the lines are 22px, not
-// large text). About 5:1.
+// A manifesto word not reached yet: grey on the graphite, about 5:1, so it holds 4.5:1 (WCAG 1.4.3) even though the
+// lines are large text at every width.
 const MUTED = 0.52;
 const QUERIES = {
   move: "(prefers-reduced-motion: no-preference)",

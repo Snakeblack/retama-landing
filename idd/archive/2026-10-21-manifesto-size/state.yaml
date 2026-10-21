@@ -1,0 +1,245 @@
+{
+  "schema": "idd-state/v1",
+  "change": "manifesto-size",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "si aplica el manifiesto (a 36 px en el móvil)",
+    "kind": "feature",
+    "summary": "El manifiesto del hero pasa a headline-sm (36 px) por debajo de lg; la regla de dos líneas queda para los títulos",
+    "acceptance": "En el móvil y hasta lg las dos frases del manifiesto van a headline-sm (36 px) y desde lg siguen a headline; DESIGN.md limita la regla de las dos líneas a los títulos y ospec check pasa"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Hero.astro",
+          "line": 75
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 310
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "si aplica el manifiesto"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 30
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/motion.ts",
+          "line": 17
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 258
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/board/Hero.astro",
+      "src/scripts/motion.ts",
+      "tests/e2e/motion.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Solo cambia el tamaño del texto, que sigue en el HTML; sin JS el manifiesto está en tinta plena"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Usa el token headline-sm de DESIGN.md; DESIGN.md acota la regla de dos líneas y design:lint está limpio"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint limpio con el manifiesto en type-headline-sm",
+      "recorded_at": "2026-10-21T21:38:43.391Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T21:39:37.023Z",
+      "detail": {
+        "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T21:39:37.023Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+        "fitness": [
+          "run-6",
+          "run-7"
+        ]
+      }
+    }
+  ],
+  "base": "54fe8606fc6fdfa552ac8510b741d78e664e0fa5",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:c9e1e9d40c2cc50c4da05662909660cbaf218374af994961dd470d84d2bc28d7",
+      "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+      "recorded_at": "2026-10-21T21:39:37.023Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:646c633283a4d9455ddd842dfbb716b01f5dd5dfe2aa6528763b8e64aa57b447",
+      "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+      "recorded_at": "2026-10-21T21:39:37.023Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:a859bbe249aff0535fcfdbb11762809393ed2d322ad7f2651ef2b949b06adf63",
+      "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+      "recorded_at": "2026-10-21T21:39:37.023Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3ed7976fa18b0e2d37b0fd81e03070991ef8f14a501704ee0e763210b6e014cd",
+      "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+      "recorded_at": "2026-10-21T21:39:37.023Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+      "recorded_at": "2026-10-21T21:39:37.023Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d47b8e75681aca6a1556f00be8eb01df0dd7db55e0557984da5e338c1c071704",
+      "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+      "recorded_at": "2026-10-21T21:39:37.023Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:b7a03d8112d08390ee53329e59be2b2bc3e06d9dbda6d1cfa690eadefbd87fd8",
+      "tree": "sha256:05d09002a32b17449326591ebdb63815d6ae826fa392216f14b6b3f18b7aed3e",
+      "recorded_at": "2026-10-21T21:39:37.023Z"
+    }
+  ],
+  "closed_at": "2026-10-21T21:39:42.467Z"
+}

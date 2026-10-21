@@ -145,6 +145,26 @@ test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
     expect((word?.x ?? 0) + (word?.width ?? 0)).toBeLessThanOrEqual(phone.width);
   });
 
+  test("el manifiesto se lee a tamaño de titular y cada frase cabe en tres líneas", async ({ page }) => {
+    await page.goto("/");
+    const lines = await page.locator("[data-manifesto]").evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const style = getComputedStyle(node);
+        const size = Number.parseFloat(style.fontSize);
+        const height = style.getPropertyValue("--text-headline-sm");
+        return {
+          size,
+          token: Number.parseFloat(height),
+          lines: Math.round(node.clientHeight / Number.parseFloat(style.lineHeight)),
+        };
+      }),
+    );
+    for (const { size, token, lines: count } of lines) {
+      expect(size).toBe(token);
+      expect(count).toBeLessThanOrEqual(3);
+    }
+  });
+
   test("Sectores lleva las pestañas en 2×2, la vuelta avanza y la marca blanca cambia de marca", async ({ page }) => {
     await page.goto("/");
     const tabs = page.locator(`${TABS} > summary`);
