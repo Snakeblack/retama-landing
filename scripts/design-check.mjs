@@ -1,8 +1,10 @@
 // ADR 0005: DESIGN.md is the single source of the design tokens.
-//   node scripts/design-check.mjs          lint DESIGN.md and check the theme is in sync
+//   node scripts/design-check.mjs          lint DESIGN.md, check the theme is in sync and that src/ uses only tokens
 //   node scripts/design-check.mjs --write  regenerate src/styles/theme.css
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { checkSource, parseTokens } from "./lib/design-values.mjs";
 
 const CLI = "node_modules/.bin/design.md";
 const THEME = "src/styles/theme.css";
@@ -67,5 +69,17 @@ if (current !== theme) {
   failed = true;
 }
 
+// Components take every colour and size from the tokens of the DESIGN.md being checked.
+const tokens = parseTokens(theme);
+const sources = readdirSync("src", { recursive: true })
+  .map((file) => join("src", String(file)))
+  .filter((file) => /\.(astro|css)$/.test(file) && file !== THEME);
+for (const file of sources) {
+  for (const finding of checkSource(file, readFileSync(file, "utf8"), tokens)) {
+    console.error(`${file}:${finding.line} ${finding.value}: ${finding.message}`);
+    failed = true;
+  }
+}
+
 if (failed) process.exit(1);
-console.log("DESIGN.md: lint clean, theme in sync");
+console.log("DESIGN.md: lint clean, theme in sync, components use only tokens");
