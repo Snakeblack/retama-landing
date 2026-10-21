@@ -60,6 +60,52 @@ test.describe("sin JavaScript (ADR 0001)", () => {
       await expect(page.locator("h1")).not.toBeEmpty();
       await expect(page.locator("main p").first()).not.toBeEmpty();
     });
+
+    test(`${path} trae el tablero completo: grupos, imágenes acreditadas y contacto (DESIGN.md)`, async ({ page }) => {
+      await page.goto(path);
+
+      const groups = page.locator("main section[id]");
+      await expect(groups).toHaveCount(4);
+      for (const group of await groups.all()) {
+        await expect(group.locator("h2")).toHaveCount(1);
+        await expect(group.locator("h2")).not.toBeEmpty();
+      }
+
+      const links = page.getByRole("navigation").getByRole("link");
+      await expect(links).toHaveCount(3);
+      for (const href of await links.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href")))) {
+        await expect(page.locator(`main ${href}`)).toHaveCount(1);
+      }
+
+      const pictures = page.locator("main picture img");
+      expect(await pictures.count()).toBeGreaterThanOrEqual(4);
+      for (const alt of await pictures.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("alt")))) {
+        expect(alt?.trim()).toBeTruthy();
+      }
+      const credits = page.locator('footer a[href^="https://commons.wikimedia.org/wiki/File:"]');
+      expect(await credits.count()).toBe(await pictures.count());
+
+      const contact = page.locator(`main section[id] a[href^="mailto:"]`);
+      await expect(contact).toHaveCount(1);
+      const address = (await contact.getAttribute("href"))?.replace("mailto:", "");
+      await expect(contact).toHaveText(address ?? "");
+      const action = page.locator("main a.bg-primary");
+      await expect(action).toHaveCount(1);
+      await expect(page.locator(`main ${await action.getAttribute("href")}`)).toContainText(address ?? "");
+    });
+
+    test(`${path} cambia de tipo de proyecto sin JavaScript, de uno en uno`, async ({ page }) => {
+      await page.goto(path);
+      const projects = page.locator("main details");
+      await expect(projects).toHaveCount(4);
+      await expect(projects.first()).toHaveAttribute("open", "");
+      await expect(projects.first().locator("ol > li")).toHaveCount(3);
+
+      await projects.nth(2).locator("summary").click();
+      await expect(projects.nth(2)).toHaveAttribute("open", "");
+      await expect(projects.nth(2).locator("ol > li").first()).toBeVisible();
+      await expect(projects.first()).not.toHaveAttribute("open");
+    });
   }
 });
 

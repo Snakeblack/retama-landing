@@ -189,7 +189,7 @@ The art direction is **The well-kept board**, dealt by taste-skill (`dense-tiles
 
 The whole page is one board of flat tiles fitted edge to edge with narrow gaps, like a tidy desk seen from above. Each tile holds one true thing: the name, a statement, a picture, a figure, a short list, a link. There is no sequence of bands: the board continues down the page with the same sizes, and its last row is the footer.
 
-**The idea.** A retama lives on poor, dry ground because of what nobody sees: a root system many times deeper than the shrub is tall. Retama works the same way: the visible software stands on documented decisions underneath. On this page, **the retama's deep roots and the firm's written decisions become the board's tiles**: the large central tile of the first screen holds the 3D scene of the plant's stems and roots, and the method tiles read like decision records (a number, a decision, its reason). The live thing, built in M2, comes from the same idea: the visitor picks a kind of project and reads the first decisions Retama would record for it.
+**The idea.** A retama lives on poor, dry ground because of what nobody sees: a root system many times deeper than the shrub is tall. Retama works the same way: the visible software stands on documented decisions underneath. On this page, **the retama's deep roots and the firm's written decisions become the board's tiles**: the large central tile of the first screen holds the 3D scene of the plant's stems and roots, and the method tiles read like decision records (a number, a decision, its reason). The live thing comes from the same idea: in the method group the visitor picks one of four kinds of project and reads the first three decisions Retama would record for it. It is a native exclusive accordion (`<details name>`), so it works without JavaScript and keeps nothing in the URL.
 
 ## Colors
 
@@ -219,7 +219,9 @@ A 12-column grid that fills the viewport with **12px outer margins** and **8px g
 
 Groups of the board (services, sectors, method, questions, contact) are separated by 128px (`section`), clearly more than any gap inside a group, and each group opens with a heading tile that names it. The first screen carries the page's one `h1`.
 
-The phone is its own board: two columns with the same gaps, re-ordered so the name and the statement lead, the photograph spans both columns and pairs of small tiles sit side by side.
+The phone is its own board: two columns with the same gaps, re-ordered so the name and the statement lead, the photograph spans both columns and pairs of small tiles sit side by side. The two-column board holds up to the `lg` breakpoint (1024px); the 12-column mosaic starts there, because below it a 3-column tile is too narrow for a statement. Rows are 96px and grow when a tile's content needs more (the `board-rows` utility), and a picture never sizes its row: it fills its tile absolutely.
+
+The first screen follows "Name band and rails": the name band; a row of three link tiles to the groups (their anchors are translated per language) beside the one action, an orange tile that leads to the contact group; and three columns: on the left the Clusius plate over a list of five facts, in the centre the scene tile with the `h1` statement tile in the ground tone laid over its lower left, and on the right two figures.
 
 ## Elevation & Depth
 
@@ -247,7 +249,7 @@ Square corners on everything: tiles, photographs, the action and form fields (`r
 
 ## Imagery
 
-Retama has no photographs of its own. In order of preference: real pictures of its world from open collections with licences that allow commercial use (botanical plates and photographs of *Retama sphaerocarpa* and *Retama monosperma*, the dry ground and coastal sands of southern Spain), downloaded into the repository and credited in the footer; interface fragments of real work drawn in HTML (`data-ui`); then drawings in code in the palette's colours. Every photograph is greyscale, square-cornered and covers its tile with `object-fit: cover`. A found picture shows the world around Retama and is never presented as Retama's product, office or team. The board carries at least four real pictures.
+Retama has no photographs of its own. In order of preference: real pictures of its world from open collections with licences that allow commercial use (botanical plates and photographs of *Retama sphaerocarpa* and *Retama monosperma*, the dry ground and coastal sands of southern Spain), downloaded into the repository and credited in the footer; interface fragments of real work drawn in HTML (`data-ui`); then drawings in code in the palette's colours. Every photograph is greyscale and baked that way into the file; an engraved plate is inverted onto the graphite, its paper turned into the raised tile tone and its lines into the light ink, so it reads as part of the board. Every picture is square-cornered and covers its tile with `object-fit: cover`. A found picture shows the world around Retama and is never presented as Retama's product, office or team. The board carries at least four real pictures.
 
 ## Motion and 3D
 
@@ -279,7 +281,7 @@ The budget, per page:
 - **At most one pinned scroll scene** (the sectors list), held for two or three screens, with its own content on every screen.
 - Between eight and sixteen elements move while the page loads and scrolls; no bounce or elastic easing; no scroll hijacking and no custom cursor.
 
-**The 3D scene** (ADR 0004) draws the retama's stems above and roots below as thin geometry in on-surface and primary on the graphite ground, turning slowly. Three tiers that look like one picture: WebGPU, then WebGL2, then the static poster image, which is the LCP element and is shown first. The scene loads after the first paint and only when its tile is visible, pauses off screen and with the tab hidden, and stays on the poster with reduced motion, data saving or a weak GPU.
+**The 3D scene** (ADR 0004) draws the retama's stems above and roots below as thin geometry in on-surface and primary on the graphite ground, turning slowly. Three tiers that look like one picture: WebGPU, then WebGL2, then the static poster, which is shown first. The poster is an inline SVG drawn at build time from the same seeded generator the scene will use (`src/lib/retama-shape.ts`), so the three tiers draw the same plant; the taproot is the one stroke in primary. The scene loads after the first paint and only when its tile is visible, pauses off screen and with the tab hidden, and stays on the poster with reduced motion, data saving or a weak GPU.
 
 **Reduced motion** keeps opacity and colour changes and drops travel, scale, parallax, the shutter and the scene's rotation. The performance budget of `scenario:perf-mobile` (LCP ≤ 1.8s, INP ≤ 200ms, CLS ≤ 0.1, Lighthouse 100) wins over any move.
 
