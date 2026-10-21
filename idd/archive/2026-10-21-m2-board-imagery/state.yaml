@@ -1,0 +1,472 @@
+{
+  "schema": "idd-state/v1",
+  "change": "m2-board-imagery",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "me encaja la recomendación (retama solo en hero y Método, frase que descifra la metáfora, fragmentos data-ui en el resto), en el PR #14 ahora",
+    "kind": "feature",
+    "summary": "Corrección de imágenes del tablero (PR #14): la retama solo como firma (póster del hero y lámina de Clusius en Método, con una frase que descifra la metáfora); fragmentos de interfaz data-ui en el raíl del hero (ADR 0004 real), Servicios (puertas de calidad reales de esta web) y Sectores (panel de rutas rotulado como ejemplo); DESIGN.md Imagery enmendado",
+    "acceptance": "/ y /en/ muestran la retama solo en el póster del hero y en la lámina de Método junto a la frase de la metáfora; el raíl del hero, Servicios y Sectores llevan fragmentos data-ui en HTML sin JS; el de Sectores lleva la etiqueta visible de ejemplo; cada imagen tiene alt y crédito; design:lint, E2E y Lighthouse 100 x4 en verde"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Method.astro",
+          "line": 41
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 220
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Qué muestra cada hueco y qué regla de imágenes queda? (respondido: ADR 0004 real en el hero, puertas de calidad reales en Servicios, panel de rutas rotulado como ejemplo en Sectores; la regla de cuatro imágenes reales se enmienda: la retama dos veces y fragmentos en el resto)"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/es.ts",
+          "line": 11
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 246
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/board.ts",
+          "line": 4
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/board/Hero.astro",
+      "src/components/board/Method.astro",
+      "src/components/board/Sectors.astro",
+      "src/components/board/Services.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/board.ts",
+      "tests/e2e/site.spec.ts"
+    ],
+    "work_units": 2,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 2 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0008 and quality scenario brand-impact, perf-mobile",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Los fragmentos son HTML estático sin JS; E2E sin JavaScript en verde"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Fragmentos solo con tokens y clases literales (design:lint en verde); DESIGN.md Imagery enmendado con la regla nueva aprobada por el usuario"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Claves nuevas frag.* en es y en con paridad (test unitario)"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "La portada se lee como empresa de software: la retama queda como firma con su metáfora explicada y los fragmentos muestran trabajo técnico real"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "Menos imágenes que descargar; LHCI 100x4 en ospec check"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint en verde dentro de ospec check sobre los fragmentos nuevos (clases literales, solo tokens) y DESIGN.md enmendado",
+      "recorded_at": "2026-10-21T12:08:32.139Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Panel de ejemplo rotulado (Recomendado) para Sectores; Sí: la retama dos veces, los fragmentos el resto (Recomendado); en el PR #14 ahora",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T12:03:29.880Z",
+      "detail": {
+        "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T12:03:29.880Z",
+      "detail": {
+        "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/site.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T12:03:29.880Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-21T12:08:46.712Z",
+      "detail": {
+        "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+        "runs": [
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12",
+          "run-13"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-21T12:08:46.712Z",
+      "detail": {
+        "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+        "check": "ev-4",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/site.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-21T12:08:46.712Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+        "fitness": [
+          "run-14",
+          "run-15",
+          "run-16"
+        ]
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-21T12:08:46.789Z"
+    }
+  ],
+  "base": "b87d6d1ec248b597f9984d1560a734eefd6192ae",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:467a43452a20fb0ce048d114153b234bdcb332466ae693edaa997da8fdc641bd",
+      "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+      "recorded_at": "2026-10-21T12:03:29.880Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:ca59835d8c6da120584fba1095ba94e90ccc0527705b40549f62fd6290ee9d13",
+      "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+      "recorded_at": "2026-10-21T12:03:29.880Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:98e18b871383d728f4d1b03ec81581f47e1f45028245880f86ebb706d8a336ac",
+      "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+      "recorded_at": "2026-10-21T12:03:29.880Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3c5cb8af7ecc18307f4ede4b7f57a53dcff4242505424e9c7b1bacb636968d1f",
+      "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+      "recorded_at": "2026-10-21T12:03:29.880Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+      "recorded_at": "2026-10-21T12:03:29.880Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:6519f95be2dcdf68281654dba1b0c7e04a9b316141edb6752142ba46e3b0ad0f",
+      "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+      "recorded_at": "2026-10-21T12:03:29.880Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:eee61392c62ac0ad13bd9b38f52ada160c3149c910b7b7f3626c677f36387677",
+      "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+      "recorded_at": "2026-10-21T12:03:29.880Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d9b8653d75c0688166864d0310309e27e25d8ff184eb14f18eee1f5acdb3c20f",
+      "tree": "sha256:1c961f6246520129986533ea4ccc29f4bd13e1d829d9237d6a97a164ed098353",
+      "recorded_at": "2026-10-21T12:03:29.880Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:467a43452a20fb0ce048d114153b234bdcb332466ae693edaa997da8fdc641bd",
+      "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+      "recorded_at": "2026-10-21T12:08:46.712Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:008175ff620c6827e7b0c09c22f6805da74fbf1b0fcb8202847e45c3ca6edaf6",
+      "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+      "recorded_at": "2026-10-21T12:08:46.712Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:78345258fe22bc126ce2f255ad0d7425cf3c976d12b10923438b44849ef4c149",
+      "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+      "recorded_at": "2026-10-21T12:08:46.712Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:820d2cb5833ac1348997f191d6609cff59678317203b730dd5142f237f6c2904",
+      "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+      "recorded_at": "2026-10-21T12:08:46.712Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+      "recorded_at": "2026-10-21T12:08:46.712Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:7e13b5b0e311b786a7a593f647d32a0ee65cf68edd841673156bdffc08b838dc",
+      "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+      "recorded_at": "2026-10-21T12:08:46.712Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:cdd7ccb0930edf9b3f303e06f49a3994f9dfa2bfb430ae19cc5a464b8d6edd8a",
+      "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+      "recorded_at": "2026-10-21T12:08:46.712Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:80323388a1ba5bc6f3d873f96e9c5d6e7668c35d46ebe0fed476500d6c4e4fe0",
+      "tree": "sha256:94050ebdbdf77695a1fd8eb9670fa9eaa73ac16e6add75bbffd556489b2a599b",
+      "recorded_at": "2026-10-21T12:08:46.712Z"
+    }
+  ],
+  "closed_at": "2026-10-21T12:08:46.789Z"
+}
