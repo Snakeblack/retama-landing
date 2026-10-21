@@ -20,6 +20,23 @@ export function listFiles(dir) {
     .sort();
 }
 
+/**
+ * Top-level entries of the skills root. Only real folders are skills; a symlink
+ * (Dirent.isDirectory() does not follow it) or a stray file would skip the scan.
+ * @param {string} root
+ * @returns {{folders: string[], rejected: string[]}}
+ */
+export function listSkillEntries(root) {
+  const folders = [];
+  const rejected = [];
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    if (entry.isDirectory()) folders.push(entry.name);
+    else if (entry.isSymbolicLink()) rejected.push(`symlink ${entry.name} is not allowed`);
+    else if (join(root, entry.name) !== MANIFEST) rejected.push(`stray file ${entry.name} is not allowed`);
+  }
+  return { folders: folders.sort(), rejected: rejected.sort() };
+}
+
 /** Symlinks of one skill folder: never hashed or scanned, so never allowed. @param {string} dir */
 export function listLinks(dir) {
   return readdirSync(dir, { recursive: true, withFileTypes: true })

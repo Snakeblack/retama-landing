@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -6,6 +6,7 @@ import {
   diffFiles,
   listFiles,
   listLinks,
+  listSkillEntries,
   readManifest,
   SKILLS_DIR,
   scanText,
@@ -74,6 +75,28 @@ describe("listLinks", () => {
   });
 });
 
+describe("listSkillEntries", () => {
+  it("rechaza symlinks y archivos sueltos en la raíz de las skills", () => {
+    const root = mkdtempSync(join(tmpdir(), "skills-root-"));
+    mkdirSync(join(root, "real"));
+    mkdirSync(join(root, "elsewhere"));
+    symlinkSync(join(root, "elsewhere"), join(root, "linked-dir"));
+    symlinkSync("/etc/hostname", join(root, "linked-file.md"));
+    writeFileSync(join(root, "notes.md"), "x");
+    const { folders, rejected } = listSkillEntries(root);
+    expect(folders).toEqual(["elsewhere", "real"]);
+    expect(rejected).toEqual([
+      "stray file notes.md is not allowed",
+      "symlink linked-dir is not allowed",
+      "symlink linked-file.md is not allowed",
+    ]);
+  });
+
+  it("la raíz real solo tiene carpetas de skills y el manifiesto", () => {
+    expect(listSkillEntries(SKILLS_DIR).rejected).toEqual([]);
+  });
+});
+
 describe("unreviewed", () => {
   const finding = { path: "a/README.md", rule: "remote-clone", line: 3 };
 
@@ -86,10 +109,7 @@ describe("unreviewed", () => {
 
 describe("skills vendorizadas (ADR 0010)", () => {
   const manifest = readManifest();
-  const folders = readdirSync(SKILLS_DIR, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
+  const { folders } = listSkillEntries(SKILLS_DIR);
 
   it("cada carpeta está en el manifiesto con origen, commit fijado, licencia y veredicto", () => {
     expect(Object.keys(manifest.skills).sort()).toEqual(folders);
