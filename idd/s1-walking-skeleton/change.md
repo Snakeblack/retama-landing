@@ -60,6 +60,10 @@ Cinco unidades de trabajo entregadas como PRs encadenados (decisión del usuario
 - Email de autor `retamozogpt@gmail.com` (usuario, 2026-10-21) en todo el historial, también en `main`. GitHub cerró los PRs #1–#5 al reescribirlo y no permite reabrirlos; se sustituyen por #6–#10, y el usuario acepta que el email antiguo quede en esos PRs cerrados. La tag local `ospec-s1-base` conserva el commit base antiguo que usa ospec.
 - Repo público y `main` protegido vía API: checks `quality`, `e2e` y `lighthouse` (strict), PR obligatorio sin aprobaciones (equipo de una persona), enforce_admins, historial lineal y sin force-push ni borrado.
 - Merge de la pila: el workflow solo existe en #10, así que los PRs se fusionan de arriba abajo en su rama base (#10 → … → #7) y #6 entra en `main` con el CI completo y rebase-merge (el historial es lineal y release-please lee los commits).
+- Fusión hecha el 2026-10-21: #10–#7 por fast-forward de sus ramas base (sin reescribir) y #6 con rebase-merge. GitHub reescribe los commits en ese merge y pone como committer el email principal de la cuenta; el autor se conserva.
+- Producción verificada en https://retama-landing.retamozogpt.workers.dev tras el deploy de `main`: `/` (es) y `/en/` responden 200 con canónica, hreflang recíproco con `x-default` y sitemap; `/en` → 307 a `/en/`; las 404 salen en su idioma con `noindex`; HSTS, CSP con hashes, `nosniff`, Referrer-Policy, Permissions-Policy, COOP y `X-Frame-Options: DENY` llegan como cabeceras.
+- release-please abrió el PR de release con el PAT y el CI corrió en él.
+- El PR de prueba de esta rama genera su preview y en él se verifica el ADR 0006.
 - Biome es dueño de JS/TS/JSON/CSS; ESLint solo de `.astro` (soporte experimental en Biome).
 
 ## Evidence
