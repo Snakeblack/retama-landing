@@ -211,7 +211,9 @@ export async function createScene(
   onLost: () => void,
   onSettled: () => void,
 ): Promise<GlyphScene> {
-  const renderer = new WebGPURenderer({ canvas, antialias: true, forceWebGL: tier === "webgl2" });
+  // No multisampling: every glyph is a quad whose edge is transparent, smoothed by the atlas's mipmaps, so it would
+  // only cost the scene's pass its samples.
+  const renderer = new WebGPURenderer({ canvas, antialias: false, forceWebGL: tier === "webgl2" });
   renderer.onDeviceLost = onLost;
   await renderer.init();
   renderer.setPixelRatio(Math.min(pixelRatio, 2));
@@ -223,8 +225,11 @@ export async function createScene(
   const camera = new PerspectiveCamera(FOV, 1, 1, 20000);
   const pipeline = new RenderPipeline(renderer);
   const drawn = pass(scene, camera).getTextureNode();
-  // Only what is brighter than the ink blooms: the glyphs in flight and the sap.
-  const lit = drawn.add(bloom(drawn, 0.9, 0.4, 0.9));
+  // Only what is brighter than the ink blooms: the glyphs in flight and the sap. The glow is soft, so it is worked out
+  // at a quarter of the canvas's size, which nearly halves the scene's cost on the GPU and looks the same.
+  const glow = bloom(drawn, 0.9, 0.4, 0.9);
+  glow.setResolutionScale(0.25);
+  const lit = drawn.add(glow);
   const grain = uniform(0);
   pipeline.outputNode = grained(lit, colors.ground, Math.min(pixelRatio, 2), grain);
 
