@@ -35,7 +35,7 @@
 | Plataforma de borde | Cloudflare | HTTPS, Git | Caída de la plataforma: la web no está disponible. El uptime externo avisa |
 | Email transaccional | Resend | HTTPS API | Error o timeout: la función responde con un error y la UI ofrece email y WhatsApp. Se registra el código de error, no los datos |
 | Anti-bot | Cloudflare Turnstile | Widget explícito, `interaction-only`, cargado al primer foco en el formulario + siteverify | Si la verificación no está disponible, se rechaza el envío (fail-closed) y se muestran vías alternativas |
-| Límite de envíos | Cloudflare (binding `ratelimits` de Workers) | Binding | 3 envíos por minuto e IP (en IPv6, por /64), contados por ubicación. Sin el binding, se rechaza el envío (fail-closed) |
+| Límite de envíos | Cloudflare (binding `ratelimits` de Workers) | Binding | 3 envíos por minuto e IP (en IPv6, por /64), contados por ubicación. Sin el binding, se rechaza el envío (fail-closed). Las Previews no heredan los bindings: tienen el suyo en `previews` de `wrangler.jsonc`, con el mismo límite y su propio contador |
 | Reserva de llamada | Cal.com (plan gratis) | iframe/embed tras clic | Si el embed falla, se muestra un enlace directo a la página de reserva |
 | WhatsApp | Meta | Enlace `wa.me` | Sin dependencia en tiempo de ejecución |
 | Medición sin cookies | Cloudflare Web Analytics | Beacon | Si falla, se pierden métricas; nunca afecta a la página |

@@ -1,0 +1,382 @@
+{
+  "schema": "idd-state/v1",
+  "change": "preview-limiter",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "Las Previews de rama no reciben el binding CONTACT_LIMITER porque no heredan la configuración de producción, y /api/contact/ responde siempre 503 en ellas",
+    "acceptance": "En la preview de la rama, POST /api/contact/ con cuerpo {} y Origin correcto responde 400 invalid (no 503), y dist/server/wrangler.json lleva previews.ratelimits con CONTACT_LIMITER"
+  },
+  "facts": {
+    "open": [
+      "¿Las previews cuentan los envíos aparte de producción (otro namespace_id) o comparten el contador de producción (1001)?",
+      "¿Las previews usan el mismo límite que producción (3 envíos por minuto) o uno distinto?",
+      "¿Este change se queda solo en el binding, o también declara los secretos de las previews (previews.secrets.required) y deja instrucciones para ponerlos?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "docs/architecture/technical-baseline.md",
+      "tests/unit/wrangler-config.test.ts",
+      "wrangler.jsonc"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches wrangler.jsonc (matches wrangler.jsonc)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0002, 0003, 0009",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "Sigue siendo un único desplegable con la misma ruta bajo demanda; las Previews de ese desplegable reciben ahora el binding que la función ya exigía"
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "impact": "conforms",
+      "reason": "ratelimits es un contador por ubicación, no almacenamiento persistente; el bloque previews no añade ningún binding de almacenamiento"
+    },
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": "conforms",
+      "reason": "Cada rama sigue con su preview desplegada por Workers Builds; el cambio hace que la preview reproduzca el límite de producción"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Contador propio (Recomendado: otro namespace_id, 1002); el mismo límite: 3 por minuto; solo el binding, sin secretos",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-22T12:30:06.105Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-22T12:30:58.013Z",
+      "detail": {
+        "lineage_id": "sha256:1fa083cd4b91c77636b6e01428ccb5fb31cb75db9d175eac6b3eba100178367e",
+        "candidate_id": "sha256:18f6b6199d2abc4b50a5efd79b5abcc54f4d747a3dad52b625345524009e734f",
+        "candidate_tree": "107358891aed4c3580d760f3c8b00564fd55a97e",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "relayed"
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T12:31:39.142Z",
+      "detail": {
+        "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T12:31:39.142Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0003 conforms",
+          "adr:0009 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+        "fitness": [
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    }
+  ],
+  "base": "d8fa87065d639aa7d0b747e252c1f8af0f06a658",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/wrangler-config.test.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:537d40cef53fea7ef200044e08d8734c2a6d2688010404a2f54d6efa13adcb5f",
+      "tree": "sha256:cb2ade6f343d3cd12a75cfec366de3f9ba5956d66ec219c4f4f3eab16dc6ded5",
+      "recorded_at": "2026-10-22T12:29:57.074Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/wrangler-config.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:945b3c3a8264fdd9403a4c3411c6bb6d62f32e608279a44432716c9d4826e242",
+      "tree": "sha256:3bdaa5ed6ec3e8c6a64b60d7520956da2fd8b47c3a6de5ec51116691d0f23f34",
+      "recorded_at": "2026-10-22T12:30:06.105Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:d9c55d48a63a3e919b975251f812881f210943bfc6b05b8bb7f2f8528094913b",
+      "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+      "recorded_at": "2026-10-22T12:31:39.142Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:f8aa534b2dfe18886a43d42df87988213fd88660b596519500fc190f79e1643b",
+      "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+      "recorded_at": "2026-10-22T12:31:39.142Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:80ffedcbfdcb083fbb7502d6ea930295d152135dbe765bea472feac4faa4c47f",
+      "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+      "recorded_at": "2026-10-22T12:31:39.142Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:30f58e85a473b6b1b79854c6c7705b874f9064824770d6b7b78f486f75b7efc4",
+      "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+      "recorded_at": "2026-10-22T12:31:39.142Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+      "recorded_at": "2026-10-22T12:31:39.142Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+      "recorded_at": "2026-10-22T12:31:39.142Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:59f5c65054af772f96a92f9defad756a2b8625c472795a72a870e9f120864f17",
+      "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+      "recorded_at": "2026-10-22T12:31:39.142Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:9515af1fbac3d3d3f15011efcacc40241437d62b9d4aaf429d015382f0a9aca5",
+      "recorded_at": "2026-10-22T12:31:39.142Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:1fa083cd4b91c77636b6e01428ccb5fb31cb75db9d175eac6b3eba100178367e",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "3fe1f2bd057ad56558e4540fc50ac90237362f57",
+          "candidate_tree": "107358891aed4c3580d760f3c8b00564fd55a97e",
+          "paths": [
+            "docs/architecture/technical-baseline.md",
+            "tests/unit/wrangler-config.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:13bbd3ef78d195262642c87a5c6fb308c35f24504ea8c34f89c4bb7f31ff7930",
+          "paths_digest": "sha256:d01a7330bb9ffca3072f89133a5fb0a8f708272077685f8cddd8ccf65eb460f8",
+          "authored_lines": 32,
+          "original_changed_lines": 34
+        },
+        "candidate_id": "sha256:18f6b6199d2abc4b50a5efd79b5abcc54f4d747a3dad52b625345524009e734f",
+        "paths": [
+          "docs/architecture/technical-baseline.md",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "107358891aed4c3580d760f3c8b00564fd55a97e",
+        "original_changed_lines": 34,
+        "authored_lines": 32
+      },
+      "current_candidate_id": "sha256:18f6b6199d2abc4b50a5efd79b5abcc54f4d747a3dad52b625345524009e734f",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "3fe1f2bd057ad56558e4540fc50ac90237362f57",
+        "candidate_tree": "107358891aed4c3580d760f3c8b00564fd55a97e",
+        "paths": [
+          "docs/architecture/technical-baseline.md",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:13bbd3ef78d195262642c87a5c6fb308c35f24504ea8c34f89c4bb7f31ff7930",
+        "paths_digest": "sha256:d01a7330bb9ffca3072f89133a5fb0a8f708272077685f8cddd8ccf65eb460f8",
+        "authored_lines": 32,
+        "original_changed_lines": 34
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "preview-limiter:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "preview-limiter:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 17,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-22T12:31:50.835Z"
+}
