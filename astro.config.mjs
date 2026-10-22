@@ -3,6 +3,12 @@ import cloudflare from "@astrojs/cloudflare";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField, fontProviders } from "astro/config";
+import { missingOwner } from "./scripts/lib/legal-owner.mjs";
+
+// The legal notice must name its owner (LSSI art. 10): Workers Builds, which publishes the site, never builds without.
+const missing = missingOwner(process.env);
+if (missing.length > 0)
+  throw new Error(`The legal notice needs its owner: set ${missing.join(" and ")} in Workers Builds.`);
 
 // Production origin for canonicals, hreflang and the sitemap. SITE_URL overrides
 // it; the fallback is the workers.dev URL until the domain lands (M6).
@@ -34,6 +40,13 @@ export default defineConfig({
       // The owner's WhatsApp, international format (34…), set in the build environment (Workers Builds) so it stays out
       // of the public repository. Without it the page shows no WhatsApp.
       PUBLIC_WHATSAPP_NUMBER: envField.string({ context: "client", access: "public", optional: true }),
+      // The owner the legal notice names (src/lib/board.ts, owner), set in the build environment (Workers Builds) so it
+      // stays out of the public repository: the name and the town, required there, and the NIF and the address once
+      // they exist. Without a name or a town the notice names nobody.
+      PUBLIC_LEGAL_NAME: envField.string({ context: "client", access: "public", optional: true }),
+      PUBLIC_LEGAL_TOWN: envField.string({ context: "client", access: "public", optional: true }),
+      PUBLIC_LEGAL_NIF: envField.string({ context: "client", access: "public", optional: true }),
+      PUBLIC_LEGAL_ADDRESS: envField.string({ context: "client", access: "public", optional: true }),
     },
   },
   i18n: {
