@@ -3,6 +3,8 @@ import { expect, type Page, test } from "@playwright/test";
 // The contact form over the build (Contact.astro, src/scripts/contact.ts). Turnstile and /api/contact/ are doubles at
 // the boundary: the widget's script is served from its real URL, so the CSP still decides whether it may run.
 const TURNSTILE = "https://challenges.cloudflare.com/turnstile/v0/api.js*";
+// WhatsApp shows only in a build given PUBLIC_WHATSAPP_NUMBER: CI builds with a test number, a plain local run without.
+const whatsappNumber = process.env.PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
 // Each render and each reset hands out a new token, as the real widget does.
 const fakeTurnstile = `
   let options, count = 0;
@@ -76,7 +78,9 @@ test.describe("formulario de contacto sin JavaScript (ADR 0001)", () => {
       await expect(page.locator("[data-choice]")).toHaveCount(5);
       await expect(page.getByRole("button", { name: labels.submit })).toBeDisabled();
       await expect(page.locator("[data-contact] noscript")).toHaveCount(1);
-      await expect(page.locator("[data-contact-direct] a:not([data-booking-open])")).toHaveCount(2);
+      await expect(page.locator("[data-contact-direct] a:not([data-booking-open])")).toHaveCount(
+        whatsappNumber ? 2 : 1,
+      );
       // Nothing the form holds can end up in a URL or in another page.
       await expect(page.locator("[data-contact] form")).not.toHaveAttribute("action");
     });
@@ -177,7 +181,7 @@ test.describe("formulario de contacto", () => {
       [502, { ok: false, error: "delivery" }, "unavailable"],
       [503, { ok: false, error: "unavailable" }, "unavailable"],
     ] as const) {
-      test(`${path} ante un ${status} conserva lo escrito y ofrece el correo precargado y WhatsApp`, async ({
+      test(`${path} ante un ${status} conserva lo escrito y ofrece el correo precargado y, si hay número, WhatsApp`, async ({
         page,
       }) => {
         const sent = await api(page, status, body);
@@ -192,7 +196,9 @@ test.describe("formulario de contacto", () => {
         const mail = failure.locator("[data-contact-mail]");
         const href = new URL((await mail.getAttribute("href")) ?? "");
         expect(href.searchParams.get("body")).toBe(`${draft.message}\n\n${draft.name}`);
-        await expect(failure.locator('a[href^="https://wa.me/"]')).toBeVisible();
+        const chat = failure.locator('a[href^="https://wa.me/"]');
+        if (whatsappNumber) await expect(chat).toHaveAttribute("href", `https://wa.me/${whatsappNumber}`);
+        else await expect(chat).toHaveCount(0);
 
         // The token was spent: a second try sends a fresh one.
         await expect(submit).toBeEnabled();

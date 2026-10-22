@@ -1,7 +1,7 @@
 ---
-import { PUBLIC_BOOKING, PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
+import { PUBLIC_BOOKING, PUBLIC_TURNSTILE_SITE_KEY, PUBLIC_WHATSAPP_NUMBER } from "astro:env/client";
 import { type Locale, t } from "../../i18n/index";
-import { bookingUrl, contactEmail, whatsappLabel, whatsappNumber } from "../../lib/board";
+import { bookingUrl, contactEmail, whatsapp } from "../../lib/board";
 import { bookingEmbedSrc } from "../../lib/booking";
 import { LIMITS, PROJECT_TYPES, type ProjectType } from "../../lib/contact";
 import type { FailureKind } from "../../lib/contact-form";
@@ -25,7 +25,7 @@ const typeLabel: Record<ProjectType, keyof typeof copy> = {
   other: "form.typeOther",
 };
 const failures: FailureKind[] = ["invalid", "verification", "rate-limited", "unavailable"];
-const whatsappHref = `https://wa.me/${whatsappNumber}`;
+const wa = whatsapp(PUBLIC_WHATSAPP_NUMBER);
 const input = "min-h-(--spacing-touch) w-full bg-surface px-md py-sm text-on-surface";
 const label = "type-small text-on-surface-muted";
 const error = "flex gap-sm type-small";---
@@ -41,7 +41,7 @@ const error = "flex gap-sm type-small";---
   <div class="col-span-2 grid content-end gap-sm bg-field p-tile-sm text-on-field md:p-tile lg:col-span-6 lg:col-start-1 lg:row-start-2" data-contact-direct>
     <p class="type-small">{copy["contact.direct"]}</p>
     <a class="feedback break-all type-statement-sm underline hover:decoration-primary md:type-statement" href={`mailto:${contactEmail}`}>{contactEmail}</a>
-    <a class="feedback underline hover:decoration-primary" href={whatsappHref}>WhatsApp · {whatsappLabel}</a>
+    {wa && <a class="feedback underline hover:decoration-primary" href={wa.href}>WhatsApp · {wa.label}</a>}
     {PUBLIC_BOOKING && <a class="feedback underline hover:decoration-primary" href={bookingUrl} data-booking-open>{copy["booking.open"]}</a>}
   </div>
 
@@ -108,7 +108,7 @@ const error = "flex gap-sm type-small";---
         }
         <p class="flex flex-wrap gap-x-lg gap-y-xs ps-md" data-failure-ways>
           <a class="feedback underline hover:decoration-primary" href={`mailto:${contactEmail}`} data-contact-mail>{copy["form.fail.mail"]}</a>
-          <a class="feedback underline hover:decoration-primary" href={whatsappHref}>WhatsApp · {whatsappLabel}</a>
+          {wa && <a class="feedback underline hover:decoration-primary" href={wa.href}>WhatsApp · {wa.label}</a>}
         </p>
       </div>
 
