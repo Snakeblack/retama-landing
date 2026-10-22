@@ -1,0 +1,961 @@
+{
+  "schema": "idd-state/v1",
+  "change": "contact-direct",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "feature",
+    "summary": "Reserva de llamada en Hablemos: el calendario de Cal.com se carga solo al pedirlo (clic), con enlace directo como alternativa; mailto y WhatsApp ya están",
+    "acceptance": "En / y /en/ el capítulo Hablemos ofrece reservar una llamada; sin pulsar no hay ninguna petición a cal.com; al pulsar se carga el calendario de Cal.com en la página y queda visible un enlace directo a la página de reserva; sin JS el enlace lleva a Cal.com; la CSP del build solo añade cal.com a frame-src; tests unitarios y E2E con Cal.com simulado"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿cómo se integra Cal.com: iframe en la página tras el clic (lo que dicen functional-scope y la base técnica) o solo un enlace que abre Cal.com en otra pestaña?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿se carga una sola vez por visita (cerrar y reabrir reutiliza el iframe) o se recarga cada vez?"
+      },
+      {
+        "category": "persistence",
+        "question": "sin cuenta de Cal.com, ¿URL provisional marcada PROVISIONAL en src/lib/board.ts (como el WhatsApp) u ocultar la reserva hasta tener cuenta?"
+      },
+      {
+        "category": "copy",
+        "question": "¿dónde va la acción de reservar y cómo se abre el calendario (en línea en el capítulo o en un diálogo)? Se decide con maquetas"
+      },
+      {
+        "category": "url-state",
+        "question": "¿abrir el calendario cambia la URL (hash) o no deja rastro, como el formulario?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿el foco pasa al calendario al abrirlo y hay forma de cerrarlo y volver a la acción?"
+      },
+      {
+        "category": "errors",
+        "question": "¿qué se ve si el iframe no carga o tarda (enlace directo siempre visible, aviso tras un tiempo)?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/ci.yml",
+      "DESIGN.md",
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "src/components/Home.astro",
+      "src/components/board/Contact.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/board.ts",
+      "src/lib/booking.ts",
+      "src/scripts/booking.ts",
+      "src/scripts/motion.ts",
+      "tests/e2e/booking.spec.ts",
+      "tests/e2e/contact-form.spec.ts",
+      "tests/e2e/security.spec.ts",
+      "tests/unit/booking.test.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs and 2 more (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0007, 0008",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/ci.yml (matches .github/workflows/**)",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "La acción de reservar es un enlace a Cal.com en el HTML; la isla booking.ts solo lo mejora con el iframe. La casilla y sus textos están en el HTML, ocultos hasta el clic."
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "La altura del calendario sale de dos tokens nuevos de DESIGN.md (calendar, calendar-sm) con el tema regenerado; design:lint limpio."
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Cal.com entra en la allowlist documentada solo como frame-src https://cal.com y solo con PUBLIC_BOOKING=true (Home.astro con Astro.csp.insertDirective); sin script de terceros nuevo, sin unsafe-inline; E2E sin violaciones al abrirlo."
+    },
+    {
+      "kind": "adr",
+      "id": "0007",
+      "impact": "conforms",
+      "reason": "El calendario solo se carga tras el clic del visitante; comprobado con Playwright: solo deja la cookie de seguridad __cf_bm de Cloudflare, ningún tracker con cookies. Sin clic, cero peticiones a cal.com (E2E)."
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Las cinco claves booking.* están en es.ts y en.ts; E2E en / y /en/."
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint: 'DESIGN.md: lint clean, theme in sync, components use only tokens'. Rechazó primero h-[calc(...)] por valor suelto; se añadieron los tokens calendar y calendar-sm y se regeneró theme.css con pnpm design:theme.",
+      "recorded_at": "2026-10-22T13:09:59.452Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-8"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-9"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "iframe tras clic (Recomendado); A: casilla clara, fila (Rec.); URL provisional (Rec.); Sí, todo eso (Rec.): la URL no cambia, el foco pasa al calendario y Cerrar lo devuelve a la acción, el iframe se carga una vez y se reutiliza, Abrir en Cal.com siempre visible sin avisos por tiempo, sin JS la acción es un enlace normal a Cal.com",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T13:09:37.787Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T13:11:02.982Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+        "fitness": [
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20",
+          "run-21",
+          "run-22"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T13:14:35.439Z",
+      "detail": {
+        "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+        "runs": [
+          "run-23",
+          "run-24",
+          "run-25",
+          "run-26",
+          "run-27"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T13:14:35.439Z",
+      "detail": {
+        "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+        "check": "ev-3",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/booking.spec.ts",
+          "tests/e2e/contact-form.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/booking.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T13:14:35.439Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+        "fitness": [
+          "run-28",
+          "run-29",
+          "run-30",
+          "run-31",
+          "run-32",
+          "run-33"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-22T13:15:57.332Z",
+      "detail": {
+        "lineage_id": "sha256:922be8fd55639e8b227625887a6b5445a88a62fb1b2055ac42eab9002399c1ab",
+        "candidate_id": "sha256:4aa66f39fa7ab5e12ec1c6f33190bbd317c53cf5753ba69d42fd82f977064284",
+        "candidate_tree": "a14178873222f00154ac37330d1012d9c437490a",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-22T13:15:48.999Z",
+          "result_digest": "sha256:febdf690c1e10b1836cbc4698350d1aebdfc27eb4048473bdb1862a62ca11c45"
+        }
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T13:17:00.805Z",
+      "detail": {
+        "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+        "runs": [
+          "run-34",
+          "run-35",
+          "run-36",
+          "run-37",
+          "run-38"
+        ]
+      }
+    },
+    {
+      "id": "ev-8",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T13:17:00.805Z",
+      "detail": {
+        "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+        "check": "ev-7",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/booking.spec.ts",
+          "tests/e2e/contact-form.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/booking.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-9",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T13:17:00.805Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+        "fitness": [
+          "run-39",
+          "run-40",
+          "run-41",
+          "run-42",
+          "run-43",
+          "run-44"
+        ]
+      }
+    }
+  ],
+  "base": "5d764c001ffa6887961a030101733d16e6d25f4f",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:41424941d5e156c3e76034f8fed15848a5783f5d43a3deb786741f7876cb6b82",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:45458ab224df2e7e54adf34bc245c5679459254f71e0b3c27b37564a8431ba4e",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:7d0417165c5289d4ac9c9c66190c975ef0159e5359094832589ce1af97df1bba",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:2f7615b35271645c16c3fc81c1b70f2c38a8ab7378e1377ab38a881c4374e61b",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:4fe3e97c02b927644b81995cc0c964940bc1e20f2d1b1de03705acb37dae3d07",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:c1191b80088f87afdd04d43363b7d99a7d75206bb975cbfa2a68ac45d98a9657",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:240888bb567daf6c652a52fa5f979adc4f828da1113f651c2cd90481d640154f",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:08db3e89ad459081bf59b36a9c144bcbc7ae64343b99779442126b529f8503cd",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:64161060d8ff3b595e291d2a191dee0c942024a22055da7ba6245995354aafcb",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:bba0870e7ab17fbe61b398b60ed223ad614b1b5e3f5404c01662f6c450efe186",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:09:37.787Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:7eea17bce9d6217566540a8544e211174e2ca4bfc5ab2d6839c613190b5938d6",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:292bfff00337dcfaf0131f27a6e3bd1f28bb3ee9b6206d3c252147f49c737841",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:e485b7c68579a7f2cd3ce8408a9fda093478a78c31a14a011654c08340469b2d",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:a17b1ac33bed8c9ed5ce26767d328ade0921b2662c71c0aa149509478a7ee3aa",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:4b0247e2cc44cd5485a23ba272cb8cfcf63912c86b3e36cd4abdbaa05f713850",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:86a1d60c834f3a85e7dcd64982dc0fdb0c7991f0c90fa02e9731c02ace83a182",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:bbb949c0ae00f66e1969e30f7cd9b79713f490f82c5a4db077f23e5096f84b02",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:04625750d63ff2158fbc381b0dc3ecf5952f8d24c3ad7bf8585e677d6f3f45b5",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:86a65c2875b60e7f298554f8b72b3eef315b05b5ddfc09e07ff2da3f6a80a2d9",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:5a9e1fa702a393629da870cd3a97897a5194900436cb50a0abb530b25e9ffd3a",
+      "tree": "sha256:5ae9e12a39bbc07c82540e4f102fd2e7b2de6201e10f4e130f81d3dd1d17ef40",
+      "recorded_at": "2026-10-22T13:11:02.982Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:41424941d5e156c3e76034f8fed15848a5783f5d43a3deb786741f7876cb6b82",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:54d023603d4492c17caa8047328027c6d30b97d533b81359887fb7ef1f9ca68f",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-25",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:7eaf83281e285807fa115a187b034185d8b9c8d58f53b60c5e2dd262a588c7b3",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-26",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:e36e495b882f96629e499c86ef333d6eba71ec0cd6eeb50dc49df7a98f3c9058",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-27",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-28",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:b52205425c08ac950dc84183a151ef8bb8b8b6c73246d3d7e32fd90a7bfa38ea",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-29",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:1c6e245abd57cae4098dcd0dabf09c31d3ec08d0cbb5465105e065efa9b449bd",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-30",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:8bdbdb7408b93b15ac68c7af2668e1dd838b9cb04b92010419947888a55bbd32",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-31",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:4daf51b78d9b6a3c185bdf21499b15972cc4ae4b2256a2826b92b9895d68e18b",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-32",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:51035314b7e76666bfc2b3988f81165c367202998bd81cd982e90b4dbd9fb9f3",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-33",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:61f8b4e14198a68d44d0f1165f9e6090ea829bf3a1a44960f6b2d42f581fb9c3",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:14:35.439Z"
+    },
+    {
+      "id": "run-34",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:7eea17bce9d6217566540a8544e211174e2ca4bfc5ab2d6839c613190b5938d6",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-35",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:eaa1b383e008f083a8b45703a870061816f8e84d94a1152d581ad9a42f80766c",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-36",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:929cc732fd17a2da4f9ecb33e3916570d3181330f0473d2ca5aa2e20db7fa738",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-37",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:79ea8dc546beacf274f824594fa85b2798c54e79d17eb0e50557b762681a67e5",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-38",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-39",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:41e80deb3a4b9c064ae76c6b414d8147fc67f77c7fe01d1c507e1a78b4526b34",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-40",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:b055dc7e15ac900613a46137d565b5302430452697e83bbb05d3eee2f8a4f4aa",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-41",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:0bdca67f854e28090ce013e0bbfc6f0e2060c36ef5c42f3aeecae2cec0f7cb34",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-42",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:e4beb7b2ba84ac8a44c2f9a50b562d040809ffb85a292b9b4977b26ae29c3eb9",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-43",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:3071ea3f48ff8de5475a7a2de8d92595bdc5689b112328da60e2ced6b0865fa8",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    },
+    {
+      "id": "run-44",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:5a9e1fa702a393629da870cd3a97897a5194900436cb50a0abb530b25e9ffd3a",
+      "tree": "sha256:161df4230d8810a03e0b030c262c295185694eeed536c9c58209f5f252961af2",
+      "recorded_at": "2026-10-22T13:17:00.805Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:922be8fd55639e8b227625887a6b5445a88a62fb1b2055ac42eab9002399c1ab",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "a2e2e7d90c3549ae2ed567c1b85f73d40f4d6ad9",
+          "candidate_tree": "a14178873222f00154ac37330d1012d9c437490a",
+          "paths": [
+            ".github/workflows/ci.yml",
+            "DESIGN.md",
+            "astro.config.mjs",
+            "docs/architecture/technical-baseline.md",
+            "src/components/Home.astro",
+            "src/components/board/Contact.astro",
+            "src/i18n/en.ts",
+            "src/i18n/es.ts",
+            "src/lib/board.ts",
+            "src/lib/booking.ts",
+            "src/scripts/booking.ts",
+            "src/scripts/motion.ts",
+            "src/styles/theme.css",
+            "tests/e2e/booking.spec.ts",
+            "tests/e2e/contact-form.spec.ts",
+            "tests/e2e/security.spec.ts",
+            "tests/unit/booking.test.ts"
+          ],
+          "diff_hash": "sha256:ae923b6bb2f75d65866d856e288f2906749cfd70a78eb57da395b80d64085a23",
+          "paths_digest": "sha256:cf39451fdd6ca090d5551f9f1898264180d281b678977f75614cb610be1e220f",
+          "authored_lines": 269,
+          "original_changed_lines": 290
+        },
+        "candidate_id": "sha256:4aa66f39fa7ab5e12ec1c6f33190bbd317c53cf5753ba69d42fd82f977064284",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "src/components/Home.astro",
+          "src/components/board/Contact.astro",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/lib/board.ts",
+          "src/lib/booking.ts",
+          "src/scripts/booking.ts",
+          "src/scripts/motion.ts",
+          "src/styles/theme.css",
+          "tests/e2e/booking.spec.ts",
+          "tests/e2e/contact-form.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/booking.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "a14178873222f00154ac37330d1012d9c437490a",
+        "original_changed_lines": 290,
+        "authored_lines": 269
+      },
+      "current_candidate_id": "sha256:4aa66f39fa7ab5e12ec1c6f33190bbd317c53cf5753ba69d42fd82f977064284",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "a2e2e7d90c3549ae2ed567c1b85f73d40f4d6ad9",
+        "candidate_tree": "a14178873222f00154ac37330d1012d9c437490a",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "src/components/Home.astro",
+          "src/components/board/Contact.astro",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/lib/board.ts",
+          "src/lib/booking.ts",
+          "src/scripts/booking.ts",
+          "src/scripts/motion.ts",
+          "src/styles/theme.css",
+          "tests/e2e/booking.spec.ts",
+          "tests/e2e/contact-form.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/booking.test.ts"
+        ],
+        "diff_hash": "sha256:ae923b6bb2f75d65866d856e288f2906749cfd70a78eb57da395b80d64085a23",
+        "paths_digest": "sha256:cf39451fdd6ca090d5551f9f1898264180d281b678977f75614cb610be1e220f",
+        "authored_lines": 269,
+        "original_changed_lines": 290
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "contact-direct:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "contact-direct:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 145,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "assumptions": [
+    "Cal.com elige el idioma del calendario según el navegador del visitante; no se pasa el de la página.",
+    "El estado apagado lo prueba el E2E local (valor por defecto) y el encendido el CI (PUBLIC_BOOKING=true en el job e2e); Lighthouse construye con el valor por defecto."
+  ],
+  "closed_at": "2026-10-22T13:17:47.902Z"
+}
