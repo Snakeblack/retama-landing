@@ -1,0 +1,547 @@
+{
+  "schema": "idd-state/v1",
+  "change": "legal-pages",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "Legal primero: aviso legal, privacidad y cookies con el titular por variables de build",
+    "kind": "feature",
+    "summary": "Legal notice, privacy policy and cookie policy pages in es and en (LSSI/RGPD), with the owner's identifying data taken from the build environment so it stays out of the public repository, linked from the footer and from the contact form",
+    "acceptance": "Both locales serve the three legal pages with reciprocal hreflang and no JS needed; the legal notice shows the owner data set in the build environment and nothing invented when it is unset; the privacy policy names the controller, purposes, legal basis, recipients (Cloudflare, Resend, Google, Cal.com), retention and rights; the cookie policy lists the cookies observed in a real visit; every page footer and the contact form link to them"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "Which owner data does the legal notice show and where does it come from: name and town from build variables now, and NIF and full address when they exist?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "Does the owner record live in one module beside the contact channels (src/lib/board.ts:1) so a later company swaps one place?"
+      },
+      {
+        "category": "persistence",
+        "question": "How long are contact messages kept in the inbox, and which provider holds the CONTACT_BACKUP mailbox?"
+      },
+      {
+        "category": "copy",
+        "question": "Which legal basis does the privacy policy state, is Retama presented as the owner's trade name, does the Spanish text prevail over the English one, and does the line under the form (src/i18n/es.ts:176) become the AEPD first layer with a link to the policy?"
+      },
+      {
+        "category": "url-state",
+        "question": "Which routes do the legal pages take, given that ADR 0008 alternates assume one path per page in every locale (src/lib/seo.ts:14): one /legal/ page with three sections or three pages, with which slugs, and are they indexable and in the sitemap or noindex?"
+      },
+      {
+        "category": "accessibility",
+        "question": "Where do the links live: in the footer of every page (src/components/board/Footer.astro:13), and also on the 404 pages that have no footer?"
+      },
+      {
+        "category": "errors",
+        "question": "What happens when the owner variables are missing: fail the Workers Builds build (WORKERS_CI=1), or publish the pages without them?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/ci.yml",
+      "DESIGN.md",
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "lighthouserc.json",
+      "scripts/lib/legal-owner.mjs",
+      "src/components/Legal.astro",
+      "src/components/NotFound.astro",
+      "src/components/board/Contact.astro",
+      "src/components/board/Footer.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/board.ts",
+      "src/pages/en/legal/index.astro",
+      "src/pages/legal/index.astro",
+      "tests/e2e/legal.spec.ts",
+      "tests/unit/legal-owner.test.ts",
+      "tests/unit/whatsapp.test.ts"
+    ],
+    "work_units": 3,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs and 2 more (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/ci.yml (matches .github/workflows/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0007, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The legal page is static HTML with no island; its E2E reads the three sections with JavaScript disabled"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "The page, footer and form line use only DESIGN.md tokens and components; DESIGN.md records the footer and the legal page and design:lint passes"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "No inline style or handler; the CSP E2E now also walks /legal/ and /en/legal/ without violations or foreign requests"
+    },
+    {
+      "kind": "adr",
+      "id": "0007",
+      "impact": "conforms",
+      "reason": "No tracking is added; the cookie policy states the no-consent baseline and the E2E checks zero cookies on the legal pages"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "/legal/ and /en/legal/ share one path per locale with reciprocal hreflang and enter the sitemap; new keys are added to es.ts and en.ts alike"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint: DESIGN.md lint clean, theme in sync, components use only tokens (2026-10-23, after the footer and legal page sections)",
+      "recorded_at": "2026-10-22T22:53:25.357Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "todos los recomendados (one /legal/ page in es and en with three sections and translated anchors, indexable and in the sitemap; PUBLIC_LEGAL_NAME and PUBLIC_LEGAL_TOWN required, PUBLIC_LEGAL_NIF and PUBLIC_LEGAL_ADDRESS optional, each line only when set; the Workers Builds build (WORKERS_CI=1) fails without name or town, local and GitHub builds go without and E2E uses test data; messages kept for the inquiry and at most 12 months without an engagement; CONTACT_BACKUP is Gmail (Google); basis art. 6.1.b for replies and 6.1.f for antispam and rate limit; Retama is the owner's trade name; Spanish prevails; the form line becomes the AEPD first layer with a link; links in the footer of every page, the 404 pages get the footer; the owner record lives in src/lib/board.ts)",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T22:54:33.919Z",
+      "detail": {
+        "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T22:54:33.919Z",
+      "detail": {
+        "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/legal.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/legal-owner.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T22:54:33.919Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-22T22:55:36.893Z",
+      "detail": {
+        "lineage_id": "sha256:d3959009b005c29817300739de608b3c2ad81d497ca5a3f24bb62a5db035abbd",
+        "candidate_id": "sha256:0e783b54d50047c23c422d3b3457d80a1d7b99cc46700796f783afde3844fd9a",
+        "candidate_tree": "fe2cec7c955751a699788bebab2df767ac15a687",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-22T22:55:28.755Z",
+          "result_digest": "sha256:0cfd2f80cf560dc7f59fe7ab1e9c816a1b6e579a36f73d39c3001b3fb68a9429"
+        }
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-22T22:55:39.811Z"
+    }
+  ],
+  "base": "754f684fdfc5bcb8071d02d7830c93bd53314750",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:4cd3c9792e24cd479441c96a01763fb6df03f7806817fa140c296163c4c3df47",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c363f35d251fe83e4f593b5cba29b9c3cc1fec5585ff4e09751fe44a2241ebd1",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:80a7ffc66a56ad91491fef94be948fb68d8ea8cd03e2b5faff3e834fd6da62fd",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:68c094eacb445d76c5dbfd932aec0463953fbc3369873c0029c179da1b9ca991",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:ac347090f90d81b02e110442a868093c532c1d7fd39cd0fb4392cd71635632db",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:bee133c0c59c0cde72ac7f09d468b7a5bfa724376e0f7eb982d5a6b06143fff3",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:4fe928eba32314c8c3f4f266bd2cedfd10fbb7bcb3fe4560e45adc961a3e66b8",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:5f9322cb0eb52b926915497ad824b85dbd26c257da5f08d01fbe948641e5695b",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:cecb9799cb28bb90cb875391d1d2aa09857b9edbf5178b64de6bf256eeba17d7",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:c4d686490d2c0643ec647cf66131fe3f11b4306dc3483da3a106f0a3b3a51aaa",
+      "tree": "sha256:10206f4fff78e0aea905189fd4a1e3e0ccd3629780a0073ba80f09a2f9bc5efa",
+      "recorded_at": "2026-10-22T22:54:33.919Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:d3959009b005c29817300739de608b3c2ad81d497ca5a3f24bb62a5db035abbd",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "304939c679ddf11e312694c2fd2813fa32a8e8d5",
+          "candidate_tree": "fe2cec7c955751a699788bebab2df767ac15a687",
+          "paths": [
+            ".github/workflows/ci.yml",
+            "DESIGN.md",
+            "astro.config.mjs",
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "lighthouserc.json",
+            "scripts/lib/legal-owner.mjs",
+            "src/components/Legal.astro",
+            "src/components/NotFound.astro",
+            "src/components/board/Contact.astro",
+            "src/components/board/Footer.astro",
+            "src/i18n/en.ts",
+            "src/i18n/es.ts",
+            "src/lib/board.ts",
+            "src/pages/en/legal/index.astro",
+            "src/pages/legal/index.astro",
+            "tests/e2e/legal.spec.ts",
+            "tests/e2e/security.spec.ts",
+            "tests/e2e/site.spec.ts",
+            "tests/unit/legal-owner.test.ts"
+          ],
+          "diff_hash": "sha256:a8c3ab1a57a43f7a3fd6ed88d3b5cf5e60fb9bb5126fe3ba01bb056bb70597b9",
+          "paths_digest": "sha256:0dc02c9fa66db9ddec8959f3f9747444c1f7d30357b0f32d402bc4214b839a04",
+          "authored_lines": 566,
+          "original_changed_lines": 584
+        },
+        "candidate_id": "sha256:0e783b54d50047c23c422d3b3457d80a1d7b99cc46700796f783afde3844fd9a",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "lighthouserc.json",
+          "scripts/lib/legal-owner.mjs",
+          "src/components/Legal.astro",
+          "src/components/NotFound.astro",
+          "src/components/board/Contact.astro",
+          "src/components/board/Footer.astro",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/lib/board.ts",
+          "src/pages/en/legal/index.astro",
+          "src/pages/legal/index.astro",
+          "tests/e2e/legal.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/legal-owner.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "fe2cec7c955751a699788bebab2df767ac15a687",
+        "original_changed_lines": 584,
+        "authored_lines": 566
+      },
+      "current_candidate_id": "sha256:0e783b54d50047c23c422d3b3457d80a1d7b99cc46700796f783afde3844fd9a",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "304939c679ddf11e312694c2fd2813fa32a8e8d5",
+        "candidate_tree": "fe2cec7c955751a699788bebab2df767ac15a687",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "lighthouserc.json",
+          "scripts/lib/legal-owner.mjs",
+          "src/components/Legal.astro",
+          "src/components/NotFound.astro",
+          "src/components/board/Contact.astro",
+          "src/components/board/Footer.astro",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/lib/board.ts",
+          "src/pages/en/legal/index.astro",
+          "src/pages/legal/index.astro",
+          "tests/e2e/legal.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/legal-owner.test.ts"
+        ],
+        "diff_hash": "sha256:a8c3ab1a57a43f7a3fd6ed88d3b5cf5e60fb9bb5126fe3ba01bb056bb70597b9",
+        "paths_digest": "sha256:0dc02c9fa66db9ddec8959f3f9747444c1f7d30357b0f32d402bc4214b839a04",
+        "authored_lines": 566,
+        "original_changed_lines": 584
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "legal-pages:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "legal-pages:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-22T22:55:39.811Z"
+}
