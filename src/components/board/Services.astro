@@ -1,43 +1,72 @@
 ---
 import { type Locale, t } from "../../i18n/index";
-import ChecksFragment from "./ChecksFragment.astro";
+import { HERO, retamaShape, strokePath } from "../../lib/retama-shape";
 
 interface Props {
   locale: Locale;
 }
 
 const copy = t(Astro.props.locale);
-const items = ["services.item1", "services.item2", "services.item3", "services.item4", "services.item5"] as const;
+const services = [
+  ["services.web", "services.webLine"],
+  ["services.custom", "services.customLine"],
+  ["services.agents", "services.agentsLine"],
+  ["services.seo", "services.seoLine"],
+] as const;
+// DESIGN.md Imagery: the cards read the hero's retama from the top down, as a dot screen drawn at build time. From lg
+// each card frames its own part of the plant (x, y, width and height in the frame of HERO): the crown, its base with
+// the taproot, the roots and their tips.
+const PARTS = ["560 60 480 470", "600 330 400 390", "380 560 840 820", "100 1100 1400 800"];
+// Below lg the cards stack and one plant runs down through them: a column as wide as the crown, cut into slices in
+// the 5:2 of their windows, one after the other.
+const COLUMN = { x: 500, y: 60, width: 600 };
+const slice = (index: number) => {
+  const height = (COLUMN.width * 2) / 5;
+  return `${COLUMN.x} ${COLUMN.y + index * height} ${COLUMN.width} ${height}`;
+};
+// The one field card, so the row is not four of the same tile.
+const FIELD = 2;
+const shape = retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots);
 ---
 
-<!-- DESIGN.md: mosaic of unlike tiles; no two neighbours hold the same kind of thing. -->
-<section id={copy["anchor.services"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="services-title">
-  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
-    <h2 id="services-title" class="text-balance type-headline-sm md:type-headline">{copy["services.title"]}</h2>
-  </div>
+<section id={copy["anchor.services"]} class="grid gap-gap" aria-labelledby="services-title">
+  <h2 id="services-title" class="text-balance px-tile-sm pt-tile-sm pb-lg type-headline-sm md:px-tile md:pt-tile md:type-headline">
+    {copy["services.title"]}
+  </h2>
 
-  <div class="col-span-2 lg:col-span-6 lg:col-start-7 lg:row-span-5 lg:row-start-1">
-    <ChecksFragment locale={Astro.props.locale} />
-  </div>
+  <!-- The plant once, as dots along its strokes; every card shows it through its own viewBox. -->
+  <svg class="absolute size-0" aria-hidden="true">
+    <defs>
+      <g id="retama-dots" fill="none" stroke-dasharray="0 5" stroke-linecap="round">
+        <path class="stroke-on-surface-muted" d={strokePath(shape, "root")} stroke-width="2.8" />
+        <path class="stroke-current" d={strokePath(shape, "stem")} stroke-width="2.8" />
+        <path class="stroke-primary" d={strokePath(shape, "taproot")} stroke-width="4.5" />
+      </g>
+    </defs>
+  </svg>
 
-  <ul class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-2">
-    {items.map((item) => <li>{copy[item]}</li>)}
+  <ul class="grid gap-gap lg:grid-cols-4">
+    {
+      services.map(([name, line], index) => (
+        <li class:list={["flex flex-col", index === FIELD ? "bg-field text-on-field" : "bg-surface-raised"]}>
+          <div class="grid gap-sm p-tile-sm md:p-tile">
+            <h3 class="text-balance type-statement-sm md:type-statement">{copy[name]}</h3>
+            <p class="max-w-(--spacing-measure)">{copy[line]}</p>
+          </div>
+          <svg class="mt-auto aspect-5/2 w-full lg:hidden" viewBox={slice(index)} aria-hidden="true" data-dots>
+            <use href="#retama-dots" />
+          </svg>
+          <svg
+            class="mt-auto hidden aspect-square w-full lg:block"
+            viewBox={PARTS[index]}
+            preserveAspectRatio="xMidYMid slice"
+            aria-hidden="true"
+            data-dots
+          >
+            <use href="#retama-dots" />
+          </svg>
+        </li>
+      ))
+    }
   </ul>
-
-  <p class="col-span-2 bg-surface-raised p-tile-sm type-statement-sm md:p-tile md:type-statement lg:col-span-3 lg:row-span-2">
-    {copy["services.statement1"]}
-  </p>
-
-  <p class="col-span-2 bg-field p-tile-sm text-on-field type-statement-sm md:p-tile md:type-statement lg:col-span-6 lg:row-span-3">
-    {copy["services.statement2"]}
-  </p>
-
-  <p class="bg-surface-raised p-tile-sm type-statement-sm md:p-tile md:type-statement lg:col-span-3 lg:row-span-3">
-    {copy["services.statement3"]}
-  </p>
-
-  <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-3">
-    <p class="type-display-sm">{copy["services.figure"]}</p>
-    <p class="type-small text-on-surface-muted">{copy["services.figureCaption"]}</p>
-  </div>
 </section>

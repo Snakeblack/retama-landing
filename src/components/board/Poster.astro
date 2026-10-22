@@ -1,5 +1,5 @@
 ---
-import { HERO, retamaShape, type StrokeKind } from "../../lib/retama-shape";
+import { HERO, retamaShape, strokePath } from "../../lib/retama-shape";
 
 interface Props {
   label: string;
@@ -10,11 +10,6 @@ const { label, class: className } = Astro.props;
 // The static tier of ADR 0004: drawn at build time, so it is HTML and paints with the page. It shows the stems and the
 // upper roots (HERO.crop); global.css stands it where the scene grows the plant (plantPlacement in glyph-scene.ts).
 const shape = retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots);
-const path = (kind: StrokeKind) =>
-  shape.strokes
-    .filter((stroke) => stroke.kind === kind)
-    .map((stroke) => `M${stroke.points.map((point) => point.join(" ")).join("L")}`)
-    .join("");
 ---
 
 <svg
@@ -24,7 +19,7 @@ const path = (kind: StrokeKind) =>
   viewBox={`0 0 ${shape.width} ${HERO.crop}`}
   data-retama-poster
 >
-  <path class="fill-none stroke-on-surface-muted" d={path("root")} stroke-width="1" vector-effect="non-scaling-stroke" />
-  <path class="fill-none stroke-on-surface" d={path("stem")} stroke-width="1" vector-effect="non-scaling-stroke" />
-  <path class="fill-none stroke-primary" d={path("taproot")} stroke-width="2" vector-effect="non-scaling-stroke" />
+  <path class="fill-none stroke-on-surface-muted" d={strokePath(shape, "root")} stroke-width="1" vector-effect="non-scaling-stroke" />
+  <path class="fill-none stroke-on-surface" d={strokePath(shape, "stem")} stroke-width="1" vector-effect="non-scaling-stroke" />
+  <path class="fill-none stroke-primary" d={strokePath(shape, "taproot")} stroke-width="2" vector-effect="non-scaling-stroke" />
 </svg>

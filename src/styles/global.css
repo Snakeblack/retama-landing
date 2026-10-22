@@ -321,6 +321,30 @@ footer,
   }
 }
 
+/* DESIGN.md Motion, the services: the dots of each card's retama come in from the top down as the card crosses the
+   screen, so the plant reads from its crown to its roots. With reduced motion, or without scroll-driven animations,
+   it is simply drawn. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-dots] {
+      animation: dots-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 50%;
+    }
+  }
+}
+
+/* Both ends are insets: an inset does not interpolate with none, so the dots would flip in instead of drawing. */
+@keyframes dots-draw {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
 /* On touch screens a scroll or a tap never starts a text selection on the board; the contact group stays
    selectable so the address can be copied. */
 @media (pointer: coarse) {
