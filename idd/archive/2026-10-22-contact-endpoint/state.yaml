@@ -1,0 +1,909 @@
+{
+  "schema": "idd-state/v1",
+  "change": "contact-endpoint",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "feature",
+    "summary": "Función /api/contact: valida el formulario, descarta el honeypot, verifica Turnstile (fail-closed), limita por IP y entrega el lead por Resend a la bandeja principal y a la de respaldo, sin guardar ni registrar datos personales",
+    "acceptance": "POST /api/contact responde éxito solo tras entregar a ambas bandejas; rechaza entrada inválida, token inválido o ausente, exceso de envíos y fallo del proveedor con un código de error distinto; ningún log contiene campos personales; tests con Resend y siteverify simulados"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿qué campos, cuáles obligatorios, con qué límites de longitud, si el tipo de proyecto es lista cerrada y si acepta solo JSON o también un envío de formulario sin JS?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿se limita por IP, con qué cupo y ventana, qué pasa si el binding no está disponible, y se normaliza el email (trim, minúsculas)?"
+      },
+      {
+        "category": "persistence",
+        "question": "¿una sola llamada a Resend con los dos destinatarios (llega a ambas o a ninguna) o dos llamadas independientes?"
+      },
+      {
+        "category": "copy",
+        "question": "¿asunto, idioma y Reply-To del email que recibes?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿la ruta es /api/contact sin variante por idioma, con el idioma del visitante en el cuerpo?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿se rechazan peticiones con Origin de otro sitio y se comprueban el hostname y la acción del token de Turnstile?"
+      },
+      {
+        "category": "errors",
+        "question": "¿qué responde a un honeypot relleno, qué código HTTP y cuerpo da cada fallo (entrada, verificación, límite, proveedor, configuración ausente) y cuántos segundos espera a Resend y a siteverify?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".gitignore",
+      "docs/architecture/technical-baseline.md",
+      "playwright.config.ts",
+      "src/lib/contact.ts",
+      "src/pages/api/contact.ts",
+      "src/server/contact.ts",
+      "tests/e2e/contact.spec.ts",
+      "tests/unit/contact-input.test.ts",
+      "tests/unit/contact.test.ts",
+      "wrangler.jsonc"
+    ],
+    "work_units": 2,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 2 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/pages/api/contact.ts (matches **/api/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches src/pages/api/contact.ts and 2 more (matches src/pages/api/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0002, 0003, 0006, 0009 and quality scenario perf-mobile, privacy-security",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "La única ruta bajo demanda es src/pages/api/contact.ts, la de la allowlist; no hay output server"
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "impact": "conforms",
+      "reason": "Sin almacén: el lead va a Resend con dos destinatarios y se descarta; ratelimits es un contador por ubicación, no un binding persistente; llega el test de logs sin campos personales que pedía el ADR"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin cambios en la CSP: la función responde JSON con nosniff y no-store; las llamadas a siteverify y Resend salen del servidor, no del navegador"
+    },
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": "conforms",
+      "reason": "Las puertas de entrega siguen igual; el E2E y Lighthouse sirven ahora dist/server/wrangler.json, que el adaptador genera al haber una ruta bajo demanda"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "none",
+      "reason": "Los activos estáticos se sirven antes que el Worker (sin run_worker_first); la página no carga nada nuevo"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "Validación, honeypot, Turnstile fail-closed, límite por IP y comprobación de Origin en servidor; logs sin datos personales"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-10"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-8"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-9"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Todas las propuestas aceptadas: campos name≤100, email≤254, projectType obligatorio en lista cerrada web|software|agents|seo|other, message 10–4000, locale es|en, honeypot website, turnstileToken; solo JSON. Honeypot → 200 falso sin envío; 400 invalid con fields, 403 verification, 429 rate-limited, 502 delivery, 503 unavailable; timeouts 5 s siteverify, 8 s Resend. Rate limit por IP 3/60 s con binding ratelimits, fail-closed 503, IP nunca en logs; email solo trim. Una sola llamada a Resend con to [principal, respaldo]. Email en español, asunto 'Nuevo contacto: {tipo} — {nombre}', Reply-To del visitante, texto plano, idioma del visitante en el cuerpo. 403 si Origin ajeno; comprobar hostname y action contact. Ruta única /api/contact con locale en el cuerpo.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T10:04:20.057Z",
+      "detail": {
+        "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T10:04:20.057Z",
+      "detail": {
+        "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+        "check": "ev-1",
+        "documents": [
+          "src/env.d.ts",
+          "src/pages/api/contact.ts"
+        ],
+        "tests": [
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact-input.test.ts",
+          "tests/unit/contact.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T10:04:20.057Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0003 conforms",
+          "adr:0006 conforms",
+          "adr:0009 conforms",
+          "scenario:perf-mobile none",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [],
+        "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-22T10:05:27.863Z",
+      "detail": {
+        "lineage_id": "sha256:56013046cbb4cf6d765da12312650837813bf9c8cf6f8347b109d6fb67d89d2c",
+        "candidate_id": "sha256:0da4f8b0c5a405e9149d43d7bf527c55298168c034d1b3ff4c87e479e750a752",
+        "candidate_tree": "e799f2c16fe00f66a5b4dc388a70869d3c44cf93",
+        "findings_digest": "sha256:e081db352ee0669a7c6a9fb4edc9e7c2e89119115b19ffcb8f8a09e051e1ffbb",
+        "attestation": "relayed"
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T10:09:57.347Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0003 conforms",
+          "adr:0006 conforms",
+          "adr:0009 conforms",
+          "scenario:perf-mobile none",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [],
+        "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+        "fitness": [
+          "run-15",
+          "run-16",
+          "run-17",
+          "run-18"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-22T10:10:58.214Z",
+      "detail": {
+        "lineage_id": "sha256:53fb608087fc266f043629a97528fd754f9eeb7611d5f372d783e324d3bb4e88",
+        "candidate_id": "sha256:88431c6068895293975a3325edad56636314113d71dc70468c929e1eb269fe25",
+        "candidate_tree": "701b983c7c900d9d1eb925fa2260847a32efbe52",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "relayed"
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T10:11:51.068Z",
+      "detail": {
+        "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+        "runs": [
+          "run-19",
+          "run-20",
+          "run-21",
+          "run-22",
+          "run-23"
+        ]
+      }
+    },
+    {
+      "id": "ev-8",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T10:11:51.068Z",
+      "detail": {
+        "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+        "check": "ev-7",
+        "documents": [
+          "src/env.d.ts",
+          "src/pages/api/contact.ts"
+        ],
+        "tests": [
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact-input.test.ts",
+          "tests/unit/contact.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-9",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T10:11:51.068Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0003 conforms",
+          "adr:0006 conforms",
+          "adr:0009 conforms",
+          "scenario:perf-mobile none",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [],
+        "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+        "fitness": [
+          "run-24",
+          "run-25",
+          "run-26",
+          "run-27"
+        ]
+      }
+    },
+    {
+      "id": "ev-10",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-22T10:11:53.878Z"
+    }
+  ],
+  "base": "542c8f1666c9e5bdcd2c01ebce5ee964ac452a92",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:7706e51c4a3129b776b63902eca124dc7f240118cbb8f4643633b06b7b4f5218",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:fadc5299700dc39f74bdebbaf81936ced9a6b827f64b4bc93be96fb7cf4c0b59",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:99afadf83a9114833657dd20bc81a845efd02022b4bc6b7d884abfb03a6b63a2",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:753625b11204ff261b7e6b15c93a23a4ced1030222d2b5334f84b92fabb843d2",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:357cef4009a01117437f4a15291d595928a39790c85be93dfc8cf3e631e2e8a6",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:bf5fa07841f51a82efa74b4415774b7d557a04116029809b583e4b589e0444ab",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:bc67a6e728a17b22411e40cdba7ece67e1f64c1cf3303a1354c259499c6da23d",
+      "recorded_at": "2026-10-22T10:04:20.057Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:d9d81ac9a6a3096c8d1d0b166d284fa06d83c4d866c450f9a75b253e90af3163",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:4760f1db92dea0ab0dbee8b9ba0b49381971e003f85fac73f2aef09f2eaa06d6",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:16a73d77d51088bf4c033dffea3b5cd4708128cd2ae261080d53082ae8b091df",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:0d8869a2c15943ec9af7c91da7705fc519096cc5b16f98ee16de3dbfbd8166aa",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:79abab74666b643b665d80ef4d10a2e9ce97ade6553493e41f0bb7095ad32773",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d30d723f739873b61671b8238353b22ab03a1c818b9de0b631ffaabc97397fd5",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:d7bb9f4bb603f79e6e878acac4f45a2ca09574c907964066561dab5dc111f497",
+      "recorded_at": "2026-10-22T10:09:57.347Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:02d7321667dc64e1e6e33403a1aef518a24b9f59b7af99c75a18e9a415a23a42",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:e030356816cca351248aeb7a8689f1d0db696005559eee4f9599c11ffe8e53db",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:607f92cdb0776421b0b8e58a58472360b167a0d5a8627db5da4e587c63e927dc",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:753639b9e1c075e461abb25bb3922f964769aa31c143b0c9e1bcf653dea44b64",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    },
+    {
+      "id": "run-25",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:99806248d17a922a90c4cd35d766cd3d93a4c86253d054517ea0440ae387ac2e",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    },
+    {
+      "id": "run-26",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:15c0de5398f2850e48ca413c4ec70b847bbf83053efaca3e27b79769e1d74399",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    },
+    {
+      "id": "run-27",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:8fdf169e19a1036f71ac4fcaa083b9ad01175dcb92f4b03c0aba4aecf4dbbd13",
+      "recorded_at": "2026-10-22T10:11:51.068Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:56013046cbb4cf6d765da12312650837813bf9c8cf6f8347b109d6fb67d89d2c",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "f8f04558c73ba32eb21e517f7f5940ed9d15e661",
+          "candidate_tree": "e799f2c16fe00f66a5b4dc388a70869d3c44cf93",
+          "paths": [
+            "docs/architecture/technical-baseline.md",
+            "package.json",
+            "src/env.d.ts",
+            "src/lib/contact.ts",
+            "src/pages/api/contact.ts",
+            "src/server/contact.ts",
+            "tests/e2e/contact.spec.ts",
+            "tests/unit/contact-input.test.ts",
+            "tests/unit/contact.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:80cd8bfd54251fc434d72a8e2c940cf76b2a1c8f10d8c5ec1c2558863a1685bb",
+          "paths_digest": "sha256:cc74efbd569c43f28d1397eba3980f9feaa80b7ec0db428ec66c5908d4c36d8b",
+          "authored_lines": 759,
+          "original_changed_lines": 762
+        },
+        "candidate_id": "sha256:0da4f8b0c5a405e9149d43d7bf527c55298168c034d1b3ff4c87e479e750a752",
+        "paths": [
+          "docs/architecture/technical-baseline.md",
+          "package.json",
+          "src/env.d.ts",
+          "src/lib/contact.ts",
+          "src/pages/api/contact.ts",
+          "src/server/contact.ts",
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact-input.test.ts",
+          "tests/unit/contact.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "e799f2c16fe00f66a5b4dc388a70869d3c44cf93",
+        "original_changed_lines": 762,
+        "authored_lines": 759
+      },
+      "current_candidate_id": "sha256:0da4f8b0c5a405e9149d43d7bf527c55298168c034d1b3ff4c87e479e750a752",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "f8f04558c73ba32eb21e517f7f5940ed9d15e661",
+        "candidate_tree": "e799f2c16fe00f66a5b4dc388a70869d3c44cf93",
+        "paths": [
+          "docs/architecture/technical-baseline.md",
+          "package.json",
+          "src/env.d.ts",
+          "src/lib/contact.ts",
+          "src/pages/api/contact.ts",
+          "src/server/contact.ts",
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact-input.test.ts",
+          "tests/unit/contact.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:80cd8bfd54251fc434d72a8e2c940cf76b2a1c8f10d8c5ec1c2558863a1685bb",
+        "paths_digest": "sha256:cc74efbd569c43f28d1397eba3980f9feaa80b7ec0db428ec66c5908d4c36d8b",
+        "authored_lines": 759,
+        "original_changed_lines": 762
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "contact-endpoint:lens-start:1:0",
+          "result_digest": "sha256:406bf8918497fd5152345ef4ee23aa838f66ba7d206bb92e2516b3104b10c830",
+          "result": {
+            "findings": [
+              {
+                "severity": "WARNING",
+                "summary": "src/server/contact.ts:75-77 readBody calls request.text() on the whole body and only then compares the byte length to MAX_BODY_BYTES (16 KB). A non-browser client can set a matching Origin header and POST a body far larger than 16 KB. The Worker buffers and decodes all of it before returning 400. Impact: the 16 KB cap does not bound memory or CPU per request.",
+                "acceptance_criteria": "A request whose Content-Length is above 16 KB, or whose streamed body goes past 16 KB, is rejected with 400 {fields: []} without the whole body being buffered. A unit test covers an oversized declared length and an oversized body with no Content-Length. A body at or below 16 KB still parses as before."
+              },
+              {
+                "severity": "SUGGESTION",
+                "summary": "src/server/contact.ts:127-128 uses the raw CF-Connecting-IP string as the rate-limit key. An IPv6 client usually controls a whole /64, so it can rotate source addresses and take a fresh 3-per-minute allowance each time. The Turnstile check remains the main control.",
+                "acceptance_criteria": "For an IPv6 CF-Connecting-IP, two addresses in the same /64 map to the same limiter key, and IPv4 addresses keep their current per-address key. A unit test asserts both. Alternatively, a documented decision explains why per-/128 keys are accepted."
+              }
+            ]
+          },
+          "operation": null,
+          "result_request_id": "contact-endpoint:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [
+        {
+          "id": "F-88db7071d0fbedb0",
+          "owner": "trust",
+          "severity": "WARNING",
+          "summary": "src/server/contact.ts:75-77 readBody calls request.text() on the whole body and only then compares the byte length to MAX_BODY_BYTES (16 KB). A non-browser client can set a matching Origin header and POST a body far larger than 16 KB. The Worker buffers and decodes all of it before returning 400. Impact: the 16 KB cap does not bound memory or CPU per request.",
+          "acceptance_criteria": "A request whose Content-Length is above 16 KB, or whose streamed body goes past 16 KB, is rejected with 400 {fields: []} without the whole body being buffered. A unit test covers an oversized declared length and an oversized body with no Content-Length. A body at or below 16 KB still parses as before.",
+          "blocking": false,
+          "resolution": "advisory"
+        },
+        {
+          "id": "F-0a2bd3dbc4320881",
+          "owner": "trust",
+          "severity": "SUGGESTION",
+          "summary": "src/server/contact.ts:127-128 uses the raw CF-Connecting-IP string as the rate-limit key. An IPv6 client usually controls a whole /64, so it can rotate source addresses and take a fresh 3-per-minute allowance each time. The Turnstile check remains the main control.",
+          "acceptance_criteria": "For an IPv6 CF-Connecting-IP, two addresses in the same /64 map to the same limiter key, and IPv4 addresses keep their current per-address key. A unit test asserts both. Alternatively, a documented decision explains why per-/128 keys are accepted.",
+          "blocking": false,
+          "resolution": "advisory"
+        }
+      ],
+      "findings_digest": "sha256:e081db352ee0669a7c6a9fb4edc9e7c2e89119115b19ffcb8f8a09e051e1ffbb",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:53fb608087fc266f043629a97528fd754f9eeb7611d5f372d783e324d3bb4e88",
+      "generation": 2,
+      "predecessor_lineage_id": "sha256:56013046cbb4cf6d765da12312650837813bf9c8cf6f8347b109d6fb67d89d2c",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "f8f04558c73ba32eb21e517f7f5940ed9d15e661",
+          "candidate_tree": "701b983c7c900d9d1eb925fa2260847a32efbe52",
+          "paths": [
+            "docs/architecture/technical-baseline.md",
+            "package.json",
+            "src/env.d.ts",
+            "src/lib/contact.ts",
+            "src/pages/api/contact.ts",
+            "src/server/contact.ts",
+            "tests/e2e/contact.spec.ts",
+            "tests/unit/contact-input.test.ts",
+            "tests/unit/contact.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:29142305c184650853a5d2c0c574981d7c6341e39dc41ec5ec917816fc6a1b56",
+          "paths_digest": "sha256:cc74efbd569c43f28d1397eba3980f9feaa80b7ec0db428ec66c5908d4c36d8b",
+          "authored_lines": 876,
+          "original_changed_lines": 879
+        },
+        "candidate_id": "sha256:88431c6068895293975a3325edad56636314113d71dc70468c929e1eb269fe25",
+        "paths": [
+          "docs/architecture/technical-baseline.md",
+          "package.json",
+          "src/env.d.ts",
+          "src/lib/contact.ts",
+          "src/pages/api/contact.ts",
+          "src/server/contact.ts",
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact-input.test.ts",
+          "tests/unit/contact.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "701b983c7c900d9d1eb925fa2260847a32efbe52",
+        "original_changed_lines": 879,
+        "authored_lines": 876
+      },
+      "current_candidate_id": "sha256:88431c6068895293975a3325edad56636314113d71dc70468c929e1eb269fe25",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "f8f04558c73ba32eb21e517f7f5940ed9d15e661",
+        "candidate_tree": "701b983c7c900d9d1eb925fa2260847a32efbe52",
+        "paths": [
+          "docs/architecture/technical-baseline.md",
+          "package.json",
+          "src/env.d.ts",
+          "src/lib/contact.ts",
+          "src/pages/api/contact.ts",
+          "src/server/contact.ts",
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact-input.test.ts",
+          "tests/unit/contact.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:29142305c184650853a5d2c0c574981d7c6341e39dc41ec5ec917816fc6a1b56",
+        "paths_digest": "sha256:cc74efbd569c43f28d1397eba3980f9feaa80b7ec0db428ec66c5908d4c36d8b",
+        "authored_lines": 876,
+        "original_changed_lines": 879
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "contact-endpoint:lens-start:2:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "contact-endpoint:lens-result:2:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-22T10:11:53.878Z"
+}

@@ -35,6 +35,7 @@
 | Plataforma de borde | Cloudflare | HTTPS, Git | Caída de la plataforma: la web no está disponible. El uptime externo avisa |
 | Email transaccional | Resend | HTTPS API | Error o timeout: la función responde con un error y la UI ofrece email y WhatsApp. Se registra el código de error, no los datos |
 | Anti-bot | Cloudflare Turnstile | Widget + siteverify | Si la verificación no está disponible, se rechaza el envío (fail-closed) y se muestran vías alternativas |
+| Límite de envíos | Cloudflare (binding `ratelimits` de Workers) | Binding | 3 envíos por minuto e IP (en IPv6, por /64), contados por ubicación. Sin el binding, se rechaza el envío (fail-closed) |
 | Reserva de llamada | Cal.com (plan gratis) | iframe/embed tras clic | Si el embed falla, se muestra un enlace directo a la página de reserva |
 | WhatsApp | Meta | Enlace `wa.me` | Sin dependencia en tiempo de ejecución |
 | Medición sin cookies | Cloudflare Web Analytics | Beacon | Si falla, se pierden métricas; nunca afecta a la página |
@@ -64,7 +65,7 @@
 | Capa | Qué protege | Herramienta |
 | --- | --- | --- |
 | Unitaria | Esquema de validación del contacto, saneado y escape del email, paridad de claves i18n, utilidades SEO (canónicas, hreflang, JSON-LD) | Vitest |
-| Integración / contrato | Función de contacto con el email y el anti-bot simulados: éxito, fallo del proveedor, token inválido, rate limit, logs sin datos personales | Vitest en runtime workerd |
+| Integración / contrato | Función de contacto con el email, el anti-bot y el límite simulados: éxito, fallo del proveedor, token inválido, rate limit, logs sin datos personales. Su cableado en workerd (ruta, binding del límite, secretos ausentes) lo prueba el E2E sobre el build | Vitest con dobles en la frontera; `@cloudflare/vitest-pool-workers` solo admite vitest 4 (2026-10-22) |
 | E2E | Navegación es/en, JS desactivado (ADR 0001), movimiento reducido y fallback 3D (ADR 0004), cabeceras y CSP sin violaciones (ADR 0006), cero cookies sin consentimiento (ADR 0007), hreflang (ADR 0008), accesibilidad (axe) | Playwright sobre el build |
 | Medición | Presupuesto `perf-mobile` y tamaño de JS por página | Lighthouse CI sobre el preview |
 | Diseño | Lint de DESIGN.md y contraste; tema sincronizado (ADR 0005) | CLI de DESIGN.md |
