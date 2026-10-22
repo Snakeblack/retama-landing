@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { retamaShape } from "../../src/lib/retama-shape";
+import { retamaShape, strokePath } from "../../src/lib/retama-shape";
 
 const frame = { width: 1600, height: 900, ground: 360 };
 
@@ -38,6 +38,17 @@ describe("forma de la retama (póster del hero, ADR 0004)", () => {
         expect(y).toBeGreaterThanOrEqual(0);
         expect(y).toBeLessThanOrEqual(frame.height);
       }
+    }
+  });
+
+  it("dibuja cada clase de trazo en un solo path, un subtrazo por trazo, con los puntos en orden", () => {
+    const shape = retamaShape(7, frame);
+    for (const kind of ["stem", "root", "taproot"] as const) {
+      const strokes = shape.strokes.filter((stroke) => stroke.kind === kind);
+      const path = strokePath(shape, kind);
+      expect(path.split("M").filter(Boolean)).toHaveLength(strokes.length);
+      const [first] = strokes;
+      expect(path.startsWith(`M${first?.points.map(([x, y]) => `${x} ${y}`).join("L")}`)).toBe(true);
     }
   });
 });

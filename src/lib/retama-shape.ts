@@ -116,3 +116,11 @@ export function retamaShape(seed: number, frame: Frame, stems = 44, roots = 9): 
   }
   return { ...frame, strokes };
 }
+
+/** One SVG path with every stroke of a kind, for the drawings made at build time (the poster, the services). */
+export function strokePath(shape: Shape, kind: StrokeKind): string {
+  return shape.strokes
+    .filter((stroke) => stroke.kind === kind)
+    .map((stroke) => `M${stroke.points.map((point) => point.join(" ")).join("L")}`)
+    .join("");
+}
