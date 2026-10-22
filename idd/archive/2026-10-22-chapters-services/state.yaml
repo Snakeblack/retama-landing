@@ -1,0 +1,499 @@
+{
+  "schema": "idd-state/v1",
+  "change": "chapters-services",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "Servicios: cuatro tarjetas con una trama de puntos de la retama generada en el build (docs/roadmap.md, M2.5 3/5)",
+    "kind": "feature",
+    "summary": "Rehacer el capítulo Servicios de la portada (M2.5 3/5): cuatro tarjetas de servicio con una trama de puntos de la retama generada en el build",
+    "acceptance": "En / y /en/, el capítulo Servicios muestra su encabezado y cuatro tarjetas (nombre y una frase cada una, en es y en) con una trama de puntos de la retama dibujada en el build y sin JS; design:lint, e2e y Lighthouse móvil siguen en verde"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿Qué composición, A (cuatro cartas en fila que leen la retama de arriba abajo; en móvil una sola planta que baja por las cuatro) o B (mosaico de piezas desiguales con la retama grande solo en Software a medida), y se enmienda DESIGN.md para admitir la retama una tercera vez, la trama de puntos y la fila de cuatro?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿Adónde van el fragmento de las puertas de calidad y la cifra «1 interlocutor técnico» que hoy viven en Servicios?"
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Cómo pasan los cinco servicios actuales a cuatro tarjetas (escritorio dentro de Software a medida) y qué frase lleva cada una, en es y en?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/es.ts",
+          "line": 10
+        }
+      },
+      {
+        "category": "accessibility",
+        "question": "¿Qué movimiento tiene el capítulo (entrada de las tarjetas, la trama que se dibuja con el scroll o nada) y qué queda con movimiento reducido?"
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "request",
+          "text": "generada en el build"
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/roadmap.md",
+      "src/components/board/Method.astro",
+      "src/components/board/Poster.astro",
+      "src/components/board/Services.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/retama-shape.ts",
+      "src/styles/global.css",
+      "tests/e2e/services.spec.ts",
+      "tests/unit/retama-shape.test.ts"
+    ],
+    "work_units": 2,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 2 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Los nombres y las frases están en el HTML y la trama es un SVG del build; el dibujo con el scroll es CSS, y sin él la planta ya está dibujada. No hay JS nuevo."
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Los colores y tamaños salen de tokens (design:lint limpio). El capítulo nuevo se describe en DESIGN.md, que es como lo pide el ADR."
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin style inline ni manejadores. La animación vive en global.css y el SVG solo usa atributos de presentación."
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Las claves nuevas de services.* están en es.ts y en.ts con los mismos nombres; las anclas no cambian."
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint: 'DESIGN.md: lint clean, theme in sync, components use only tokens'. Services.astro y Method.astro solo usan utilidades de tokens (aspect-5/2 y size-0 no son valores sueltos), y global.css no añade colores ni tamaños sueltos. theme.css no se tocó.",
+      "recorded_at": "2026-10-22T00:16:32.824Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Composición A: cuatro cartas que recorren la retama de arriba abajo (en el móvil, una planta que baja por las cuatro), con DESIGN.md enmendado. Escritorio entra en Software a medida, con los textos de la maqueta y su versión en inglés. El fragmento de las puertas y la cifra «1 interlocutor» pasan ya a Método. Movimiento: entrada escalonada y una trama que se dibuja con el scroll; con movimiento reducido ya está dibujada.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T00:15:17.232Z",
+      "detail": {
+        "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T00:15:17.232Z",
+      "detail": {
+        "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/services.spec.ts",
+          "tests/unit/retama-shape.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T00:15:17.232Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T00:17:33.654Z",
+      "detail": {
+        "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+        "runs": [
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T00:17:33.654Z",
+      "detail": {
+        "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+        "check": "ev-4",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/services.spec.ts",
+          "tests/unit/retama-shape.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T00:17:33.654Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+        "fitness": [
+          "run-16",
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20"
+        ]
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-22T00:17:37.838Z"
+    }
+  ],
+  "base": "4ffe5b12afb2894063c3888138ab77772ec6cd07",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9ed152293ccdfb0e3059a45c71370355d4ad336810c80dcd16d57e446a506c19",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:6b5acfa99bd698f514cc564d204fd4d684214578041c2861758e45ceba9e756b",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:06a15675ba57a570f672f99baa8e5065542d86dffe3e0710b72793bcb643b9be",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3d40daf1c57d2b6cbe42eb4ea46138e331770ee7c042531bfb968f7066ac3ff1",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:e9ca5bb8783a369cd850cf01ce48ef88e04eaee3bc9972767f8d1f12e8e91661",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:cc2339964504c8a37ff8d34508174620a12bbce6354d9c6576d7506d04173162",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d48576c0e530741d06aa0e22b9532b7863289e4b5c91cdb74babeb0dec46fefd",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:c1600f35042b75e24d837bd2535cc174a1ade0228f4e0c35b932bb54ab0585e4",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:545ce72700327e5f5e48d0544be563d981f9d4c5bf9407a6619292a6142aa69c",
+      "tree": "sha256:098d77c25576f6c5cebceb6beb397761a82eb0f6aff3e4fa0f46bfe15d6502b2",
+      "recorded_at": "2026-10-22T00:15:17.232Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9ed152293ccdfb0e3059a45c71370355d4ad336810c80dcd16d57e446a506c19",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:5f21d04f6d9e48cb6b218d2de9beb032881f6dcf59afcd4494b6277bb52b94da",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:98b5f0fdde5bffe1ba76d14c5e56ec237d1550c4a53729808a7361db4d381073",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:7a21e57be6773aaf404c43c3a667899564da04633e04be6f3ba86f4c0137f550",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:0846d01c459c7cf6a56154d1c951e43669543f059351624d0c59f9e6d1d72142",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:02f1379daf72629c19ea00dd362f38cd53f35b154ace278351c71532d16dfb73",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:0d76287afa3270ddeaab92d8b0a33d5c1d180cafc81eb5cf9424e05de752cb2f",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:240424a9a194fa920284bec305480faa29c102510f1d283f5f580ea03b7c936e",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:276dcc421da1a9f875d7b74f93b31eb5fdc27904b6e4f9dfb2f97d12bc9cdedf",
+      "tree": "sha256:df842f5a3a31a7f06fb1a4164af6dca9b033dc67a43f33b5235c79c5b636f496",
+      "recorded_at": "2026-10-22T00:17:33.654Z"
+    }
+  ],
+  "closed_at": "2026-10-22T00:17:37.838Z"
+}
