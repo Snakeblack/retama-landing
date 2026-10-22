@@ -1,0 +1,391 @@
+{
+  "schema": "idd-state/v1",
+  "change": "accounts-config",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "Turnstile site key 0x4AAAAAAFhBi8PjbC1-gViF, as a build variable as proposed; Cal.com account set up through its MCP",
+    "kind": "feature",
+    "summary": "Turnstile site key from the PUBLIC_TURNSTILE_SITE_KEY build variable (test key by default) and the Cal.com booking page made final",
+    "acceptance": "A build with PUBLIC_TURNSTILE_SITE_KEY set puts that key in data-site-key of the contact form; without it the build keeps the test key 1x00000000000000000000AA; bookingUrl stays https://cal.com/retama/llamada without the PROVISIONAL mark; the baseline says the Cal.com brand colour needs the Teams plan"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "astro.config.mjs",
+          "line": 26
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/board.ts",
+          "line": 17
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 39
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/board.ts",
+          "line": 13
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/booking.ts",
+          "line": 5
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "src/scripts/contact.ts",
+          "line": 48
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "src/server/contact.ts",
+          "line": 177
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "src/lib/board.ts",
+      "tests/e2e/contact-form.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0002, 0006",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "La clave entra como variable de build del mismo Worker (Workers Builds), igual que PUBLIC_BOOKING; ni servicio ni despliegue nuevos."
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "La CSP no cambia: Turnstile ya está en script-src y frame-src; solo cambia el valor de data-site-key. Build con y sin la variable comprobado (data-site-key real y de pruebas)."
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T16:16:53.065Z",
+      "detail": {
+        "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T16:16:53.065Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0006 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+        "fitness": [
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T16:18:00.732Z",
+      "detail": {
+        "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+        "runs": [
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T16:18:00.732Z",
+      "detail": {
+        "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+        "check": "ev-3",
+        "documents": [
+          "DESIGN.md"
+        ],
+        "tests": [
+          "tests/e2e/contact-form.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T16:18:00.732Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0006 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+        "fitness": [
+          "run-13",
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-22T16:18:05.937Z"
+    }
+  ],
+  "base": "6dabf4254899d57edf7dc2bf26bb92f7e01ee663",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:a1bf5f2dd8ac1a3156cb66a268a6c7e239557adce3fe927e7a1d3f88d9893b3c",
+      "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+      "recorded_at": "2026-10-22T16:16:53.065Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:88df2cc88f0d44fa3538dbffe915105ae26d8d99ee24ca5a51eec3ef2510a5ab",
+      "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+      "recorded_at": "2026-10-22T16:16:53.065Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3afa9e7278109fc0998ee87784f1e02c972d3a95679c78c473c295b6787f4a9",
+      "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+      "recorded_at": "2026-10-22T16:16:53.065Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:a7a664a89b4b8bfa67dd36de2f09f5ab0ca1d7d6e072c65da76acb289aece161",
+      "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+      "recorded_at": "2026-10-22T16:16:53.065Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+      "recorded_at": "2026-10-22T16:16:53.065Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+      "recorded_at": "2026-10-22T16:16:53.065Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3446de60dde9191936e54a7999d523131272cceb619497a318a23a68864e18f",
+      "tree": "sha256:8db09f352a5b9bacf1cd94737524329f63b8b662e24960c11265bfe63dd48875",
+      "recorded_at": "2026-10-22T16:16:53.065Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:4a07ab252ac5d7c7fa28713a52b9595f72022591da80a13d5c13ea99ea956e1c",
+      "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+      "recorded_at": "2026-10-22T16:18:00.732Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:e011d00b9db7bfac4cacda3115bc702721c14fb2585c07ee816dc211fbbdfcaa",
+      "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+      "recorded_at": "2026-10-22T16:18:00.732Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:d4ca8aecf1921fcf7de7d06dd1f178def775ee4cf6931b6f361840ad34549cd4",
+      "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+      "recorded_at": "2026-10-22T16:18:00.732Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:316efe82c21519dd429aa55bbe6b5692c700576660e26386c7ef65b5a472f8c2",
+      "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+      "recorded_at": "2026-10-22T16:18:00.732Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+      "recorded_at": "2026-10-22T16:18:00.732Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+      "recorded_at": "2026-10-22T16:18:00.732Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:079957ce26f7ac89cbf64fbd31a945e6193ccec91c578e9dd08b8c4a486006a2",
+      "tree": "sha256:01a75f1aa0289eb6edc434a5402bc14ac28ddf5b23c1a9153e19f4b118a94643",
+      "recorded_at": "2026-10-22T16:18:00.732Z"
+    }
+  ],
+  "closed_at": "2026-10-22T16:18:05.937Z"
+}
