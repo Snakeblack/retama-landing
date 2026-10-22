@@ -1,7 +1,7 @@
 ---
-import { PUBLIC_BOOKING } from "astro:env/client";
+import { PUBLIC_BOOKING, PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
 import { type Locale, t } from "../../i18n/index";
-import { bookingUrl, contactEmail, turnstileSiteKey, whatsappLabel, whatsappNumber } from "../../lib/board";
+import { bookingUrl, contactEmail, whatsappLabel, whatsappNumber } from "../../lib/board";
 import { bookingEmbedSrc } from "../../lib/booking";
 import { LIMITS, PROJECT_TYPES, type ProjectType } from "../../lib/contact";
 import type { FailureKind } from "../../lib/contact-form";
@@ -47,7 +47,7 @@ const error = "flex gap-sm type-small";---
 
   <!-- The island (src/scripts/contact.ts, bundled by Home.astro) enables the button: without script there is no
        anti-bot token, so the form never sends blind and nothing it holds ends up in a URL. -->
-  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1" data-contact data-site-key={turnstileSiteKey} data-email={contactEmail} data-subject={copy["form.subject"]} data-sending={copy["form.sending"]}>
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1" data-contact data-site-key={PUBLIC_TURNSTILE_SITE_KEY} data-email={contactEmail} data-subject={copy["form.subject"]} data-sending={copy["form.sending"]}>
     <form class="grid content-start gap-lg" aria-labelledby="contact-title" novalidate>
       <input type="hidden" name="locale" value={locale} />
       <div class="sr-only" aria-hidden="true">

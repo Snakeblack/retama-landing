@@ -108,6 +108,8 @@ test.describe("formulario de contacto", () => {
       await expect
         .poll(() => page.evaluate(() => (window as unknown as { __turnstile?: Record<string, unknown> }).__turnstile))
         .toMatchObject({
+          // A build without PUBLIC_TURNSTILE_SITE_KEY keeps Turnstile's test key, which always passes.
+          sitekey: "1x00000000000000000000AA",
           action: "contact",
           appearance: "interaction-only",
           language: locale,
