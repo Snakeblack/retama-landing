@@ -36,7 +36,7 @@
 | Email transaccional | Resend | HTTPS API | Error o timeout: la función responde con un error y la UI ofrece email y WhatsApp. Se registra el código de error, no los datos |
 | Anti-bot | Cloudflare Turnstile | Widget explícito, `interaction-only`, cargado al primer foco en el formulario + siteverify | Si la verificación no está disponible, se rechaza el envío (fail-closed) y se muestran vías alternativas |
 | Límite de envíos | Cloudflare (binding `ratelimits` de Workers) | Binding | 3 envíos por minuto e IP (en IPv6, por /64), contados por ubicación. Sin el binding, se rechaza el envío (fail-closed). Las Previews no heredan los bindings: tienen el suyo en `previews` de `wrangler.jsonc`, con el mismo límite y su propio contador |
-| Reserva de llamada | Cal.com (plan gratis) | iframe/embed tras clic | Si el embed falla, se muestra un enlace directo a la página de reserva |
+| Reserva de llamada | Cal.com (plan gratis) | iframe simple tras clic, sin el script de embed de Cal.com; detrás del flag de build `PUBLIC_BOOKING` (apagado por defecto) | El enlace directo a la página de reserva está siempre a la vista; sin JS, la acción es ese enlace |
 | WhatsApp | Meta | Enlace `wa.me` | Sin dependencia en tiempo de ejecución |
 | Medición sin cookies | Cloudflare Web Analytics | Beacon | Si falla, se pierden métricas; nunca afecta a la página |
 | Errores de cliente | Por decidir en M6 (plan gratis) | HTTPS | Si falla, no se reporta; nunca afecta a la página |
@@ -89,7 +89,8 @@ No se fija ningún porcentaje de cobertura. TDD estricto en la función de conta
 | Biome 2.5 + eslint-plugin-astro | 0009 | Solo ESLint 10 + Prettier | Biome es rápido, pero su soporte de `.astro` es experimental | 2026-10-21: biomejs.dev language support |
 | Vitest 5, Playwright 1.64, Lighthouse CI 0.15 | 0009 | — | LHCI no publica versión desde 06-2025: vigilar | 2026-10-21: npm |
 | Resend (plan gratis: 3.000 emails/mes, 100/día) | 0003 | Cloudflare Email Service, Formspree | API simple y dominio verificado; terceros fuera de la CSP del cliente | 2026-10-21: resend.com/pricing |
-| Cloudflare Turnstile | 0002, 0006 | hCaptcha, honeypot solo | Gratis, invisible, nativo de la plataforma. Único tercero de la CSP: `script-src` y `frame-src https://challenges.cloudflare.com`. La clave de sitio es la de pruebas hasta que se cree el widget (`src/lib/board.ts`) | 2026-10-21: cloudflare/skills `turnstile-spin`; 2026-10-22: CSP comprobada en el build con la clave de pruebas |
+| Cloudflare Turnstile | 0002, 0006 | hCaptcha, honeypot solo | Gratis, invisible, nativo de la plataforma. Único tercero de `script-src`; en `frame-src` lo acompaña Cal.com solo con la reserva activada. La clave de sitio es la de pruebas hasta que se cree el widget (`src/lib/board.ts`) | 2026-10-21: cloudflare/skills `turnstile-spin`; 2026-10-22: CSP comprobada en el build con la clave de pruebas |
+| Cal.com (plan gratis) | 0006, 0007 | Calendly, enlace sin iframe | iframe simple con `?embed=true&theme=dark`, sin `embed.js`, así que solo entra en `frame-src https://cal.com`, y solo con `PUBLIC_BOOKING=true` (lo añade `Home.astro`). Al abrirlo deja solo la cookie de seguridad `__cf_bm` de Cloudflare. La página es provisional hasta que exista la cuenta (`src/lib/board.ts`); su color de marca se ajusta en la cuenta | 2026-10-22: iframe probado con Playwright (peticiones a cal.com, app.cal.com y Sentry; ninguna cookie de seguimiento) |
 | Cloudflare Web Analytics | 0007 | Umami, Plausible (de pago) | Sin cookies, gratis, Web Vitals de campo | 2026-10-21: informe de plataforma |
 | release-please | 0009 | Tags manuales | SemVer desde Conventional Commits (ronda 5) | Pendiente de verificar la versión en el slice 1 |
 
