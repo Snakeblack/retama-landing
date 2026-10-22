@@ -1,0 +1,260 @@
+{
+  "schema": "idd-state/v1",
+  "change": "contact-email-domain",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "ya hice mi parte, te toca la tuya (cambiar el correo visible de la web por hola@retama.dev)",
+    "kind": "feature",
+    "summary": "Show hola@retama.dev as the contact address instead of the owner Gmail, now that Email Routing forwards it",
+    "acceptance": "Both pages show hola@retama.dev as the direct address, the mailto links and the prefilled failure mail go to it, and no page holds retamozogpt@gmail.com"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/board.ts",
+          "line": 5
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Contact.astro",
+          "line": 43
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "request",
+          "text": "cambiar el correo visible de la web por hola@retama.dev"
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Contact.astro",
+          "line": 110
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Contact.astro",
+          "line": 50
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Contact.astro",
+          "line": 4
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "tests/e2e/contact-form.spec.ts",
+          "line": 195
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "src/lib/board.ts",
+      "tests/e2e/contact-form.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "untested-product",
+      "reason": "product code without a test: touches src/lib/board.ts",
+      "source": "diff"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "boundary-tests",
+      "signal": "untested-product",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T22:20:24.772Z",
+      "detail": {
+        "tree": "sha256:4b404c238448b25b6ab5a57b08ad46e195658344cbc41052dd2e378d627233bf",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T22:21:34.230Z",
+      "detail": {
+        "tree": "sha256:eb7608977b0791d4a716cdba6e91534decc4059c9c0d27de4879c51fbaa2cf40",
+        "runs": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "tested-check",
+      "obligation": "boundary-tests",
+      "recorded_at": "2026-10-22T22:21:34.230Z",
+      "detail": {
+        "tree": "sha256:eb7608977b0791d4a716cdba6e91534decc4059c9c0d27de4879c51fbaa2cf40",
+        "run": "run-6",
+        "has_test": true
+      }
+    }
+  ],
+  "base": "2d58da4bd7a0c05539b79050222ff016e6781dff",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0ce359f7df60aee2d087e374d4dcc7becf18bbc05e959c64223e3405821f28ee",
+      "tree": "sha256:4b404c238448b25b6ab5a57b08ad46e195658344cbc41052dd2e378d627233bf",
+      "recorded_at": "2026-10-22T22:20:24.772Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:26d908747e1f0ed1459870e135ed0fa0f6f8c9f230034b488845c5b8f252cddb",
+      "tree": "sha256:4b404c238448b25b6ab5a57b08ad46e195658344cbc41052dd2e378d627233bf",
+      "recorded_at": "2026-10-22T22:20:24.772Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:7d68b93a82c5640629d8f28846da8521e2c790a035755c3c86a94a05ffe1736c",
+      "tree": "sha256:4b404c238448b25b6ab5a57b08ad46e195658344cbc41052dd2e378d627233bf",
+      "recorded_at": "2026-10-22T22:20:24.772Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:6ada4989c7ed974ef89e799f8e2fe659ccfb32db70c724edeb454f36e32e2756",
+      "tree": "sha256:4b404c238448b25b6ab5a57b08ad46e195658344cbc41052dd2e378d627233bf",
+      "recorded_at": "2026-10-22T22:20:24.772Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:4b404c238448b25b6ab5a57b08ad46e195658344cbc41052dd2e378d627233bf",
+      "recorded_at": "2026-10-22T22:20:24.772Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0ce359f7df60aee2d087e374d4dcc7becf18bbc05e959c64223e3405821f28ee",
+      "tree": "sha256:eb7608977b0791d4a716cdba6e91534decc4059c9c0d27de4879c51fbaa2cf40",
+      "recorded_at": "2026-10-22T22:21:34.230Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:3e5f156a95827b37606aa9030b1a062a4d2d56cb3d6f35fe8c6e4cbf458340c9",
+      "tree": "sha256:eb7608977b0791d4a716cdba6e91534decc4059c9c0d27de4879c51fbaa2cf40",
+      "recorded_at": "2026-10-22T22:21:34.230Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:e88d3878c8020df36631614b276600e25930510288c700aa597184a7fd3a7469",
+      "tree": "sha256:eb7608977b0791d4a716cdba6e91534decc4059c9c0d27de4879c51fbaa2cf40",
+      "recorded_at": "2026-10-22T22:21:34.230Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:4470c232536fbdd148ad4bd9a3fec3aa6cfc38b7c0f0f846851fe313171fbe70",
+      "tree": "sha256:eb7608977b0791d4a716cdba6e91534decc4059c9c0d27de4879c51fbaa2cf40",
+      "recorded_at": "2026-10-22T22:21:34.230Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:eb7608977b0791d4a716cdba6e91534decc4059c9c0d27de4879c51fbaa2cf40",
+      "recorded_at": "2026-10-22T22:21:34.230Z"
+    }
+  ],
+  "closed_at": "2026-10-22T22:21:39.499Z"
+}

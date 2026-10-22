@@ -5,6 +5,8 @@ import { expect, type Page, test } from "@playwright/test";
 const TURNSTILE = "https://challenges.cloudflare.com/turnstile/v0/api.js*";
 // WhatsApp shows only in a build given PUBLIC_WHATSAPP_NUMBER: CI builds with a test number, a plain local run without.
 const whatsappNumber = process.env.PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
+// The domain address Cloudflare Email Routing forwards to the owner: never their personal inbox.
+const address = "hola@retama.dev";
 // Each render and each reset hands out a new token, as the real widget does.
 const fakeTurnstile = `
   let options, count = 0;
@@ -81,6 +83,8 @@ test.describe("formulario de contacto sin JavaScript (ADR 0001)", () => {
       await expect(page.locator("[data-contact-direct] a:not([data-booking-open])")).toHaveCount(
         whatsappNumber ? 2 : 1,
       );
+      const direct = page.locator(`[data-contact-direct] a[href="mailto:${address}"]`);
+      await expect(direct).toHaveText(address);
       // Nothing the form holds can end up in a URL or in another page.
       await expect(page.locator("[data-contact] form")).not.toHaveAttribute("action");
     });
@@ -195,6 +199,7 @@ test.describe("formulario de contacto", () => {
         await expect(page.getByLabel(labels.message)).toHaveValue(draft.message);
         const mail = failure.locator("[data-contact-mail]");
         const href = new URL((await mail.getAttribute("href")) ?? "");
+        expect(href.pathname).toBe(address);
         expect(href.searchParams.get("body")).toBe(`${draft.message}\n\n${draft.name}`);
         const chat = failure.locator('a[href^="https://wa.me/"]');
         if (whatsappNumber) await expect(chat).toHaveAttribute("href", `https://wa.me/${whatsappNumber}`);

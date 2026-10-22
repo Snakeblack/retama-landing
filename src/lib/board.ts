@@ -1,8 +1,9 @@
 // Facts of the board that are the same in every language (DESIGN.md, Imagery and Components).
 // The contact channels live here and only here; the owner's personal ones (WhatsApp) come from the build environment.
 
-/** The contact address beside the form; its visible text is the address itself. */
-export const contactEmail = "retamozogpt@gmail.com";
+/** The contact address beside the form; its visible text is the address itself. Cloudflare Email Routing forwards it
+ * to the owner's inbox. */
+export const contactEmail = "hola@retama.dev";
 
 /** The Cal.com page where a call is booked (the owner's account, event "Llamada"); it shows only while PUBLIC_BOOKING
  * is on (astro.config.mjs). Contact.astro admits its origin, and only it, as a frame. The Turnstile site key is not
