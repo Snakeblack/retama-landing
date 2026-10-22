@@ -1,0 +1,204 @@
+{
+  "schema": "idd-state/v1",
+  "change": "index-wipe",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "El índice del móvil aparece de golpe: el keyframe index-wipe solo tiene from con inset, que no interpola con none",
+    "acceptance": "A mitad de la apertura el índice está recortado parcialmente desde abajo (clip-path inset con porcentaje intermedio) y al acabar queda sin recorte"
+  },
+  "facts": {
+    "basis": "El arreglo ya decidido es el de dots-draw (global.css:337): ambos extremos como inset; duración, curva y movimiento reducido no cambian"
+  },
+  "plan": {
+    "paths": [
+      "src/styles/global.css",
+      "tests/e2e/header.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-22T00:46:25.822Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T00:48:03.720Z",
+      "detail": {
+        "tree": "sha256:34da6b57f12b6ce2a2213c135f35fe5c8fe94ab1ee889cf5f371ad9385566823",
+        "runs": [
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12"
+        ]
+      }
+    }
+  ],
+  "base": "6a6f5b40cb5672f9c5212fb940402e5895b746f8",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/header.spec.ts -g cortina",
+      "exit_code": 1,
+      "output_sha256": "sha256:04a6f8451d53640a5f8e7a672cddc3b4c03e1a13a7205e0d0df988fb910a4eba",
+      "tree": "sha256:7cc627b8dad90e2184a696ae0be96588c3f9e1cb411bcc744475d0485326336f",
+      "recorded_at": "2026-10-22T00:46:16.327Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/header.spec.ts -g cortina",
+      "exit_code": 0,
+      "output_sha256": "sha256:746b8314dca860b1b216cc352062a5461992a89e12dbc967627e9319e1802865",
+      "tree": "sha256:aa5e0b6815ccbb95ecbe5a4e5f8fdea4a6483c453af90fa6cb2cf990dbf19cdd",
+      "recorded_at": "2026-10-22T00:46:25.822Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 1,
+      "output_sha256": "sha256:ab343d65a74e2b3fa093e1c733483c87e6391579a758cef1e8a374ec4ca294bf",
+      "tree": "sha256:4b9ef565a6d97cffd36fcb7ac4d647bb6b7d06e692c43669c3351d4416445e83",
+      "recorded_at": "2026-10-22T00:47:13.703Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:2ea0edab2dffaaea153a6a90f914c987cd99461702a95022ab4c0aa2880bb930",
+      "tree": "sha256:4b9ef565a6d97cffd36fcb7ac4d647bb6b7d06e692c43669c3351d4416445e83",
+      "recorded_at": "2026-10-22T00:47:13.703Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:76a32fe388acb56fcd52ffeb5772af8a4c7df0cf2d160f5d22e5b5c07f6bb739",
+      "tree": "sha256:4b9ef565a6d97cffd36fcb7ac4d647bb6b7d06e692c43669c3351d4416445e83",
+      "recorded_at": "2026-10-22T00:47:13.703Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:07e71b32d1f698f150ae8612ee0e29438cfa43858fcb3ddc08f4a1054b7e4292",
+      "tree": "sha256:4b9ef565a6d97cffd36fcb7ac4d647bb6b7d06e692c43669c3351d4416445e83",
+      "recorded_at": "2026-10-22T00:47:13.703Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:4b9ef565a6d97cffd36fcb7ac4d647bb6b7d06e692c43669c3351d4416445e83",
+      "recorded_at": "2026-10-22T00:47:13.703Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9ed152293ccdfb0e3059a45c71370355d4ad336810c80dcd16d57e446a506c19",
+      "tree": "sha256:34da6b57f12b6ce2a2213c135f35fe5c8fe94ab1ee889cf5f371ad9385566823",
+      "recorded_at": "2026-10-22T00:48:03.720Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:b43f13d9f9afba4ef384eeee2e592e56db835ecde3d8313b5c8edecd17124404",
+      "tree": "sha256:34da6b57f12b6ce2a2213c135f35fe5c8fe94ab1ee889cf5f371ad9385566823",
+      "recorded_at": "2026-10-22T00:48:03.720Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:16e8ed83b9f12f09d213b11e2163c101fc09f1b2c1f24f706bc91f1dfcafc4cf",
+      "tree": "sha256:34da6b57f12b6ce2a2213c135f35fe5c8fe94ab1ee889cf5f371ad9385566823",
+      "recorded_at": "2026-10-22T00:48:03.720Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:eebc88ba98542e0f434824bba14750d352f5dd37923e891e9829e4076807b113",
+      "tree": "sha256:34da6b57f12b6ce2a2213c135f35fe5c8fe94ab1ee889cf5f371ad9385566823",
+      "recorded_at": "2026-10-22T00:48:03.720Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:34da6b57f12b6ce2a2213c135f35fe5c8fe94ab1ee889cf5f371ad9385566823",
+      "recorded_at": "2026-10-22T00:48:03.720Z"
+    }
+  ],
+  "closed_at": "2026-10-22T00:48:05.650Z"
+}

@@ -244,9 +244,14 @@ footer,
   overflow: hidden;
 }
 
+/* Both ends are insets, as in dots-draw: against none the inset would not interpolate and the index would flip in. */
 @keyframes index-wipe {
   from {
     clip-path: inset(0 0 100% 0);
+  }
+
+  to {
+    clip-path: inset(0);
   }
 }
 

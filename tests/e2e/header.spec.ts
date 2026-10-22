@@ -71,6 +71,23 @@ test.describe("cabecera flotante e índice de capítulos en el móvil (DESIGN.md
     });
   }
 
+  test("el índice baja como una cortina al abrirse, no aparece de golpe", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Índice" }).click();
+    const dialog = page.getByRole("dialog", { name: "Índice" });
+    // Halfway through the wipe the index is cut partway from the bottom, not either all there or all gone.
+    const halfway = await dialog.evaluate((node) => {
+      const [wipe] = node
+        .getAnimations()
+        .filter((animation) => (animation as CSSAnimation).animationName === "index-wipe");
+      if (!wipe) return "no animation";
+      wipe.pause();
+      wipe.currentTime = Number(wipe.effect?.getComputedTiming().duration) / 2;
+      return getComputedStyle(node).clipPath;
+    });
+    expect(halfway).toMatch(/^inset\(0px 0px (?:[1-9]\d?(?:\.\d+)?)%\)$/);
+  });
+
   test("la cabecera se va al bajar y vuelve al subir", async ({ page }) => {
     await page.goto("/");
     expect(await barTop(page)).toBe(0);
