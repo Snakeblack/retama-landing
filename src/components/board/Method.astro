@@ -3,6 +3,7 @@ import { Picture } from "astro:assets";
 import plate from "../../assets/board/clusius-1576-retama-monosperma.jpg";
 import { type Locale, t } from "../../i18n/index";
 import AdrFragment from "./AdrFragment.astro";
+import ChecksFragment from "./ChecksFragment.astro";
 
 interface Props {
   locale: Locale;
@@ -63,7 +64,7 @@ const projects = [
     ))
   }
 
-  <!-- The proof of the method: a real decision record of this site and two figures it checks on every release. -->
+  <!-- The proof of the method: a real decision record of this site, the gates it passes and the figures they check. -->
   <div class="col-span-2 lg:col-span-6 lg:row-span-3">
     <AdrFragment locale={Astro.props.locale} />
   </div>
@@ -76,6 +77,15 @@ const projects = [
   <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-3">
     <p class="type-headline-sm md:type-headline">{copy["hero.figure2"]}</p>
     <p class="type-small text-on-surface-muted">{copy["hero.figure2Caption"]}</p>
+  </div>
+
+  <div class="col-span-2 lg:col-span-6 lg:row-span-5">
+    <ChecksFragment locale={Astro.props.locale} />
+  </div>
+
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
+    <p class="type-headline-sm md:type-headline">{copy["services.figure"]}</p>
+    <p class="type-small text-on-surface-muted">{copy["services.figureCaption"]}</p>
   </div>
 
   <div class="col-span-2 grid gap-gap lg:col-span-12" data-rows>
