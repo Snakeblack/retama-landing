@@ -1,34 +1,132 @@
 ---
 import { type Locale, t } from "../../i18n/index";
-import { contactEmail } from "../../lib/board";
-import ReplyFragment from "./ReplyFragment.astro";
+import { contactEmail, turnstileSiteKey, whatsappLabel, whatsappNumber } from "../../lib/board";
+import { LIMITS, PROJECT_TYPES, type ProjectType } from "../../lib/contact";
+import type { FailureKind } from "../../lib/contact-form";
 
 interface Props {
   locale: Locale;
 }
 
-const copy = t(Astro.props.locale);
+const { locale } = Astro.props;
+const copy = t(locale);
 const steps = [
   ["contact.step1", "contact.step1Rest"],
   ["contact.step2", "contact.step2Rest"],
   ["contact.step3", "contact.step3Rest"],
 ] as const;
+const typeLabel: Record<ProjectType, keyof typeof copy> = {
+  web: "services.web",
+  software: "services.custom",
+  agents: "services.agents",
+  seo: "services.seo",
+  other: "form.typeOther",
+};
+const failures: FailureKind[] = ["invalid", "verification", "rate-limited", "unavailable"];
+const whatsappHref = `https://wa.me/${whatsappNumber}`;
+const input = "min-h-(--spacing-touch) w-full bg-surface px-md py-sm text-on-surface";
+const label = "type-small text-on-surface-muted";
+const error = "flex gap-sm type-small";
 ---
 
-<!-- Until the form lands (M3) the contact is the address itself, readable and copyable without a mail client.
-     Phone order: heading, address, the example reply, then what happens after writing. -->
+<!-- DESIGN.md Layout, the contact: heading and the light tile with the address on the left half, the form on the
+     right half, what happens after writing across the width. Phone order: heading, address, form, steps. -->
 <section id={copy["anchor.contact"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="contact-title" data-selectable data-chapter="contact">
   <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-6">
     <h2 id="contact-title" class="text-balance type-headline-sm md:type-headline">{copy["contact.title"]}</h2>
     <p class="max-w-(--spacing-measure)">{copy["contact.lead"]}</p>
   </div>
 
-  <div class="col-span-2 flex flex-col justify-end bg-field p-tile-sm text-on-field md:p-tile lg:col-span-6">
+  <div class="col-span-2 grid content-end gap-sm bg-field p-tile-sm text-on-field md:p-tile lg:col-span-6 lg:col-start-1 lg:row-start-2" data-contact-direct>
+    <p class="type-small">{copy["contact.direct"]}</p>
     <a class="feedback break-all type-statement-sm underline hover:decoration-primary md:type-statement" href={`mailto:${contactEmail}`}>{contactEmail}</a>
+    <a class="feedback underline hover:decoration-primary" href={whatsappHref}>WhatsApp · {whatsappLabel}</a>
   </div>
 
-  <div class="col-span-2 lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1">
-    <ReplyFragment locale={Astro.props.locale} />
+  <!-- The island (src/scripts/contact.ts) enables the button: without script there is no anti-bot token, so the form
+       never sends blind and nothing it holds ends up in a URL. -->
+  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1" data-contact data-site-key={turnstileSiteKey} data-email={contactEmail} data-subject={copy["form.subject"]} data-sending={copy["form.sending"]}>
+    <form class="grid content-start gap-lg" aria-labelledby="contact-title" novalidate>
+      <input type="hidden" name="locale" value={locale} />
+      <div class="sr-only" aria-hidden="true">
+        <label>{copy["form.honeypot"]} <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+      </div>
+
+      <div class="grid gap-md md:grid-cols-2">
+        <div class="grid content-start gap-xs">
+          <label class={label} for="contact-name">{copy["form.name"]}</label>
+          <input class={input} id="contact-name" name="name" type="text" autocomplete="name" maxlength={LIMITS.name} required />
+          <p class={error} id="contact-name-error" data-error="name" hidden>
+            <span class="mt-xs size-sm shrink-0 bg-primary" aria-hidden="true"></span>{copy["form.error.name"]}
+          </p>
+        </div>
+        <div class="grid content-start gap-xs">
+          <label class={label} for="contact-email">{copy["form.email"]}</label>
+          <input class={input} id="contact-email" name="email" type="email" autocomplete="email" maxlength={LIMITS.email} required />
+          <p class={error} id="contact-email-error" data-error="email" hidden>
+            <span class="mt-xs size-sm shrink-0 bg-primary" aria-hidden="true"></span>{copy["form.error.email"]}
+          </p>
+        </div>
+      </div>
+
+      <fieldset class="grid gap-xs" id="contact-projectType">
+        <legend class={`mb-xs ${label}`}>{copy["form.type"]}</legend>
+        <div class="grid grid-cols-2 gap-xs md:grid-cols-3">
+          {
+            PROJECT_TYPES.map((type) => (
+              <label class="feedback flex min-h-(--spacing-touch) cursor-pointer items-center gap-sm bg-surface px-md py-sm type-small text-on-surface-muted hover:text-on-surface has-checked:bg-field has-checked:text-on-field" data-choice>
+                <input class="peer sr-only" type="radio" name="projectType" value={type} required />
+                <span class="size-sm shrink-0 bg-on-surface-muted peer-checked:bg-primary" aria-hidden="true" />
+                {copy[typeLabel[type]]}
+              </label>
+            ))
+          }
+        </div>
+        <p class={error} id="contact-projectType-error" data-error="projectType" hidden>
+          <span class="mt-xs size-sm shrink-0 bg-primary" aria-hidden="true"></span>{copy["form.error.projectType"]}
+        </p>
+      </fieldset>
+
+      <div class="grid content-start gap-xs">
+        <label class={label} for="contact-message">{copy["form.message"]}</label>
+        <textarea class={`${input} resize-y`} id="contact-message" name="message" rows="6" minlength={LIMITS.messageMin} maxlength={LIMITS.messageMax} required></textarea>
+        <p class={error} id="contact-message-error" data-error="message" hidden>
+          <span class="mt-xs size-sm shrink-0 bg-primary" aria-hidden="true"></span>{copy["form.error.message"]}
+        </p>
+      </div>
+
+      <div role="alert" class="grid gap-sm bg-surface p-md" data-contact-failure hidden>
+        {
+          failures.map((kind) => (
+            <p class="flex gap-sm" data-failure={kind} hidden>
+              <span class="mt-sm size-sm shrink-0 bg-primary" aria-hidden="true" />
+              {copy[`form.fail.${kind}`]}
+            </p>
+          ))
+        }
+        <p class="flex flex-wrap gap-x-lg gap-y-xs ps-md" data-failure-ways>
+          <a class="feedback underline hover:decoration-primary" href={`mailto:${contactEmail}`} data-contact-mail>{copy["form.fail.mail"]}</a>
+          <a class="feedback underline hover:decoration-primary" href={whatsappHref}>WhatsApp · {whatsappLabel}</a>
+        </p>
+      </div>
+
+      <!-- Turnstile shows here only when Cloudflare asks for a click; until then it takes no room in the form. -->
+      <div class="-mt-lg data-shown:mt-0" data-turnstile></div>
+
+      <noscript><p class="type-small">{copy["form.noscript"]}</p></noscript>
+
+      <div class="flex flex-wrap items-center justify-between gap-md">
+        <p class="flex-1 type-small text-on-surface-muted">{copy["form.privacy"]}</p>
+        <button class="feedback min-h-(--spacing-touch) bg-primary px-lg type-label text-on-primary hover:bg-field hover:text-on-field disabled:cursor-not-allowed disabled:bg-surface disabled:text-on-surface-muted" type="submit" disabled>
+          {copy["form.submit"]}
+        </button>
+      </div>
+    </form>
+
+    <div class="grid content-start gap-md" tabindex="-1" data-contact-done hidden>
+      <p class="type-headline-sm md:type-headline">{copy["form.done.title"]}</p>
+      <p>{copy["form.done.lead"]} <strong class="type-body-strong" data-contact-done-email></strong>.</p>
+    </div>
   </div>
 
   <ol class="col-span-2 grid gap-lg bg-surface-raised p-tile-sm md:grid-cols-3 md:p-tile lg:col-span-12">
@@ -44,3 +142,7 @@ const steps = [
     }
   </ol>
 </section>
+
+<script>
+  import "../../scripts/contact";
+</script>

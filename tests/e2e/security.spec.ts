@@ -24,7 +24,9 @@ test.describe("cabeceras de seguridad (ADR 0006)", () => {
       expect(csp).not.toContain(",");
       expect(csp).toContain("frame-ancestors 'none'");
       expect(csp).toContain("object-src 'none'");
-      expect(csp).toMatch(/script-src 'self'( 'sha256-[^']+')*;/);
+      // ADR 0006 allowlist: Turnstile, the one third party, for the contact form.
+      expect(csp).toMatch(/script-src 'self' https:\/\/challenges\.cloudflare\.com( 'sha256-[^']+')*;/);
+      expect(csp).toContain("frame-src https://challenges.cloudflare.com");
       expect(csp).not.toMatch(/unsafe-inline|unsafe-eval/);
     });
   }

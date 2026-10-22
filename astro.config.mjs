@@ -76,7 +76,10 @@ export default defineConfig({
         "img-src 'self' data:",
         "font-src 'self'",
         "connect-src 'self'",
+        // ADR 0006 allowlist: Turnstile's widget for the contact form, loaded on the first focus in it.
+        "frame-src https://challenges.cloudflare.com",
       ],
+      scriptDirective: { resources: ["'self'", "https://challenges.cloudflare.com"] },
     },
   },
 });
