@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.2.0](https://github.com/Snakeblack/retama-landing/compare/v0.1.0...v0.2.0) (2026-10-22)
+
+
+### Features
+
+* **contact:** add the /api/contact function behind the contact form ([1565262](https://github.com/Snakeblack/retama-landing/commit/1565262ae784425c1e9269f6a12fa264d82a83cf))
+* **contact:** add the contact form to the Hablemos chapter ([c2e97d9](https://github.com/Snakeblack/retama-landing/commit/c2e97d907eb9249f0cb1812bcd6d2d8c8384ecc6))
+* **contact:** book a call from the contact chapter behind PUBLIC_BOOKING ([40699e1](https://github.com/Snakeblack/retama-landing/commit/40699e169d26783f1476e8568f22827472f90291))
+* **contact:** take the Turnstile site key from the build environment ([605efd6](https://github.com/Snakeblack/retama-landing/commit/605efd63f5bc11d3abbc5c29e341053e566c6cb2))
+* **design:** adopt the well-kept board art direction ([1500827](https://github.com/Snakeblack/retama-landing/commit/15008276f44ee176c113f5ab4992ecd05356f534))
+* **design:** give the grounds a fine grain that only darkens ([66d45bb](https://github.com/Snakeblack/retama-landing/commit/66d45bb8b85f9106d8cc586bba365d34239c85bf))
+* **design:** reject loose colours and sizes in components ([d37ffc2](https://github.com/Snakeblack/retama-landing/commit/d37ffc27bd4c3696e4263259e9b6905c740ee748))
+* **design:** soften the grain of the grounds ([58be0e1](https://github.com/Snakeblack/retama-landing/commit/58be0e11a7dd5dc48e49de0e8f7511361616122f))
+* **design:** soften the grain of the grounds by another fifth ([ea7f4c4](https://github.com/Snakeblack/retama-landing/commit/ea7f4c4ea72f7ed9d8b3cb5d04dac4805603b3d2))
+* **header:** float the header over the hero and give phones a chapter index ([91659fb](https://github.com/Snakeblack/retama-landing/commit/91659fbc043906b952ccacbf93606b58a79a4ef7))
+* **header:** gather the desktop links on the right, next to the language switch ([6927dd4](https://github.com/Snakeblack/retama-landing/commit/6927dd440f6d0f19057521e736da41d769c816f7))
+* **home:** add the motion layer with the shutter, entrances and the code lens ([205bb60](https://github.com/Snakeblack/retama-landing/commit/205bb608d8a4acdecd374445ac9bc7ccdd0f89a3))
+* **home:** build the well-kept board with final copy and found pictures ([9ca9714](https://github.com/Snakeblack/retama-landing/commit/9ca9714bfb41f38d54759dcce9125374ef4fd80e))
+* **home:** draw the retama poster from a seeded shape ([acce62f](https://github.com/Snakeblack/retama-landing/commit/acce62f57b0da4467f4bea3dc623c2f254c78cf2))
+* **home:** drop the code texture from the title ([00e772c](https://github.com/Snakeblack/retama-landing/commit/00e772cac7e27d4d9cd13ae6340f2c3a95803991))
+* **home:** grow the retama from glyphs of the site's own code ([5fd7521](https://github.com/Snakeblack/retama-landing/commit/5fd75217e238fbcc61e85c6ca4e9c3e582fc8d03))
+* **home:** grow the retama scene in 3D with wind and rising sap ([0fd76e2](https://github.com/Snakeblack/retama-landing/commit/0fd76e2e6f72ecc6391dc1f2821f1d6768adb643))
+* **home:** hand the title back to its letters and show its code on hover ([e2266d6](https://github.com/Snakeblack/retama-landing/commit/e2266d6a0bcf5bd36595baa06f9cfffd5d4684b4))
+* **home:** keep the retama as a signature and show the work in fragments ([9bec2e7](https://github.com/Snakeblack/retama-landing/commit/9bec2e7778238c4cf83a36142d6dec6ebc1d8680))
+* **home:** let the cursor blow stronger wind over the retama ([1d392ca](https://github.com/Snakeblack/retama-landing/commit/1d392caf434dac514ff85e17f439a7be58fcd209))
+* **home:** let the scene draw the grain in the first chapter ([6438b6a](https://github.com/Snakeblack/retama-landing/commit/6438b6ac89e88840e09581d2e1311e2f94a01924))
+* **home:** paint the title in letters and hand it back once the retama grows ([a35a8f6](https://github.com/Snakeblack/retama-landing/commit/a35a8f6ae91a03d9e909c996504a63a75e87b933))
+* **home:** pin the sectors scene with one example fragment per sector ([1f1d1f2](https://github.com/Snakeblack/retama-landing/commit/1f1d1f2d83cc461d5db05e3631d0933a385a9bcc))
+* **home:** read the retama down four service cards ([dc40cb2](https://github.com/Snakeblack/retama-landing/commit/dc40cb20c6173b5aa786cc2c06554aba546264a9))
+* **home:** set the manifesto at headline size on phones ([4a19511](https://github.com/Snakeblack/retama-landing/commit/4a19511d1c98129d0dee372ffda61530802079f5))
+* **home:** sweep the code across the name on touch and stop board selection ([3573f36](https://github.com/Snakeblack/retama-landing/commit/3573f362a8ec2075265a2bdc308dbe769dfcdfec))
+* **home:** tell the method without jargon, with the project switcher as its proof ([9e0eed2](https://github.com/Snakeblack/retama-landing/commit/9e0eed23dd354e6cfa6ad84cccc9bf0470716d61))
+* **home:** turn the sectors into a compact switcher with live fragments ([7ae7ae4](https://github.com/Snakeblack/retama-landing/commit/7ae7ae4a061391e3bbd8fb00e6cff591bdd0d18a))
+
+
+### Bug Fixes
+
+* **contact:** bundle the contact island with the rest of the home ([6135f6f](https://github.com/Snakeblack/retama-landing/commit/6135f6fd4035c41ce9f7477c51834a040090d32e))
+* **deploy:** give branch previews their own contact limiter ([5d764c0](https://github.com/Snakeblack/retama-landing/commit/5d764c001ffa6887961a030101733d16e6d25f4f))
+* **design:** wipe the phone index in instead of flipping it ([154c132](https://github.com/Snakeblack/retama-landing/commit/154c13284859be75f687a7ba686a080016e76e34))
+* **header:** give the hero title air under the header and make the index buttons icons ([6d55db1](https://github.com/Snakeblack/retama-landing/commit/6d55db19c02b8578b082b9a2c58745a6a1d1ef29))
+* **release:** bump the minor for features before 1.0 ([c89d9a9](https://github.com/Snakeblack/retama-landing/commit/c89d9a9d20dce120a5c4727bbe68ab6b569cb09a))
+
+
+### Performance Improvements
+
+* **scene:** work the bloom out at a quarter size and drop multisampling ([542c8f1](https://github.com/Snakeblack/retama-landing/commit/542c8f1666c9e5bdcd2c01ebce5ee964ac452a92))
+
 ## 0.1.0 (2026-10-21)
 
 
