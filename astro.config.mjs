@@ -31,6 +31,9 @@ export default defineConfig({
         access: "public",
         default: "1x00000000000000000000AA",
       }),
+      // The owner's WhatsApp, international format (34…), set in the build environment (Workers Builds) so it stays out
+      // of the public repository. Without it the page shows no WhatsApp.
+      PUBLIC_WHATSAPP_NUMBER: envField.string({ context: "client", access: "public", optional: true }),
     },
   },
   i18n: {
