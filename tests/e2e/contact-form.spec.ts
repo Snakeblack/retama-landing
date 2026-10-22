@@ -76,7 +76,7 @@ test.describe("formulario de contacto sin JavaScript (ADR 0001)", () => {
       await expect(page.locator("[data-choice]")).toHaveCount(5);
       await expect(page.getByRole("button", { name: labels.submit })).toBeDisabled();
       await expect(page.locator("[data-contact] noscript")).toHaveCount(1);
-      await expect(page.locator("[data-contact-direct] a")).toHaveCount(2);
+      await expect(page.locator("[data-contact-direct] a:not([data-booking-open])")).toHaveCount(2);
       // Nothing the form holds can end up in a URL or in another page.
       await expect(page.locator("[data-contact] form")).not.toHaveAttribute("action");
     });
@@ -104,15 +104,15 @@ test.describe("formulario de contacto", () => {
 
       await page.getByLabel(labels.name).focus();
       await expect.poll(() => loads.length).toBe(1);
-      const options = await page.evaluate(
-        () => (window as unknown as { __turnstile: Record<string, unknown> }).__turnstile,
-      );
-      expect(options).toMatchObject({
-        action: "contact",
-        appearance: "interaction-only",
-        language: locale,
-        "response-field": false,
-      });
+      // The request goes out before the script runs and renders: wait for the widget's options, not just the load.
+      await expect
+        .poll(() => page.evaluate(() => (window as unknown as { __turnstile?: Record<string, unknown> }).__turnstile))
+        .toMatchObject({
+          action: "contact",
+          appearance: "interaction-only",
+          language: locale,
+          "response-field": false,
+        });
     });
 
     test(`${path} marca los campos que faltan al enviar y los suelta al corregirlos`, async ({ page }) => {
