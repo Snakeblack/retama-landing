@@ -16,7 +16,7 @@
     "typecheck": "astro check",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "serve:dist": "wrangler dev -c dist/client/wrangler.json",
+    "serve:dist": "wrangler dev -c dist/server/wrangler.json",
     "design:theme": "node scripts/design-check.mjs --write",
     "design:lint": "node scripts/design-check.mjs",
     "skills:scan": "node scripts/skills-scan.mjs"
