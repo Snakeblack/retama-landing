@@ -1,0 +1,381 @@
+{
+  "schema": "idd-state/v1",
+  "change": "whatsapp-from-env",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "el whatsapp provisional, pon el mio personal [numero], aunque supongo que habra más adelante uno de empresa",
+    "kind": "feature",
+    "summary": "Take the WhatsApp number from the build environment (PUBLIC_WHATSAPP_NUMBER) and hide WhatsApp when it is unset, so no placeholder number is ever published and the owner personal number stays out of the public repository",
+    "acceptance": "A build with PUBLIC_WHATSAPP_NUMBER set shows WhatsApp with that number, grouped in threes, linking to wa.me in the direct ways and the failure ways; a build without it shows no WhatsApp link and no 34600000000 anywhere; no tracked file holds the owner number"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/board.ts",
+          "line": 15
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/board.ts",
+          "line": 16
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "request",
+          "text": "aunque supongo que habra más adelante uno de empresa"
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Contact.astro",
+          "line": 44
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Contact.astro",
+          "line": 28
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Contact.astro",
+          "line": 111
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "astro.config.mjs",
+          "line": 26
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/ci.yml",
+      "DESIGN.md",
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "src/components/board/Contact.astro",
+      "src/lib/board.ts",
+      "tests/e2e/contact-form.spec.ts",
+      "tests/unit/whatsapp.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/ci.yml (matches .github/workflows/**)",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T21:28:11.149Z",
+      "detail": {
+        "tree": "sha256:16b8132e4d2d00032176db6c82499f958f4b5c7910aef61aa68a1741121f11d4",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T21:28:11.149Z",
+      "detail": {
+        "tree": "sha256:16b8132e4d2d00032176db6c82499f958f4b5c7910aef61aa68a1741121f11d4",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md"
+        ],
+        "tests": [
+          "tests/e2e/contact-form.spec.ts",
+          "tests/unit/whatsapp.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-22T21:29:24.731Z",
+      "detail": {
+        "lineage_id": "sha256:0435fdbc48342eb9125b95d0f1b0422dbad06a81222e4666cff8c72e73610037",
+        "candidate_id": "sha256:81e880351008aca754309dd90e46178661555ae2954f4be77ad2c45d64d4929a",
+        "candidate_tree": "cd5ea51e1949e66103accca0917e9cc4c3d6659d",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-22T21:29:18.683Z",
+          "result_digest": "sha256:baaaae318d1b2f016127acda3d217dc7089a34ed7d0675c65570f8033b8a60df"
+        }
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-22T21:29:27.518Z"
+    }
+  ],
+  "base": "a46df7e2de6a54dee5cac7a0cefe4360db7c4b03",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:79afe74904acba0f98af7ce609121c3f07bcd71ff61e54147d133d6ecfe05027",
+      "tree": "sha256:16b8132e4d2d00032176db6c82499f958f4b5c7910aef61aa68a1741121f11d4",
+      "recorded_at": "2026-10-22T21:28:11.149Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3a2e9a858a0c383199ae37945c757d4c0989a4be20d8da303876a153172971d",
+      "tree": "sha256:16b8132e4d2d00032176db6c82499f958f4b5c7910aef61aa68a1741121f11d4",
+      "recorded_at": "2026-10-22T21:28:11.149Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:907be8411ab5029017d5941df5a11a6b3ffa3f4937a78d4b6e5a6e8eb19bb141",
+      "tree": "sha256:16b8132e4d2d00032176db6c82499f958f4b5c7910aef61aa68a1741121f11d4",
+      "recorded_at": "2026-10-22T21:28:11.149Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:18252bdebd83187c746374dd9c572e95328c2047639b7c3861bf7005bea5221f",
+      "tree": "sha256:16b8132e4d2d00032176db6c82499f958f4b5c7910aef61aa68a1741121f11d4",
+      "recorded_at": "2026-10-22T21:28:11.149Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:16b8132e4d2d00032176db6c82499f958f4b5c7910aef61aa68a1741121f11d4",
+      "recorded_at": "2026-10-22T21:28:11.149Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:0435fdbc48342eb9125b95d0f1b0422dbad06a81222e4666cff8c72e73610037",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "e8752fc926c65e045153adf272f500d97cd5a860",
+          "candidate_tree": "cd5ea51e1949e66103accca0917e9cc4c3d6659d",
+          "paths": [
+            ".github/workflows/ci.yml",
+            "DESIGN.md",
+            "astro.config.mjs",
+            "docs/architecture/technical-baseline.md",
+            "src/components/board/Contact.astro",
+            "src/lib/board.ts",
+            "tests/e2e/contact-form.spec.ts",
+            "tests/unit/whatsapp.test.ts"
+          ],
+          "diff_hash": "sha256:30763cd0c7da71883bcaa2e911ce219995ca1e94b6362ef50c9500de9429b420",
+          "paths_digest": "sha256:c216a28910e166aaef6de893f213ed41992be7b132d0ffda92d37cc20b16e8e8",
+          "authored_lines": 53,
+          "original_changed_lines": 71
+        },
+        "candidate_id": "sha256:81e880351008aca754309dd90e46178661555ae2954f4be77ad2c45d64d4929a",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "src/components/board/Contact.astro",
+          "src/lib/board.ts",
+          "tests/e2e/contact-form.spec.ts",
+          "tests/unit/whatsapp.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "cd5ea51e1949e66103accca0917e9cc4c3d6659d",
+        "original_changed_lines": 71,
+        "authored_lines": 53
+      },
+      "current_candidate_id": "sha256:81e880351008aca754309dd90e46178661555ae2954f4be77ad2c45d64d4929a",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "e8752fc926c65e045153adf272f500d97cd5a860",
+        "candidate_tree": "cd5ea51e1949e66103accca0917e9cc4c3d6659d",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "DESIGN.md",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "src/components/board/Contact.astro",
+          "src/lib/board.ts",
+          "tests/e2e/contact-form.spec.ts",
+          "tests/unit/whatsapp.test.ts"
+        ],
+        "diff_hash": "sha256:30763cd0c7da71883bcaa2e911ce219995ca1e94b6362ef50c9500de9429b420",
+        "paths_digest": "sha256:c216a28910e166aaef6de893f213ed41992be7b132d0ffda92d37cc20b16e8e8",
+        "authored_lines": 53,
+        "original_changed_lines": 71
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "whatsapp-from-env:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "whatsapp-from-env:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 36,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "assumptions": [
+    "The variable is read as digits only: spaces and a leading + are dropped, so the number written by hand or compact gives the same link"
+  ],
+  "closed_at": "2026-10-22T21:29:27.518Z"
+}

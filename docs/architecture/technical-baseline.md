@@ -37,7 +37,7 @@
 | Anti-bot | Cloudflare Turnstile | Widget explícito, `interaction-only`, cargado al primer foco en el formulario + siteverify | Si la verificación no está disponible, se rechaza el envío (fail-closed) y se muestran vías alternativas |
 | Límite de envíos | Cloudflare (binding `ratelimits` de Workers) | Binding | 3 envíos por minuto e IP (en IPv6, por /64), contados por ubicación. Sin el binding, se rechaza el envío (fail-closed). Las Previews no heredan los bindings: tienen el suyo en `previews` de `wrangler.jsonc`, con el mismo límite y su propio contador |
 | Reserva de llamada | Cal.com (plan gratis) | iframe simple tras clic, sin el script de embed de Cal.com; detrás del flag de build `PUBLIC_BOOKING` (apagado por defecto) | El enlace directo a la página de reserva está siempre a la vista; sin JS, la acción es ese enlace |
-| WhatsApp | Meta | Enlace `wa.me` | Sin dependencia en tiempo de ejecución |
+| WhatsApp | Meta | Enlace `wa.me`; el número llega en la variable de build `PUBLIC_WHATSAPP_NUMBER` (Workers Builds), fuera del repositorio público | Sin dependencia en tiempo de ejecución. Sin número, la página no muestra WhatsApp |
 | Medición sin cookies | Cloudflare Web Analytics | Beacon | Si falla, se pierden métricas; nunca afecta a la página |
 | Errores de cliente | Por decidir en M6 (plan gratis) | HTTPS | Si falla, no se reporta; nunca afecta a la página |
 | Uptime | Por decidir en M6 (plan gratis) | HTTPS ping | — |
