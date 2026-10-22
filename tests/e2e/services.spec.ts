@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Locator, type Page, test } from "@playwright/test";
 
 const pages = [
   {
@@ -6,14 +6,14 @@ const pages = [
     title: "Lo que construimos",
     method: "Cómo trabajamos",
     services: ["Webs y CMS", "Software a medida", "Agentes y automatizaciones", "SEO y analítica"],
-    gate: "Lighthouse móvil",
+    contact: "Hablemos",
   },
   {
     path: "/en/",
     title: "What we build",
     method: "How we work",
     services: ["Websites and CMS", "Custom software", "Agents and automation", "SEO and analytics"],
-    gate: "Mobile Lighthouse",
+    contact: "Let's talk",
   },
 ];
 
@@ -103,12 +103,42 @@ test.describe("el capítulo Servicios (DESIGN.md Layout e Imagery)", () => {
     expect(clips.every((clip) => clip === "none")).toBe(true);
   });
 
-  for (const { path, method, gate } of pages) {
-    test(`${path} lleva las puertas de calidad y la cifra del interlocutor al capítulo Método`, async ({ page }) => {
+  for (const { path, method, contact } of pages) {
+    test(`${path} cuenta el método sin jerga, con la cifra del interlocutor`, async ({ page }) => {
       await page.goto(path);
       const chapter = page.getByRole("region", { name: method });
-      await expect(chapter.getByText(gate)).toBeVisible();
       await expect(chapter.getByText("1", { exact: true })).toBeVisible();
+      // The page speaks to clients, not engineers: no tooling names, in any project of the switcher either.
+      await expect(chapter).not.toContainText(/\b(ADR|lint|tests?|E2E|Lighthouse|CMS|JavaScript|runtime)\b/i);
+    });
+
+    test(`${path} pone los proyectos en pestañas y abre sus decisiones al lado desde lg`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(path);
+      const projects = page.getByRole("region", { name: method }).locator('details[name="project"]');
+      // Boxes in page coordinates, so a click that scrolls does not move them.
+      const box = (element: Locator) =>
+        element.evaluate((node) => {
+          const { x, y, width } = node.getBoundingClientRect();
+          return { x, y: y + window.scrollY, width };
+        });
+      const tabs = await Promise.all((await projects.locator("summary").all()).map(box));
+      const sheet = await box(projects.first().locator("figure"));
+      // Two by two: the first two tabs share a row, the next two the row under it.
+      expect(tabs[0]?.y).toBe(tabs[1]?.y);
+      expect(tabs[2]?.y).toBe(tabs[3]?.y);
+      expect(tabs[2]?.y).toBeGreaterThan(tabs[0]?.y ?? 0);
+      expect(sheet?.x).toBeGreaterThan((tabs[1]?.x ?? 0) + (tabs[1]?.width ?? 0));
+
+      await projects.nth(3).locator("summary").click();
+      const next = await box(projects.nth(3).locator("figure"));
+      expect(next?.x).toBe(sheet?.x);
+      expect(next?.y).toBe(sheet?.y);
+    });
+
+    test(`${path} dice qué pasa después de escribir: tres pasos en el contacto`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.getByRole("region", { name: contact }).locator("ol").last().locator("> li")).toHaveCount(3);
     });
   }
 });
