@@ -64,6 +64,12 @@ test.describe("sin JavaScript (ADR 0001)", () => {
       await expect(page.locator("main p").first()).not.toBeEmpty();
     });
 
+    // scenario:perf-mobile: every module script of the head is a round trip before the first paint for Lighthouse.
+    test(`${path} carga sus islas en un único script de módulo`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator('script[type="module"][src]')).toHaveCount(1);
+    });
+
     test(`${path} lleva a contacto desde la acción fija de la cabecera`, async ({ page }) => {
       await page.goto(path);
       // It may be faded out over the first chapter, but it is always in the header.

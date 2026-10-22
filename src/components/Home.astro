@@ -57,7 +57,10 @@ const chapters = (
   <Footer slot="footer" locale={locale} />
 </Base>
 
+<!-- One bundle for the page: a second module script in the head costs Lighthouse a round trip before the first
+     paint (scenario:perf-mobile). -->
 <script>
+  import "../scripts/contact";
   import "../scripts/motion";
   import "../scripts/scene";
 </script>
