@@ -1,0 +1,187 @@
+{
+  "schema": "idd-state/v1",
+  "change": "contact-script-bundle",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "La isla del contacto iba en un segundo script de módulo y Lighthouse móvil bajaba a 0,99 (FCP simulado +300 ms)",
+    "acceptance": "La home carga un único script de módulo inicial y Lighthouse da 1 en rendimiento en / y /en/ (lhci collect, 3 pasadas)"
+  },
+  "facts": {
+    "basis": "La regresión y su causa están medidas (FCP 1065→1379 ms con el segundo script, 1067 al unificarlo); el comportamiento del formulario no cambia y lo cubren sus E2E"
+  },
+  "plan": {
+    "paths": [
+      "src/components/Home.astro",
+      "src/components/board/Contact.astro"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared quality scenario perf-mobile",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "Devuelve la home a un único script de módulo inicial: Lighthouse móvil vuelve a 1 (FCP 1067 ms, LCP ≤ 1,71 s)"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-22T11:35:22.375Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T11:36:20.020Z",
+      "detail": {
+        "tree": "sha256:04a6e9d16e2f5f8945f0ac81a9fea59a5f132b15dcab8933b569bfceb7ecad54",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T11:36:20.020Z",
+      "detail": {
+        "refs": [
+          "scenario:perf-mobile conforms"
+        ],
+        "records": []
+      }
+    }
+  ],
+  "base": "d8e0d0c90b6d9506cbfe33dd7d38f3053c27444a",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm test:e2e --grep \"único script de módulo\"",
+      "exit_code": 1,
+      "output_sha256": "sha256:a3bd74d5bb0d495f60a1498b5f03ca413452bfacd27d7753f66373e86bf5662b",
+      "tree": "sha256:95963e6111e9a2ef2f94b4335d49854a0a83ca0a0f95aca2560bd5d795b0ca5e",
+      "recorded_at": "2026-10-22T11:35:14.712Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm test:e2e --grep \"único script de módulo\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d1bb36baaeb2a65312f9ebfeea60d91aa800cea1c0fd730454ad98360dc3d7a3",
+      "tree": "sha256:35c65baecbd89464d18f1d55e14ac65c518c04fdea1b22ab3754a2d8ab27550c",
+      "recorded_at": "2026-10-22T11:35:22.375Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:e3fdc527c93ab2e3c89d25853e36ad6671e7d90cdc66084f9d187ea83df91d0c",
+      "tree": "sha256:04a6e9d16e2f5f8945f0ac81a9fea59a5f132b15dcab8933b569bfceb7ecad54",
+      "recorded_at": "2026-10-22T11:36:20.020Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:e4e80e867c9de8cab1c6600b6c82bb04b20adea7a2678c8b5b0ecf677990cead",
+      "tree": "sha256:04a6e9d16e2f5f8945f0ac81a9fea59a5f132b15dcab8933b569bfceb7ecad54",
+      "recorded_at": "2026-10-22T11:36:20.020Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:9352da88c54874e8f342bccf4482d9a9ae2990649761562f8575c769374c234f",
+      "tree": "sha256:04a6e9d16e2f5f8945f0ac81a9fea59a5f132b15dcab8933b569bfceb7ecad54",
+      "recorded_at": "2026-10-22T11:36:20.020Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:5f3a3cb3cda68b50b9dedf865f7a6141d5c351870f0452794ce30aff7f884965",
+      "tree": "sha256:04a6e9d16e2f5f8945f0ac81a9fea59a5f132b15dcab8933b569bfceb7ecad54",
+      "recorded_at": "2026-10-22T11:36:20.020Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:04a6e9d16e2f5f8945f0ac81a9fea59a5f132b15dcab8933b569bfceb7ecad54",
+      "recorded_at": "2026-10-22T11:36:20.020Z"
+    }
+  ],
+  "closed_at": "2026-10-22T11:36:25.004Z"
+}

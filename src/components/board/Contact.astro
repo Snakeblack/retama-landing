@@ -43,8 +43,8 @@ const error = "flex gap-sm type-small";
     <a class="feedback underline hover:decoration-primary" href={whatsappHref}>WhatsApp · {whatsappLabel}</a>
   </div>
 
-  <!-- The island (src/scripts/contact.ts) enables the button: without script there is no anti-bot token, so the form
-       never sends blind and nothing it holds ends up in a URL. -->
+  <!-- The island (src/scripts/contact.ts, bundled by Home.astro) enables the button: without script there is no
+       anti-bot token, so the form never sends blind and nothing it holds ends up in a URL. -->
   <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1" data-contact data-site-key={turnstileSiteKey} data-email={contactEmail} data-subject={copy["form.subject"]} data-sending={copy["form.sending"]}>
     <form class="grid content-start gap-lg" aria-labelledby="contact-title" novalidate>
       <input type="hidden" name="locale" value={locale} />
@@ -142,7 +142,3 @@ const error = "flex gap-sm type-small";
     }
   </ol>
 </section>
-
-<script>
-  import "../../scripts/contact";
-</script>
