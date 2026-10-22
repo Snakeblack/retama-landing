@@ -90,7 +90,8 @@ test.describe("sin JavaScript (ADR 0001)", () => {
         await expect(group.locator("h2")).not.toBeEmpty();
       }
 
-      const links = page.getByRole("navigation").getByRole("link");
+      // The header's chapter links; the footer's legal links lead to another page.
+      const links = page.getByRole("banner").getByRole("navigation").getByRole("link");
       await expect(links).toHaveCount(3);
       for (const href of await links.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href")))) {
         await expect(page.locator(`main ${href}`)).toHaveCount(1);

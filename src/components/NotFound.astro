@@ -1,6 +1,7 @@
 ---
 import { type Locale, localizedPath, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
+import Footer from "./board/Footer.astro";
 
 interface Props {
   locale: Locale;
@@ -18,4 +19,5 @@ const copy = t(locale);
       <a class="type-label inline-flex min-h-(--spacing-touch) items-center bg-primary px-lg text-on-primary hover:bg-field hover:text-on-field" href={localizedPath(locale, "/")}>{copy["notFound.back"]}</a>
     </div>
   </section>
+  <Footer slot="footer" locale={locale} />
 </Base>

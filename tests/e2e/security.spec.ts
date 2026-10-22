@@ -37,7 +37,7 @@ test.describe("cabeceras de seguridad (ADR 0006)", () => {
 });
 
 test.describe("navegación sin violaciones de CSP ni rastreo (ADR 0006, ADR 0007)", () => {
-  for (const path of ["/", "/en/"]) {
+  for (const path of ["/", "/en/", "/legal/", "/en/legal/"]) {
     test(`${path} no viola la CSP, no crea cookies y no sale del propio origen`, async ({ page, context, baseURL }) => {
       const violations: string[] = [];
       page.on("console", (message) => {

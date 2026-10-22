@@ -1,0 +1,143 @@
+---
+import { PUBLIC_LEGAL_ADDRESS, PUBLIC_LEGAL_NAME, PUBLIC_LEGAL_NIF, PUBLIC_LEGAL_TOWN } from "astro:env/client";
+import { type Locale, t } from "../i18n/index";
+import Base from "../layouts/Base.astro";
+import { contactEmail, owner } from "../lib/board";
+import Footer from "./board/Footer.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = t(locale);
+// The owner comes from the build environment (astro.config.mjs); without it the notice names nobody, and Workers Builds
+// refuses to build (scripts/lib/legal-owner.mjs).
+const who = owner({ name: PUBLIC_LEGAL_NAME, town: PUBLIC_LEGAL_TOWN, nif: PUBLIC_LEGAL_NIF, address: PUBLIC_LEGAL_ADDRESS });
+const sections = [
+  ["anchor.legalNotice", "legal.notice.title"],
+  ["anchor.privacy", "legal.privacy.title"],
+  ["anchor.cookies", "legal.cookies.title"],
+] as const;
+const privacy = [
+  ["legal.privacy.data", "legal.privacy.dataText"],
+  ["legal.privacy.purpose", "legal.privacy.purposeText"],
+  ["legal.privacy.basis", "legal.privacy.basisText"],
+  ["legal.privacy.retention", "legal.privacy.retentionText"],
+  ["legal.privacy.recipients", "legal.privacy.recipientsText"],
+  ["legal.privacy.transfers", "legal.privacy.transfersText"],
+] as const;
+const link = "feedback underline hover:decoration-primary";
+const mail = `mailto:${contactEmail}`;
+---
+
+<!-- DESIGN.md Layout, the legal page: one page per language with the legal notice, the privacy policy and the cookie
+     policy, each a section with its heading tile on the left and its running text on the right. -->
+<Base locale={locale} title={copy["legal.metaTitle"]} description={copy["legal.metaDescription"]}>
+  <div class="mt-(--header-height) grid gap-section px-margin pt-xl" data-grounds>
+    <div class="grid grid-cols-2 gap-gap lg:grid-cols-12">
+      <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-7">
+        <h1 class="text-balance type-headline-sm md:type-headline">{copy["legal.title"]}</h1>
+        <p class="max-w-(--spacing-measure) type-statement-sm md:type-statement">{copy["legal.lead"]}</p>
+        <p class="type-small text-on-surface-muted">{copy["legal.updated"]}</p>
+      </div>
+      <nav class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-5" aria-label={copy["legal.title"]}>
+        <ul class="grid gap-sm">
+          {
+            sections.map(([anchor, title]) => (
+              <li>
+                <a class={`${link} flex min-h-(--spacing-touch) items-center type-statement-sm md:type-statement`} href={`#${copy[anchor]}`}>
+                  {copy[title]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <section id={copy["anchor.legalNotice"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="notice-title">
+      <h2 id="notice-title" class="col-span-2 bg-surface-raised p-tile-sm text-balance type-headline-sm md:p-tile md:type-headline lg:col-span-4">
+        {copy["legal.notice.title"]}
+      </h2>
+      <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-8">
+        <p class="max-w-(--spacing-measure)">{copy["legal.notice.lead"]}</p>
+        <dl class="grid max-w-(--spacing-measure) gap-xs" data-owner>
+          {
+            who && (
+              <>
+                <div class="grid gap-xs bg-surface p-md md:grid-cols-3">
+                  <dt class="type-small text-on-surface-muted">{copy["legal.notice.owner"]}</dt>
+                  <dd class="type-body-strong md:col-span-2">{who.name}</dd>
+                </div>
+                {who.nif && (
+                  <div class="grid gap-xs bg-surface p-md md:grid-cols-3">
+                    <dt class="type-small text-on-surface-muted">{copy["legal.notice.nif"]}</dt>
+                    <dd class="md:col-span-2">{who.nif}</dd>
+                  </div>
+                )}
+                <div class="grid gap-xs bg-surface p-md md:grid-cols-3">
+                  <dt class="type-small text-on-surface-muted">{copy[who.address ? "legal.notice.address" : "legal.notice.town"]}</dt>
+                  <dd class="md:col-span-2">{who.address ? `${who.address}, ${who.town}` : who.town}</dd>
+                </div>
+              </>
+            )
+          }
+          <div class="grid gap-xs bg-surface p-md md:grid-cols-3">
+            <dt class="type-small text-on-surface-muted">{copy["legal.notice.email"]}</dt>
+            <dd class="md:col-span-2"><a class={link} href={mail}>{contactEmail}</a></dd>
+          </div>
+          <div class="grid gap-xs bg-surface p-md md:grid-cols-3">
+            <dt class="type-small text-on-surface-muted">{copy["legal.notice.activity"]}</dt>
+            <dd class="md:col-span-2">{copy["legal.notice.activityText"]}</dd>
+          </div>
+        </dl>
+        <p class="max-w-(--spacing-measure)">{copy["legal.notice.use"]}</p>
+        <p class="max-w-(--spacing-measure)">{copy["legal.notice.offer"]}</p>
+        <p class="max-w-(--spacing-measure)">{copy["legal.notice.links"]}</p>
+        <p class="max-w-(--spacing-measure)">{copy["legal.notice.law"]}</p>
+      </div>
+    </section>
+
+    <section id={copy["anchor.privacy"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="privacy-title">
+      <h2 id="privacy-title" class="col-span-2 bg-surface-raised p-tile-sm text-balance type-headline-sm md:p-tile md:type-headline lg:col-span-4">
+        {copy["legal.privacy.title"]}
+      </h2>
+      <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-8">
+        <p class="max-w-(--spacing-measure)">{copy["legal.privacy.lead"]}</p>
+        <p class="max-w-(--spacing-measure)">
+          <strong class="type-body-strong">{copy["legal.privacy.controller"]}</strong> {copy["legal.privacy.controllerText"]}{" "}
+          <a class={link} href={mail}>{contactEmail}</a>.
+        </p>
+        {
+          privacy.map(([lead, text]) => (
+            <p class="max-w-(--spacing-measure)">
+              <strong class="type-body-strong">{copy[lead]}</strong> {copy[text]}
+            </p>
+          ))
+        }
+        <p class="max-w-(--spacing-measure)">
+          <strong class="type-body-strong">{copy["legal.privacy.rights"]}</strong> {copy["legal.privacy.rightsText"]}{" "}
+          <a class={link} href={mail}>{contactEmail}</a>. {copy["legal.privacy.complaint"]}{" "}
+          <a class={link} href="https://www.aepd.es/" hreflang="es">{copy["legal.privacy.authority"]}</a>.
+        </p>
+      </div>
+    </section>
+
+    <section id={copy["anchor.cookies"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="cookies-title">
+      <h2 id="cookies-title" class="col-span-2 bg-surface-raised p-tile-sm text-balance type-headline-sm md:p-tile md:type-headline lg:col-span-4">
+        {copy["legal.cookies.title"]}
+      </h2>
+      <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-8">
+        <p class="max-w-(--spacing-measure)">{copy["legal.cookies.lead"]}</p>
+        <ul class="grid max-w-(--spacing-measure) gap-xs">
+          <li class="bg-surface p-md"><strong class="type-body-strong">{copy["legal.cookies.form"]}</strong> {copy["legal.cookies.formText"]}</li>
+          <li class="bg-surface p-md"><strong class="type-body-strong">{copy["legal.cookies.booking"]}</strong> {copy["legal.cookies.bookingText"]}</li>
+        </ul>
+        <p class="max-w-(--spacing-measure)">{copy["legal.cookies.exempt"]}</p>
+        <p class="max-w-(--spacing-measure)">{copy["legal.cookies.later"]}</p>
+      </div>
+    </section>
+  </div>
+  <Footer slot="footer" locale={locale} />
+</Base>

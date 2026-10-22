@@ -173,7 +173,10 @@ export const es = {
   "form.typeOther": "Otro",
   "form.message": "Cuéntanos tu proyecto",
   "form.honeypot": "Deja este campo vacío",
-  "form.privacy": "Solo usamos estos datos para responderte. No se guardan en la web.",
+  "form.privacyOwner": "Responsable:",
+  "form.privacy":
+    "Solo usamos estos datos para responderte, porque nos lo pides, y no se ceden a nadie. Puedes acceder a ellos, corregirlos o borrarlos.",
+  "form.privacyLink": "Política de privacidad",
   "form.submit": "Enviar",
   "form.sending": "Enviando…",
   "form.noscript": "Para enviar el formulario hace falta JavaScript. Escríbenos al correo o por WhatsApp.",
@@ -199,6 +202,79 @@ export const es = {
   "contact.step3Rest": "con las opciones, lo que cuesta cada una y lo que descartaríamos.",
 
   "footer.top": "Volver arriba",
+  "footer.legalLabel": "Información legal",
+
+  "anchor.legalNotice": "aviso-legal",
+  "anchor.privacy": "privacidad",
+  "anchor.cookies": "cookies",
+  "legal.metaTitle": "Información legal · Retama",
+  "legal.metaDescription":
+    "Aviso legal, política de privacidad y política de cookies de Retama: quién está detrás, qué pasa con tus datos y qué guarda la web en tu navegador.",
+  "legal.title": "Información legal",
+  "legal.lead": "Quién está detrás de Retama, qué hacemos con tus datos y qué guarda esta web en tu navegador.",
+  "legal.updated": "Actualizado el 23 de octubre de 2026.",
+
+  "legal.notice.title": "Aviso legal",
+  "legal.notice.lead":
+    "Retama es el nombre comercial con el que trabaja su titular. Estos son sus datos, como pide la Ley 34/2002 de servicios de la sociedad de la información (LSSI):",
+  "legal.notice.owner": "Titular",
+  "legal.notice.nif": "NIF",
+  "legal.notice.address": "Domicilio",
+  "legal.notice.town": "Localidad",
+  "legal.notice.email": "Correo",
+  "legal.notice.activity": "Actividad",
+  "legal.notice.activityText": "Diseño y desarrollo de software, webs y automatizaciones, en remoto.",
+  "legal.notice.use":
+    "Usar esta web es gratis y no pide registro. Sus textos, su diseño y la marca Retama son de su titular: puedes citarlos enlazando a esta web, pero no copiarlos para presentarlos como tuyos.",
+  "legal.notice.offer":
+    "Cuidamos que lo que cuenta esta web sea correcto y esté al día, pero no es una oferta vinculante: el alcance, el precio y los plazos de cada proyecto se fijan por escrito en su propuesta.",
+  "legal.notice.links":
+    "Los enlaces a Cal.com y a WhatsApp llevan a servicios de terceros, con sus propias condiciones y su propia privacidad.",
+  "legal.notice.law":
+    "Se aplica la ley española. Si eres consumidor, puedes acudir a los tribunales de tu domicilio. Este texto está en español y en inglés; si no coinciden, vale el español.",
+
+  "legal.privacy.title": "Privacidad",
+  "legal.privacy.lead":
+    "Esta web solo trata datos personales cuando nos escribes por el formulario o reservas una llamada. Esto es lo que pasa con ellos, conforme al Reglamento General de Protección de Datos (RGPD).",
+  "legal.privacy.controller": "Responsable.",
+  "legal.privacy.controllerText": "El titular del aviso legal. Para cualquier cosa sobre tus datos, escribe a",
+  "legal.privacy.data": "Qué datos.",
+  "legal.privacy.dataText":
+    "Los del formulario: tu nombre, tu correo, qué necesitas y tu mensaje, que hacen falta para responderte. Para frenar el spam, Cloudflare comprueba que eres una persona y la web usa tu dirección IP para contar tus envíos durante un minuto, sin guardarla. Si reservas una llamada, los datos que des en Cal.com.",
+  "legal.privacy.purpose": "Para qué.",
+  "legal.privacy.purposeText":
+    "Para responder a tu consulta y, si nos lo pides, preparar una propuesta. No te enviamos publicidad ni hacemos perfiles ni decisiones automatizadas con tus datos.",
+  "legal.privacy.basis": "Base legal.",
+  "legal.privacy.basisText":
+    "Responderte es una medida precontractual que tú pides (artículo 6.1.b del RGPD). Comprobar que eres una persona y limitar los envíos protege la web del abuso, un interés legítimo (artículo 6.1.f).",
+  "legal.privacy.retention": "Cuánto tiempo.",
+  "legal.privacy.retentionText":
+    "Mientras dura tu consulta. Si no acaba en un encargo, borramos el mensaje en un plazo máximo de 12 meses; si acaba en uno, guardamos lo que la ley obligue a conservar.",
+  "legal.privacy.recipients": "Quién más los trata.",
+  "legal.privacy.recipientsText":
+    "Solo los proveedores que nos ayudan a hacerlo, como encargados del tratamiento: Cloudflare (aloja la web, comprueba que eres una persona y reenvía el correo), Resend (envía tu mensaje, desde su región de la UE), Google (el buzón de Gmail donde llega) y, si reservas, Cal.com. No vendemos ni cedemos tus datos.",
+  "legal.privacy.transfers": "Fuera de la UE.",
+  "legal.privacy.transfersText":
+    "Estos proveedores son empresas de Estados Unidos. Sus contratos cubren la transferencia con las cláusulas contractuales tipo de la Comisión Europea o con el Marco de Privacidad de Datos UE-EE. UU., según el caso.",
+  "legal.privacy.rights": "Tus derechos.",
+  "legal.privacy.rightsText":
+    "Puedes pedir acceso a tus datos, corregirlos, borrarlos, oponerte o limitar su uso, y llevártelos, escribiendo a",
+  "legal.privacy.complaint": "Si crees que no los atendemos bien, puedes reclamar ante la",
+  "legal.privacy.authority": "Agencia Española de Protección de Datos",
+
+  "legal.cookies.title": "Cookies",
+  "legal.cookies.lead":
+    "Esta web no usa cookies de seguimiento ni de publicidad, y no guarda nada en tu navegador cuando la visitas. Por eso no te pide permiso. Solo guardan algo dos servicios que tú pides, y es técnico:",
+  "legal.cookies.form": "Al usar el formulario.",
+  "legal.cookies.formText":
+    "La comprobación antispam de Cloudflare Turnstile guarda cf.turnstile.u en el almacenamiento local de challenges.cloudflare.com, para distinguir a las personas de los bots.",
+  "legal.cookies.booking": "Al reservar una llamada.",
+  "legal.cookies.bookingText":
+    "Cal.com, que se abre dentro de la web, pone en cal.com la cookie de seguridad __cf_bm de Cloudflare, que caduca a los 30 minutos, y guarda reserverUid en su almacenamiento local para apartarte la hora que eliges mientras reservas.",
+  "legal.cookies.exempt":
+    "Las dos son necesarias para el servicio que pides, así que la ley no exige tu consentimiento (artículo 22.2 de la LSSI). Puedes borrarlas desde los ajustes de tu navegador.",
+  "legal.cookies.later":
+    "Si algún día añadimos una herramienta con cookies que no sean necesarias, te pediremos permiso antes de activarla y lo contaremos aquí.",
 
   "notFound.title": "Página no encontrada",
   "notFound.lead": "La página que buscas no existe o ha cambiado de dirección.",
