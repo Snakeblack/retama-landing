@@ -1,0 +1,264 @@
+{
+  "schema": "idd-state/v1",
+  "change": "glyph-scene-cost",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "refactor",
+    "summary": "Abaratar la escena de glifos en GPU (bloom, MSAA, densidad, DPR) sin cambiar lo que se ve",
+    "acceptance": "En el banco de la Radeon 610M el coste por fotograma de la escena baja al menos un tercio en móvil y en escritorio retina, las capturas no se distinguen de las de antes, Lighthouse sigue en 100 y las puertas de calidad pasan"
+  },
+  "facts": {
+    "open": [
+      "¿Se aplican solo las optimizaciones invisibles (bloom a 1/4 de resolución y sin MSAA) o también el DPR limitado a 1,5 en móvil, que ablanda los glifos de 7 px?",
+      "¿El bloom se queda en el móvil (a 1/4) o se quita solo allí?",
+      "¿La escena pasa por un modo ligero (sin bloom, DPR 1) antes de rendirse al póster cuando va por debajo de 30 fps, o se mantiene el salto directo al póster?",
+      "¿Se mantiene la densidad de glifos (unos 6.600, que cuestan 0,1 ms) o se reduce igualmente en el móvil?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "docs/roadmap.md",
+      "src/scripts/scene-three.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0004",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "La escena sigue siendo una mejora diferida en un worker, con el mismo póster y la misma salida por lentitud; solo baja su coste en GPU, lo que refuerza el presupuesto de scenario:perf-mobile"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Solo las invisibles (bloom a 1/4 y sin MSAA); el bloom se queda en el móvil a 1/4; salto directo al póster si va lenta; mantener la densidad de glifos",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T09:25:08.603Z",
+      "detail": {
+        "tree": "sha256:a1b924b1d0a160059d627e8b50ed4c1b54965f18273c6c26a422afa28e478032",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T09:25:08.603Z",
+      "detail": {
+        "refs": [
+          "adr:0004 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:a1b924b1d0a160059d627e8b50ed4c1b54965f18273c6c26a422afa28e478032",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T09:28:08.185Z",
+      "detail": {
+        "tree": "sha256:08f9f0df607a0d2bef096e3dc4da888dca9ecd7af04f32e6beebe40dde2f1222",
+        "runs": [
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T09:28:08.185Z",
+      "detail": {
+        "refs": [
+          "adr:0004 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:08f9f0df607a0d2bef096e3dc4da888dca9ecd7af04f32e6beebe40dde2f1222",
+        "fitness": [
+          "run-12"
+        ]
+      }
+    }
+  ],
+  "base": "d33ce86e57ecf09f8bec7c8f90e6f95a532d7911",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9ed152293ccdfb0e3059a45c71370355d4ad336810c80dcd16d57e446a506c19",
+      "tree": "sha256:a1b924b1d0a160059d627e8b50ed4c1b54965f18273c6c26a422afa28e478032",
+      "recorded_at": "2026-10-22T09:25:08.603Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:77e1de7caf7a28341c2017a99db8d8a18d1f050aef860fe75288805a4049a93f",
+      "tree": "sha256:a1b924b1d0a160059d627e8b50ed4c1b54965f18273c6c26a422afa28e478032",
+      "recorded_at": "2026-10-22T09:25:08.603Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:bf1b6c69838f42c6ad7ef105304d561b9ef7d1e9837067ed47efc0c4341a3eac",
+      "tree": "sha256:a1b924b1d0a160059d627e8b50ed4c1b54965f18273c6c26a422afa28e478032",
+      "recorded_at": "2026-10-22T09:25:08.603Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3e090ae0a601c9aa4bc50d247a1bc0a03197a6fef45c1c8a6730df834cc37175",
+      "tree": "sha256:a1b924b1d0a160059d627e8b50ed4c1b54965f18273c6c26a422afa28e478032",
+      "recorded_at": "2026-10-22T09:25:08.603Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:a1b924b1d0a160059d627e8b50ed4c1b54965f18273c6c26a422afa28e478032",
+      "recorded_at": "2026-10-22T09:25:08.603Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:05913ecd9f72139663de8f57d5e1bc0b38888ebb1f77048683cba390860beb6f",
+      "tree": "sha256:a1b924b1d0a160059d627e8b50ed4c1b54965f18273c6c26a422afa28e478032",
+      "recorded_at": "2026-10-22T09:25:08.603Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:79445e0c787b7d2318dd3366f153bb50f1ee2878806dece3f79c961f80197668",
+      "tree": "sha256:08f9f0df607a0d2bef096e3dc4da888dca9ecd7af04f32e6beebe40dde2f1222",
+      "recorded_at": "2026-10-22T09:28:08.185Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:7a72db5f271395d485bf6bff0531f058acc0d360776d6db8de0b11bbfff08290",
+      "tree": "sha256:08f9f0df607a0d2bef096e3dc4da888dca9ecd7af04f32e6beebe40dde2f1222",
+      "recorded_at": "2026-10-22T09:28:08.185Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:d33522e715d18222cccf2518bea44f1cf888b01caced977bd63f41886b03cae5",
+      "tree": "sha256:08f9f0df607a0d2bef096e3dc4da888dca9ecd7af04f32e6beebe40dde2f1222",
+      "recorded_at": "2026-10-22T09:28:08.185Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:ac3ce98a96f05844599902f6746d0dd0b752542f9293403e9235bd0a09f21010",
+      "tree": "sha256:08f9f0df607a0d2bef096e3dc4da888dca9ecd7af04f32e6beebe40dde2f1222",
+      "recorded_at": "2026-10-22T09:28:08.185Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:08f9f0df607a0d2bef096e3dc4da888dca9ecd7af04f32e6beebe40dde2f1222",
+      "recorded_at": "2026-10-22T09:28:08.185Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:c7f4b9eaf2d8c58a4301692ef80a4a93cf234a36297be041a7e4c23ad200a3cc",
+      "tree": "sha256:08f9f0df607a0d2bef096e3dc4da888dca9ecd7af04f32e6beebe40dde2f1222",
+      "recorded_at": "2026-10-22T09:28:08.185Z"
+    }
+  ],
+  "closed_at": "2026-10-22T09:28:14.038Z"
+}
