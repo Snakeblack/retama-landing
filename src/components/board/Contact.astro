@@ -1,6 +1,8 @@
 ---
+import { PUBLIC_BOOKING } from "astro:env/client";
 import { type Locale, t } from "../../i18n/index";
-import { contactEmail, turnstileSiteKey, whatsappLabel, whatsappNumber } from "../../lib/board";
+import { bookingUrl, contactEmail, turnstileSiteKey, whatsappLabel, whatsappNumber } from "../../lib/board";
+import { bookingEmbedSrc } from "../../lib/booking";
 import { LIMITS, PROJECT_TYPES, type ProjectType } from "../../lib/contact";
 import type { FailureKind } from "../../lib/contact-form";
 
@@ -26,8 +28,7 @@ const failures: FailureKind[] = ["invalid", "verification", "rate-limited", "una
 const whatsappHref = `https://wa.me/${whatsappNumber}`;
 const input = "min-h-(--spacing-touch) w-full bg-surface px-md py-sm text-on-surface";
 const label = "type-small text-on-surface-muted";
-const error = "flex gap-sm type-small";
----
+const error = "flex gap-sm type-small";---
 
 <!-- DESIGN.md Layout, the contact: heading and the light tile with the address on the left half, the form on the
      right half, what happens after writing across the width. Phone order: heading, address, form, steps. -->
@@ -41,6 +42,7 @@ const error = "flex gap-sm type-small";
     <p class="type-small">{copy["contact.direct"]}</p>
     <a class="feedback break-all type-statement-sm underline hover:decoration-primary md:type-statement" href={`mailto:${contactEmail}`}>{contactEmail}</a>
     <a class="feedback underline hover:decoration-primary" href={whatsappHref}>WhatsApp · {whatsappLabel}</a>
+    {PUBLIC_BOOKING && <a class="feedback underline hover:decoration-primary" href={bookingUrl} data-booking-open>{copy["booking.open"]}</a>}
   </div>
 
   <!-- The island (src/scripts/contact.ts, bundled by Home.astro) enables the button: without script there is no
@@ -128,6 +130,25 @@ const error = "flex gap-sm type-small";
       <p>{copy["form.done.lead"]} <strong class="type-body-strong" data-contact-done-email></strong>.</p>
     </div>
   </div>
+
+  <!-- The booking (src/scripts/booking.ts): Cal.com's calendar, framed across the width only when the visitor asks for
+       it from the direct ways. Without script the tile never shows and the action is a plain link to Cal.com. -->
+  {
+    PUBLIC_BOOKING && (
+      <div class="col-span-2 grid gap-md bg-surface-raised p-tile-sm md:p-tile lg:col-span-12" id="booking" aria-labelledby="booking-title" role="region" data-booking hidden>
+        <div class="flex flex-wrap items-center justify-between gap-x-lg gap-y-xs">
+          <h3 id="booking-title" class="type-statement-sm md:type-statement">{copy["booking.title"]}</h3>
+          <div class="flex items-center gap-lg">
+            <a class="feedback type-small underline hover:decoration-primary" href={bookingUrl} target="_blank" rel="noopener">{copy["booking.external"]}</a>
+            <button class="feedback min-h-(--spacing-touch) type-small text-on-surface-muted hover:text-on-surface" type="button" data-booking-close>
+              {copy["booking.close"]}
+            </button>
+          </div>
+        </div>
+        <div class="h-(--spacing-calendar-sm) bg-surface md:h-(--spacing-calendar)" data-booking-frame data-src={bookingEmbedSrc(bookingUrl)} data-title={copy["booking.frame"]} />
+      </div>
+    )
+  }
 
   <ol class="col-span-2 grid gap-lg bg-surface-raised p-tile-sm md:grid-cols-3 md:p-tile lg:col-span-12">
     {

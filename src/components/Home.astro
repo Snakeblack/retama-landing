@@ -1,6 +1,9 @@
 ---
+import { PUBLIC_BOOKING } from "astro:env/client";
 import { type Locale, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
+import { bookingUrl } from "../lib/board";
+import { bookingFrameDirective } from "../lib/booking";
 import ChapterIndex from "./ChapterIndex.astro";
 import Contact from "./board/Contact.astro";
 import Footer from "./board/Footer.astro";
@@ -22,6 +25,10 @@ const chapters = (
     ["anchor.method", "nav.method", "method.title"],
   ] as const
 ).map(([anchor, name, title]) => ({ anchor: copy[anchor], name: copy[name], title: copy[title] }));
+
+// The call booking of the contact chapter waits for its flag (astro.config.mjs): off, there is no action, no tile and
+// no Cal.com in the CSP. The directive goes here, before Base renders the head; from Contact.astro it comes too late.
+if (PUBLIC_BOOKING) Astro.csp?.insertDirective(bookingFrameDirective(bookingUrl));
 ---
 
 <!-- DESIGN.md Layout: the home is a sequence of chapters, 128px apart, more than any gap inside one. -->
@@ -60,6 +67,7 @@ const chapters = (
 <!-- One bundle for the page: a second module script in the head costs Lighthouse a round trip before the first
      paint (scenario:perf-mobile). -->
 <script>
+  import "../scripts/booking";
   import "../scripts/contact";
   import "../scripts/motion";
   import "../scripts/scene";

@@ -8,6 +8,10 @@ export const contactEmail = "retamozogpt@gmail.com";
 /** PROVISIONAL: the WhatsApp Business number, international format without "+" or spaces. */
 export const whatsappNumber = "34600000000";
 
+/** PROVISIONAL: the Cal.com page where a call is booked; until the account exists Cal.com answers it with a 404, so the
+ * booking stays off (PUBLIC_BOOKING, astro.config.mjs). Contact.astro admits its origin, and only it, as a frame. */
+export const bookingUrl = "https://cal.com/retama/llamada";
+
 /** PROVISIONAL: Turnstile's test site key, which always passes; the real one comes from the widget made by hand in
  * the Cloudflare dashboard, paired with TURNSTILE_SECRET_KEY. */
 export const turnstileSiteKey = "1x00000000000000000000AA";

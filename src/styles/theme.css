@@ -76,6 +76,8 @@
   --spacing-focus: 2px;
   --spacing-touch: 48px;
   --spacing-measure: 640px;
+  --spacing-calendar: 672px;
+  --spacing-calendar-sm: 864px;
 }
 @theme static {
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
