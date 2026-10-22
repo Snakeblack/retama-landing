@@ -68,7 +68,7 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 - Imágenes OG por idioma generadas en build.
 - robots.txt (crawlers de IA permitidos) y llms.txt.
 - FAQ.
-- Aviso legal, privacidad y cookies (LSSI/RGPD).
+- Aviso legal, privacidad y cookies (LSSI/RGPD) (hecho, `legal-pages`): una página `/legal/` por idioma con las tres secciones, el titular por variables de build y los enlaces en el pie y bajo el formulario.
 
 ## M5 — Blog
 
@@ -82,7 +82,7 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 - Uptime externo y errores de cliente: se elige proveedor gratis.
 - Cloudflare Web Analytics.
 - Dominio y DNS.
-- Checklist de lanzamiento.
+- Checklist de lanzamiento, con el NIF y el domicilio en el aviso legal (`PUBLIC_LEGAL_NIF`, `PUBLIC_LEGAL_ADDRESS`; art. 10 de la LSSI) y los textos legales revisados por un gestor.
 
 ## v2 (aplazado)
 
@@ -98,7 +98,7 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 | Versión exacta de TypeScript compatible con `astro check` | Usuario + agente | S1 |
 | Dirección de arte, tipografías y logotipo | Usuario (con taste-skill) | Inicio de M1 |
 | Copy final es/en | Usuario | M2 |
-| Datos legales (razón social, NIF, domicilio) para el aviso legal | Usuario | M4 |
+| Datos legales (razón social, NIF, domicilio) para el aviso legal: en M4 el titular es una persona física con nombre y municipio (`legal-pages`); faltan el NIF y el domicilio | Usuario | Checklist de lanzamiento (M6) |
 | Cuentas de Resend, Cal.com y WhatsApp Business; direcciones principal y de respaldo | Usuario | M3 |
 | Proveedores gratuitos de uptime y errores de cliente | Usuario | M6 |
 | Herramienta y CMP de heatmaps | Usuario | v2 |
