@@ -91,12 +91,11 @@ test.describe("sin JavaScript (ADR 0001)", () => {
       }
 
       // DESIGN.md Imagery: the retama only as a signature, interface fragments for the rest, examples labelled.
-      await expect(page.locator("main [data-ui]")).toHaveCount(7);
+      await expect(page.locator("main [data-ui]")).toHaveCount(9);
       for (const label of await page.locator("main [data-ui] [data-example]").all())
         await expect(label).not.toBeEmpty();
-      await expect(page.locator("main [data-ui] [data-example]")).toHaveCount(5);
+      await expect(page.locator("main [data-ui] [data-example]")).toHaveCount(9);
       const pictures = page.locator("main picture img");
-      expect(await pictures.count()).toBeGreaterThanOrEqual(1);
       for (const alt of await pictures.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("alt")))) {
         expect(alt?.trim()).toBeTruthy();
       }

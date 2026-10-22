@@ -190,7 +190,7 @@ test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
         .first()
         .evaluate((node) => getComputedStyle(node).userSelect);
     expect(await select("main h1")).toBe("none");
-    expect(await select("footer li")).toBe("none");
+    expect(await select("footer p")).toBe("none");
     expect(await select('main a[href^="mailto:"]')).not.toBe("none");
   });
 });

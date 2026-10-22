@@ -1,22 +1,25 @@
 ---
-import { Picture } from "astro:assets";
-import plate from "../../assets/board/clusius-1576-retama-monosperma.jpg";
 import { type Locale, t } from "../../i18n/index";
-import AdrFragment from "./AdrFragment.astro";
-import ChecksFragment from "./ChecksFragment.astro";
 
 interface Props {
   locale: Locale;
 }
 
 const copy = t(Astro.props.locale);
-const records = [
+// The figures the method answers for, under its heading; the last one counts up once (DESIGN.md Motion).
+const figures = [
+  ["services.figure", "services.figureCaption"],
+  ["hero.figure2", "hero.figure2Caption"],
+  ["hero.figure1", "hero.figure1Caption"],
+] as const;
+const principles = [
   ["method.d1", "method.d1Reason"],
   ["method.d2", "method.d2Reason"],
   ["method.d3", "method.d3Reason"],
   ["method.d4", "method.d4Reason"],
 ] as const;
-// The live piece (DESIGN.md Overview): a native exclusive accordion, so it works without JS.
+// The live piece and the proof of the method (DESIGN.md Overview): a native exclusive accordion laid out as tabs
+// (global.css), so it works without JS. Each project opens the first three decisions Retama would record for it.
 const projects = [
   ["live.web", ["live.web.d1", "live.web.r1"], ["live.web.d2", "live.web.r2"], ["live.web.d3", "live.web.r3"]],
   [
@@ -40,73 +43,67 @@ const projects = [
 ] as const;
 ---
 
-<section id={copy["anchor.method"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12 lg:board-rows" aria-labelledby="method-title">
-  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
-    <h2 id="method-title" class="text-balance type-headline-sm md:type-headline">{copy["method.title"]}</h2>
+<section id={copy["anchor.method"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="method-title">
+  <div class="col-span-2 flex flex-col justify-between gap-xl bg-surface-raised p-tile-sm md:p-tile lg:col-span-6">
+    <div class="grid gap-lg">
+      <h2 id="method-title" class="text-balance type-headline-sm md:type-headline">{copy["method.title"]}</h2>
+      <p class="max-w-(--spacing-measure) type-statement-sm md:type-statement">{copy["method.lead"]}</p>
+    </div>
+    <dl class="grid gap-md md:grid-cols-3 md:gap-lg">
+      {
+        figures.map(([figure, caption]) => (
+          <div class="flex items-baseline gap-md md:grid md:content-start md:gap-xs">
+            <dt class="min-w-(--spacing-2xl) type-headline-sm tabular-nums md:type-headline" data-count={figure === "hero.figure1" ? "" : undefined}>
+              {copy[figure]}
+            </dt>
+            <dd class="type-small text-on-surface-muted">{copy[caption]}</dd>
+          </div>
+        ))
+      }
+    </dl>
   </div>
 
-  <div class="col-span-2 relative aspect-video overflow-hidden bg-surface-raised lg:col-span-6 lg:col-start-7 lg:row-span-5 lg:row-start-1 lg:aspect-auto">
-    <Picture
-      src={plate}
-      alt={copy["method.plateAlt"]}
-      formats={["avif", "webp"]}
-      widths={[480, 800, 950]}
-      sizes="(min-width: 1024px) 50vw, 100vw"
-      class="absolute inset-0 size-full object-cover object-bottom"
-    />
-  </div>
+  <ul class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:grid-cols-2 md:p-tile lg:col-span-6 lg:grid-cols-1 lg:content-between">
+    {
+      principles.map(([lead, reason]) => (
+        <li class="max-w-(--spacing-measure)">
+          <strong class="type-body-strong">{copy[lead]}</strong> {copy[reason]}
+        </li>
+      ))
+    }
+  </ul>
 
-  {
-    records.map(([decision, reason]) => (
-      <p class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-2">
-        <strong class="type-body-strong">{copy[decision]}</strong> {copy[reason]}
-      </p>
-    ))
-  }
-
-  <!-- The proof of the method: a real decision record of this site, the gates it passes and the figures they check. -->
-  <div class="col-span-2 lg:col-span-6 lg:row-span-3">
-    <AdrFragment locale={Astro.props.locale} />
-  </div>
-
-  <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-3">
-    <p class="type-headline-sm tabular-nums md:type-headline" data-count>{copy["hero.figure1"]}</p>
-    <p class="type-small text-on-surface-muted">{copy["hero.figure1Caption"]}</p>
-  </div>
-
-  <div class="bg-surface-raised p-tile-sm md:p-tile lg:col-span-3 lg:row-span-3">
-    <p class="type-headline-sm md:type-headline">{copy["hero.figure2"]}</p>
-    <p class="type-small text-on-surface-muted">{copy["hero.figure2Caption"]}</p>
-  </div>
-
-  <div class="col-span-2 lg:col-span-6 lg:row-span-5">
-    <ChecksFragment locale={Astro.props.locale} />
-  </div>
-
-  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-6 lg:row-span-3">
-    <p class="type-headline-sm md:type-headline">{copy["services.figure"]}</p>
-    <p class="type-small text-on-surface-muted">{copy["services.figureCaption"]}</p>
-  </div>
-
-  <div class="col-span-2 grid gap-gap lg:col-span-12" data-rows>
-    <div class="bg-surface-raised p-tile-sm md:p-tile">
+  <div class="col-span-2 lg:col-span-12" data-projects>
+    <div class="grid content-start gap-md bg-surface-raised p-tile-sm md:p-tile">
       <h3 class="text-balance type-statement-sm md:type-statement">{copy["live.title"]}</h3>
-      <p class="text-on-surface-muted">{copy["live.lead"]}</p>
+      <p>{copy["live.lead"]}</p>
     </div>
     {
       projects.map(([name, ...decisions], index) => (
-        <details class="group bg-surface-raised" name="project" open={index === 0}>
-          <summary class="feedback flex min-h-(--spacing-touch) cursor-pointer list-none items-center gap-md p-tile-sm type-statement-sm group-open:text-primary hover:bg-field hover:text-on-field md:p-tile md:type-statement [&::-webkit-details-marker]:hidden">
-            <span class="size-md shrink-0 bg-on-surface-muted group-open:bg-primary" aria-hidden="true" />
+        <details class="group" name="project" open={index === 0}>
+          <summary class="feedback flex min-h-(--spacing-touch) cursor-pointer list-none items-center gap-md bg-surface-raised p-tile-sm type-statement-sm text-on-surface-muted group-open:bg-field group-open:text-on-field hover:bg-field hover:text-on-field md:p-tile [&::-webkit-details-marker]:hidden">
+            <span class="size-sm shrink-0 bg-on-surface-muted group-open:bg-primary" aria-hidden="true" />
             {copy[name]}
           </summary>
-          <ol class="grid gap-lg px-tile-sm pb-tile-sm md:grid-cols-3 md:px-tile md:pb-tile">
-            {decisions.map(([decision, reason]) => (
-              <li class="max-w-(--spacing-measure)">
-                <strong class="type-body-strong">{copy[decision]}</strong> {copy[reason]}
-              </li>
-            ))}
-          </ol>
+          <figure class="flex h-full flex-col gap-md bg-surface-raised p-tile-sm md:p-tile" data-ui>
+            <figcaption class="flex items-center justify-between gap-md type-small text-on-surface-muted">
+              {copy["live.sheet"]} · {copy[name]}
+              <span class="bg-field px-sm text-on-field" data-example>
+                {copy["frag.example"]}
+              </span>
+            </figcaption>
+            <ol class="grid gap-xs">
+              {decisions.map(([decision, reason]) => (
+                <li class="grid gap-xs bg-surface p-md">
+                  <span class="flex items-start gap-sm type-body-strong">
+                    <span class="mt-sm size-sm shrink-0 bg-primary" aria-hidden="true" />
+                    {copy[decision]}
+                  </span>
+                  <span class="ps-md">{copy[reason]}</span>
+                </li>
+              ))}
+            </ol>
+          </figure>
         </details>
       ))
     }
