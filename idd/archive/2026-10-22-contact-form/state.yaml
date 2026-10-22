@@ -1,0 +1,385 @@
+{
+  "schema": "idd-state/v1",
+  "change": "contact-form",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "M3 2/3 contact-form: formulario en Hablemos (Turnstile cargado al interactuar, CSP con challenges.cloudflare.com, estados de éxito y error, i18n es/en), con maquetas primero",
+    "kind": "feature",
+    "summary": "Formulario de contacto en el capítulo Hablemos (es/en) que envía a /api/contact con Turnstile cargado al interactuar, validación en cliente y estados de envío, éxito y error",
+    "acceptance": "En / y /en/ el capítulo Hablemos muestra el formulario (nombre, correo, tipo de proyecto, mensaje) en el HTML; al enviarlo con datos válidos llama a /api/contact/ con el token de Turnstile y muestra el éxito; ante un 4xx/5xx muestra un error que conserva lo escrito y ofrece correo y WhatsApp; la CSP del build admite challenges.cloudflare.com y nada más nuevo; tests unitarios y E2E con la API simulada"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿Cómo se compone el capítulo (maquetas A/B), cómo se elige el tipo de proyecto (casillas o desplegable) y qué ve un visitante sin JavaScript, si el envío exige el token de Turnstile?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿Tras un envío correcto se sustituye el formulario por la confirmación o se vacía para otro envío, y cómo se evita el doble envío?"
+      },
+      {
+        "category": "persistence",
+        "question": "¿Se guarda el borrador del mensaje en el navegador al recargar, o nada (ADR 0003, estado efímero)?"
+      },
+      {
+        "category": "copy",
+        "question": "¿El enlace de correo del error lleva precargado lo escrito, qué número de WhatsApp provisional se usa y qué texto de privacidad acompaña al botón hasta la página legal de M4?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿El formulario lee algo de la URL (preseleccionar el tipo desde Servicios) o ninguno?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿Turnstile se muestra siempre o solo cuando Cloudflare necesita una interacción (appearance interaction-only)?"
+      },
+      {
+        "category": "errors",
+        "question": "¿Cuándo aparecen los errores de cada campo y qué mensaje distinto se da por 400, 403 de verificación, 429, 502 y 503?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "src/components/board/Contact.astro",
+      "src/components/board/ReplyFragment.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/board.ts",
+      "src/lib/contact-form.ts",
+      "src/scripts/contact.ts",
+      "tests/e2e/contact-form.spec.ts",
+      "tests/e2e/security.spec.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/contact-form.test.ts"
+    ],
+    "work_units": 3,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs and 2 more (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0003, 0005, 0006, 0007, 0008 and quality scenario perf-mobile, privacy-security",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "El formulario y sus textos están en el HTML; la isla solo activa el botón, valida y envía; sin script queda el aviso y las vías directas. JS inicial 49.5 KB de 60 KB"
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "impact": "conforms",
+      "reason": "Nada se guarda: ni borrador en el navegador ni datos en la URL; el estado del formulario es efímero"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Los componentes input y choice se añaden a DESIGN.md con tokens existentes; design:lint limpio y tema en sincronía"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Turnstile entra en la allowlist documentada (script-src y frame-src challenges.cloudflare.com) sin unsafe-inline; E2E sin violaciones de CSP"
+    },
+    {
+      "kind": "adr",
+      "id": "0007",
+      "impact": "conforms",
+      "reason": "Turnstile no es rastreo y solo se carga al interactuar con el formulario; la navegación sigue sin cookies ni peticiones a terceros (security.spec)"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Todos los textos nuevos en es.ts y en.ts con las mismas claves; el formulario manda el locale de la página"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "La isla es pequeña y Turnstile no se descarga hasta el primer foco; no toca el LCP"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "Fail-closed sin token, honeypot, validación en servidor intacta y CSP estricta con un único tercero"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint: DESIGN.md lint clean, theme in sync, components use only tokens (input, input-label, input-error, choice, choice-checked nuevos con tokens existentes)",
+      "recorded_at": "2026-10-22T11:21:19.661Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Maqueta A (formulario a la derecha, campos oscuros, tipo en casillas, casilla clara con correo y WhatsApp, sin la respuesta de ejemplo). Sin JS: botón desactivado + aviso noscript a correo y WhatsApp. Estados: errores al enviar con foco al primero y se van al corregir; botón Enviando desactivado; éxito sustituye el formulario por confirmación con su correo; error conserva lo escrito con mensajes propios para 429, 403 y 502/503/red, y enlaces a correo precargado y WhatsApp. Turnstile interaction-only cargado al primer foco; WhatsApp provisional +34 600 000 000 en el módulo de configuración; aviso de privacidad; nada en la URL ni borrador guardado.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-22T11:22:24.518Z",
+      "detail": {
+        "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-22T11:22:24.518Z",
+      "detail": {
+        "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/contact-form.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/contact-form.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-22T11:22:24.518Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0003 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "adr:0008 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [],
+        "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-22T11:22:43.721Z"
+    }
+  ],
+  "base": "103803638d5a25e6a63e1b5781e71801ab704022",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:e3fdc527c93ab2e3c89d25853e36ad6671e7d90cdc66084f9d187ea83df91d0c",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:5bca7de211ba1d8cbdb98bd970713d89b347df657df9ab6f5b05825513cc2aa4",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:cfbe9976640d7bbcaf995479b7a879651a6c4ffc15df48ea8933c78f05320c28",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:94525b34f0c15aefdb2b812631fc2b726015d2b4c3414ab6ff3fc8c70fed01ec",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:3acf6c08ed45980b80cd5a2fb3a6d5bb83bdcd406bff4a4d9c98fa929a7dcecf",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:44ec75caf84d569345492c5d487fa67b0d39af8cdb85054113280c4faa827446",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:fba658664c03bb794fa52e7b2d5eff7c728cd11e4b652b4344d1f7373ce1af80",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:0ae8872d69f61fa8e9a62fe88a848fc9bb0e0413107cb93afadc7c7fbddbd5f1",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:9fb0931e184cda653ae3703bf113e4d6033d800eda1e1511a63885e04059ba22",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:037bb205cca908e493d3366dcf00d2c9bbb718a8e4d433d48ff99eb6321e69b6",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:731bc8156a8e9d182a3542492fa896304189dfab697b9bbcc18b03380e49573f",
+      "tree": "sha256:e5ddef94bfdb5e5e54b985e192edb94e7ec788fce877bd7ca3e611c01950d1c6",
+      "recorded_at": "2026-10-22T11:22:24.518Z"
+    }
+  ],
+  "closed_at": "2026-10-22T11:22:43.721Z"
+}

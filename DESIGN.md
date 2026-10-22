@@ -177,6 +177,31 @@ components:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.primary}"
     size: "{spacing.focus}"
+  input:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.body}"
+    rounded: "{rounded.tile}"
+    height: "{spacing.touch}"
+    padding: "{spacing.md}"
+  input-label:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.on-surface-muted}"
+    typography: "{typography.small}"
+  input-error:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.small}"
+  choice:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface-muted}"
+    typography: "{typography.small}"
+    rounded: "{rounded.tile}"
+    height: "{spacing.touch}"
+    padding: "{spacing.md}"
+  choice-checked:
+    backgroundColor: "{colors.field}"
+    textColor: "{colors.on-field}"
 ---
 
 # Retama
@@ -225,7 +250,7 @@ Chapters (services, sectors, method, questions, contact) are separated by 128px 
 
 **The method** is one screen on desktop and two on phones, with no tile left half empty. Its first row is two tiles of six columns: the heading with one statement under it and the three figures (one person to talk to, no tracking cookies, 100 out of 100 in Google's web quality checks) at its foot, and the four principles, a run-in phrase and one sentence each, two by two in one tile. Under them the projects: a tile with their question and lead, the four tabs two by two under it, short names at statement size (the open one is the field with the primary square), and the open project's sheet of three decisions in the right half beside them; on phones the sheet follows the tabs. Rows of the method and the contact take the height of their content, never a fixed span, so no tile is left with a hole.
 
-**The contact** puts the heading with its lead and, under it, the address on the field tile, on the left half; the example reply on the right half; and across the width a tile with what happens after writing: the reply within a working day, a short call if it helps and a written proposal with its options and their cost. On phones the address comes right after the heading.
+**The contact** puts the heading with its lead and, under it, the field tile with the direct ways to write (the address at statement size and WhatsApp), on the left half; the form on a raised tile on the right half, as tall as both; and across the width a tile with what happens after writing: the reply within a working day, a short call if it helps and a written proposal with its options and their cost. The form asks for the name and the email side by side, what the visitor needs as five choices (the four services and "other"), and the project in a few lines, with one sentence on what the data is used for beside the action, **Enviar**. A field that is wrong says why under it, with the primary square, when the visitor sends, and leaves as soon as it is right. Sending turns the action into "Enviando…"; once sent, the form gives way to the confirmation with the address the reply goes to; a failure keeps what was written and offers the mail, prefilled with it, and WhatsApp. Without the script the form is there with its action disabled and a note pointing to the address (ADR 0001). The anti-bot check stays invisible unless Cloudflare asks for a click. On phones the direct ways come right after the heading, then the form (owner, 2026-10-22).
 
 The header is a plain bar that floats over the page, so the scene of the first chapter fills the screen under it: the 6px primary bar, then the wordmark alone on the left and, gathered on the right, the links to the services, sectors and method chapters (their anchors are translated per language) and the language switch, `ES / EN` in small type with the current language in full ink and the other a quiet link to the same page. Over the first chapter it has no ground of its own; it takes the page's ground as the chapter leaves (scroll-driven, by the time the next chapter reaches it). It slides up out of the way while the page scrolls down and comes back as soon as it scrolls up, but never while the keyboard is in it; a chapter reached by a link stops below it. On phones the links leave the bar for **the chapter index**: an icon button, two lines on a touch-sized raised tile and named "Índice" for assistive technology, opens a modal dialog over the whole screen, on the page's ground, with the same bar at its top (a close icon, named "Cerrar", where it was), one raised tile per chapter (home, services, sectors, method: the name at headline size and the chapter's heading in small muted type under it; the chapter on screen in primary with the primary square and "Estás aquí"), and at the bottom, within reach of the thumb, the contact lead and **Hablemos** across the width. It is a native dialog opened by invoker commands, so it traps the focus, closes with Escape and opens without script; choosing a chapter closes it. The one action, **Hablemos**, is a button-primary fixed to the lower right corner on the page margin. It fades out while the first chapter (which has its own action) or the contact chapter is on screen, through scroll-driven animations; where those do not exist, or with the keyboard on it, it simply stays.
 
@@ -258,10 +283,12 @@ Square corners on everything: tiles, photographs, the action and form fields (`r
 - **button-primary / button-primary-hover:** the one action, a filled orange rectangle at least 48px tall; on hover and press it inverts to the light field.
 - **link / link-quiet:** text links in full ink with an underline; quiet links in muted small type.
 - **focus-ring:** a 2px primary outline with a 2px offset on every focusable element.
+- **input / input-label / input-error:** a form field, a filled graphite box one step below its raised tile, touch-tall, with no border; its label above in small muted type, and its error under it in small ink after the primary square.
+- **choice / choice-checked:** one option of a set, a touch-tall tile in the field's graphite with the muted square; the chosen one turns to the light field with the primary square, like the open tab of the projects. The radio itself is hidden, so the tile carries the focus ring.
 
 ## Imagery
 
-The retama is the brand's signature, not its subject: a visitor has to read a software firm within five seconds, and a board full of plants reads as a nursery. So the plant appears only twice: the scene of the first chapter, and the services, where the same plant is a dot screen drawn at build time from the poster's generator (dots along every stroke: ink on the stems, muted on the roots, primary on the taproot), cut into parts the cards read from the top down. The dot screen is a drawing, not a texture: it never fills a ground. Every other picture slot holds an interface fragment drawn in HTML and marked `data-ui`, an example that carries a visible "Example" label, never presented as a client's work: one per sector in the sectors group (a route dispatch panel, an approvals queue, a game economy editor and one client portal under three made-up brands), the decision sheet of each kind of project in the method and the first reply in the contact. Fragments use the board's tokens: tiles in surface-raised, rows in surface, small type, the primary square as status mark, no borders or shadows. The page holds no found picture since the method dropped the Clusius plate (2026-10-22). One that comes later comes from an open collection with a licence that allows commercial use, is downloaded into the repository and credited in the footer. It is greyscale and baked that way into the file; an engraved plate is inverted onto the graphite, its paper turned into the raised tile tone and its lines into the light ink, so it reads as part of the board. Every picture is square-cornered and covers its tile with `object-fit: cover`, and a found picture shows the world around Retama, never Retama's product, office or team.
+The retama is the brand's signature, not its subject: a visitor has to read a software firm within five seconds, and a board full of plants reads as a nursery. So the plant appears only twice: the scene of the first chapter, and the services, where the same plant is a dot screen drawn at build time from the poster's generator (dots along every stroke: ink on the stems, muted on the roots, primary on the taproot), cut into parts the cards read from the top down. The dot screen is a drawing, not a texture: it never fills a ground. Every other picture slot holds an interface fragment drawn in HTML and marked `data-ui`, an example that carries a visible "Example" label, never presented as a client's work: one per sector in the sectors group (a route dispatch panel, an approvals queue, a game economy editor and one client portal under three made-up brands), and the decision sheet of each kind of project in the method. Fragments use the board's tokens: tiles in surface-raised, rows in surface, small type, the primary square as status mark, no borders or shadows. The page holds no found picture since the method dropped the Clusius plate (2026-10-22). One that comes later comes from an open collection with a licence that allows commercial use, is downloaded into the repository and credited in the footer. It is greyscale and baked that way into the file; an engraved plate is inverted onto the graphite, its paper turned into the raised tile tone and its lines into the light ink, so it reads as part of the board. Every picture is square-cornered and covers its tile with `object-fit: cover`, and a found picture shows the world around Retama, never Retama's product, office or team.
 
 ## Motion and 3D
 

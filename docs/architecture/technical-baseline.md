@@ -23,7 +23,7 @@
 | --- | --- | --- | --- |
 | Sitio estático | Páginas, i18n, SEO, escena 3D, animaciones | Contenido y traducciones (repo) | Editor, mediante PR |
 | Isla 3D | Escena progresiva (ADR 0004) | Ninguno | — |
-| Isla de contacto | Formulario, validación en cliente, token anti-bot | Ninguno (estado efímero) | — |
+| Isla de contacto | Formulario, validación en cliente con las reglas de la función (`src/lib/contact.ts`), token anti-bot. Sin script, el botón queda desactivado y se ofrecen el correo y WhatsApp | Ninguno (estado efímero) | — |
 | Función de contacto | Validar, verificar el anti-bot, limitar, entregar por email | Ninguno; tránsito (ADR 0003) | — |
 | DESIGN.md | Tokens y justificación visual (ADR 0005) | Sistema de diseño | Editor y agentes, mediante PR |
 | Skills vendorizadas | Guía para los agentes (ADR 0010) | `.claude/skills/` + manifiesto | Editor, mediante PR |
@@ -34,7 +34,7 @@
 | --- | --- | --- | --- |
 | Plataforma de borde | Cloudflare | HTTPS, Git | Caída de la plataforma: la web no está disponible. El uptime externo avisa |
 | Email transaccional | Resend | HTTPS API | Error o timeout: la función responde con un error y la UI ofrece email y WhatsApp. Se registra el código de error, no los datos |
-| Anti-bot | Cloudflare Turnstile | Widget + siteverify | Si la verificación no está disponible, se rechaza el envío (fail-closed) y se muestran vías alternativas |
+| Anti-bot | Cloudflare Turnstile | Widget explícito, `interaction-only`, cargado al primer foco en el formulario + siteverify | Si la verificación no está disponible, se rechaza el envío (fail-closed) y se muestran vías alternativas |
 | Límite de envíos | Cloudflare (binding `ratelimits` de Workers) | Binding | 3 envíos por minuto e IP (en IPv6, por /64), contados por ubicación. Sin el binding, se rechaza el envío (fail-closed) |
 | Reserva de llamada | Cal.com (plan gratis) | iframe/embed tras clic | Si el embed falla, se muestra un enlace directo a la página de reserva |
 | WhatsApp | Meta | Enlace `wa.me` | Sin dependencia en tiempo de ejecución |
@@ -89,7 +89,7 @@ No se fija ningún porcentaje de cobertura. TDD estricto en la función de conta
 | Biome 2.5 + eslint-plugin-astro | 0009 | Solo ESLint 10 + Prettier | Biome es rápido, pero su soporte de `.astro` es experimental | 2026-10-21: biomejs.dev language support |
 | Vitest 5, Playwright 1.64, Lighthouse CI 0.15 | 0009 | — | LHCI no publica versión desde 06-2025: vigilar | 2026-10-21: npm |
 | Resend (plan gratis: 3.000 emails/mes, 100/día) | 0003 | Cloudflare Email Service, Formspree | API simple y dominio verificado; terceros fuera de la CSP del cliente | 2026-10-21: resend.com/pricing |
-| Cloudflare Turnstile | 0002, 0006 | hCaptcha, honeypot solo | Gratis, invisible, nativo de la plataforma | 2026-10-21: cloudflare/skills `turnstile-spin` |
+| Cloudflare Turnstile | 0002, 0006 | hCaptcha, honeypot solo | Gratis, invisible, nativo de la plataforma. Único tercero de la CSP: `script-src` y `frame-src https://challenges.cloudflare.com`. La clave de sitio es la de pruebas hasta que se cree el widget (`src/lib/board.ts`) | 2026-10-21: cloudflare/skills `turnstile-spin`; 2026-10-22: CSP comprobada en el build con la clave de pruebas |
 | Cloudflare Web Analytics | 0007 | Umami, Plausible (de pago) | Sin cookies, gratis, Web Vitals de campo | 2026-10-21: informe de plataforma |
 | release-please | 0009 | Tags manuales | SemVer desde Conventional Commits (ronda 5) | Pendiente de verificar la versión en el slice 1 |
 
