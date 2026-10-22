@@ -1,18 +1,38 @@
 ---
-import { type Locale, t } from "../../i18n/index";
+import { type Locale, localizedPath, t } from "../../i18n/index";
 import Wordmark from "../Wordmark.astro";
 
 interface Props {
   locale: Locale;
 }
 
-const copy = t(Astro.props.locale);
+const { locale } = Astro.props;
+const copy = t(locale);
+const legal = localizedPath(locale, "/legal/");
+const links = [
+  ["anchor.legalNotice", "legal.notice.title"],
+  ["anchor.privacy", "legal.privacy.title"],
+  ["anchor.cookies", "legal.cookies.title"],
+] as const;
 ---
 
-<!-- DESIGN.md: the board's last row is the footer. -->
+<!-- DESIGN.md: the board's last row is the footer, with the legal links in quiet type under the wordmark. -->
 <footer class="grid grid-cols-2 gap-gap px-margin pt-section pb-margin lg:grid-cols-12">
-  <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-9">
+  <div class="col-span-2 grid gap-md bg-surface-raised p-tile-sm md:p-tile lg:col-span-9">
     <Wordmark class="block type-wordmark" />
+    <nav aria-label={copy["footer.legalLabel"]}>
+      <ul class="flex flex-wrap gap-x-lg">
+        {
+          links.map(([anchor, title]) => (
+            <li>
+              <a class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface-muted underline hover:text-on-surface" href={`${legal}#${copy[anchor]}`}>
+                {copy[title]}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
     <p class="type-small text-on-surface-muted">© {new Date().getFullYear()} Retama</p>
   </div>
 

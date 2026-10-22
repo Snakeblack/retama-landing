@@ -46,12 +46,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      # The call booking and WhatsApp are off by default; E2E builds with them on to prove them (a local run proves them
-      # off). The WhatsApp number is a test one: the owner's real number lives only in Workers Builds.
+      # The call booking, WhatsApp and the legal owner are off by default; E2E builds with them on to prove them (a local
+      # run proves them off). The number and the owner are test ones: the owner's real data lives only in Workers Builds.
       - run: pnpm test:e2e
         env:
           PUBLIC_BOOKING: "true"
           PUBLIC_WHATSAPP_NUMBER: "34600000000"
+          PUBLIC_LEGAL_NAME: "Titular de Prueba"
+          PUBLIC_LEGAL_TOWN: "Localidad de Prueba (Madrid)"
       - if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

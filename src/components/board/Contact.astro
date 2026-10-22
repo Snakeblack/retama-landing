@@ -1,7 +1,13 @@
 ---
-import { PUBLIC_BOOKING, PUBLIC_TURNSTILE_SITE_KEY, PUBLIC_WHATSAPP_NUMBER } from "astro:env/client";
-import { type Locale, t } from "../../i18n/index";
-import { bookingUrl, contactEmail, whatsapp } from "../../lib/board";
+import {
+  PUBLIC_BOOKING,
+  PUBLIC_LEGAL_NAME,
+  PUBLIC_LEGAL_TOWN,
+  PUBLIC_TURNSTILE_SITE_KEY,
+  PUBLIC_WHATSAPP_NUMBER,
+} from "astro:env/client";
+import { type Locale, localizedPath, t } from "../../i18n/index";
+import { bookingUrl, contactEmail, owner, whatsapp } from "../../lib/board";
 import { bookingEmbedSrc } from "../../lib/booking";
 import { LIMITS, PROJECT_TYPES, type ProjectType } from "../../lib/contact";
 import type { FailureKind } from "../../lib/contact-form";
@@ -26,6 +32,9 @@ const typeLabel: Record<ProjectType, keyof typeof copy> = {
 };
 const failures: FailureKind[] = ["invalid", "verification", "rate-limited", "unavailable"];
 const wa = whatsapp(PUBLIC_WHATSAPP_NUMBER);
+// The AEPD's first layer beside the action: who is responsible, what for and the rights, with the policy one link away.
+const controller = owner({ name: PUBLIC_LEGAL_NAME, town: PUBLIC_LEGAL_TOWN });
+const policy = `${localizedPath(locale, "/legal/")}#${copy["anchor.privacy"]}`;
 const input = "min-h-(--spacing-touch) w-full bg-surface px-md py-sm text-on-surface";
 const label = "type-small text-on-surface-muted";
 const error = "flex gap-sm type-small";---
@@ -118,7 +127,10 @@ const error = "flex gap-sm type-small";---
       <noscript><p class="type-small">{copy["form.noscript"]}</p></noscript>
 
       <div class="flex flex-wrap items-center justify-between gap-md">
-        <p class="flex-1 type-small text-on-surface-muted">{copy["form.privacy"]}</p>
+        <p class="flex-1 type-small text-on-surface-muted" data-privacy>
+          {controller && <>{copy["form.privacyOwner"]} {controller.name}. </>}{copy["form.privacy"]}{" "}
+          <a class="feedback underline hover:text-on-surface" href={policy}>{copy["form.privacyLink"]}</a>.
+        </p>
         <button class="feedback min-h-(--spacing-touch) bg-primary px-lg type-label text-on-primary hover:bg-field hover:text-on-field disabled:cursor-not-allowed disabled:bg-surface disabled:text-on-surface-muted" type="submit" disabled>
           {copy["form.submit"]}
         </button>

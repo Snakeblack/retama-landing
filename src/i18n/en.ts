@@ -174,7 +174,10 @@ export const en = {
   "form.typeOther": "Something else",
   "form.message": "Tell us about your project",
   "form.honeypot": "Leave this field empty",
-  "form.privacy": "We only use this to reply to you. Nothing is stored on the website.",
+  "form.privacyOwner": "Controller:",
+  "form.privacy":
+    "We only use this to reply to you, because you ask us to, and we share it with no one. You can see it, correct it or have it deleted.",
+  "form.privacyLink": "Privacy policy",
   "form.submit": "Send",
   "form.sending": "Sending…",
   "form.noscript": "Sending the form needs JavaScript. Write to us by email or on WhatsApp.",
@@ -200,6 +203,79 @@ export const en = {
   "contact.step3Rest": "with the options, what each one costs and what we would rule out.",
 
   "footer.top": "Back to top",
+  "footer.legalLabel": "Legal information",
+
+  "anchor.legalNotice": "legal-notice",
+  "anchor.privacy": "privacy",
+  "anchor.cookies": "cookies",
+  "legal.metaTitle": "Legal information · Retama",
+  "legal.metaDescription":
+    "Retama's legal notice, privacy policy and cookie policy: who is behind it, what happens to your data and what the website keeps in your browser.",
+  "legal.title": "Legal information",
+  "legal.lead": "Who is behind Retama, what we do with your data and what this website keeps in your browser.",
+  "legal.updated": "Updated on 23 October 2026.",
+
+  "legal.notice.title": "Legal notice",
+  "legal.notice.lead":
+    "Retama is the trade name its owner works under. These are the owner's details, as Spain's Information Society Services Act (Ley 34/2002, LSSI) requires:",
+  "legal.notice.owner": "Owner",
+  "legal.notice.nif": "Tax ID (NIF)",
+  "legal.notice.address": "Address",
+  "legal.notice.town": "Town",
+  "legal.notice.email": "Email",
+  "legal.notice.activity": "Activity",
+  "legal.notice.activityText": "Design and development of software, websites and automation, remotely.",
+  "legal.notice.use":
+    "Using this website is free and needs no sign-up. Its texts, its design and the Retama brand belong to its owner: you may quote them with a link to this website, but not copy them to pass them off as your own.",
+  "legal.notice.offer":
+    "We take care that what this website says is correct and up to date, but it is not a binding offer: the scope, price and timeline of each project are set in writing in its proposal.",
+  "legal.notice.links":
+    "The links to Cal.com and WhatsApp lead to third-party services, with their own terms and their own privacy.",
+  "legal.notice.law":
+    "Spanish law applies. If you are a consumer, you may go to the courts where you live. This text is in Spanish and English; where they differ, the Spanish one prevails.",
+
+  "legal.privacy.title": "Privacy",
+  "legal.privacy.lead":
+    "This website only handles personal data when you write to us through the form or book a call. This is what happens to it, under the General Data Protection Regulation (GDPR).",
+  "legal.privacy.controller": "Controller.",
+  "legal.privacy.controllerText": "The owner named in the legal notice. For anything about your data, write to",
+  "legal.privacy.data": "What data.",
+  "legal.privacy.dataText":
+    "What the form asks for: your name, your email, what you need and your message, which we need to reply to you. To stop spam, Cloudflare checks that you are a person, and the website uses your IP address to count your sends over one minute, without storing it. If you book a call, what you give Cal.com.",
+  "legal.privacy.purpose": "What for.",
+  "legal.privacy.purposeText":
+    "To answer your enquiry and, if you ask us to, prepare a proposal. We send you no advertising, and we build no profiles and make no automated decisions with your data.",
+  "legal.privacy.basis": "Legal basis.",
+  "legal.privacy.basisText":
+    "Replying to you is a pre-contractual step you ask for (Article 6(1)(b) GDPR). Checking that you are a person and limiting sends protects the website from abuse, a legitimate interest (Article 6(1)(f)).",
+  "legal.privacy.retention": "How long.",
+  "legal.privacy.retentionText":
+    "While your enquiry lasts. If it does not lead to a project, we delete the message within 12 months at most; if it does, we keep what the law requires us to keep.",
+  "legal.privacy.recipients": "Who else handles it.",
+  "legal.privacy.recipientsText":
+    "Only the providers that help us do this, as processors: Cloudflare (hosts the website, checks that you are a person and forwards the email), Resend (sends your message, from its EU region), Google (the Gmail inbox it lands in) and, if you book, Cal.com. We do not sell or share your data.",
+  "legal.privacy.transfers": "Outside the EU.",
+  "legal.privacy.transfersText":
+    "These providers are US companies. Their contracts cover the transfer with the European Commission's standard contractual clauses or the EU-US Data Privacy Framework, as the case may be.",
+  "legal.privacy.rights": "Your rights.",
+  "legal.privacy.rightsText":
+    "You can ask to see your data, correct it, delete it, object to or restrict its use, and take it with you, by writing to",
+  "legal.privacy.complaint": "If you think we are not handling them well, you can complain to the",
+  "legal.privacy.authority": "Spanish Data Protection Agency (AEPD)",
+
+  "legal.cookies.title": "Cookies",
+  "legal.cookies.lead":
+    "This website uses no tracking or advertising cookies, and keeps nothing in your browser when you visit it. That is why it does not ask for your permission. Only two services you ask for keep something, and it is technical:",
+  "legal.cookies.form": "When you use the form.",
+  "legal.cookies.formText":
+    "Cloudflare Turnstile's spam check keeps cf.turnstile.u in the local storage of challenges.cloudflare.com, to tell people from bots.",
+  "legal.cookies.booking": "When you book a call.",
+  "legal.cookies.bookingText":
+    "Cal.com, which opens inside the website, sets Cloudflare's __cf_bm security cookie on cal.com, which expires after 30 minutes, and keeps reserverUid in its local storage to hold the time you pick while you book.",
+  "legal.cookies.exempt":
+    "Both are needed for the service you ask for, so the law does not require your consent (Article 22.2 LSSI). You can delete them in your browser's settings.",
+  "legal.cookies.later":
+    "If we ever add a tool with cookies that are not needed, we will ask for your permission before turning it on and say so here.",
 
   "notFound.title": "Page not found",
   "notFound.lead": "The page you are looking for does not exist or has moved.",
