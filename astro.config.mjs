@@ -2,7 +2,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig, fontProviders } from "astro/config";
+import { defineConfig, envField, fontProviders } from "astro/config";
 
 // Production origin for canonicals, hreflang and the sitemap. SITE_URL overrides
 // it; the fallback is the workers.dev URL until the domain lands (M6).
@@ -19,6 +19,13 @@ export default defineConfig({
     // Build-time image transforms; no Cloudflare Images binding.
     imageService: "compile",
   }),
+  env: {
+    schema: {
+      // The call booking of the contact chapter: off until the Cal.com account exists. Set it to "true" in the build
+      // environment (Workers Builds) to show it; the CSP admits Cal.com only then.
+      PUBLIC_BOOKING: envField.boolean({ context: "client", access: "public", default: false }),
+    },
+  },
   i18n: {
     locales: ["es", "en"],
     defaultLocale: "es",
@@ -76,7 +83,8 @@ export default defineConfig({
         "img-src 'self' data:",
         "font-src 'self'",
         "connect-src 'self'",
-        // ADR 0006 allowlist: Turnstile's widget for the contact form, loaded on the first focus in it.
+        // ADR 0006 allowlist: Turnstile's widget for the contact form, loaded on the first focus in it. Contact.astro
+        // adds the Cal.com booking page here only while PUBLIC_BOOKING is on.
         "frame-src https://challenges.cloudflare.com",
       ],
       scriptDirective: { resources: ["'self'", "https://challenges.cloudflare.com"] },

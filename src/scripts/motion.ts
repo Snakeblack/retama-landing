@@ -29,7 +29,10 @@ function entrances(move: boolean) {
       paused: true,
       defaults: { duration: motion.duration.reveal, ease: motion.ease.out },
     });
-    [...group.children].forEach((tile, index) => {
+    // A tile hidden at load (the booking) shows when it is asked for, not with its group: tweening it while hidden
+    // would make GSAP lift it out of the page to measure it, and a framed page reloads when it moves.
+    const tiles = [...group.children].filter((tile) => !(tile as HTMLElement).hidden);
+    tiles.forEach((tile, index) => {
       const at = index * motion.stagger.item;
       if (!move) {
         timeline.from(tile, { opacity: 0 }, at);

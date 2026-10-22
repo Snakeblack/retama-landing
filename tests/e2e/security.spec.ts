@@ -24,9 +24,13 @@ test.describe("cabeceras de seguridad (ADR 0006)", () => {
       expect(csp).not.toContain(",");
       expect(csp).toContain("frame-ancestors 'none'");
       expect(csp).toContain("object-src 'none'");
-      // ADR 0006 allowlist: Turnstile, the one third party, for the contact form.
+      // ADR 0006 allowlist: Turnstile for the contact form and, only while the booking is on (PUBLIC_BOOKING), the
+      // Cal.com calendar as a frame.
       expect(csp).toMatch(/script-src 'self' https:\/\/challenges\.cloudflare\.com( 'sha256-[^']+')*;/);
-      expect(csp).toContain("frame-src https://challenges.cloudflare.com");
+      const booking = process.env.PUBLIC_BOOKING === "true" ? " https://cal.com" : "";
+      expect(csp.split(/;\s*/).find((directive) => directive.startsWith("frame-src "))).toBe(
+        `frame-src https://challenges.cloudflare.com${booking}`,
+      );
       expect(csp).not.toMatch(/unsafe-inline|unsafe-eval/);
     });
   }
