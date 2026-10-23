@@ -1,0 +1,75 @@
+---
+import { render } from "astro:content";
+import { type Locale, localizedPath, t } from "../i18n/index";
+import Base from "../layouts/Base.astro";
+import type { LocalArticle } from "../lib/articles";
+import { articlePath, formatDate, readingMinutes } from "../lib/blog";
+import Footer from "./board/Footer.astro";
+
+interface Props {
+  locale: Locale;
+  article: LocalArticle;
+}
+
+const { locale, article } = Astro.props;
+const { entry, slug, paths } = article;
+const { title, description, published, updated } = entry.data;
+const copy = t(locale);
+const { Content } = await render(entry);
+const dates = [
+  ["blog.published", published],
+  ...(updated ? [["blog.updated", updated] as const] : []),
+] as const;
+---
+
+<!-- DESIGN.md Layout, the article: the title and its lead on the left with the dates beside them, then the body held to
+     measure on the left and the way to the contact on the right, which stays in view while the body scrolls. -->
+<Base
+  locale={locale}
+  title={`${title} · Retama`}
+  description={description}
+  trail={[
+    { name: copy["nav.blog"], path: localizedPath(locale, "/blog/") },
+    { name: title, path: articlePath(locale, slug) },
+  ]}
+  paths={paths}
+  article={{ headline: title, description, published, updated, path: articlePath(locale, slug) }}
+>
+  <article class="mt-(--header-height) grid grid-cols-2 gap-gap px-margin pt-xl lg:grid-cols-12" aria-labelledby="article-title" data-grounds>
+    <header class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-8">
+      <h1 id="article-title" class="text-balance type-headline-sm md:type-headline">{title}</h1>
+      <p class="max-w-(--spacing-measure) type-statement-sm md:type-statement">{description}</p>
+    </header>
+
+    <div class="col-span-2 flex flex-col justify-between gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-4">
+      <div class="grid gap-md">
+        <dl class="grid gap-xs">
+          {
+            dates.map(([label, date]) => (
+              <div class="grid gap-xs bg-surface p-md">
+                <dt class="type-small text-on-surface-muted">{copy[label]}</dt>
+                <dd><time datetime={date.toISOString().slice(0, 10)}>{formatDate(locale, date)}</time></dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="type-small text-on-surface-muted">{`${readingMinutes(entry.body ?? "")} ${copy["blog.minutes"]}`}</p>
+      </div>
+      <a class="feedback flex min-h-(--spacing-touch) w-fit items-center type-small text-on-surface-muted underline hover:text-on-surface" href={localizedPath(locale, "/blog/")}>
+        {copy["blog.all"]}
+      </a>
+    </div>
+
+    <div class="col-span-2 bg-surface-raised p-tile-sm md:p-tile lg:col-span-8" data-article>
+      <Content />
+    </div>
+
+    <aside class="col-span-2 grid content-start gap-lg self-start bg-surface-raised p-tile-sm md:p-tile lg:sticky lg:top-(--header-clearance) lg:col-span-4">
+      <p class="type-statement-sm">{copy["blog.talk"]}</p>
+      <a class="feedback flex min-h-(--spacing-touch) w-fit items-center bg-primary px-lg type-label text-on-primary hover:bg-field hover:text-on-field" href={`${localizedPath(locale, "/")}#${copy["anchor.contact"]}`}>
+        {copy["nav.talk"]}
+      </a>
+    </aside>
+  </article>
+  <Footer slot="footer" locale={locale} />
+</Base>

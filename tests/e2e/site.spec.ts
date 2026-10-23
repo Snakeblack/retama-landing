@@ -91,10 +91,12 @@ test.describe("sin JavaScript (ADR 0001)", () => {
         await expect(group.locator("h2")).not.toBeEmpty();
       }
 
-      // The header's chapter links; the footer's legal links lead to another page.
+      // The header's chapter links, then the blog's; the footer's legal links lead to another page.
       const links = page.getByRole("banner").getByRole("navigation").getByRole("link");
-      await expect(links).toHaveCount(4);
-      for (const href of await links.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href")))) {
+      await expect(links).toHaveCount(5);
+      const hrefs = await links.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href") ?? ""));
+      expect(hrefs.filter((href) => href.startsWith("#"))).toHaveLength(4);
+      for (const href of hrefs.filter((href) => href.startsWith("#"))) {
         await expect(page.locator(`main ${href}`)).toHaveCount(1);
       }
 
@@ -158,7 +160,7 @@ test("hreflang recíproco con x-default en todas las páginas del sitemap (ADR 0
   }
 });
 
-test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga de pan en las legales", async ({
+test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga de pan fuera del inicio", async ({
   page,
   request,
 }) => {
@@ -172,13 +174,17 @@ test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga 
     const retama = graph.find((node) => node["@id"] === new URL("/#organization", url).href);
     expect(retama, url).not.toHaveProperty("address");
 
+    // The breadcrumb climbs from the page to the home of its language, one step per folder: legal, blog, article.
     const trail = graph.find((node) => node["@type"] === "BreadcrumbList");
-    if (new URL(url).pathname.endsWith("/legal/")) {
+    const home = new URL(new URL(url).pathname.startsWith("/en/") ? "/en/" : "/", url).href;
+    if (url !== home) {
+      const expected = [url];
+      while (expected[0] !== home) expected.unshift(new URL("..", expected[0]).href);
       const steps = trail?.itemListElement as { item: string }[];
       expect(
         steps.map((step) => step.item),
         url,
-      ).toEqual([new URL("..", url).href, url]);
+      ).toEqual(expected);
     } else expect(trail, url).toBeUndefined();
   }
 });

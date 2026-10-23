@@ -5,9 +5,11 @@ interface Props {
   locale: Locale;
   /** The header's switch carries the lang-switch hook; its copy inside the chapter index does not. */
   primary?: boolean;
+  /** The page's path in every language when it is translated, like an article of the blog. */
+  paths?: Record<Locale, string> | undefined;
 }
 
-const { locale, primary = false } = Astro.props;
+const { locale, primary = false, paths } = Astro.props;
 const page = pathWithoutLocale(Astro.url.pathname);
 ---
 
@@ -25,7 +27,7 @@ const page = pathWithoutLocale(Astro.url.pathname);
         ) : (
           <a
             class:list={["feedback -mx-xs flex min-h-(--spacing-touch) items-center px-xs hover:text-primary", { "lang-switch": primary }]}
-            href={localizedPath(code, page)}
+            href={paths?.[code] ?? localizedPath(code, page)}
             hreflang={code}
             lang={code}
           >

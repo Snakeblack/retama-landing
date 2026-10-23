@@ -1,7 +1,7 @@
 ---
 import { Font } from "astro:assets";
-import { type Locale, localizedPath } from "../i18n/index";
-import { alternates, type Crumb, canonicalUrl, jsonLd, openGraph, structuredData } from "../lib/seo";
+import { type Locale, localizedPath, t } from "../i18n/index";
+import { type Article, alternates, type Crumb, canonicalUrl, jsonLd, openGraph, structuredData } from "../lib/seo";
 import "../styles/global.css";
 import theme from "../styles/theme.css?raw";
 import LangSwitch from "../components/LangSwitch.astro";
@@ -16,9 +16,18 @@ interface Props {
   trail?: Crumb[];
   /** The page holds the questions chapter, which the JSON-LD repeats as its FAQPage. */
   questions?: boolean;
+  /** The page's path in every language when it is translated, like an article; otherwise it is the same path. */
+  paths?: Record<Locale, string>;
+  /** The page is an article of the blog: Open Graph and the JSON-LD describe it. */
+  article?: Article;
+  /** The page is the blog's index, which its link in the header marks. */
+  blog?: boolean;
 }
 
-const { locale, title, description, noindex = false, trail, questions = false } = Astro.props;
+const { locale, title, description, noindex = false, trail, questions = false, paths, article, blog = false } = Astro.props;
+const copy = t(locale);
+// On a page with a chapter index (the home), the links leave the bar on phones for the index, which holds them too.
+const withMenu = Astro.slots.has("menu");
 const site = Astro.site ?? new URL(Astro.url.origin);
 // The browser chrome takes the page ground from the DESIGN.md tokens.
 const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
@@ -38,15 +47,15 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
       !noindex && (
         <>
           <link rel="canonical" href={canonicalUrl(site, Astro.url.pathname)} />
-          {alternates(site, Astro.url.pathname).map((alt) => (
+          {alternates(site, Astro.url.pathname, paths).map((alt) => (
             <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
           ))}
-          {openGraph(site, locale, Astro.url.pathname, title, description).map(([property, content]) => (
+          {openGraph(site, locale, Astro.url.pathname, title, description, article).map(([property, content]) => (
             <meta property={property} content={content} />
           ))}
           <meta name="twitter:card" content="summary_large_image" />
           {/* A data block, never run: the CSP's script-src does not apply to it (ADR 0006). */}
-          <script type="application/ld+json" set:html={jsonLd(structuredData(site, locale, trail, questions))} />
+          <script type="application/ld+json" set:html={jsonLd(structuredData(site, locale, trail, questions, article))} />
         </>
       )
     }
@@ -57,9 +66,10 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
   <body>
     <!-- DESIGN.md Layout: the header floats over the page, the first chapter's scene included; header.ts sends it away
          while the page scrolls down and back as soon as it scrolls up. Its text lines up with the text inside the tiles:
-         page margin plus tile padding. The wordmark stands alone on the left and the rest gathers on the right: a page
-         may add its links (slot "nav", from md), its chapter index (slot "menu", on phones) and its fixed action (slot
-         "action", outside the bar that moves). -->
+         page margin plus tile padding. The wordmark stands alone on the left and the rest gathers on the right: the
+         links, which a page may lead with its own (slot "nav", list items) before the blog's, its chapter index (slot
+         "menu", which takes the links' place on phones) and its fixed action (slot "action", outside the bar that
+         moves). -->
     <header>
       <div class="fixed inset-x-0 top-0 z-20 bg-surface" data-header-bar>
         <div class="h-bar bg-primary" aria-hidden="true"></div>
@@ -69,8 +79,21 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
               <Wordmark class="block" />
               <span class="sr-only">Retama</span>
             </a>
-            <slot name="nav" />
-            <LangSwitch locale={locale} primary />
+            <nav class:list={["md:block", withMenu ? "hidden" : "block"]} aria-label={copy["nav.label"]}>
+              <ul class="flex gap-lg">
+                <slot name="nav" />
+                <li>
+                  <a
+                    class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface hover:text-primary"
+                    href={localizedPath(locale, "/blog/")}
+                    aria-current={blog ? "page" : undefined}
+                  >
+                    {copy["nav.blog"]}
+                  </a>
+                </li>
+              </ul>
+            </nav>
+            <LangSwitch locale={locale} paths={paths} primary />
             <slot name="menu" />
           </div>
         </div>
