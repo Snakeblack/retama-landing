@@ -238,7 +238,7 @@ export const en = {
     "Retama's legal notice, privacy policy and cookie policy: who is behind it, what happens to your data and what the website keeps in your browser.",
   "legal.title": "Legal information",
   "legal.lead": "Who is behind Retama, what we do with your data and what this website keeps in your browser.",
-  "legal.updated": "Updated on 23 October 2026.",
+  "legal.updated": "Updated on 24 October 2026.",
 
   "legal.notice.title": "Legal notice",
   "legal.notice.lead":
@@ -261,24 +261,24 @@ export const en = {
 
   "legal.privacy.title": "Privacy",
   "legal.privacy.lead":
-    "This website only handles personal data when you write to us through the form or book a call. This is what happens to it, under the General Data Protection Regulation (GDPR).",
+    "This website handles personal data when you write to us through the form or book a call, and it counts visits without identifying you. This is what happens to it, under the General Data Protection Regulation (GDPR).",
   "legal.privacy.controller": "Controller.",
   "legal.privacy.controllerText": "The owner named in the legal notice. For anything about your data, write to",
   "legal.privacy.data": "What data.",
   "legal.privacy.dataText":
-    "What the form asks for: your name, your email, what you need and your message, which we need to reply to you. To stop spam, Cloudflare checks that you are a person, and the website uses your IP address to count your sends over one minute, without storing it. If you book a call, what you give Cal.com.",
+    "What the form asks for: your name, your email, what you need and your message, which we need to reply to you. To stop spam, Cloudflare checks that you are a person, and the website uses your IP address to count your sends over one minute, without storing it. If you book a call, what you give Cal.com. When you visit the website, Cloudflare Web Analytics receives the technical side of each visit (the page, the website you came from, your browser, your country and how long it takes to load) to count visits in aggregate, without cookies, without storing anything in your browser and without following you from one website to another.",
   "legal.privacy.purpose": "What for.",
   "legal.privacy.purposeText":
-    "To answer your enquiry and, if you ask us to, prepare a proposal. We send you no advertising, and we build no profiles and make no automated decisions with your data.",
+    "To answer your enquiry and, if you ask us to, prepare a proposal. The visits, to learn which pages are read and whether the website loads fast. We send you no advertising, and we build no profiles and make no automated decisions with your data.",
   "legal.privacy.basis": "Legal basis.",
   "legal.privacy.basisText":
-    "Replying to you is a pre-contractual step you ask for (Article 6(1)(b) GDPR). Checking that you are a person and limiting sends protects the website from abuse, a legitimate interest (Article 6(1)(f)).",
+    "Replying to you is a pre-contractual step you ask for (Article 6(1)(b) GDPR). Checking that you are a person and limiting sends protects the website from abuse, and counting visits in aggregate helps us improve it: both are legitimate interests (Article 6(1)(f)).",
   "legal.privacy.retention": "How long.",
   "legal.privacy.retentionText":
     "While your enquiry lasts. If it does not lead to a project, we delete the message within 12 months at most; if it does, we keep what the law requires us to keep.",
   "legal.privacy.recipients": "Who else handles it.",
   "legal.privacy.recipientsText":
-    "Only the providers that help us do this, as processors: Cloudflare (hosts the website, checks that you are a person and forwards the email), Resend (sends your message, from its EU region), Google (the Gmail inbox it lands in) and, if you book, Cal.com. We do not sell or share your data.",
+    "Only the providers that help us do this, as processors: Cloudflare (hosts the website, counts visits, checks that you are a person and forwards the email), Resend (sends your message, from its EU region), Google (the Gmail inbox it lands in) and, if you book, Cal.com. We do not sell or share your data.",
   "legal.privacy.transfers": "Outside the EU.",
   "legal.privacy.transfersText":
     "These providers are US companies. Their contracts cover the transfer with the European Commission's standard contractual clauses or the EU-US Data Privacy Framework, as the case may be.",

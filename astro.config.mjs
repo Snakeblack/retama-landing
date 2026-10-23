@@ -40,6 +40,9 @@ export default defineConfig({
       // The owner's WhatsApp, international format (34…), set in the build environment (Workers Builds) so it stays out
       // of the public repository. Without it the page shows no WhatsApp.
       PUBLIC_WHATSAPP_NUMBER: envField.string({ context: "client", access: "public", optional: true }),
+      // The token of the Cloudflare Web Analytics site of retama.dev (dashboard → Web Analytics → Manage site), set in
+      // the build environment (Workers Builds). Without it no page loads the beacon (src/lib/analytics.ts).
+      PUBLIC_CF_ANALYTICS_TOKEN: envField.string({ context: "client", access: "public", optional: true }),
       // The owner the legal notice names (src/lib/board.ts, owner), set in the build environment (Workers Builds) so it
       // stays out of the public repository: the name and the town, required there, and the NIF and the address once
       // they exist. Without a name or a town the notice names nobody.
