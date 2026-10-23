@@ -318,6 +318,6 @@ export const en = {
   "blog.minutes": "min read",
   "blog.all": "All articles",
   "blog.imageAlt": "an article on Retama's blog",
-  "blog.rss": "Subscribe via RSS",
+  "blog.rss": "Using an RSS reader? Add this address:",
   "blog.talk": "Got a project on your hands? Tell us about it and we reply within a working day.",
 } satisfies Dictionary;

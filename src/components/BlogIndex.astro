@@ -12,6 +12,8 @@ interface Props {
 const { locale } = Astro.props;
 const copy = t(locale);
 const list = await articles(locale);
+// A browser shows the RSS as raw XML, so the index gives its address for a reader rather than a link to it.
+const feed = new URL(feedPath(locale), Astro.site ?? Astro.url.origin).href;
 ---
 
 <!-- DESIGN.md Layout, the blog: like the questions, the heading tile on the left and the articles on the right, newest
@@ -29,9 +31,11 @@ const list = await articles(locale);
       <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-5">
         <h1 class="text-balance type-headline-sm md:type-headline">{copy["blog.title"]}</h1>
         <p class="max-w-(--spacing-measure) type-statement-sm md:type-statement">{copy["blog.lead"]}</p>
-        <a class="feedback flex min-h-(--spacing-touch) w-fit items-center type-small text-on-surface-muted underline hover:text-on-surface" href={feedPath(locale)} type="application/rss+xml">
-          {copy["blog.rss"]}
-        </a>
+        <div class="grid gap-xs">
+          <p class="type-small text-on-surface-muted">{copy["blog.rss"]}</p>
+          <!-- One tap selects the whole address, on touch screens too, where the board's text is not selectable. -->
+          <p class="w-fit max-w-full bg-surface p-md type-small wrap-anywhere select-all" data-feed-address>{feed}</p>
+        </div>
       </div>
 
       <ul class="col-span-2 grid content-start gap-gap lg:col-span-7" aria-label={copy["blog.listLabel"]}>
