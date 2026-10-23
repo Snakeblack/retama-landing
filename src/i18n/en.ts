@@ -10,9 +10,11 @@ export const en = {
   "nav.services": "Services",
   "nav.sectors": "Sectors",
   "nav.method": "Method",
+  "nav.questions": "Questions",
   "anchor.services": "services",
   "anchor.sectors": "sectors",
   "anchor.method": "method",
+  "anchor.questions": "questions",
   "anchor.contact": "contact",
   "nav.talk": "Let's talk",
   "nav.index": "Contents",
@@ -160,6 +162,27 @@ export const en = {
   "live.agents.r2": "If something goes wrong, you know why and since when.",
   "live.agents.d3": "We measure the savings before we scale.",
   "live.agents.r3": "We only automate more of what has already given you hours back.",
+
+  "faq.title": "What clients ask us",
+  "faq.lead": "If your question is not here, write to us: we reply within one working day.",
+  "faq.q1": "How long does a project take?",
+  "faq.a1":
+    "It depends on what it is, its size and its complexity: a landing page takes weeks; a web application or custom software, months. The proposal sets the timeline in writing, and you get a delivery every one or two weeks, depending on the scope.",
+  "faq.q2": "How is it priced?",
+  "faq.a2":
+    "Made to measure, like the software. You can go in phases: a first MVP and, on top of it, a wider scope in short cycles, deciding at each one. Or fix the budget from the start, with the final delivery of what we propose.",
+  "faq.q3": "What is working remotely like?",
+  "faq.a3":
+    "We talk in short calls, with or without video, and what matters is written down. You get a tracking space for your project alone, where you see what we are working on, what we have decided and what comes next.",
+  "faq.q4": "Who owns the code?",
+  "faq.a4":
+    "You do, always. Once paid, the code, the documentation and the written decisions are yours: you can carry on with us or with anyone you like.",
+  "faq.q5": "What warranty do I get?",
+  "faq.a5":
+    "Six months from delivery, during which we fix any fault in what we have built at no cost. That is how long real use takes to bring out what testing does not. Changes and new features are quoted separately.",
+  "faq.q6": "And after delivery?",
+  "faq.a6":
+    "You can take out an optional monthly maintenance plan. If you would rather not, we handle what you need on request, at a somewhat higher cost that depends on its complexity.",
 
   "contact.title": "Let's talk",
   "contact.lead": "Write to us with whatever you have, even a half-formed idea. We reply with specific questions.",

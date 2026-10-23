@@ -14,9 +14,11 @@ interface Props {
   noindex?: boolean;
   /** The page's breadcrumb after the home page of its language, for the JSON-LD. */
   trail?: Crumb[];
+  /** The page holds the questions chapter, which the JSON-LD repeats as its FAQPage. */
+  questions?: boolean;
 }
 
-const { locale, title, description, noindex = false, trail } = Astro.props;
+const { locale, title, description, noindex = false, trail, questions = false } = Astro.props;
 const site = Astro.site ?? new URL(Astro.url.origin);
 // The browser chrome takes the page ground from the DESIGN.md tokens.
 const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
@@ -44,7 +46,7 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
           ))}
           <meta name="twitter:card" content="summary_large_image" />
           {/* A data block, never run: the CSP's script-src does not apply to it (ADR 0006). */}
-          <script type="application/ld+json" set:html={jsonLd(structuredData(site, locale, trail))} />
+          <script type="application/ld+json" set:html={jsonLd(structuredData(site, locale, trail, questions))} />
         </>
       )
     }

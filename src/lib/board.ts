@@ -45,3 +45,14 @@ export function whatsapp(number: string | undefined): { href: string; label: str
     label: `+${digits.slice(0, 2)} ${digits.slice(2).replace(/(\d{3})(?=\d)/g, "$1 ")}`,
   };
 }
+
+/** The questions chapter of the home, in order: each question with its answer, as i18n keys. The home shows them, and
+ * seo.ts repeats them as the FAQPage of the JSON-LD and in llms.txt, so the three always say the same. */
+export const questions = [
+  ["faq.q1", "faq.a1"],
+  ["faq.q2", "faq.a2"],
+  ["faq.q3", "faq.a3"],
+  ["faq.q4", "faq.a4"],
+  ["faq.q5", "faq.a5"],
+  ["faq.q6", "faq.a6"],
+] as const;

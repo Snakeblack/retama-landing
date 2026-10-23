@@ -9,6 +9,7 @@ import Contact from "./board/Contact.astro";
 import Footer from "./board/Footer.astro";
 import Hero from "./board/Hero.astro";
 import Method from "./board/Method.astro";
+import Questions from "./board/Questions.astro";
 import Sectors from "./board/Sectors.astro";
 import Services from "./board/Services.astro";
 
@@ -23,6 +24,7 @@ const chapters = (
     ["anchor.services", "nav.services", "services.title"],
     ["anchor.sectors", "nav.sectors", "sectors.title"],
     ["anchor.method", "nav.method", "method.title"],
+    ["anchor.questions", "nav.questions", "faq.title"],
   ] as const
 ).map(([anchor, name, title]) => ({ anchor: copy[anchor], name: copy[name], title: copy[title] }));
 
@@ -32,7 +34,7 @@ if (PUBLIC_BOOKING) Astro.csp?.insertDirective(bookingFrameDirective(bookingUrl)
 ---
 
 <!-- DESIGN.md Layout: the home is a sequence of chapters, 128px apart, more than any gap inside one. -->
-<Base locale={locale} title={copy["meta.title"]} description={copy["meta.description"]}>
+<Base locale={locale} title={copy["meta.title"]} description={copy["meta.description"]} questions>
   <!-- From md the links sit in the header; on phones the chapter index holds them. -->
   <nav slot="nav" class="hidden md:block" aria-label={copy["nav.label"]}>
     <ul class="flex gap-lg">
@@ -59,6 +61,7 @@ if (PUBLIC_BOOKING) Astro.csp?.insertDirective(bookingFrameDirective(bookingUrl)
     <Services locale={locale} />
     <Sectors locale={locale} />
     <Method locale={locale} />
+    <Questions locale={locale} />
     <Contact locale={locale} />
   </div>
   <Footer slot="footer" locale={locale} />

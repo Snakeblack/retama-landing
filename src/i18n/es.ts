@@ -8,9 +8,11 @@ export const es = {
   "nav.services": "Servicios",
   "nav.sectors": "Sectores",
   "nav.method": "Método",
+  "nav.questions": "Preguntas",
   "anchor.services": "servicios",
   "anchor.sectors": "sectores",
   "anchor.method": "metodo",
+  "anchor.questions": "preguntas",
   "anchor.contact": "contacto",
   "nav.talk": "Hablemos",
   "nav.index": "Índice",
@@ -159,6 +161,27 @@ export const es = {
   "live.agents.r2": "Si algo sale mal, se sabe por qué y desde cuándo.",
   "live.agents.d3": "Medimos el ahorro antes de ampliar.",
   "live.agents.r3": "Solo automatizamos más lo que ya te ha devuelto horas.",
+
+  "faq.title": "Lo que nos preguntan",
+  "faq.lead": "Si tu duda no está aquí, escríbenos: te respondemos en un día laborable.",
+  "faq.q1": "¿Cuánto tarda un proyecto?",
+  "faq.a1":
+    "Depende de qué sea, de su tamaño y de su complejidad: una landing page se cuenta en semanas; una aplicación web o un software a medida, en meses. La propuesta fija el plazo por escrito, y recibes una entrega cada una o dos semanas, según el alcance.",
+  "faq.q2": "¿Cómo se presupuesta?",
+  "faq.a2":
+    "A medida, como el software. Puedes ir por fases: un primer MVP y, sobre él, ampliar el alcance en ciclos cortos, decidiendo en cada uno. O cerrar el presupuesto desde el principio, con la entrega final de lo que proponemos.",
+  "faq.q3": "¿Cómo es trabajar en remoto?",
+  "faq.a3":
+    "Hablamos en llamadas cortas, con vídeo o sin él, y lo importante queda por escrito. Tienes un espacio de seguimiento solo para tu proyecto, donde ves en qué estamos, lo que hemos decidido y lo que viene.",
+  "faq.q4": "¿De quién es el código?",
+  "faq.a4":
+    "Tuyo, siempre. Al pagar, el código, la documentación y las decisiones escritas pasan a ser tuyos: puedes seguir con nosotros o con quien quieras.",
+  "faq.q5": "¿Qué garantía tengo?",
+  "faq.a5":
+    "Seis meses desde la entrega, en los que corregimos sin coste cualquier fallo de lo que hemos construido. Es el tiempo que tarda el uso real en sacar lo que las pruebas no ven. Los cambios y las funciones nuevas se presupuestan aparte.",
+  "faq.q6": "¿Y después de la entrega?",
+  "faq.a6":
+    "Puedes contratar un mantenimiento mensual, opcional. Si prefieres no tenerlo, atendemos lo que necesites bajo petición, con un coste algo más alto que depende de su complejidad.",
 
   "contact.title": "Hablemos",
   "contact.lead": "Escríbenos con lo que tengas, aunque sea una idea a medias. Te contestamos con preguntas concretas.",

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { en } from "../../src/i18n/en";
 import { es } from "../../src/i18n/es";
+import { questions } from "../../src/lib/board";
 import {
   alternates,
   type Crumb,
@@ -84,6 +85,27 @@ describe("structuredData", () => {
     });
   });
 
+  it("repite las preguntas de la portada como FAQPage, con el texto de la página, solo cuando la página las tiene", () => {
+    expect(node(graph(), "FAQPage")).toBeUndefined();
+    const faq = node(structuredData(site, "es", [], true)["@graph"] as Record<string, unknown>[], "FAQPage");
+    expect(faq).toMatchObject({
+      "@type": "FAQPage",
+      "@id": "https://retama.example/#preguntas",
+      url: "https://retama.example/#preguntas",
+      inLanguage: "es",
+      isPartOf: { "@id": "https://retama.example/#website" },
+    });
+    const entities = faq?.mainEntity as { name: string; acceptedAnswer: { "@type": string; text: string } }[];
+    expect(entities).toHaveLength(questions.length);
+    questions.forEach(([question, answer], index) => {
+      expect(entities[index]).toEqual({
+        "@type": "Question",
+        name: es[question],
+        acceptedAnswer: { "@type": "Answer", text: es[answer] },
+      });
+    });
+  });
+
   it("añade la miga de pan desde el inicio del idioma solo cuando la página la da", () => {
     expect(node(graph(), "BreadcrumbList")).toBeUndefined();
     expect(node(graph([{ name: "Legal information", path: "/en/legal/" }]), "BreadcrumbList")).toEqual({
@@ -130,6 +152,12 @@ describe("llmsTxt", () => {
     expect(text).toContain("hola@retama.dev");
     for (const key of ["services.web", "services.custom", "services.agents", "services.seo"] as const)
       expect(text).toContain(en[key]);
+  });
+
+  it("responde las preguntas de la portada, cada una enlazada a su capítulo", () => {
+    expect(text).toMatch(/^## Questions$/m);
+    for (const [question, answer] of questions)
+      expect(text).toContain(`- [${en[question]}](https://retama.example/en/#questions): ${en[answer]}`);
   });
 });
 

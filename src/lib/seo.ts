@@ -1,5 +1,5 @@
 import { defaultLocale, type Locale, locales, localizedPath, pathWithoutLocale, t } from "../i18n/index";
-import { contactEmail } from "./board";
+import { contactEmail, questions } from "./board";
 
 export interface Alternate {
   hreflang: string;
@@ -59,9 +59,15 @@ export interface Crumb {
 
 const services = ["services.web", "services.custom", "services.agents", "services.seo"] as const;
 
-/** The JSON-LD of a page: Retama, the site and, when the page gives a trail, its breadcrumb. Only data that exists: no
- * company yet, so no address, tax ID or founder, and no profiles or service area until the owner has them. */
-export function structuredData(site: URL, locale: Locale, trail: Crumb[] = []): Record<string, unknown> {
+/** The JSON-LD of a page: Retama, the site, when the page gives a trail its breadcrumb and, when it holds the questions
+ * chapter, its FAQPage. Only data that exists: no company yet, so no address, tax ID or founder, and no profiles or
+ * service area until the owner has them. */
+export function structuredData(
+  site: URL,
+  locale: Locale,
+  trail: Crumb[] = [],
+  withQuestions = false,
+): Record<string, unknown> {
   const copy = t(locale);
   const home = new URL("/", site).href;
   const organization = `${home}#organization`;
@@ -105,6 +111,22 @@ export function structuredData(site: URL, locale: Locale, trail: Crumb[] = []): 
       })),
     });
   }
+  if (withQuestions) {
+    // The answers are the chapter's own text, word for word, as search engines ask of a FAQPage.
+    const chapter = `${new URL(localizedPath(locale, "/"), site).href}#${copy["anchor.questions"]}`;
+    graph.push({
+      "@type": "FAQPage",
+      "@id": chapter,
+      url: chapter,
+      inLanguage: locale,
+      isPartOf: { "@id": `${home}#website` },
+      mainEntity: questions.map(([question, answer]) => ({
+        "@type": "Question",
+        name: copy[question],
+        acceptedAnswer: { "@type": "Answer", text: copy[answer] },
+      })),
+    });
+  }
   return { "@context": "https://schema.org", "@graph": graph };
 }
 
@@ -132,6 +154,12 @@ export function llmsTxt(site: URL): string {
     "## Services",
     "",
     ...services.map((key) => `- ${copy[key]}: ${copy[`${key}Line`]}`),
+    "",
+    "## Questions",
+    "",
+    ...questions.map(
+      ([question, answer]) => `- [${copy[question]}](${url("en", "/")}#${copy["anchor.questions"]}): ${copy[answer]}`,
+    ),
     "",
     "## Pages",
     "",
