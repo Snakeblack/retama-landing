@@ -10,3 +10,11 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
+
+# Workers static assets serves .txt as text/plain with no charset; both files are UTF-8 (llms.txt says «Información»).
+# These rules only add the charset: the /* block above still applies to them.
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
