@@ -58,15 +58,18 @@ function wordmark(theme) {
 const px = (value) => Number.parseFloat(value);
 const el = (type, style, children) => ({ type, props: { style, children } });
 
-/** The card as Satori elements: the bar, the wordmark, the two-tone title and the lead over the retama. */
-export function ogCard(copy, theme) {
-  const type = (level) => ({
-    fontFamily: "Stack Sans Headline",
-    fontWeight: 300,
-    fontSize: px(theme[`text-${level}`]),
-    lineHeight: Number(theme[`leading-${level}`]),
-    letterSpacing: `${theme[`tracking-${level}`]}`,
-  });
+// Each type level as Satori style, from the theme.
+const typeStyle = (theme, level) => ({
+  fontFamily: "Stack Sans Headline",
+  fontWeight: 300,
+  fontSize: px(theme[`text-${level}`]),
+  lineHeight: Number(theme[`leading-${level}`]),
+  letterSpacing: `${theme[`tracking-${level}`]}`,
+});
+
+/** The frame both cards share: the graphite ground with the retama on the right edge, the bar across the top, the
+ * wordmark at the top left and the card's text at the bottom left. */
+function frame(theme, text) {
   const wordmarkSize = 44;
   return el(
     "div",
@@ -104,32 +107,77 @@ export function ogCard(copy, theme) {
             type: "img",
             props: { src: wordmark(theme), width: wordmarkSize * 3.391, height: wordmarkSize * 0.716 },
           },
-          el("div", { display: "flex", flexDirection: "column" }, [
-            el("div", { ...type("display"), marginLeft: -px(theme["spacing-xs"]) }, copy["hero.word"]),
-            el("div", { ...type("headline"), color: theme["color-primary"] }, copy["hero.rest"]),
-            el(
-              "div",
-              {
-                ...type("statement"),
-                maxWidth: px(theme["spacing-measure"]),
-                textWrap: "balance",
-                marginTop: px(theme["spacing-lg"]),
-              },
-              copy["hero.lead"],
-            ),
-          ]),
+          el("div", { display: "flex", flexDirection: "column" }, text),
         ],
       ),
     ],
   );
 }
 
-/** The PNG of a language's card. */
-export async function ogImage(copy, theme) {
-  const image = await satori(ogCard(copy, theme), {
+/** The card of a language as Satori elements: the two-tone title and the lead over the retama. */
+export function ogCard(copy, theme) {
+  return frame(theme, [
+    el("div", { ...typeStyle(theme, "display"), marginLeft: -px(theme["spacing-xs"]) }, copy["hero.word"]),
+    el("div", { ...typeStyle(theme, "headline"), color: theme["color-primary"] }, copy["hero.rest"]),
+    el(
+      "div",
+      {
+        ...typeStyle(theme, "statement"),
+        maxWidth: px(theme["spacing-measure"]),
+        textWrap: "balance",
+        marginTop: px(theme["spacing-lg"]),
+      },
+      copy["hero.lead"],
+    ),
+  ]);
+}
+
+/** The card of an article (owner, 2026-10-23): "Blog" in muted ink over its title at headline size, which holds two
+ * lines at most (src/lib/blog.ts, TITLE_MAX), clear of the retama. */
+export function ogArticleCard(title, copy, theme) {
+  return frame(theme, [
+    el(
+      "div",
+      {
+        ...typeStyle(theme, "statement"),
+        color: theme["color-on-surface-muted"],
+        marginBottom: px(theme["spacing-md"]),
+      },
+      copy["nav.blog"],
+    ),
+    el(
+      "div",
+      { ...typeStyle(theme, "headline"), maxWidth: px(theme["spacing-measure"]) * 1.15, textWrap: "balance" },
+      title,
+    ),
+  ]);
+}
+
+async function png(card) {
+  const image = await satori(card, {
     width: WIDTH,
     height: HEIGHT,
     fonts: [{ name: "Stack Sans Headline", data: headline, weight: 300, style: "normal" }],
   });
   return sharp(Buffer.from(image)).png().toBuffer();
+}
+
+/** The PNG of a language's card. */
+export function ogImage(copy, theme) {
+  return png(ogCard(copy, theme));
+}
+
+/** The PNG of an article's card. */
+export function ogArticleImage(title, copy, theme) {
+  return png(ogArticleCard(title, copy, theme));
+}
+
+/** The BlogPosting of a built page, from its JSON-LD (src/lib/seo.ts, structuredData): its headline, language and
+ * image, which postbuild draws. */
+export function blogPostings(html) {
+  return [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].flatMap(([, json]) =>
+    (JSON.parse(json)["@graph"] ?? [])
+      .filter((node) => node["@type"] === "BlogPosting")
+      .map(({ headline, inLanguage, image }) => ({ headline, inLanguage, image })),
+  );
 }

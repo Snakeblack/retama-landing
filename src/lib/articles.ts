@@ -1,6 +1,7 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 import type { Locale } from "../i18n/index";
-import { checkArticles, entryLocale, entrySlug, newestFirst, translations } from "./blog";
+import { articlePath, checkArticles, entryLocale, entrySlug, newestFirst, translations } from "./blog";
+import type { FeedItem } from "./feed";
 
 export type ArticleEntryOf = CollectionEntry<"blog">;
 
@@ -22,4 +23,15 @@ export async function articles(locale: Locale): Promise<LocalArticle[]> {
     if (!group) throw new Error(`${entry.id}: no translations`);
     return { entry, slug: entrySlug(entry.id), paths: translations(group) };
   });
+}
+
+/** The articles of a language as summaries, for the RSS and llms.txt: no body. */
+export async function articleSummaries(locale: Locale): Promise<(FeedItem & { locale: Locale })[]> {
+  return (await articles(locale)).map(({ entry, slug }) => ({
+    locale,
+    title: entry.data.title,
+    description: entry.data.description,
+    published: entry.data.published,
+    path: articlePath(locale, slug),
+  }));
 }

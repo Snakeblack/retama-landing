@@ -317,5 +317,7 @@ export const en = {
   "blog.updated": "Updated on",
   "blog.minutes": "min read",
   "blog.all": "All articles",
+  "blog.imageAlt": "an article on Retama's blog",
+  "blog.rss": "Subscribe via RSS",
   "blog.talk": "Got a project on your hands? Tell us about it and we reply within a working day.",
 } satisfies Dictionary;

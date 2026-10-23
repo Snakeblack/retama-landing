@@ -28,6 +28,17 @@ export function articlePath(locale: Locale, slug?: string): string {
   return localizedPath(locale, slug ? `/blog/${slug}/` : "/blog/");
 }
 
+/** The RSS of a language's blog, beside its index. */
+export function feedPath(locale: Locale): string {
+  return `${articlePath(locale)}rss.xml`;
+}
+
+/** The Open Graph image of an article, drawn at build time by scripts/postbuild.mjs; under its language's folder,
+ * since two languages may share a slug. */
+export function ogImagePath(locale: Locale, slug: string): string {
+  return `/og/${locale}/${slug}.png`;
+}
+
 /** The articles grouped by their key, one per language. The build fails, listing every problem at once, when an
  * article is missing in a language (ADR 0008), a language has its key twice, a title would run past two lines, the
  * update predates the publication, or the body holds code: DESIGN.md has no monospace for it, and the highlighter

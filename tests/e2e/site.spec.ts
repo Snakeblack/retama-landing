@@ -189,7 +189,10 @@ test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga 
   }
 });
 
-test("Open Graph con la imagen de su idioma en todas las páginas del sitemap", async ({ page, request }) => {
+test("Open Graph con la imagen de su idioma, o la suya en los artículos, en todas las páginas del sitemap", async ({
+  page,
+  request,
+}) => {
   for (const url of await sitemapUrls(request)) {
     await page.goto(new URL(url).pathname);
     const lang = (await page.locator("html").getAttribute("lang")) ?? "";
@@ -200,8 +203,10 @@ test("Open Graph con la imagen de su idioma en todas las páginas del sitemap", 
     expect(await og("og:image:alt"), url).toBeTruthy();
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
 
+    // An article has its own, named after its slug under its language's folder (src/lib/blog.ts, ogImagePath).
     const image = await og("og:image");
-    expect(image, url).toBe(new URL(`/og/${lang}.png`, url).href);
+    const slug = new URL(url).pathname.match(/\/blog\/([^/]+)\/$/)?.[1];
+    expect(image, url).toBe(new URL(slug ? `/og/${lang}/${slug}.png` : `/og/${lang}.png`, url).href);
     const response = await request.get(new URL(image ?? "").pathname);
     expect(response.status(), image ?? "").toBe(200);
     expect(response.headers()["content-type"]).toBe("image/png");

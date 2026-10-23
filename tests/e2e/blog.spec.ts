@@ -121,3 +121,51 @@ for (const { lang, home, index, article, other, talk, contact } of blogs) {
     await expect(page).toHaveURL(new RegExp(`${index}$`));
   });
 }
+
+for (const { lang, index, article, headline } of blogs) {
+  const feed = `${index}rss.xml`;
+
+  test(`${feed} da los artículos de su idioma con su resumen y su enlace`, async ({ request, baseURL }) => {
+    const response = await request.get(feed);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("xml");
+    const xml = await response.text();
+    expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
+    expect(xml).toContain(`<language>${lang}</language>`);
+    expect(xml).toMatch(new RegExp(`<atom:link href="[^"]+${feed}" rel="self"`));
+    expect(xml.match(/<item>/g)).toHaveLength(2);
+    const origin = xml.match(/<link>(https?:\/\/[^/]+)\//)?.[1] ?? baseURL;
+    expect(xml).toContain(`<title>${headline}</title>`);
+    expect(xml).toContain(`<link>${origin}${article}</link>`);
+    // A summary, not the text: no article body in the feed.
+    expect(xml).not.toContain("<content:encoded>");
+  });
+
+  test(`el índice y los artículos de ${index} anuncian su RSS, y el índice lo enlaza`, async ({ page }) => {
+    for (const path of [index, article]) {
+      await page.goto(path);
+      await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", feed);
+    }
+    await page.goto(index);
+    await expect(page.getByRole("main").locator(`a[href="${feed}"]`)).toBeVisible();
+    await page.goto(index.replace("blog/", ""));
+    await expect(page.locator('link[type="application/rss+xml"]')).toHaveCount(0);
+  });
+
+  test(`${article} declara su propia imagen Open Graph, con su título en el texto alternativo`, async ({
+    page,
+    request,
+  }) => {
+    await page.goto(article);
+    const image = (await page.locator('meta[property="og:image"]').getAttribute("content")) ?? "";
+    const slug = article.split("/").filter(Boolean).pop();
+    expect(new URL(image).pathname).toBe(`/og/${lang}/${slug}.png`);
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      "content",
+      new RegExp(`^${headline}, `),
+    );
+    const response = await request.get(new URL(image).pathname);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe("image/png");
+  });
+}
