@@ -23,7 +23,8 @@ const dates = [
 ---
 
 <!-- DESIGN.md Layout, the article: the title and its lead on the left with the dates beside them, then the body held to
-     measure on the left and the way to the contact on the right, which stays in view while the body scrolls. -->
+     measure on the left and the way to the contact on the right, which stays in view while the body scrolls. Unlike the
+     board, an article is read and quoted, so its text stays selectable on touch screens (global.css). -->
 <Base
   locale={locale}
   title={`${title} · Retama`}
@@ -43,7 +44,7 @@ const dates = [
   }}
   feed={feedPath(locale)}
 >
-  <article class="mt-(--header-height) grid grid-cols-2 gap-gap px-margin pt-xl lg:grid-cols-12" aria-labelledby="article-title" data-grounds>
+  <article class="mt-(--header-height) grid grid-cols-2 gap-gap px-margin pt-xl lg:grid-cols-12" aria-labelledby="article-title" data-grounds data-selectable>
     <header class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-8">
       <h1 id="article-title" class="text-balance type-headline-sm md:type-headline">{title}</h1>
       <p class="max-w-(--spacing-measure) type-statement-sm md:type-statement">{description}</p>
