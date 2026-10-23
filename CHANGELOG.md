@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.0](https://github.com/Snakeblack/retama-landing/compare/v0.2.0...v0.3.0) (2026-10-23)
+
+
+### Features
+
+* **contact:** show hola@retama.dev as the contact address ([754f684](https://github.com/Snakeblack/retama-landing/commit/754f684fdfc5bcb8071d02d7830c93bd53314750))
+* **contact:** take the WhatsApp number from the build environment ([e9cd4d0](https://github.com/Snakeblack/retama-landing/commit/e9cd4d04c87550161e8febe0ebaeb4ee3df19767))
+* **home:** answer common questions in a chapter of their own ([65164fd](https://github.com/Snakeblack/retama-landing/commit/65164fd8c52323a5fa38592921ccb1b1000d3ea0))
+* **legal:** publish the legal notice, privacy and cookie policies ([683a7ea](https://github.com/Snakeblack/retama-landing/commit/683a7eaf25c5693f4108110fbb2be339e2836866))
+* **legal:** take the site owner from the build environment ([b5238c2](https://github.com/Snakeblack/retama-landing/commit/b5238c27c4490f826d1a23509dca8e89b6a1c60e))
+* **seo:** describe Retama in JSON-LD on every indexable page ([1672b73](https://github.com/Snakeblack/retama-landing/commit/1672b73988cfec564ce7b3d65b27fb829aa94109))
+* **seo:** draw an Open Graph image per language at build time ([eef74b1](https://github.com/Snakeblack/retama-landing/commit/eef74b1b0b70ba48cd75943a3ff04e0862295266))
+* **seo:** serve robots.txt and llms.txt built with the site origin ([7b9ed1f](https://github.com/Snakeblack/retama-landing/commit/7b9ed1f63992eb7f18cf14ee4f5208f9cce7e4ca))
+
+
+### Bug Fixes
+
+* **headers:** serve robots.txt and llms.txt as UTF-8 ([e2c8231](https://github.com/Snakeblack/retama-landing/commit/e2c823120b3559f178c4e2ceb2561f4ac8218756))
+
 ## [0.2.0](https://github.com/Snakeblack/retama-landing/compare/v0.1.0...v0.2.0) (2026-10-22)
 
 
