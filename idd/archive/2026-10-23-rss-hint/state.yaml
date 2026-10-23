@@ -1,0 +1,296 @@
+{
+  "schema": "idd-state/v1",
+  "change": "rss-hint",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "el 1 (opción 1: explicar en vez de enlazar: una línea «¿Usas un lector de RSS? Añade esta dirección:» con la URL del feed visible y fácil de copiar; se mantiene el link rel=alternate del head)",
+    "kind": "feature",
+    "summary": "El índice del blog explica el RSS en vez de enlazar al XML: una línea para quien usa un lector y la dirección absoluta del feed visible y fácil de copiar",
+    "acceptance": "En /blog/ y /en/blog/ no hay ningún enlace al rss.xml; el tile del índice dice cómo usar el RSS y muestra la URL absoluta del feed de su idioma, que se selecciona entera de un toque también en pantallas táctiles; el head sigue anunciando el feed"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/blog.ts",
+          "line": 32
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/feed.ts",
+          "line": 14
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "request",
+          "text": "«¿Usas un lector de RSS? Añade esta dirección:»"
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "request",
+          "text": "se mantiene el link rel=alternate del head"
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "request",
+          "text": "con la URL del feed visible y fácil de copiar"
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0001-static-first-with-islands.md",
+          "line": 20
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/BlogIndex.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "tests/e2e/blog.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The address and its line are static HTML; selecting it whole is CSS (user-select: all), with no script"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "The address is a row on the field's graphite with small type, from the tokens; DESIGN.md describes it and design:lint passes"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Each language shows its own feed's address and the line has the same key in es.ts and en.ts"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T17:22:05.718Z",
+      "detail": {
+        "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-23T17:22:05.718Z",
+      "detail": {
+        "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/blog.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T17:22:05.718Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    }
+  ],
+  "base": "39731add5cbc5807e730f5ec8d1f2a912bd88152",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:014d7e3b9de04b6e7746171ad93cb5fe63e05738922b6e04002be1545c98206d",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:80c6cf620f23668af899ea3488688fed3d37b5b00dc973b78cc812002fb7eba7",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:15987df45089581578b79ca37758a5475ff08954c599d1eb3496714ed70ca68b",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:b6c8f6788736e9ac83e994756692e192fad6f8e022ae665619da74d9298987f1",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:9f498240a61c28f1ba7786179b9b167d96fbf50c932f1bdad68444388469bd5f",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:d11c54746ff971384ee6011cc812e2ccbddba1cdda2a548319993647a315ff90",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:d829dbd6efd05ee922d84c67205c2640640053f3bbc29c4b8b0c8f653b61f9a1",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:ed139b9cf3913fd25e3442901a3516881dec85613b47e3450646408a427a1b52",
+      "tree": "sha256:b111e1b96958a6f0b11f2e4c4cfd154f0bb867b3209a7a1056f342d6ee85818b",
+      "recorded_at": "2026-10-23T17:22:05.718Z"
+    }
+  ],
+  "closed_at": "2026-10-23T17:22:10.717Z"
+}
