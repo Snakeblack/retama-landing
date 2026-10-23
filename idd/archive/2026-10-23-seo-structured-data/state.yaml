@@ -1,0 +1,342 @@
+{
+  "schema": "idd-state/v1",
+  "change": "seo-structured-data",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "Siguiente en M4, en otra sesión: JSON-LD con robots.txt y llms.txt.",
+    "kind": "feature",
+    "summary": "JSON-LD (Organization, ProfessionalService, WebSite, BreadcrumbList) on the pages of both locales, a robots.txt that admits AI crawlers and points to the sitemap, and an llms.txt",
+    "acceptance": "Every indexable page in es and en carries valid JSON-LD for Retama and the site, with no data that does not exist (no address, no NIF); the legal pages carry a BreadcrumbList; /robots.txt allows every crawler, AI crawlers included, and names the sitemap of the build's site; /llms.txt follows llmstxt.org and links the pages; the CSP stays without unsafe-inline and Lighthouse stays at 100"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "Which areaServed value: the country ES, ES plus the EU, or none (worldwide, remote)?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "Which identity does the JSON-LD give: the brand Retama alone, or with the owner (a natural person) as founder; and which sameAs profile URLs (LinkedIn, GitHub), if any?"
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 3
+        }
+      },
+      {
+        "category": "copy",
+        "question": "Which language for llms.txt: one file in English (en) linking both locales, one in Spanish (es), or one per locale (/llms.txt and /en/llms.txt)?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/seo.ts",
+          "line": 13
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "src/layouts/Base.astro",
+          "line": 29
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "astro.config.mjs",
+          "line": 10
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "src/components/Legal.astro",
+      "src/layouts/Base.astro",
+      "src/lib/seo.ts",
+      "src/pages/llms.txt.ts",
+      "src/pages/robots.txt.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/seo.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0006, 0007, 0008 and quality scenario perf-mobile, privacy-security, seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "JSON-LD, robots.txt and llms.txt are static build output; no text depends on JS"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "The JSON-LD is a data block that never runs, so script-src does not apply and the CSP gains no hash nor unsafe-inline; '<' is escaped so no text closes the script"
+    },
+    {
+      "kind": "adr",
+      "id": "0007",
+      "impact": "none",
+      "reason": "No tracking or third party is added; robots.txt and llms.txt are plain files of the own origin"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "JSON-LD names the page's locale copy and the breadcrumb starts at the home page of that locale; llms.txt links both locales"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "About 1.5 KB of inline JSON per page, no script to run and no request"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "No personal data: the brand only, without the owner's name; the CSP is unchanged"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Adds the structured data of the organization and its services the scenario asks for, plus robots.txt with the sitemap and llms.txt"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "areaServed: Ninguna (no se declara). Identidad: solo la marca Retama (nombre, URL, logo, hola@retama.dev), sin founder. sameAs: ninguno todavía. llms.txt: uno en inglés en /llms.txt que enlaza es y en.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T07:12:26.652Z",
+      "detail": {
+        "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T07:12:26.652Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0006 conforms",
+          "adr:0007 none",
+          "adr:0008 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-23T07:14:14.485Z"
+    }
+  ],
+  "base": "4f0521beecd498a3b1e6233dee96917a3062d5ba",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:a397378c3f993cdb5cf8f48d0b3aacd372bd596c005b41290f609176a8c75758",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:ccaf6f7175cba370f8f412f78dbff24067881d666aca5e94cd5c74dca6469ef1",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:109f2e3e257955ff3a633719978006398195411df400af21389c08fcfd2ffd25",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:08bbecb7e96c06dcf75528ee0f104490bea03847bc687776b7c311026503f5c4",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:0486615e5c9bccd918ba9ae8734755e3ec973da3aca9364654995262078c8d7d",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:c7a08cc48c948240e8039717c761de6e17ec4e330fe6eea5c06af3c5c2aede26",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:063550e786867adcabc1aa88cf41f2762aa2ce6b8532039a09273ec51c33f9a2",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:2d3e562aa96203c5786fbb0df3894f9f62a4a1a0b997350dbf4663ce67625c7a",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:8cf7c98241c960094abbce48c930e2eddc3eaf9c0c4f6fb74750d95a64e7a3ba",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:fe102604f6474edce3b6d2103a4f6bdef1cae42b99ad7a5c7f6e4bdbe3162d78",
+      "tree": "sha256:9b48cd0234b08c8504bdfac59d981c472147972f0490ee425418568804f5eb47",
+      "recorded_at": "2026-10-23T07:12:26.652Z"
+    }
+  ],
+  "assumptions": [
+    "ProfessionalService carries no address: the owner has no registered address yet (no-legal-entity); Google's local-business rich result is not a goal",
+    "BreadcrumbList only on the legal pages: the home page is the root, and a one-item trail adds nothing",
+    "robots.txt admits every crawler, AI training and search crawlers alike, as the roadmap's M4 item says",
+    "The Organization logo is the existing /favicon.svg until the OG images change brings a raster mark"
+  ],
+  "closed_at": "2026-10-23T07:14:14.485Z"
+}
