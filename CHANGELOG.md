@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/Snakeblack/retama-landing/compare/v0.3.0...v0.4.0) (2026-10-23)
+
+
+### Features
+
+* **blog:** offer an RSS per language and an image per article ([f3ba8c7](https://github.com/Snakeblack/retama-landing/commit/f3ba8c7e756ca33ecca22e116ebe70591d71a136))
+* **blog:** publish articles per language with their own SEO ([90eff44](https://github.com/Snakeblack/retama-landing/commit/90eff446432071fcd53774284ce709526965afb4))
+
+
+### Bug Fixes
+
+* **blog:** give the RSS address instead of linking to raw XML ([44441ef](https://github.com/Snakeblack/retama-landing/commit/44441ef6e7552a13d85ccc641f5de18db4229ffd))
+* **blog:** let readers select an article's text on touch screens ([6b4601d](https://github.com/Snakeblack/retama-landing/commit/6b4601d922925df4b0528274030ad79a511904d5))
+
 ## [0.3.0](https://github.com/Snakeblack/retama-landing/compare/v0.2.0...v0.3.0) (2026-10-23)
 
 
