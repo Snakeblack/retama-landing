@@ -51,6 +51,18 @@ plataforma → `wrangler`, `workers-best-practices`, `turnstile-spin`. La accesi
 | `pnpm preview` | Build servido por workerd con `_headers` |
 | `pnpm lint` / `pnpm typecheck` / `pnpm test` / `pnpm test:e2e` | Puertas de calidad |
 | `pnpm design:lint` / `pnpm design:theme` | Lint de DESIGN.md con contraste y sincronía del tema / regenerarlo |
+| `pnpm pr:merge <n>` | Fusiona un PR por el procedimiento (abajo); `--dry-run` solo comprueba |
+
+## Fusionar PRs
+
+Cada PR se fusiona con `pnpm pr:merge <n>` (`scripts/merge-pr.mjs`), uno a uno, nunca con `gh pr merge` a mano. El
+script se niega si el PR no está abierto, tiene conflictos, está por detrás de su base (da la orden
+`gh pr update-branch <n> --rebase`) o tiene algún check pendiente o en rojo sobre su último commit. Un check en rojo que
+no es obligatorio, como el Workers Builds de la rama de release-please, solo pasa si se nombra con
+`--allow-failing "<check>"`. Fusiona con rebase atado a ese commit, comprueba que GitHub lo da por fusionado y solo
+entonces borra la rama remota y la local, si `git cherry` encuentra todos sus commits en la base. Con varios PRs
+pendientes, primero los de funcionalidad y al final el de release-please; un PR encadenado se fusiona en su padre y
+después el padre en `main`.
 
 Los cambios de código siguen IDD (`idd/config.yaml`). Commits en Conventional Commits, sin atribución a
 herramientas.

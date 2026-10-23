@@ -19,7 +19,8 @@
     "serve:dist": "wrangler dev -c dist/server/wrangler.json",
     "design:theme": "node scripts/design-check.mjs --write",
     "design:lint": "node scripts/design-check.mjs",
-    "skills:scan": "node scripts/skills-scan.mjs"
+    "skills:scan": "node scripts/skills-scan.mjs",
+    "pr:merge": "node scripts/merge-pr.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.4.1",
