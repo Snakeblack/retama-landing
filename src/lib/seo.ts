@@ -28,6 +28,8 @@ export interface Article {
   updated?: Date | undefined;
   /** Its path in the page's language. */
   path: string;
+  /** The path of its own Open Graph image (src/lib/blog.ts, ogImagePath). */
+  image: string;
 }
 
 const isoDate = (date: Date) => date.toISOString().slice(0, 10);
@@ -35,8 +37,8 @@ const isoDate = (date: Date) => date.toISOString().slice(0, 10);
 // Open Graph wants a territory with the language: Spain for Spanish, the international default for English.
 const ogLocales: Record<Locale, string> = { es: "es_ES", en: "en_US" };
 
-/** The Open Graph tags of an indexable page, as [property, content]. The image is its language's, drawn at build time
- * by scripts/postbuild.mjs into og/<locale>.png at 1200×630; an article shares it until blog-feed draws its own. */
+/** The Open Graph tags of an indexable page, as [property, content]. The image, 1200×630 and drawn at build time by
+ * scripts/postbuild.mjs, is its language's (og/<locale>.png), or an article's own, named after it. */
 export function openGraph(
   site: URL,
   locale: Locale,
@@ -61,11 +63,11 @@ export function openGraph(
     ...locales
       .filter((other) => other !== locale)
       .map((other): [string, string] => ["og:locale:alternate", ogLocales[other]]),
-    ["og:image", new URL(`/og/${locale}.png`, site).href],
+    ["og:image", new URL(article?.image ?? `/og/${locale}.png`, site).href],
     ["og:image:type", "image/png"],
     ["og:image:width", "1200"],
     ["og:image:height", "630"],
-    ["og:image:alt", t(locale)["og.imageAlt"]],
+    ["og:image:alt", article ? `${article.headline}, ${t(locale)["blog.imageAlt"]}` : t(locale)["og.imageAlt"]],
     ...dates,
   ];
 }
@@ -159,7 +161,7 @@ export function structuredData(
       inLanguage: locale,
       datePublished: isoDate(article.published),
       dateModified: isoDate(article.updated ?? article.published),
-      image: new URL(`/og/${locale}.png`, site).href,
+      image: new URL(article.image, site).href,
       author: { "@id": organization },
       publisher: { "@id": organization },
       isPartOf: { "@id": `${home}#website` },

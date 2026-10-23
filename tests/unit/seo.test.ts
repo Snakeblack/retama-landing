@@ -135,11 +135,12 @@ describe("structuredData de un artículo", () => {
     description: "What drives the cost.",
     published: new Date("2026-10-23"),
     path: "/en/blog/what-it-costs/",
+    image: "/og/en/what-it-costs.png",
   };
   const nodes = (item?: Article) => structuredData(site, "en", [], false, item)["@graph"] as Record<string, unknown>[];
   const posting = (item?: Article) => nodes(item).find((node) => node["@type"] === "BlogPosting");
 
-  it("lo describe como BlogPosting de Retama, en su idioma y con la imagen del idioma", () => {
+  it("lo describe como BlogPosting de Retama, en su idioma y con su propia imagen", () => {
     expect(posting()).toBeUndefined();
     expect(posting(article)).toEqual({
       "@type": "BlogPosting",
@@ -151,7 +152,7 @@ describe("structuredData de un artículo", () => {
       inLanguage: "en",
       datePublished: "2026-10-23",
       dateModified: "2026-10-23",
-      image: "https://retama.example/og/en.png",
+      image: "https://retama.example/og/en/what-it-costs.png",
       author: { "@id": "https://retama.example/#organization" },
       publisher: { "@id": "https://retama.example/#organization" },
       isPartOf: { "@id": "https://retama.example/#website" },
@@ -246,8 +247,12 @@ describe("openGraph", () => {
       published: new Date("2026-10-23"),
       updated: new Date("2026-11-02"),
       path: "/en/blog/a/",
+      image: "/og/en/a.png",
     });
     expect(new Map(tags).get("og:type")).toBe("article");
+    // Its own image, named after it.
+    expect(new Map(tags).get("og:image")).toBe("https://retama.example/og/en/a.png");
+    expect(new Map(tags).get("og:image:alt")).toBe(`A, ${en["blog.imageAlt"]}`);
     expect(tags).toContainEqual(["article:published_time", "2026-10-23"]);
     expect(tags).toContainEqual(["article:modified_time", "2026-11-02"]);
     expect(tags.filter(([property]) => property === "og:type")).toHaveLength(1);

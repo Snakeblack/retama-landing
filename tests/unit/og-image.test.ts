@@ -1,7 +1,14 @@
 import { readFileSync } from "node:fs";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
-import { ogCard, ogImage, themeTokens } from "../../scripts/lib/og-image.mjs";
+import {
+  blogPostings,
+  ogArticleCard,
+  ogArticleImage,
+  ogCard,
+  ogImage,
+  themeTokens,
+} from "../../scripts/lib/og-image.mjs";
 import { en } from "../../src/i18n/en";
 import { es } from "../../src/i18n/es";
 
@@ -42,5 +49,41 @@ describe("ogImage", () => {
   it("dibuja una imagen distinta por idioma", async () => {
     const [spanish, english] = await Promise.all([ogImage(es, theme), ogImage(en, theme)]);
     expect(spanish.equals(english)).toBe(false);
+  });
+});
+
+describe("ogArticleCard", () => {
+  it("lleva «Blog» y el título del artículo, sin la frase del hero", () => {
+    expect(texts(ogArticleCard("Cuánto cuesta un software a medida", es, theme))).toEqual([
+      es["nav.blog"],
+      "Cuánto cuesta un software a medida",
+    ]);
+  });
+});
+
+describe("ogArticleImage", () => {
+  it("dibuja un PNG de 1200×630", async () => {
+    const meta = await sharp(await ogArticleImage("What custom software costs", en, theme)).metadata();
+    expect([meta.format, meta.width, meta.height]).toEqual(["png", 1200, 630]);
+  });
+});
+
+describe("blogPostings", () => {
+  const page = (graph: unknown[]) =>
+    `<html><head><script type="application/ld+json">${JSON.stringify({ "@graph": graph }).replace(/</g, "\\u003c")}</script></head></html>`;
+
+  it("lee de una página el titular, el idioma y la imagen de su BlogPosting", () => {
+    const html = page([
+      { "@type": "WebSite" },
+      { "@type": "BlogPosting", headline: "A <b>", inLanguage: "es", image: "https://retama.example/og/es/a.png" },
+    ]);
+    expect(blogPostings(html)).toEqual([
+      { headline: "A <b>", inLanguage: "es", image: "https://retama.example/og/es/a.png" },
+    ]);
+  });
+
+  it("no encuentra nada en una página sin artículo ni JSON-LD", () => {
+    expect(blogPostings(page([{ "@type": "WebSite" }]))).toEqual([]);
+    expect(blogPostings("<html></html>")).toEqual([]);
   });
 });

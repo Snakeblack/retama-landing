@@ -3,7 +3,7 @@ import { render } from "astro:content";
 import { type Locale, localizedPath, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
 import type { LocalArticle } from "../lib/articles";
-import { articlePath, formatDate, readingMinutes } from "../lib/blog";
+import { articlePath, feedPath, formatDate, ogImagePath, readingMinutes } from "../lib/blog";
 import Footer from "./board/Footer.astro";
 
 interface Props {
@@ -33,7 +33,15 @@ const dates = [
     { name: title, path: articlePath(locale, slug) },
   ]}
   paths={paths}
-  article={{ headline: title, description, published, updated, path: articlePath(locale, slug) }}
+  article={{
+    headline: title,
+    description,
+    published,
+    updated,
+    path: articlePath(locale, slug),
+    image: ogImagePath(locale, slug),
+  }}
+  feed={feedPath(locale)}
 >
   <article class="mt-(--header-height) grid grid-cols-2 gap-gap px-margin pt-xl lg:grid-cols-12" aria-labelledby="article-title" data-grounds>
     <header class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-8">

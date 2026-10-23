@@ -22,9 +22,22 @@ interface Props {
   article?: Article;
   /** The page is the blog's index, which its link in the header marks. */
   blog?: boolean;
+  /** The RSS of the page's blog, which the head announces (the blog's index and its articles). */
+  feed?: string;
 }
 
-const { locale, title, description, noindex = false, trail, questions = false, paths, article, blog = false } = Astro.props;
+const {
+  locale,
+  title,
+  description,
+  noindex = false,
+  trail,
+  questions = false,
+  paths,
+  article,
+  blog = false,
+  feed,
+} = Astro.props;
 const copy = t(locale);
 // On a page with a chapter index (the home), the links leave the bar on phones for the index, which holds them too.
 const withMenu = Astro.slots.has("menu");
@@ -60,6 +73,7 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
       )
     }
     <link rel="sitemap" href="/sitemap-index.xml" />
+    {feed && <link rel="alternate" type="application/rss+xml" title={copy["blog.metaTitle"]} href={feed} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content={themeColor} />
   </head>

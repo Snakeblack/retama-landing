@@ -2,7 +2,7 @@
 import { type Locale, localizedPath, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
 import { articles } from "../lib/articles";
-import { articlePath, formatDate, readingMinutes } from "../lib/blog";
+import { articlePath, feedPath, formatDate, readingMinutes } from "../lib/blog";
 import Footer from "./board/Footer.astro";
 
 interface Props {
@@ -22,12 +22,16 @@ const list = await articles(locale);
   description={copy["blog.metaDescription"]}
   trail={[{ name: copy["nav.blog"], path: localizedPath(locale, "/blog/") }]}
   blog
+  feed={feedPath(locale)}
 >
   <div class="mt-(--header-height) px-margin pt-xl" data-grounds>
     <div class="grid grid-cols-2 gap-gap lg:grid-cols-12">
       <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-5">
         <h1 class="text-balance type-headline-sm md:type-headline">{copy["blog.title"]}</h1>
         <p class="max-w-(--spacing-measure) type-statement-sm md:type-statement">{copy["blog.lead"]}</p>
+        <a class="feedback flex min-h-(--spacing-touch) w-fit items-center type-small text-on-surface-muted underline hover:text-on-surface" href={feedPath(locale)} type="application/rss+xml">
+          {copy["blog.rss"]}
+        </a>
       </div>
 
       <ul class="col-span-2 grid content-start gap-gap lg:col-span-7" aria-label={copy["blog.listLabel"]}>
