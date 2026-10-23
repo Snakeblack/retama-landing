@@ -1,0 +1,1118 @@
+{
+  "schema": "idd-state/v1",
+  "change": "text-charset",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "si hazlo en un change pequeño",
+    "kind": "bug",
+    "summary": "robots.txt and llms.txt are served as text/plain without a charset, so a browser may show the UTF-8 of llms.txt (Información) as mojibake",
+    "acceptance": "/robots.txt and /llms.txt are served with Content-Type text/plain; charset=utf-8 and keep every security header of the site"
+  },
+  "facts": {
+    "basis": "The user asked for charset=utf-8 on both files (previous turn); the files are UTF-8 and every other header stays as the /* block sets it"
+  },
+  "plan": {
+    "paths": [
+      "public/_headers",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/headers.test.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches public/_headers (matches public/_headers)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0006 and quality scenario privacy-security, seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "The security headers stay in the single /* block, which still applies to both files; the new rules only set their Content-Type, and a unit test guards that only one block carries the CSP"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "No header is removed or weakened; nosniff stays"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Crawlers and browsers read robots.txt and llms.txt as UTF-8"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-17"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-16"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-18"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-23T08:37:03.352Z",
+      "detail": {
+        "red": "run-2",
+        "green": "run-3"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T08:38:16.592Z",
+      "detail": {
+        "refs": [
+          "adr:0006 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:210071cf2832dca6ef3ac90a5279f7abdef64e56ebd36559e4346cf4925cc18f",
+        "fitness": [
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T08:39:24.857Z",
+      "detail": {
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "runs": [
+          "run-10",
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T08:39:24.857Z",
+      "detail": {
+        "refs": [
+          "adr:0006 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "fitness": [
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T08:40:45.826Z",
+      "detail": {
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "runs": [
+          "run-16",
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T08:40:45.826Z",
+      "detail": {
+        "refs": [
+          "adr:0006 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "fitness": [
+          "run-21"
+        ]
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T08:42:10.979Z",
+      "detail": {
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "runs": [
+          "run-22",
+          "run-23",
+          "run-24",
+          "run-25",
+          "run-26"
+        ]
+      }
+    },
+    {
+      "id": "ev-8",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T08:42:10.979Z",
+      "detail": {
+        "refs": [
+          "adr:0006 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "fitness": [
+          "run-27"
+        ]
+      }
+    },
+    {
+      "id": "ev-9",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T08:43:19.759Z",
+      "detail": {
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "runs": [
+          "run-28",
+          "run-29",
+          "run-30",
+          "run-31",
+          "run-32"
+        ]
+      }
+    },
+    {
+      "id": "ev-10",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T08:43:19.759Z",
+      "detail": {
+        "refs": [
+          "adr:0006 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "fitness": [
+          "run-33"
+        ]
+      }
+    },
+    {
+      "id": "ev-11",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T08:44:44.124Z",
+      "detail": {
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "runs": [
+          "run-34",
+          "run-35",
+          "run-36",
+          "run-37",
+          "run-38"
+        ]
+      }
+    },
+    {
+      "id": "ev-12",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T08:44:44.124Z",
+      "detail": {
+        "refs": [
+          "adr:0006 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "fitness": [
+          "run-39"
+        ]
+      }
+    },
+    {
+      "id": "ev-13",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-23T09:30:05.427Z",
+      "detail": {
+        "lineage_id": "sha256:eea56c34b35976a1ce33525a205d5b4057d1fdf5aa9a3939dd5cc36543a614dc",
+        "candidate_id": "sha256:c9a65673a016dc300400814e89f569cd5e44f758e81fb7ea0d959d812407538a",
+        "candidate_tree": "e435f74fe0588ad17b54440a32a976c3fafb6b76",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-23T09:30:00.024Z",
+          "result_digest": "sha256:69694207379e1e23e449e86a34f41ec53bc9d50deed050c344de6b9a682174da"
+        }
+      }
+    },
+    {
+      "id": "ev-14",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T09:30:56.215Z",
+      "detail": {
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "runs": [
+          "run-40",
+          "run-41",
+          "run-42",
+          "run-43",
+          "run-44"
+        ]
+      }
+    },
+    {
+      "id": "ev-15",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T09:30:56.215Z",
+      "detail": {
+        "refs": [
+          "adr:0006 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "fitness": [
+          "run-45"
+        ]
+      }
+    },
+    {
+      "id": "ev-16",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-23T09:31:18.954Z",
+      "detail": {
+        "lineage_id": "sha256:05ba7d28fba430a7d46a2d4ad25591c971b10ae02db04672a5c6a0d75f389aa3",
+        "candidate_id": "sha256:e4b2e5a8a0a67743f0e115613ba50eb04d43a91555dfe2703c10a050621e11eb",
+        "candidate_tree": "809e93a7f915b21f587b406f9c8412ac6118604e",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "relayed"
+      }
+    },
+    {
+      "id": "ev-17",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T09:32:13.255Z",
+      "detail": {
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "runs": [
+          "run-46",
+          "run-47",
+          "run-48",
+          "run-49",
+          "run-50"
+        ]
+      }
+    },
+    {
+      "id": "ev-18",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T09:32:13.255Z",
+      "detail": {
+        "refs": [
+          "adr:0006 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+        "fitness": [
+          "run-51"
+        ]
+      }
+    }
+  ],
+  "base": "d1481387839b6964f14c2fbf850010b655b03bd3",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/site.spec.ts -g \"robots.txt admite\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:cd2259a772223ed3e959e9350fbbc6e730aec215aaf1b269349abdf49e4396cd",
+      "tree": "sha256:8326d4916ac2bf7c82e712df3b33baee6bc95f5fca50578fdf50ed6372976a56",
+      "recorded_at": "2026-10-23T08:36:34.000Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/headers.test.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:07b58442d1d989f05393715feb2ce6c3ebab422bd96b0bb2c2303a9023e7f025",
+      "tree": "sha256:71b11e2d818d073ae887003374b4a51655c186d5310a454e85cc8fddb8ef2801",
+      "recorded_at": "2026-10-23T08:36:57.423Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/headers.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:b61c631bc5b17955eb3df6402079ae22b692a3b35ce098a9b12e195aa527f9d1",
+      "tree": "sha256:b01560dcb37f75c29e6abbdb95d04a8e1862422fdfa13d059bf94b68878d0aec",
+      "recorded_at": "2026-10-23T08:37:03.352Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 1,
+      "output_sha256": "sha256:8c3f666d543bc05789a471e1fecc223f3acfb1eedac3015ea2b080ccaae0a2ac",
+      "tree": "sha256:210071cf2832dca6ef3ac90a5279f7abdef64e56ebd36559e4346cf4925cc18f",
+      "recorded_at": "2026-10-23T08:38:16.592Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:4e76b2b0e008d7a2c3d33dafe662744538694ecd4034023e608cc8ece47124b8",
+      "tree": "sha256:210071cf2832dca6ef3ac90a5279f7abdef64e56ebd36559e4346cf4925cc18f",
+      "recorded_at": "2026-10-23T08:38:16.592Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:7b8d59c0e6b1c5c3a403ef2100b32bf8d03ecf35387b10fe8f2d8d623e9bb948",
+      "tree": "sha256:210071cf2832dca6ef3ac90a5279f7abdef64e56ebd36559e4346cf4925cc18f",
+      "recorded_at": "2026-10-23T08:38:16.592Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:aa4eb4cd5386c1507c06a76f72d230b38443b6ef1ff83dedb73656ad07114e8f",
+      "tree": "sha256:210071cf2832dca6ef3ac90a5279f7abdef64e56ebd36559e4346cf4925cc18f",
+      "recorded_at": "2026-10-23T08:38:16.592Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:210071cf2832dca6ef3ac90a5279f7abdef64e56ebd36559e4346cf4925cc18f",
+      "recorded_at": "2026-10-23T08:38:16.592Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:bb15f93b22bc987f9e91909cb3d8ebe5167494e7629aa68159694ad48673e85c",
+      "tree": "sha256:210071cf2832dca6ef3ac90a5279f7abdef64e56ebd36559e4346cf4925cc18f",
+      "recorded_at": "2026-10-23T08:38:16.592Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f586fec2683160773d091088bf28acda4a7866d03f00c58fef50d56a47860ae5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:39:24.857Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:74210993424d9ce76041f0f8034d82bce3c371f72789dd1421c3ad7a9edf4b7e",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:39:24.857Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:f688c019fab9e40c5de47bfd4396365a42c9f20a6b4ded44e5e9283dffe01ea0",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:39:24.857Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:f802b5744fcabef0bf21e30debe36cae552e8d4666684cf09e1149c710bed5b4",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:39:24.857Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:39:24.857Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:dc6e34ecb4ed9f4f3dc60c76891e94b3cde4b895022bc0fd632853cb5ad61a3d",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:39:24.857Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f586fec2683160773d091088bf28acda4a7866d03f00c58fef50d56a47860ae5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:40:45.826Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:33a37a06b6935fa1259b927e4d15cb5d688c8e0e4d2ca67edb4038c48541730e",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:40:45.826Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:93e1c5e77013d53931e164a2e7bfcf9fda224fd35534e7681e909d0dca85bfde",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:40:45.826Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:361e0181a7872643bcd3b4dc0d1f653b3b7d61230b9f57bf7bdb275b809ee14f",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:40:45.826Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:40:45.826Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:e287cf73b18692c885c3f4d96c37185264fd8a349b7f315944a292bb13698442",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:40:45.826Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f586fec2683160773d091088bf28acda4a7866d03f00c58fef50d56a47860ae5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:42:10.979Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:37334629d5d8471b5165b3870dbf7b181807fecf0910a63747808b00f189adc6",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:42:10.979Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:7b1808b02250a303710b349199fe361d744a997453d6e03ffd21f244870fe7ef",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:42:10.979Z"
+    },
+    {
+      "id": "run-25",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:9a43afa38d2553e2feeed79c4e1574c6fb493de819968cf5e978a9eb011cea7d",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:42:10.979Z"
+    },
+    {
+      "id": "run-26",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:42:10.979Z"
+    },
+    {
+      "id": "run-27",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:5e539b1ec446a35ba323919aeb7645c55e196d9a891baf9c8fddc387b703a18a",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:42:10.979Z"
+    },
+    {
+      "id": "run-28",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f586fec2683160773d091088bf28acda4a7866d03f00c58fef50d56a47860ae5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:43:19.759Z"
+    },
+    {
+      "id": "run-29",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:fa2d757972a367c4ee813b58914c6d885eebd1630f0160d8204bdc56aac8ab10",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:43:19.759Z"
+    },
+    {
+      "id": "run-30",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:ab1ef39266ffb172312b773496db7665df859d241b20e5c7bbba7733b5c85504",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:43:19.759Z"
+    },
+    {
+      "id": "run-31",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:cabfd1d6292e10b133d625b95529b184aac9a475f0c6f3107c0b601e2c578a29",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:43:19.759Z"
+    },
+    {
+      "id": "run-32",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:43:19.759Z"
+    },
+    {
+      "id": "run-33",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:3e406002298da7d355ba85b44c5efee4de55ff61645e9cdedc91a25ebddd22c7",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:43:19.759Z"
+    },
+    {
+      "id": "run-34",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f586fec2683160773d091088bf28acda4a7866d03f00c58fef50d56a47860ae5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:44:44.124Z"
+    },
+    {
+      "id": "run-35",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:3bb6556bb89e5fa2f12038da374fb6517af8e9ca10c099ef9bec3e8748731820",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:44:44.124Z"
+    },
+    {
+      "id": "run-36",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:06d245b349a616e1ff84dc4ae1a450dc705f9d0eac5dcaf4bbe6302b82358f45",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:44:44.124Z"
+    },
+    {
+      "id": "run-37",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:108b7b936e3084a13f10c6d9b7b7896eb50933d71334446fe244aa2915cc0729",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:44:44.124Z"
+    },
+    {
+      "id": "run-38",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:44:44.124Z"
+    },
+    {
+      "id": "run-39",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:172228c6370033e6eb3d3dd28a6e0709c3fff301c727447abee4a5b464888eb1",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T08:44:44.124Z"
+    },
+    {
+      "id": "run-40",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f586fec2683160773d091088bf28acda4a7866d03f00c58fef50d56a47860ae5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:30:56.215Z"
+    },
+    {
+      "id": "run-41",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:0861e221cd3ebb6b9f4ce9c191ade38ac66dff776090fbf5cb61319a97ad9af9",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:30:56.215Z"
+    },
+    {
+      "id": "run-42",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:4203fbd3d83b9caf66b50db139afb45b14085299ba961f6530e1e060d0da2dfd",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:30:56.215Z"
+    },
+    {
+      "id": "run-43",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:b5a00483b8ba979b68be22150e0f9bd833461103fe6181dab59448b6a6032387",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:30:56.215Z"
+    },
+    {
+      "id": "run-44",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:30:56.215Z"
+    },
+    {
+      "id": "run-45",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:242dd28bb0fa3f39ebb2eb6bfceebea66c953931d657ce394755751648d6905f",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:30:56.215Z"
+    },
+    {
+      "id": "run-46",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f586fec2683160773d091088bf28acda4a7866d03f00c58fef50d56a47860ae5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:32:13.255Z"
+    },
+    {
+      "id": "run-47",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:87f768c57d91f0b5ae61e706d800085d9c7875be50db7275185c7ef7cf9dc37a",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:32:13.255Z"
+    },
+    {
+      "id": "run-48",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:158b7ba80afe73252dd7c29913355b459fc4cdd16d9e7c829e7745fc190c25da",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:32:13.255Z"
+    },
+    {
+      "id": "run-49",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:4185aaccb6952a3396b4574927177d917326fb80fc9661948d31ab280f274d8e",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:32:13.255Z"
+    },
+    {
+      "id": "run-50",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:32:13.255Z"
+    },
+    {
+      "id": "run-51",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d86a4cbb196ebfcbc24e9c8f0db200480cec17a13d5bccef78dad1122be825c8",
+      "tree": "sha256:0bd02d53f40756ea8eabd093bef2cfc83340113238333aa6f814238d6d59a15f",
+      "recorded_at": "2026-10-23T09:32:13.255Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:eea56c34b35976a1ce33525a205d5b4057d1fdf5aa9a3939dd5cc36543a614dc",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "8d948973dad634c5f0e27cb53e4cbbb0f95f2c42",
+          "candidate_tree": "e435f74fe0588ad17b54440a32a976c3fafb6b76",
+          "paths": [
+            "public/_headers",
+            "tests/unit/headers.test.ts"
+          ],
+          "diff_hash": "sha256:7f47738d449e210b2c25f9b0e0584ce9fec6e68a4db0433eb2410323d376f178",
+          "paths_digest": "sha256:59e646edb0688852b824838af07f52bdcd8f0a79f45742018a5e7a618ba2bd3f",
+          "authored_lines": 35,
+          "original_changed_lines": 35
+        },
+        "candidate_id": "sha256:c9a65673a016dc300400814e89f569cd5e44f758e81fb7ea0d959d812407538a",
+        "paths": [
+          "public/_headers",
+          "tests/unit/headers.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "e435f74fe0588ad17b54440a32a976c3fafb6b76",
+        "original_changed_lines": 35,
+        "authored_lines": 35
+      },
+      "current_candidate_id": "sha256:c9a65673a016dc300400814e89f569cd5e44f758e81fb7ea0d959d812407538a",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "8d948973dad634c5f0e27cb53e4cbbb0f95f2c42",
+        "candidate_tree": "e435f74fe0588ad17b54440a32a976c3fafb6b76",
+        "paths": [
+          "public/_headers",
+          "tests/unit/headers.test.ts"
+        ],
+        "diff_hash": "sha256:7f47738d449e210b2c25f9b0e0584ce9fec6e68a4db0433eb2410323d376f178",
+        "paths_digest": "sha256:59e646edb0688852b824838af07f52bdcd8f0a79f45742018a5e7a618ba2bd3f",
+        "authored_lines": 35,
+        "original_changed_lines": 35
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "text-charset:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "text-charset:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 18,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:05ba7d28fba430a7d46a2d4ad25591c971b10ae02db04672a5c6a0d75f389aa3",
+      "generation": 2,
+      "predecessor_lineage_id": "sha256:eea56c34b35976a1ce33525a205d5b4057d1fdf5aa9a3939dd5cc36543a614dc",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "8d948973dad634c5f0e27cb53e4cbbb0f95f2c42",
+          "candidate_tree": "809e93a7f915b21f587b406f9c8412ac6118604e",
+          "paths": [
+            "public/_headers",
+            "tests/unit/headers.test.ts"
+          ],
+          "diff_hash": "sha256:51f5f75a584af52fb3e17dab68ac560010126a3aa19a3c463c726181fc5f0d00",
+          "paths_digest": "sha256:59e646edb0688852b824838af07f52bdcd8f0a79f45742018a5e7a618ba2bd3f",
+          "authored_lines": 37,
+          "original_changed_lines": 37
+        },
+        "candidate_id": "sha256:e4b2e5a8a0a67743f0e115613ba50eb04d43a91555dfe2703c10a050621e11eb",
+        "paths": [
+          "public/_headers",
+          "tests/unit/headers.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "809e93a7f915b21f587b406f9c8412ac6118604e",
+        "original_changed_lines": 37,
+        "authored_lines": 37
+      },
+      "current_candidate_id": "sha256:e4b2e5a8a0a67743f0e115613ba50eb04d43a91555dfe2703c10a050621e11eb",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "8d948973dad634c5f0e27cb53e4cbbb0f95f2c42",
+        "candidate_tree": "809e93a7f915b21f587b406f9c8412ac6118604e",
+        "paths": [
+          "public/_headers",
+          "tests/unit/headers.test.ts"
+        ],
+        "diff_hash": "sha256:51f5f75a584af52fb3e17dab68ac560010126a3aa19a3c463c726181fc5f0d00",
+        "paths_digest": "sha256:59e646edb0688852b824838af07f52bdcd8f0a79f45742018a5e7a618ba2bd3f",
+        "authored_lines": 37,
+        "original_changed_lines": 37
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "text-charset:lens-start:2:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "text-charset:lens-result:2:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 19,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-23T09:32:18.151Z"
+}
