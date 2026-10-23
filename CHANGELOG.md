@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/Snakeblack/retama-landing/compare/v0.4.0...v0.4.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* **legal:** let readers select the legal text on touch screens ([6889c4e](https://github.com/Snakeblack/retama-landing/commit/6889c4ea99b5f7b10465a9de5b52df70d3589127))
+
 ## [0.4.0](https://github.com/Snakeblack/retama-landing/compare/v0.3.0...v0.4.0) (2026-10-23)
 
 
