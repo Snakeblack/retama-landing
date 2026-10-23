@@ -316,6 +316,8 @@ export const es = {
   "blog.updated": "Actualizado el",
   "blog.minutes": "min de lectura",
   "blog.all": "Todos los artículos",
+  "blog.imageAlt": "artículo del blog de Retama",
+  "blog.rss": "Suscríbete por RSS",
   "blog.talk": "¿Tienes un proyecto entre manos? Cuéntanoslo y te respondemos en un día laborable.",
 } as const;
 

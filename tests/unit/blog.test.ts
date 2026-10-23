@@ -5,8 +5,10 @@ import {
   checkArticles,
   entryLocale,
   entrySlug,
+  feedPath,
   formatDate,
   newestFirst,
+  ogImagePath,
   readingMinutes,
   translations,
 } from "../../src/lib/blog";
@@ -42,6 +44,18 @@ describe("articlePath", () => {
     expect(articlePath("en")).toBe("/en/blog/");
     expect(articlePath("es", "cuanto-cuesta")).toBe("/blog/cuanto-cuesta/");
     expect(articlePath("en", "what-it-costs")).toBe("/en/blog/what-it-costs/");
+  });
+});
+
+describe("feedPath y ogImagePath", () => {
+  it("ponen el RSS junto al índice de cada idioma, sin barra final", () => {
+    expect(feedPath("es")).toBe("/blog/rss.xml");
+    expect(feedPath("en")).toBe("/en/blog/rss.xml");
+  });
+
+  it("dan a cada artículo su imagen bajo la carpeta de su idioma, aunque dos idiomas compartan slug", () => {
+    expect(ogImagePath("es", "cuanto-cuesta")).toBe("/og/es/cuanto-cuesta.png");
+    expect(ogImagePath("en", "same")).not.toBe(ogImagePath("es", "same"));
   });
 });
 
