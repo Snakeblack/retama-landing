@@ -22,6 +22,17 @@ describe("dominio de producción (M6)", () => {
   });
 });
 
+// Workers Logs y Traces al 100 %: con el tráfico del sitio queda muy lejos del cupo gratis (M6, observability).
+describe("observabilidad del Worker (M6)", () => {
+  it("guarda todos los logs y todas las trazas", () => {
+    expect(config.observability).toEqual({
+      enabled: true,
+      logs: { enabled: true, head_sampling_rate: 1 },
+      traces: { enabled: true, head_sampling_rate: 1 },
+    });
+  });
+});
+
 describe("límite de envíos en las Previews (ADR 0002)", () => {
   // Las Previews no heredan los bindings de producción: sin el suyo, /api/contact/ responde siempre 503.
   it("cada Preview tiene su CONTACT_LIMITER con el mismo límite que producción", () => {

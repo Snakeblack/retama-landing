@@ -28,6 +28,8 @@ export interface ContactDeps {
   env: ContactEnv;
   fetch: typeof fetch;
   log: (line: string) => void;
+  /** Lines Workers Logs shows at error severity: the failures that need the owner to act. */
+  error: (line: string) => void;
 }
 
 type Outcome =
@@ -39,6 +41,9 @@ type Outcome =
   | "unavailable"
   | "verification"
   | "delivery";
+
+/** Our own failures; every other outcome is the visitor's or a bot's doing. */
+const FAILURES: readonly Outcome[] = ["unavailable", "delivery"];
 
 const STATUS: Record<Outcome, number> = {
   sent: 200,
@@ -61,15 +66,29 @@ const PROJECT_LABEL: Record<ProjectType, string> = {
 };
 const LOCALE_LABEL = { es: "español", en: "inglés" } as const;
 
+const HEADERS = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } as const;
+
 function reply(deps: ContactDeps, outcome: Outcome, extra: { fields?: string[]; status?: number } = {}): Response {
   // Only the outcome and a provider's status code: never a field, an address or the IP.
-  deps.log(JSON.stringify({ event: "contact", outcome, ...(extra.status ? { status: extra.status } : {}) }));
+  const line = JSON.stringify({ event: "contact", outcome, ...(extra.status ? { status: extra.status } : {}) });
+  (FAILURES.includes(outcome) ? deps.error : deps.log)(line);
   const ok = outcome === "sent" || outcome === "honeypot";
   const body = ok ? { ok } : { ok, error: outcome, ...(extra.fields ? { fields: extra.fields } : {}) };
-  return Response.json(body, {
-    status: STATUS[outcome],
-    headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" },
-  });
+  return Response.json(body, { status: STATUS[outcome], headers: HEADERS });
+}
+
+/**
+ * GET /api/contact/, for the external uptime monitor: 200 when every secret and the rate-limit binding are
+ * there, 503 otherwise, without naming what is missing. It calls no third party and spends no send.
+ */
+export function contactHealth(env: ContactEnv): Response {
+  const { TURNSTILE_SECRET_KEY, RESEND_API_KEY, CONTACT_FROM, CONTACT_TO, CONTACT_BACKUP, CONTACT_LIMITER } = env;
+  const ready = Boolean(
+    TURNSTILE_SECRET_KEY && RESEND_API_KEY && CONTACT_FROM && CONTACT_TO && CONTACT_BACKUP && CONTACT_LIMITER,
+  );
+  return ready
+    ? Response.json({ ok: true }, { headers: HEADERS })
+    : Response.json({ ok: false, error: "unavailable" }, { status: 503, headers: HEADERS });
 }
 
 /** The body as text, or undefined past MAX_BODY_BYTES: a declared length is refused unread, a stream is cut. */

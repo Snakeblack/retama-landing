@@ -1,0 +1,400 @@
+{
+  "schema": "idd-state/v1",
+  "change": "observability",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "feature",
+    "summary": "Workers Logs y Traces activados en wrangler.jsonc, y /api/contact/ vigilable por un uptime externo gratuito (UptimeRobot) junto con / y /en/",
+    "acceptance": "El Worker desplegado tiene observability activa (logs y traces) y los fallos del contacto salen con severidad de error; UptimeRobot recibe 2xx en /, /en/ y en una comprobación GET de /api/contact/ que no llama a terceros ni revela datos; la línea base y el roadmap nombran UptimeRobot"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "UptimeRobot gratis solo hace GET/HEAD y da por caído todo lo que no sea 2xx/3xx, y hoy GET /api/contact/ responde 404 (src/pages/api/contact.ts:24 solo exporta POST): ¿se añade un GET de salud, qué comprueba y qué responde, o no se vigila la API?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿la comprobación de salud cuenta contra el límite de envíos CONTACT_LIMITER o queda fuera?"
+      },
+      {
+        "category": "persistence",
+        "question": "¿se activan también las Traces y con qué muestreo, sabiendo que el plan gratis da 200.000 eventos al día y 3 días de retención y que el precio cambia el 01-12-2026?"
+      },
+      {
+        "category": "copy",
+        "question": "¿a quién avisa UptimeRobot (correo de la cuenta) y se publica su página de estado gratuita?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿el GET de salud vive en la misma ruta /api/contact/ (sin ruta nueva, ADR 0002) o en otra?"
+      },
+      {
+        "category": "accessibility",
+        "question": "no hay interfaz nueva; ¿se confirma que el cambio no toca páginas visibles?"
+      },
+      {
+        "category": "errors",
+        "question": "¿qué desenlaces del contacto deben salir con severidad de error (console.error) en Workers Logs? Hoy todo va por console.log (src/server/contact.ts:66)"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "src/pages/api/contact.ts",
+      "src/server/contact.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/contact.test.ts",
+      "tests/unit/wrangler-config.test.ts",
+      "wrangler.jsonc"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/pages/api/contact.ts (matches **/api/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches src/pages/api/contact.ts and 2 more (matches src/pages/api/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0002, 0003",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "El GET de salud vive en la misma y única ruta bajo demanda /api/contact; no se añade ninguna ruta y on-demand-routes sigue pasando. observability es configuración de la plataforma, no un desplegable nuevo."
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "impact": "conforms",
+      "reason": "Workers Logs guarda eventos efímeros de la plataforma (3 días), no un almacén del sistema; no se añade ningún binding persistente y los registros siguen sin datos personales (tests de registros). El GET de salud no lee ni guarda nada."
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "GET de salud con config en la misma ruta /api/contact/: 200 {ok:true} con los 5 secretos y el binding, 503 unavailable si falta alguno, sin llamar a terceros ni gastar CONTACT_LIMITER; sin interfaz nueva. Severidad error solo para unavailable y delivery. Traces al 100% (logs al 100%). UptimeRobot avisa por email de la cuenta, sin status page.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T19:51:41.803Z",
+      "detail": {
+        "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-23T19:51:41.803Z",
+      "detail": {
+        "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+        "check": "ev-1",
+        "documents": [
+          "docs/architecture/technical-baseline.md",
+          "src/pages/api/contact.ts"
+        ],
+        "tests": [
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact.test.ts",
+          "tests/unit/wrangler-config.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T19:51:41.803Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0003 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+        "fitness": [
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-23T19:52:23.992Z",
+      "detail": {
+        "lineage_id": "sha256:840c27234cffb465e760a388d8ecdf02ce8a00ee866f811913f6144c498e60ca",
+        "candidate_id": "sha256:8e45fafa87e8a76c2954b1c648460be8f4fc0a24516aa998fac249f7e10ea739",
+        "candidate_tree": "42801f6bc1ecde37068a111b1ed02e01b864a0b7",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "relayed"
+      }
+    }
+  ],
+  "base": "5f6cc4b23124ebb827aa5911e5186111c10e0dd1",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:ffcca1a58704af7b69b18b24752463f90ff729d30946def95d3d967790adae01",
+      "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+      "recorded_at": "2026-10-23T19:51:41.803Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:2d7ef70773617bc20f084bfe26d9525b8bf9f7f930d7441690efa85e648b8a17",
+      "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+      "recorded_at": "2026-10-23T19:51:41.803Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:2d38d08993581ee5ad7fcb8b83f37093cf17ebf30236c4f659bc9aaf1a3c3a9b",
+      "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+      "recorded_at": "2026-10-23T19:51:41.803Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:e26ff0079c80cbd604c63cf0a3dbce5242f5943b69d226cdd56653a9fbccea92",
+      "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+      "recorded_at": "2026-10-23T19:51:41.803Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+      "recorded_at": "2026-10-23T19:51:41.803Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+      "recorded_at": "2026-10-23T19:51:41.803Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:5a5d53798e169c4967f9abd15b98aaca3202263804557795d2825a1f7250d8b5",
+      "tree": "sha256:8b2950daa51b3fa68c6fe6e1c217c82cee68a22c414a1f24c70630bdd9c541ed",
+      "recorded_at": "2026-10-23T19:51:41.803Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:840c27234cffb465e760a388d8ecdf02ce8a00ee866f811913f6144c498e60ca",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "30fb340231349eec943362c7628de1ec4f1d3b3d",
+          "candidate_tree": "42801f6bc1ecde37068a111b1ed02e01b864a0b7",
+          "paths": [
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "src/pages/api/contact.ts",
+            "src/server/contact.ts",
+            "tests/e2e/contact.spec.ts",
+            "tests/unit/contact.test.ts",
+            "tests/unit/wrangler-config.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:f348a2bbc4add590d75651a51df12019fd28d66a3130aa75fe1f69581e624c99",
+          "paths_digest": "sha256:2f1b13f847f456737f2c9fa29f581e36647e9537fcec810d92ed7bc8b8f0fe97",
+          "authored_lines": 165,
+          "original_changed_lines": 178
+        },
+        "candidate_id": "sha256:8e45fafa87e8a76c2954b1c648460be8f4fc0a24516aa998fac249f7e10ea739",
+        "paths": [
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "src/pages/api/contact.ts",
+          "src/server/contact.ts",
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact.test.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "42801f6bc1ecde37068a111b1ed02e01b864a0b7",
+        "original_changed_lines": 178,
+        "authored_lines": 165
+      },
+      "current_candidate_id": "sha256:8e45fafa87e8a76c2954b1c648460be8f4fc0a24516aa998fac249f7e10ea739",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "30fb340231349eec943362c7628de1ec4f1d3b3d",
+        "candidate_tree": "42801f6bc1ecde37068a111b1ed02e01b864a0b7",
+        "paths": [
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "src/pages/api/contact.ts",
+          "src/server/contact.ts",
+          "tests/e2e/contact.spec.ts",
+          "tests/unit/contact.test.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:f348a2bbc4add590d75651a51df12019fd28d66a3130aa75fe1f69581e624c99",
+        "paths_digest": "sha256:2f1b13f847f456737f2c9fa29f581e36647e9537fcec810d92ed7bc8b8f0fe97",
+        "authored_lines": 165,
+        "original_changed_lines": 178
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "observability:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "observability:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 89,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-23T19:52:42.603Z"
+}

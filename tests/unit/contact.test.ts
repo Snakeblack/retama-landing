@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   type ContactDeps,
   type ContactEnv,
+  contactHealth,
   handleContact,
   MAX_BODY_BYTES,
   RESEND_URL,
@@ -44,6 +45,7 @@ function setup(
 ) {
   const calls: Call[] = [];
   const logs: string[] = [];
+  const errors: string[] = [];
   const keys: string[] = [];
   const replies: Record<string, Reply> = {
     [SITEVERIFY_URL]:
@@ -74,8 +76,13 @@ function setup(
       return typeof reply === "function" ? reply(init) : reply.clone();
     },
     log: (line) => logs.push(line),
+    // Error lines are log lines too, kept apart to check their severity.
+    error: (line) => {
+      logs.push(line);
+      errors.push(line);
+    },
   };
-  return { deps, calls, logs, keys };
+  return { deps, calls, logs, errors, keys };
 }
 
 /** A body that never ends, in 1 KB chunks, counting how many were read. */
@@ -378,6 +385,87 @@ describe("handleContact", () => {
       const { logs } = await send(body, { resend: Response.json({}, { status: 422 }) });
       expect(JSON.parse(logs[0] ?? "")).toEqual({ event: "contact", outcome: "delivery", status: 422 });
     });
+  });
+
+  // Workers Logs muestra con severidad de error solo los fallos que piden actuar: falta configuración o
+  // Resend no entrega. Los rechazos por el visitante o por bots siguen como información.
+  describe("severidad en Workers Logs", () => {
+    const failures: [string, unknown, Parameters<typeof setup>[0]][] = [
+      ["configuración", body, { env: {} }],
+      ["sin binding del límite", body, { limiter: "missing" }],
+      ["entrega rechazada", body, { resend: Response.json({}, { status: 500 }) }],
+      ["entrega sin respuesta", body, { resend: new Error("timeout") }],
+    ];
+    for (const [label, payload, options] of failures) {
+      it(`${label}: registra con severidad de error`, async () => {
+        const { logs, errors } = await send(payload, options);
+        expect(errors).toEqual(logs);
+        expect(errors).toHaveLength(1);
+      });
+    }
+
+    const handled: [string, unknown, Parameters<typeof setup>[0]][] = [
+      ["éxito", body, {}],
+      ["honeypot", { ...body, website: "spam" }, {}],
+      ["entrada inválida", { ...body, email: "ana@" }, {}],
+      ["límite", body, { limiter: "deny" }],
+      ["verificación", body, { siteverify: Response.json({ success: false }) }],
+    ];
+    for (const [label, payload, options] of handled) {
+      it(`${label}: registra como información`, async () => {
+        const { logs, errors } = await send(payload, options);
+        expect(logs).toHaveLength(1);
+        expect(errors).toEqual([]);
+      });
+    }
+
+    it("un origen ajeno registra como información", async () => {
+      const { logs, errors } = await send(body, {}, { Origin: "https://evil.example" });
+      expect(logs).toHaveLength(1);
+      expect(errors).toEqual([]);
+    });
+  });
+});
+
+// GET /api/contact/: la comprobación del uptime externo (UptimeRobot gratis solo hace GET y da por caído lo
+// que no es 2xx). Mira la configuración sin llamar a terceros ni gastar el límite de envíos.
+describe("contactHealth", () => {
+  const limiter = () => {
+    const keys: string[] = [];
+    return {
+      keys,
+      CONTACT_LIMITER: {
+        limit: async ({ key }: { key: string }) => {
+          keys.push(key);
+          return { success: true };
+        },
+      },
+    };
+  };
+
+  it("responde 200 con los secretos y el binding del límite, sin gastar envíos", async () => {
+    const { keys, CONTACT_LIMITER } = limiter();
+    const response = contactHealth({ ...env, CONTACT_LIMITER });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(keys).toEqual([]);
+  });
+
+  for (const secret of Object.keys(env) as (keyof ContactEnv)[]) {
+    it(`sin ${secret} responde 503 sin decir qué falta`, async () => {
+      const { CONTACT_LIMITER } = limiter();
+      const response = contactHealth({ ...env, [secret]: undefined, CONTACT_LIMITER });
+      expect(response.status).toBe(503);
+      expect(await response.json()).toEqual({ ok: false, error: "unavailable" });
+      expect(response.headers.get("Cache-Control")).toBe("no-store");
+    });
+  }
+
+  it("sin el binding del límite responde 503", async () => {
+    const response = contactHealth(env);
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ ok: false, error: "unavailable" });
   });
 });
 
