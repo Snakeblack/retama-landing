@@ -1,0 +1,188 @@
+{
+  "schema": "idd-state/v1",
+  "change": "legal-select",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "En pantallas táctiles el texto de la página legal no se puede seleccionar, porque la regla que lo impide en el tablero se aplica a todo main",
+    "acceptance": "En un móvil (pointer: coarse) el título, los datos del titular, el correo y el texto de /legal/ y /en/legal/ se pueden seleccionar y copiar; el tablero de la portada sigue sin selección salvo el contacto"
+  },
+  "facts": {
+    "basis": "El usuario lo pidió (2026-10-23) tras el arreglo de los artículos (article-select): mismo mecanismo, data-selectable en el contenedor de la página legal; el resto del comportamiento táctil no cambia"
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/Legal.astro",
+      "tests/e2e/legal.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0005",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md records that the legal page stays selectable on touch screens, like the contact and the articles; no token or style changes"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-23T17:58:30.355Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T17:59:17.221Z",
+      "detail": {
+        "tree": "sha256:e20d38856afc18ab9c9e72d7a22225b39d0c54801c8cf6153a13aaa610e721e9",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T17:59:17.221Z",
+      "detail": {
+        "refs": [
+          "adr:0005 conforms"
+        ],
+        "records": []
+      }
+    }
+  ],
+  "base": "8436b58da1761a8113cb963ee8137cb341174adb",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/legal.spec.ts -g 'pantallas táctiles'",
+      "exit_code": 1,
+      "output_sha256": "sha256:e6566ecb8256afcbdc9887db010ef2f6259357bf72999ffb624f337ddc5179f1",
+      "tree": "sha256:4632c7e41e7640dbbb05fd7ad1f6186ee384ecc2958649e36981f2032c5187c8",
+      "recorded_at": "2026-10-23T17:58:13.857Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/legal.spec.ts -g 'pantallas táctiles'",
+      "exit_code": 0,
+      "output_sha256": "sha256:97775c70c9f8764341172822d54167103a35b0576238e373c2c26e7c08335a30",
+      "tree": "sha256:24d67001b00f8c6aa633636726dc89d0fc798c8776d0cd001379af72c9985ff0",
+      "recorded_at": "2026-10-23T17:58:30.355Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:5c8644ab90b232e186e42379f96e11dec7dd9c1c56613ac273a7c638fa3fe916",
+      "tree": "sha256:e20d38856afc18ab9c9e72d7a22225b39d0c54801c8cf6153a13aaa610e721e9",
+      "recorded_at": "2026-10-23T17:59:17.221Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c2d8168fd419d925399cfc043e95c177aefd99ab9a128716c5a956d364b9d35b",
+      "tree": "sha256:e20d38856afc18ab9c9e72d7a22225b39d0c54801c8cf6153a13aaa610e721e9",
+      "recorded_at": "2026-10-23T17:59:17.221Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:c2683b86664ba1582b1b4368343c4852d8682bd657d2d8ccd9614a68f14d15a1",
+      "tree": "sha256:e20d38856afc18ab9c9e72d7a22225b39d0c54801c8cf6153a13aaa610e721e9",
+      "recorded_at": "2026-10-23T17:59:17.221Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:565d1ab98237ff48bd30ad3ca20306d29ed31cd3c95741effef890eea387e597",
+      "tree": "sha256:e20d38856afc18ab9c9e72d7a22225b39d0c54801c8cf6153a13aaa610e721e9",
+      "recorded_at": "2026-10-23T17:59:17.221Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:e20d38856afc18ab9c9e72d7a22225b39d0c54801c8cf6153a13aaa610e721e9",
+      "recorded_at": "2026-10-23T17:59:17.221Z"
+    }
+  ],
+  "closed_at": "2026-10-23T17:59:23.194Z"
+}
