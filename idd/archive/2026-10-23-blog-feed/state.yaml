@@ -1,0 +1,380 @@
+{
+  "schema": "idd-state/v1",
+  "change": "blog-feed",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "venga si, haz el blog en esta misma sesion cuando termines fusionas (blog-feed, M5 change 2: RSS por idioma e imagen Open Graph por artículo)",
+    "kind": "feature",
+    "summary": "RSS del blog por idioma (/blog/rss.xml y /en/blog/rss.xml) e imagen Open Graph propia de cada artículo, dibujada en el build",
+    "acceptance": "El build publica un RSS válido por idioma con sus artículos, anunciado desde las páginas, y cada artículo declara en og:image y BlogPosting una imagen 1200×630 propia con su título, servida como PNG"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿El RSS 2.0 se genera con @astrojs/rss 4.0.19 (oficial, MIT, junio de 2026) o a mano como robots.txt y llms.txt, sin dependencia?"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/blog.ts",
+          "line": 34
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Qué lleva cada entrada del RSS: el resumen (description, máximo una frase) y el enlace, o el texto completo del artículo en HTML?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿Dónde se anuncia el RSS: <link rel=alternate type=application/rss+xml> en el head de todas las páginas o solo del blog, y un enlace visible «RSS» en el índice o en el pie?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿Qué muestra la imagen PNG de 1200×630 de cada artículo: barra, wordmark, título a tamaño headline y entradilla, con o sin la retama a la derecha, y qué texto alternativo (og:image:alt) lleva?"
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "scripts/postbuild.mjs",
+          "line": 46
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [],
+    "work_units": 3,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0008 and quality scenario brand-impact, perf-mobile, seo-discovery",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "diff"
+    },
+    {
+      "id": "persistent-data",
+      "reason": "persistent data: scripts/postbuild.mjs adds writeFile",
+      "source": "diff"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The feeds and images are static build output; the pages add no script and the RSS link is plain HTML"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "The article card reads its colours, sizes and spacing from the generated theme; DESIGN.md describes the card and the RSS link; design:lint passes"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "none",
+      "reason": "A link element, meta tags and XML files; no script, style or third party, so the CSP is unchanged"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "One feed per language with its language element, and one image per article under its language's folder; the new keys exist in es.ts and en.ts"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "The article card keeps the home card's frame with the retama, in the DESIGN.md tokens"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "none",
+      "reason": "Nothing loads on the page: a link tag, and images drawn after the build"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Shared articles get their own image and title; readers and crawlers find each language's feed from the head"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "migration-compat-and-test",
+      "signal": "persistent-data",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "@astrojs/rss (Recommended); Resumen y enlace (Recommended); Head del blog + enlace en índice (Recommended): <link rel=alternate> en el índice y los artículos y un enlace RSS discreto en el tile del índice; Título + retama (Recommended): barra, wordmark, «Blog» en gris, título del artículo a tamaño titular y la retama a la derecha, alt «<título>, artículo del blog de Retama»",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T16:32:10.702Z",
+      "detail": {
+        "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-23T16:32:10.702Z",
+      "detail": {
+        "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/blog.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/blog.test.ts",
+          "tests/unit/feed.test.ts",
+          "tests/unit/og-image.test.ts",
+          "tests/unit/seo.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T16:32:10.702Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 none",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile none",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "migration-test",
+      "obligation": "migration-compat-and-test",
+      "recorded_at": "2026-10-23T16:32:30.293Z",
+      "detail": {
+        "run": "run-11",
+        "tree": "sha256:c378dd07bc6b2449ad2968e9a04945bfd77cc366377899a68300ec021bdbb007",
+        "plan": "No persistent data (ADR 0003): postbuild's writeFile writes build output into dist/client, regenerated from scratch on every build. Existing URLs keep working: /og/es.png and /og/en.png are still drawn for the home, legal and blog index; the articles' new images live under /og/<locale>/. Rollback: revert the commit and rebuild; nothing outside the build output changes."
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-23T16:32:36.630Z"
+    }
+  ],
+  "base": "ef6256dc0760256668a3265e772c28785237bac2",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0da81bf6a40b5ee64374bbf067a01e46c7570561844e9d723de9e565eb3fe75f",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:fdcef36bb6c202b505c5211bbc793766d6463f18784652e7b88bd2613f57e58c",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:325f3db53af22ed7dd8e7918b6438d6f06032c05c3ff55df0c1850cd43bfd2d4",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:041ee6e6b735f4b009da6b6aa970b3f0219e2f8ca83562905bda76c93f61b6ed",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:db51d41dc709cce49abdbbac402e6902f2dbeb3f9fb59beceb9ac79150def239",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:bc86e8d6157e784256b4cd2d2d8f0e16e5686074609f4985c00d974a630ed2b6",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:90f150409335ea28fced1c6b3882a9b27fef8d15d88d68a961ad8ae378be88a8",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:7e725a03a3c6f00fa950d878dd0a07eab28a7a805be62148cb12e86a70444450",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:6e44b464f8d21325c1a04d40e2eca8326c5c5e7ea5a62e8c2d3b291cfe5c2cb8",
+      "tree": "sha256:fe7c89ae4922ded6f767bed93f0f9350c9c8892033ae42b7773110852c131a80",
+      "recorded_at": "2026-10-23T16:32:10.702Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "migration-test",
+      "command": "pnpm exec playwright test tests/e2e/site.spec.ts tests/e2e/blog.spec.ts -g 'Open Graph|RSS'",
+      "exit_code": 0,
+      "output_sha256": "sha256:8e7ad5f22b8281f65d75056500da1b6a8d1b2fdd5b3c2f2b8e423a2edc5c75c9",
+      "tree": "sha256:c378dd07bc6b2449ad2968e9a04945bfd77cc366377899a68300ec021bdbb007",
+      "recorded_at": "2026-10-23T16:32:30.293Z"
+    }
+  ],
+  "closed_at": "2026-10-23T16:32:36.630Z"
+}

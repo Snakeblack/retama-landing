@@ -85,7 +85,9 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
    con canónica, hreflang recíproco, Open Graph `article` con la imagen del idioma, JSON-LD `BlogPosting` y miga de
    pan; en el sitemap y en llms.txt. «Blog» en la cabecera, el índice de capítulos y el pie. Dos artículos iniciales
    para clientes, firmados por Retama.
-2. `blog-feed`: RSS por idioma (`/blog/rss.xml`, `/en/blog/rss.xml`) e imagen Open Graph propia de cada artículo.
+2. `blog-feed` (hecho): RSS 2.0 por idioma (`/blog/rss.xml`, `/en/blog/rss.xml`) con el resumen y el enlace de cada
+   artículo, anunciado en el head del índice y de los artículos y enlazado en el índice; imagen Open Graph propia de
+   cada artículo (`/og/<idioma>/<slug>.png`), con «Blog», su título y la retama, dibujada en el build.
 
 ## M6 — Operación y lanzamiento
 
