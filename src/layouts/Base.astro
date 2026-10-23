@@ -1,9 +1,12 @@
 ---
 import { Font } from "astro:assets";
+import { PUBLIC_CF_ANALYTICS_TOKEN } from "astro:env/client";
 import { type Locale, localizedPath, t } from "../i18n/index";
+import { analyticsToken, beaconCsp } from "../lib/analytics";
 import { type Article, alternates, type Crumb, canonicalUrl, jsonLd, openGraph, structuredData } from "../lib/seo";
 import "../styles/global.css";
 import theme from "../styles/theme.css?raw";
+import Analytics from "../components/Analytics.astro";
 import LangSwitch from "../components/LangSwitch.astro";
 import Wordmark from "../components/Wordmark.astro";
 
@@ -44,6 +47,14 @@ const withMenu = Astro.slots.has("menu");
 const site = Astro.site ?? new URL(Astro.url.origin);
 // The browser chrome takes the page ground from the DESIGN.md tokens.
 const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
+// Cloudflare Web Analytics waits for the site's token (astro.config.mjs): without it there is no beacon and the CSP
+// admits nothing more. With it, every page measures, Previews included: Cloudflare drops hostnames outside retama.dev.
+const analytics = analyticsToken(PUBLIC_CF_ANALYTICS_TOKEN) !== null;
+if (analytics) {
+  const csp = beaconCsp();
+  Astro.csp?.insertScriptResource(csp.script);
+  Astro.csp?.insertDirective(csp.connect);
+}
 ---
 
 <!doctype html>
@@ -121,5 +132,6 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
     <script>
       import "../scripts/header";
     </script>
+    {analytics && <Analytics />}
   </body>
 </html>

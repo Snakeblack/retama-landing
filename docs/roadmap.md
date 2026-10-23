@@ -96,7 +96,9 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
   con los secretos y el binding o 503 si falta alguno. Los avisos van por email a la cuenta, sin página de estado.
 - Errores de cliente: endpoint propio `/api/report` en Workers Logs, también para los informes de la CSP (requiere un
   ADR que amplíe el 0002).
-- Cloudflare Web Analytics.
+- `web-analytics` (hecho): Cloudflare Web Analytics puesto a mano tras el evento `load`, con el token en
+  `PUBLIC_CF_ANALYTICS_TOKEN` (Workers Builds); sin token, ni beacon ni Cloudflare en la CSP. La política de privacidad
+  cuenta la medición.
 - `domain` (hecho): producción en `retama.dev`, Custom Domain del Worker, y `www.retama.dev` con un 301 a `retama.dev`;
   la URL `workers.dev` de producción, apagada; las Previews siguen en `workers.dev`. En la zona, el robots.txt
   gestionado y el bloqueo de bots de IA se dejan apagados, para que no contradigan el robots.txt del sitio.

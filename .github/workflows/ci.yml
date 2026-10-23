@@ -46,11 +46,13 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      # The call booking, WhatsApp and the legal owner are off by default; E2E builds with them on to prove them (a local
-      # run proves them off). The number and the owner are test ones: the owner's real data lives only in Workers Builds.
+      # The call booking, WhatsApp, the legal owner and Web Analytics are off by default; E2E builds with them on to prove
+      # them (a local run proves them off). The number, the owner and the analytics token are test ones: the real ones
+      # live only in Workers Builds.
       - run: pnpm test:e2e
         env:
           PUBLIC_BOOKING: "true"
+          PUBLIC_CF_ANALYTICS_TOKEN: "0123456789abcdef0123456789abcdef"
           PUBLIC_WHATSAPP_NUMBER: "34600000000"
           PUBLIC_LEGAL_NAME: "Titular de Prueba"
           PUBLIC_LEGAL_TOWN: "Localidad de Prueba (Madrid)"

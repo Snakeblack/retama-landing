@@ -1,0 +1,623 @@
+{
+  "schema": "idd-state/v1",
+  "change": "web-analytics",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "M6, 3.ª pieza del roadmap: Cloudflare Web Analytics (docs/roadmap.md:99)",
+    "kind": "feature",
+    "summary": "Medir las visitas de retama.dev con Cloudflare Web Analytics, sin cookies ni almacenamiento en el navegador (M6, 3.ª pieza)",
+    "acceptance": "Con el token del sitio en la build, cada página carga el beacon de Cloudflare Web Analytics sin violar la CSP, sin cookies ni nada guardado en el navegador y sin pasar el presupuesto de JS del ADR 0001; sin token, la build no carga beacon ni amplía la CSP; la política de privacidad cuenta la medición"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿Snippet manual con el token del sitio en PUBLIC_CF_ANALYTICS_TOKEN (Workers Builds) o configuración automática del borde? Sin token, ¿ni beacon ni CSP ampliada, como PUBLIC_BOOKING? Y el límite de 60 KB gzip del ADR 0001: el beacon pesa 10,0 KB y la portada ya carga 49,7 KB; ¿se carga tras el evento load (no cuenta) o al inicio (59,7 KB)?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿Lo cargan todas las páginas de Base.astro (portada, blog, legales y 404)? ¿Las Previews lo cargan con el mismo token (Cloudflare descarta los hostnames que no son retama.dev) o solo la rama main (WORKERS_CI_BRANCH)?"
+      },
+      {
+        "category": "persistence",
+        "question": "¿El test del ADR 0007 admite solo static.cloudflareinsights.com y cloudflareinsights.com (beacon como doble en su URL real, CI con un token de prueba) y comprueba además que no queda nada en localStorage ni sessionStorage?"
+      },
+      {
+        "category": "copy",
+        "question": "¿Se actualiza la política de privacidad (entrada, quién trata los datos y base legal) y la fecha «Actualizado el» para contar la medición de Cloudflare?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "astro.config.mjs",
+          "line": 19
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0007-consent-gated-tracking.md",
+          "line": 15
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/technical-baseline.md",
+          "line": 43
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/ci.yml",
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/lib/analytics.ts",
+      "src/scripts/analytics.ts",
+      "tests/e2e/security.spec.ts",
+      "tests/unit/analytics.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs and 2 more (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/ci.yml (matches .github/workflows/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0006, 0007",
+      "source": "declaration"
+    },
+    {
+      "id": "persistent-data",
+      "reason": "persistent data: tests/e2e/security.spec.ts adds localStorage",
+      "source": "diff"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "El beacon (10,0 KB gzip) se añade tras el evento load; el cargador cuenta en el presupuesto y la portada queda en 50,0 de 60 KB (fitness js-budget con token)."
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "La allowlist crece solo con los dos orígenes del beacon (script-src static.cloudflareinsights.com, connect-src cloudflareinsights.com) y solo con token, documentados en technical-baseline.md; sin unsafe-inline; E2E sin violaciones."
+    },
+    {
+      "kind": "adr",
+      "id": "0007",
+      "impact": "conforms",
+      "reason": "Cloudflare Web Analytics es la medición agregada sin cookies ni identificadores persistentes que decide el ADR; su fitness sigue exigiendo cero cookies, añade localStorage y sessionStorage vacíos y solo admite los dos orígenes del beacon."
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "migration-compat-and-test",
+      "signal": "persistent-data",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Instalación: Manual, tras load (Recomendado). Alcance: Todas, también Previews (Recomendado). Test 0007: Admitir solo Insights (Recomendado). Privacidad: Sí, y la fecha (Recomendado).",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T23:52:36.451Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "migration-test",
+      "obligation": "migration-compat-and-test",
+      "recorded_at": "2026-10-23T23:53:04.886Z",
+      "detail": {
+        "run": "run-10",
+        "tree": "sha256:b8d56a23dbfb9c8a0cb1f759f040a4ceceddd6b212d7be69ef9939759831f578",
+        "plan": "Sin datos persistentes que migrar: el change no guarda nada en el navegador ni en el servidor (ADR 0003, ADR 0007). La señal sale de que el test lee localStorage.length y sessionStorage.length para afirmar que están vacíos. Vuelta atrás: quitar PUBLIC_CF_ANALYTICS_TOKEN de Workers Builds y reconstruir, sin beacon ni CSP ampliada."
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T23:54:16.720Z",
+      "detail": {
+        "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+        "runs": [
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-23T23:54:16.720Z",
+      "detail": {
+        "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+        "check": "ev-3",
+        "documents": [
+          "docs/architecture/technical-baseline.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/security.spec.ts",
+          "tests/unit/analytics.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T23:54:16.720Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+        "fitness": [
+          "run-16",
+          "run-17",
+          "run-18",
+          "run-19"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-23T23:59:38.393Z",
+      "detail": {
+        "lineage_id": "sha256:9580bd9d0869cdc1de620a3e0024a31da08f8cecb2b38e58c106b3ca6be4938a",
+        "candidate_id": "sha256:5e6ebb2a17ed6ee3c7d9dd36c60e1bb0f56c6d6dd513bd98487f55a67b1f6b5a",
+        "candidate_tree": "2d347e2fd0581545e0b8d7d055a1d94d932a5a76",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "relayed"
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-23T23:59:44.786Z"
+    }
+  ],
+  "base": "fd06a18b02e8af9c09819c81581f1cc4164658db",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 1,
+      "output_sha256": "sha256:fc34adf84e5225105c9848881c77b311fa7fa84f06ac8162447d8da690b79bc9",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:7e50df059078572493f300c42eeae765294ec1debb8bdbda45d4b89d8b08c832",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:ddd19a8031f86faaa3bd7bc4a41c8177ca5ef472baa5f4a43800a204033332e7",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:9614cd9539425e7f9829ba7eee9dba45170ebb1605025fa6afae5995c734092a",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d906766965904ad53f11bee3dcc40a4a2cc2e56e803323be77679e5517e14420",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:dde616f7139a2cbb277bf7c3b215451f95e32271cfda5461de3a25ab8a08aafb",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:6da481eff2d01cb1c30d88ea804b314e4b8b5a37fb05d08f7629ab560a41dcf8",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:93fd26fb8d1f5e4d3be5f76e04583a6fa094da1a0d5f98aa1ec400bf56d4385c",
+      "tree": "sha256:7adbb43266408bf33356ccf4afd4d65ae672b789de26245ee3b8f2edddf38a75",
+      "recorded_at": "2026-10-23T23:52:36.451Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "migration-test",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:6f98b5f49cad1acaba349ff81a969e61c10f04329884fccb6d1e2a0c3333e2f1",
+      "tree": "sha256:b8d56a23dbfb9c8a0cb1f759f040a4ceceddd6b212d7be69ef9939759831f578",
+      "recorded_at": "2026-10-23T23:53:04.886Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:7994c7d76f29a6a532a6e33ffd95c51cded39310ab2a4320e0c2d9d88a8b0b15",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:b03782cce341f5d07f3bb135364dd977a6d8540eeda7f54427a128c7359f75b1",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:60137b6e87be620c262b72708978b46ee9ce753be07825630b26d9359c186f2a",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:c5606065451f105d70f339af5e6ce218ae0070dbfbcf3fce842c6469d35f6586",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:72e94f30649a5958e6d59d7c88b4c7eacc2f863004d055494b4b80c8bee3a912",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:659ac065b15f72575dbb92d75adad1c549609ec291fae2ebafd76a3fd7e4d269",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:958a11cf63c637ad00657cd23b6005cfc4a5506b882c9d5274bd36f42bb4a9ba",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:b84232d21a5d1b6c884776dba574de5afc84ddd420188ed5fdf821dd5526a827",
+      "tree": "sha256:6b0df7ceecce54bf7b217aa58fe64f8ebd5214d6a64c41c4d3adab79201e158e",
+      "recorded_at": "2026-10-23T23:54:16.720Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:9580bd9d0869cdc1de620a3e0024a31da08f8cecb2b38e58c106b3ca6be4938a",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "96b99e4d2978d9b2a2417a1f0d8a00a02519334e",
+          "candidate_tree": "2d347e2fd0581545e0b8d7d055a1d94d932a5a76",
+          "paths": [
+            ".github/workflows/ci.yml",
+            "astro.config.mjs",
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "src/components/Analytics.astro",
+            "src/i18n/en.ts",
+            "src/i18n/es.ts",
+            "src/layouts/Base.astro",
+            "src/lib/analytics.ts",
+            "src/scripts/analytics.ts",
+            "tests/e2e/security.spec.ts",
+            "tests/unit/analytics.test.ts"
+          ],
+          "diff_hash": "sha256:05af1b2575621024fb20f3415debda199c2a4923e85566ee3948a540b1f66251",
+          "paths_digest": "sha256:91f6566207d1ea728f1cee61a31adb3a53d09207847deb819407aedf87313873",
+          "authored_lines": 212,
+          "original_changed_lines": 234
+        },
+        "candidate_id": "sha256:5e6ebb2a17ed6ee3c7d9dd36c60e1bb0f56c6d6dd513bd98487f55a67b1f6b5a",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "src/components/Analytics.astro",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/layouts/Base.astro",
+          "src/lib/analytics.ts",
+          "src/scripts/analytics.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/analytics.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "2d347e2fd0581545e0b8d7d055a1d94d932a5a76",
+        "original_changed_lines": 234,
+        "authored_lines": 212
+      },
+      "current_candidate_id": "sha256:5e6ebb2a17ed6ee3c7d9dd36c60e1bb0f56c6d6dd513bd98487f55a67b1f6b5a",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "96b99e4d2978d9b2a2417a1f0d8a00a02519334e",
+        "candidate_tree": "2d347e2fd0581545e0b8d7d055a1d94d932a5a76",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "src/components/Analytics.astro",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/layouts/Base.astro",
+          "src/lib/analytics.ts",
+          "src/scripts/analytics.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/analytics.test.ts"
+        ],
+        "diff_hash": "sha256:05af1b2575621024fb20f3415debda199c2a4923e85566ee3948a540b1f66251",
+        "paths_digest": "sha256:91f6566207d1ea728f1cee61a31adb3a53d09207847deb819407aedf87313873",
+        "authored_lines": 212,
+        "original_changed_lines": 234
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "web-analytics:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "web-analytics:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 117,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "assumptions": [
+    "El formato del token de Web Analytics no se valida en la build: un token mal copiado solo deja de medir."
+  ],
+  "closed_at": "2026-10-23T23:59:44.786Z"
+}

@@ -237,7 +237,7 @@ export const es = {
     "Aviso legal, política de privacidad y política de cookies de Retama: quién está detrás, qué pasa con tus datos y qué guarda la web en tu navegador.",
   "legal.title": "Información legal",
   "legal.lead": "Quién está detrás de Retama, qué hacemos con tus datos y qué guarda esta web en tu navegador.",
-  "legal.updated": "Actualizado el 23 de octubre de 2026.",
+  "legal.updated": "Actualizado el 24 de octubre de 2026.",
 
   "legal.notice.title": "Aviso legal",
   "legal.notice.lead":
@@ -260,24 +260,24 @@ export const es = {
 
   "legal.privacy.title": "Privacidad",
   "legal.privacy.lead":
-    "Esta web solo trata datos personales cuando nos escribes por el formulario o reservas una llamada. Esto es lo que pasa con ellos, conforme al Reglamento General de Protección de Datos (RGPD).",
+    "Esta web trata datos personales cuando nos escribes por el formulario o reservas una llamada, y cuenta las visitas sin identificarte. Esto es lo que pasa con ellos, conforme al Reglamento General de Protección de Datos (RGPD).",
   "legal.privacy.controller": "Responsable.",
   "legal.privacy.controllerText": "El titular del aviso legal. Para cualquier cosa sobre tus datos, escribe a",
   "legal.privacy.data": "Qué datos.",
   "legal.privacy.dataText":
-    "Los del formulario: tu nombre, tu correo, qué necesitas y tu mensaje, que hacen falta para responderte. Para frenar el spam, Cloudflare comprueba que eres una persona y la web usa tu dirección IP para contar tus envíos durante un minuto, sin guardarla. Si reservas una llamada, los datos que des en Cal.com.",
+    "Los del formulario: tu nombre, tu correo, qué necesitas y tu mensaje, que hacen falta para responderte. Para frenar el spam, Cloudflare comprueba que eres una persona y la web usa tu dirección IP para contar tus envíos durante un minuto, sin guardarla. Si reservas una llamada, los datos que des en Cal.com. Al visitar la web, Cloudflare Web Analytics recibe lo técnico de cada visita (la página, la web de la que vienes, tu navegador, tu país y cuánto tarda en cargar) para contar las visitas en conjunto, sin cookies, sin guardar nada en tu navegador y sin seguirte de una web a otra.",
   "legal.privacy.purpose": "Para qué.",
   "legal.privacy.purposeText":
-    "Para responder a tu consulta y, si nos lo pides, preparar una propuesta. No te enviamos publicidad ni hacemos perfiles ni decisiones automatizadas con tus datos.",
+    "Para responder a tu consulta y, si nos lo pides, preparar una propuesta. Las visitas, para saber qué páginas se leen y si la web carga rápido. No te enviamos publicidad ni hacemos perfiles ni decisiones automatizadas con tus datos.",
   "legal.privacy.basis": "Base legal.",
   "legal.privacy.basisText":
-    "Responderte es una medida precontractual que tú pides (artículo 6.1.b del RGPD). Comprobar que eres una persona y limitar los envíos protege la web del abuso, un interés legítimo (artículo 6.1.f).",
+    "Responderte es una medida precontractual que tú pides (artículo 6.1.b del RGPD). Comprobar que eres una persona y limitar los envíos protege la web del abuso, y contar las visitas en conjunto sirve para mejorarla: los dos son intereses legítimos (artículo 6.1.f).",
   "legal.privacy.retention": "Cuánto tiempo.",
   "legal.privacy.retentionText":
     "Mientras dura tu consulta. Si no acaba en un encargo, borramos el mensaje en un plazo máximo de 12 meses; si acaba en uno, guardamos lo que la ley obligue a conservar.",
   "legal.privacy.recipients": "Quién más los trata.",
   "legal.privacy.recipientsText":
-    "Solo los proveedores que nos ayudan a hacerlo, como encargados del tratamiento: Cloudflare (aloja la web, comprueba que eres una persona y reenvía el correo), Resend (envía tu mensaje, desde su región de la UE), Google (el buzón de Gmail donde llega) y, si reservas, Cal.com. No vendemos ni cedemos tus datos.",
+    "Solo los proveedores que nos ayudan a hacerlo, como encargados del tratamiento: Cloudflare (aloja la web, cuenta las visitas, comprueba que eres una persona y reenvía el correo), Resend (envía tu mensaje, desde su región de la UE), Google (el buzón de Gmail donde llega) y, si reservas, Cal.com. No vendemos ni cedemos tus datos.",
   "legal.privacy.transfers": "Fuera de la UE.",
   "legal.privacy.transfersText":
     "Estos proveedores son empresas de Estados Unidos. Sus contratos cubren la transferencia con las cláusulas contractuales tipo de la Comisión Europea o con el Marco de Privacidad de Datos UE-EE. UU., según el caso.",
