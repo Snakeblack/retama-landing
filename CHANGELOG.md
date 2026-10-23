@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/Snakeblack/retama-landing/compare/v0.5.0...v0.6.0) (2026-10-23)
+
+
+### Features
+
+* **platform:** add Workers Logs, Traces and an uptime health check ([c0c0a8e](https://github.com/Snakeblack/retama-landing/commit/c0c0a8edadaf9b877fcd7bed8c9cee442bd1b3e6))
+
 ## [0.5.0](https://github.com/Snakeblack/retama-landing/compare/v0.4.1...v0.5.0) (2026-10-23)
 
 
