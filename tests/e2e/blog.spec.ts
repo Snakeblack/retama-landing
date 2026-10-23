@@ -141,15 +141,32 @@ for (const { lang, index, article, headline } of blogs) {
     expect(xml).not.toContain("<content:encoded>");
   });
 
-  test(`el índice y los artículos de ${index} anuncian su RSS, y el índice lo enlaza`, async ({ page }) => {
+  test(`el índice y los artículos de ${index} anuncian su RSS, y el índice da su dirección sin enlazar el XML`, async ({
+    page,
+  }) => {
     for (const path of [index, article]) {
       await page.goto(path);
       await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", feed);
     }
-    await page.goto(index);
-    await expect(page.getByRole("main").locator(`a[href="${feed}"]`)).toBeVisible();
     await page.goto(index.replace("blog/", ""));
     await expect(page.locator('link[type="application/rss+xml"]')).toHaveCount(0);
+
+    // A browser shows the feed as raw XML, so the index explains it and gives the address for a reader instead.
+    await page.goto(index);
+    await expect(page.locator(`a[href$="rss.xml"]`)).toHaveCount(0);
+    const canonical = (await page.locator('link[rel="canonical"]').getAttribute("href")) ?? "";
+    const address = page.getByRole("main").locator("[data-feed-address]");
+    await expect(address).toHaveText(new URL(feed, canonical).href);
+    await expect(address).toBeVisible();
+  });
+
+  test(`en el móvil, la dirección del RSS de ${index} se selecciona entera de un toque`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(index);
+    const address = page.locator("[data-feed-address]");
+    // The board's text is not selectable on touch screens (global.css); the address is, as a whole.
+    expect(await address.evaluate((node) => getComputedStyle(node).userSelect)).toBe("all");
+    await expect(address).toBeInViewport();
   });
 
   test(`${article} declara su propia imagen Open Graph, con su título en el texto alternativo`, async ({

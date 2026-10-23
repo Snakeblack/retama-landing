@@ -317,7 +317,7 @@ export const es = {
   "blog.minutes": "min de lectura",
   "blog.all": "Todos los artículos",
   "blog.imageAlt": "artículo del blog de Retama",
-  "blog.rss": "Suscríbete por RSS",
+  "blog.rss": "¿Usas un lector de RSS? Añade esta dirección:",
   "blog.talk": "¿Tienes un proyecto entre manos? Cuéntanoslo y te respondemos en un día laborable.",
 } as const;
 
