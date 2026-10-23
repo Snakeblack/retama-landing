@@ -72,7 +72,9 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
   `twitter:card` en cada página indexable; la 404 no lleva ninguna.
 - robots.txt (crawlers de IA permitidos) y llms.txt (hecho, `seo-structured-data`): los dos se generan en el build con
   el origen del sitio; llms.txt va en inglés y enlaza las páginas de los dos idiomas.
-- FAQ.
+- FAQ (hecho, `faq`): un capítulo de preguntas en la portada, entre el método y el contacto, con plazos, presupuesto,
+  trabajo remoto, propiedad del código, garantía de seis meses y mantenimiento; acordeón nativo sin JavaScript, en el
+  menú y en el índice, repetido como `FAQPage` en el JSON-LD y en llms.txt.
 - Aviso legal, privacidad y cookies (LSSI/RGPD) (hecho, `legal-pages`): una página `/legal/` por idioma con las tres secciones, el titular por variables de build y los enlaces en el pie y bajo el formulario.
 
 ## M5 — Blog
