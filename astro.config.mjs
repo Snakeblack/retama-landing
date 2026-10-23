@@ -10,9 +10,9 @@ const missing = missingOwner(process.env);
 if (missing.length > 0)
   throw new Error(`The legal notice needs its owner: set ${missing.join(" and ")} in Workers Builds.`);
 
-// Production origin for canonicals, hreflang and the sitemap. SITE_URL overrides
-// it; the fallback is the workers.dev URL until the domain lands (M6).
-const site = process.env.SITE_URL ?? "https://retama-landing.retamozogpt.workers.dev";
+// Production origin for canonicals, hreflang and the sitemap, the Custom Domain of wrangler.jsonc.
+// SITE_URL overrides it.
+const site = process.env.SITE_URL ?? "https://retama.dev";
 
 export default defineConfig({
   site,

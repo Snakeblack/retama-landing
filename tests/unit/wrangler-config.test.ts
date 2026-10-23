@@ -10,6 +10,18 @@ type RateLimit = { name: string; namespace_id: string; simple: { limit: number; 
 
 const limiter = (ratelimits?: RateLimit[]) => ratelimits?.find(({ name }) => name === "CONTACT_LIMITER");
 
+describe("dominio de producción (M6)", () => {
+  it("producción se sirve solo en retama.dev, como Custom Domain del Worker", () => {
+    expect(config.routes).toEqual([{ pattern: "retama.dev", custom_domain: true }]);
+    expect(config.workers_dev).toBe(false);
+  });
+
+  // Las Previews viven en workers.dev aunque producción ya no: preview_urls tiene que estar puesto a mano.
+  it("las Previews por rama siguen publicándose", () => {
+    expect(config.preview_urls).toBe(true);
+  });
+});
+
 describe("límite de envíos en las Previews (ADR 0002)", () => {
   // Las Previews no heredan los bindings de producción: sin el suyo, /api/contact/ responde siempre 503.
   it("cada Preview tiene su CONTACT_LIMITER con el mismo límite que producción", () => {
