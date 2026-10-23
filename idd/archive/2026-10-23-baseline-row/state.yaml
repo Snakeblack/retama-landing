@@ -1,0 +1,112 @@
+{
+  "schema": "idd-state/v1",
+  "change": "baseline-row",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "docs",
+    "summary": "Restore the cookieless analytics row of the Integrations table and move the Open Graph image record to the Technology record",
+    "acceptance": "In docs/architecture/technical-baseline.md the Integrations row 'Medición sin cookies' reads 'Cloudflare Web Analytics | Beacon | Si falla, se pierden métricas; nunca afecta a la página' with four cells, and the Satori + sharp + @fontsource row sits in the Technology record with five cells"
+  },
+  "facts": {
+    "basis": "git show 4519197~1 holds the original Integrations row verbatim; the misplaced row already has the five Technology record columns (Elección, Implementa, Alternativas, Por qué, Fuente fechada)"
+  },
+  "plan": {
+    "paths": [
+      "docs/architecture/technical-baseline.md"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T23:15:02.084Z",
+      "detail": {
+        "tree": "sha256:954ff0908cce6b3951659ae2f6e5bb8936b2030dcd7144475f202d28c3aa1246",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    }
+  ],
+  "base": "f90434f6850f139c94c6a91f1657ec8903dd867b",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:8aabc19a2a1b3d536d39d14e6ed270abd2d2207397dd1db502e593235848fb69",
+      "tree": "sha256:954ff0908cce6b3951659ae2f6e5bb8936b2030dcd7144475f202d28c3aa1246",
+      "recorded_at": "2026-10-23T23:15:02.084Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:97f06eac69e9d148ca9e0bba8fddfff909a3fe7323610cd5872131fed93ef50d",
+      "tree": "sha256:954ff0908cce6b3951659ae2f6e5bb8936b2030dcd7144475f202d28c3aa1246",
+      "recorded_at": "2026-10-23T23:15:02.084Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:7dbb40da93368e0a7e94345ad5f44ea1741f77ce4b5657695316cb6a50bea175",
+      "tree": "sha256:954ff0908cce6b3951659ae2f6e5bb8936b2030dcd7144475f202d28c3aa1246",
+      "recorded_at": "2026-10-23T23:15:02.084Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:e71299ae95c15f58e23ddf10337b6a1cb85be6980c02717e8bcf8f284ee45cc4",
+      "tree": "sha256:954ff0908cce6b3951659ae2f6e5bb8936b2030dcd7144475f202d28c3aa1246",
+      "recorded_at": "2026-10-23T23:15:02.084Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:954ff0908cce6b3951659ae2f6e5bb8936b2030dcd7144475f202d28c3aa1246",
+      "recorded_at": "2026-10-23T23:15:02.084Z"
+    }
+  ],
+  "closed_at": "2026-10-23T23:15:08.611Z"
+}
