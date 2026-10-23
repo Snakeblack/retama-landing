@@ -8,6 +8,7 @@ overrides:
   # @lhci/cli (no release since 06-2025) pins vulnerable transitive versions.
   "tmp": ">=0.2.6"
   "basic-ftp": ">=6.2.1"
+  "body-parser@1": "^1.20.9"
 
 auditConfig:
   ignoreGhsas:
@@ -15,3 +16,6 @@ auditConfig:
     # downloaded browsers; Lighthouse CI runs the installed Chrome and downloads none.
     - GHSA-jmr9-qjv8-65gv
     - GHSA-7pqw-9j4j-h8q3
+    # zod 3 has no patched release (the fix is 4.6.6). Only @google/design.md, on our own
+    # DESIGN.md, and chromium-bidi, on messages from the local Chrome, validate with it.
+    - GHSA-mrhx-c7xc-m3w5
