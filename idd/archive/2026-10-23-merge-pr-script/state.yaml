@@ -1,0 +1,190 @@
+{
+  "schema": "idd-state/v1",
+  "change": "merge-pr-script",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "1. si añade el script (scripts/merge-pr que hace las comprobaciones y se niega a fusionar si alguna falla). Respuestas: si el PR está BEHIND, se detiene y lo dice con la orden gh pr update-branch --rebase; un check en rojo bloquea salvo que lo nombre con --allow-failing",
+    "kind": "feature",
+    "summary": "pnpm pr:merge <n>: fusiona un PR solo si pasa las comprobaciones del procedimiento (estado, CI sobre su commit, al día con main), verifica que quedó fusionado y solo entonces limpia las ramas",
+    "acceptance": "pnpm pr:merge <n> se niega y explica por qué con un PR BEHIND, en conflicto, en borrador, cerrado, con checks pendientes o en rojo no nombrados en --allow-failing; con todo en verde fusiona con rebase atado a su commit, confirma MERGED y solo entonces borra la rama remota y la local cuyo contenido ya está en main; --dry-run solo comprueba"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "request",
+          "text": "se niega a fusionar si alguna falla"
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "scripts/skills-scan.mjs",
+          "line": 3
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "path",
+          "path": "AGENTS.md",
+          "line": 52
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "request",
+          "text": "se detiene y lo dice con la orden gh pr update-branch --rebase"
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "AGENTS.md",
+          "line": 53
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "request",
+          "text": "un check en rojo bloquea salvo que lo nombre con --allow-failing"
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "AGENTS.md",
+      "package.json",
+      "scripts/lib/merge-pr.mjs",
+      "scripts/merge-pr.mjs",
+      "tests/unit/merge-pr.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T18:48:32.882Z",
+      "detail": {
+        "tree": "sha256:3efbc6d6d2044c210f4a4fcc95ac068f710a26eb7c40a954e5ee71901bb930c6",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-23T18:48:42.472Z"
+    }
+  ],
+  "base": "e0546a5f2ce176245007ffadbdc8aa2d554282cd",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:2e63b7ad8093c458e22bda65371b10afdcd2e3768e37a8215dfe32bc71d30ee1",
+      "tree": "sha256:3efbc6d6d2044c210f4a4fcc95ac068f710a26eb7c40a954e5ee71901bb930c6",
+      "recorded_at": "2026-10-23T18:48:32.882Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:5f0aab878e85ceeac3d14a305ce23cd4993456376822e070f4adbc8f5a1bf58d",
+      "tree": "sha256:3efbc6d6d2044c210f4a4fcc95ac068f710a26eb7c40a954e5ee71901bb930c6",
+      "recorded_at": "2026-10-23T18:48:32.882Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:fa4dd32c8e510d4ac3727e36e85be87568fe1b7c548fdbc5bb7d356b0015ae19",
+      "tree": "sha256:3efbc6d6d2044c210f4a4fcc95ac068f710a26eb7c40a954e5ee71901bb930c6",
+      "recorded_at": "2026-10-23T18:48:32.882Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:198dde9ff98d2ecdac1a4bf89be940c4706154603e06108c4580bde97a57775c",
+      "tree": "sha256:3efbc6d6d2044c210f4a4fcc95ac068f710a26eb7c40a954e5ee71901bb930c6",
+      "recorded_at": "2026-10-23T18:48:32.882Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:3efbc6d6d2044c210f4a4fcc95ac068f710a26eb7c40a954e5ee71901bb930c6",
+      "recorded_at": "2026-10-23T18:48:32.882Z"
+    }
+  ],
+  "closed_at": "2026-10-23T18:48:42.472Z"
+}
