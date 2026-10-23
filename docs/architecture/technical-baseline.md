@@ -21,7 +21,7 @@
 
 | Componente | Responsabilidad | Datos que posee | Quién escribe |
 | --- | --- | --- | --- |
-| Sitio estático | Páginas, i18n, SEO (canónica, hreflang, sitemap, JSON-LD en `src/lib/seo.ts`, `robots.txt` y `llms.txt` generados en el build), escena 3D, animaciones | Contenido y traducciones (repo) | Editor, mediante PR |
+| Sitio estático | Páginas, i18n, blog (colección `blog` de Markdown en `src/content/blog/<idioma>/`, `src/content.config.ts`; el build falla si un artículo no está en todos los idiomas, `src/lib/blog.ts`), SEO (canónica, hreflang, sitemap, JSON-LD en `src/lib/seo.ts`, `robots.txt` y `llms.txt` generados en el build), escena 3D, animaciones | Contenido, artículos y traducciones (repo) | Editor, mediante PR |
 | Isla 3D | Escena progresiva (ADR 0004) | Ninguno | — |
 | Isla de contacto | Formulario, validación en cliente con las reglas de la función (`src/lib/contact.ts`), token anti-bot. Sin script, el botón queda desactivado y se ofrecen el correo y WhatsApp | Ninguno (estado efímero) | — |
 | Función de contacto | Validar, verificar el anti-bot, limitar, entregar por email | Ninguno; tránsito (ADR 0003) | — |
@@ -66,7 +66,7 @@
 
 | Capa | Qué protege | Herramienta |
 | --- | --- | --- |
-| Unitaria | Esquema de validación del contacto, saneado y escape del email, paridad de claves i18n, utilidades SEO (canónicas, hreflang, JSON-LD) | Vitest |
+| Unitaria | Esquema de validación del contacto, saneado y escape del email, paridad de claves i18n, utilidades SEO (canónicas, hreflang, JSON-LD) y del blog (traducciones, tiempo de lectura, fechas) | Vitest |
 | Integración / contrato | Función de contacto con el email, el anti-bot y el límite simulados: éxito, fallo del proveedor, token inválido, rate limit, logs sin datos personales. Su cableado en workerd (ruta, binding del límite, secretos ausentes) lo prueba el E2E sobre el build | Vitest con dobles en la frontera; `@cloudflare/vitest-pool-workers` solo admite vitest 4 (2026-10-22) |
 | E2E | Navegación es/en, JS desactivado (ADR 0001), movimiento reducido y fallback 3D (ADR 0004), cabeceras y CSP sin violaciones (ADR 0006), cero cookies sin consentimiento (ADR 0007), hreflang (ADR 0008), accesibilidad (axe) | Playwright sobre el build |
 | Medición | Presupuesto `perf-mobile` y tamaño de JS por página | Lighthouse CI sobre el preview |

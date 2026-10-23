@@ -1,0 +1,405 @@
+{
+  "schema": "idd-state/v1",
+  "change": "blog",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "continua (M5 de docs/roadmap.md: el blog, content collections por idioma; índice, artículos y RSS; SEO por artículo)",
+    "kind": "feature",
+    "summary": "Blog por idioma (es en /blog/, en en /en/blog/): artículos en content collections del repositorio, índice y página de artículo con SEO",
+    "acceptance": "El build publica un índice del blog y cada artículo en es y en, legibles sin JavaScript, con canónica, hreflang recíproco, metadatos y JSON-LD propios, enlazados desde el sitio, y los textos de interfaz en es.ts y en.ts"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿En qué formato van los artículos (Markdown .md en el repo, sin CMS por technical-baseline.md:18), en cuántos changes se parte M5, entra el RSS por idioma (/rss.xml y /en/rss.xml) en este, y la imagen Open Graph de cada artículo es propia de 1200×630 o la del idioma?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿El mismo artículo lleva un slug traducido en cada idioma (enlazados por una clave común) o el mismo slug en los dos?"
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Para quién escribe el blog (clientes o perfil técnico), quién escribe los artículos iniciales y sobre qué temas, y qué autor firma (la marca Retama o una persona)?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿Rutas /blog/ y /en/blog/<slug>/, y dónde se enlaza el blog: cabecera, índice de capítulos del móvil, pie?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿Qué lleva la página de artículo (título, fecha, tiempo de lectura, entradilla) y se admiten imágenes y bloques de código, hoy sin monospace por DESIGN.md?"
+      },
+      {
+        "category": "errors",
+        "question": "¿Qué pasa si un artículo no está en los dos idiomas: falla el build (ADR 0008 prohíbe páginas sin alternativa) o se publica solo en uno con hreflang a sí mismo?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "src/components/Article.astro",
+      "src/components/BlogIndex.astro",
+      "src/components/ChapterIndex.astro",
+      "src/components/Home.astro",
+      "src/components/LangSwitch.astro",
+      "src/components/board/Footer.astro",
+      "src/content.config.ts",
+      "src/content/blog/en/what-custom-software-costs.md",
+      "src/content/blog/en/why-we-write-every-decision-down.md",
+      "src/content/blog/es/cuanto-cuesta-un-software-a-medida.md",
+      "src/content/blog/es/por-que-escribimos-cada-decision.md",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/lib/articles.ts",
+      "src/lib/blog.ts",
+      "src/lib/seo.ts",
+      "src/pages/blog/[slug].astro",
+      "src/pages/blog/index.astro",
+      "src/pages/en/blog/[slug].astro",
+      "src/pages/en/blog/index.astro",
+      "src/pages/llms.txt.ts",
+      "src/styles/global.css",
+      "tests/e2e/blog.spec.ts",
+      "tests/e2e/header.spec.ts",
+      "tests/unit/blog.test.ts",
+      "tests/unit/seo.test.ts"
+    ],
+    "work_units": 3,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The index and the articles are static HTML generated at build time from Markdown; no script is added and the E2E reads them with JS disabled"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md describes the blog, header, index and footer changes; the pages and the article body styles use only the generated tokens and design:lint passes"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "No inline style or handler: the build refuses code in articles, which the highlighter would render with inline style attributes the CSP blocks"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Each article has its own translated slug; alternates and the language switch take the paths of every language, x-default included, and the build fails when an article misses a language; the reciprocal hreflang E2E covers the new sitemap URLs"
+    },
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "The blog pages are static assets of the same Worker; no new service, binding or route handler"
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "impact": "none",
+      "reason": "Articles live in the repository and are read at build time; nothing is stored at runtime"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "The blog follows the board: raised tiles, statement and headline sizes, the field for quotes and the one primary action"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "No JavaScript and no new requests: the pages reuse the inlined stylesheet and the self-hosted fonts"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Articles get canonical, reciprocal hreflang, Open Graph article, JSON-LD BlogPosting and breadcrumb, and appear in the sitemap and llms.txt"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "todos los recomendados: (1) Markdown .md sin MDX; M5 en dos changes: blog (colecciones, índice, artículo, canónica, hreflang, JSON-LD BlogPosting y BreadcrumbList, sitemap, llms.txt, OG con la imagen del idioma) y blog-feed (RSS por idioma en /blog/rss.xml y /en/blog/rss.xml e imagen OG por artículo); (2) slug traducido por idioma con clave común en el frontmatter; (3) para clientes, el agente redacta 2 artículos iniciales en es y en para revisión (cuánto cuesta y cuánto tarda un software a medida; por qué dejamos por escrito cada decisión), firma la marca Retama; (4) /blog/ y /en/blog/<slug>/, Blog en la cabecera de todas las páginas, en el índice de capítulos del móvil y en el pie; (5) artículo con h1, entradilla, fecha de publicación y actualización, tiempo de lectura, cuerpo a measure con h2/h3, listas, enlaces y citas, imágenes opcionales en gris, sin bloques de código; índice en tiles del más reciente al más antiguo sin etiquetas ni paginación; (6) el build falla si un artículo no está en los dos idiomas (ADR 0008)",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T14:21:06.087Z",
+      "detail": {
+        "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-23T14:21:06.087Z",
+      "detail": {
+        "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/blog.spec.ts",
+          "tests/e2e/header.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/blog.test.ts",
+          "tests/unit/seo.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T14:21:06.087Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "adr:0002 conforms",
+          "adr:0003 none",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-23T14:21:19.432Z"
+    }
+  ],
+  "base": "47b62d811e5321f64418f17e5bfc554cf4916448",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:1d15e80c07d19b565875c65060f4ec238140a7b9ed3515ac01bfd691661c3cc2",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:4b51a04930bdc8eb3e612811f8efbc3510916128326f8e1e31be24a557823297",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:a66a57ab811956e4d3f2ec1f89bb452030666fe91bb2c8ea26b75939acd28daa",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:e67ad2a10e049b7b55b0f658ccfd54f1a15c07bb1866ad3b5ef4b978969cbf58",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:fe2c9141243be430d3946b8078ec3d09d140c93a2fbcf6c22c02e61b8cacc169",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:56aa0ae10ba8b9eda4eb655058297e2bb1857e8e328613da5c2dc21ae0ab88e1",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:159fb469c7e0f04254de14086f8f128a0d435578e69f6318ffbf937beadf8dbb",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:51815f91ad7e33bc3dfea4cb8eacb910ca4d14ee9877a33fab0bfcc2e59a9be3",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:831da4526a5e0ecfdce922b8f032cbbd8a213e7359932b7484a99f55ac055ab3",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:6561ce061bbaefa0f0701312358e99c8ef9da7bbf77956538edf2d036149fc4c",
+      "tree": "sha256:06165b3b1b3bbbfc935b77e00eeadcd487a6054b522956ec5dd113f15e0239f0",
+      "recorded_at": "2026-10-23T14:21:06.087Z"
+    }
+  ],
+  "closed_at": "2026-10-23T14:21:19.432Z"
+}
