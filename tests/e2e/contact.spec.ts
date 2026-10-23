@@ -54,6 +54,14 @@ test.describe("función de contacto (ADR 0002)", () => {
     expect(await response.json()).toEqual({ ok: false, error: "unavailable" });
   });
 
+  // El uptime externo hace GET: con el binding pero sin secretos (el build de los tests), la ruta responde 503.
+  test("GET responde a la comprobación de salud sin gastar envíos", async ({ request, baseURL }) => {
+    const response = await request.get("/api/contact/", { headers: headers(baseURL) });
+    expect(response.status()).toBe(503);
+    expect(await response.json()).toEqual({ ok: false, error: "unavailable" });
+    expect(response.headers()["cache-control"]).toBe("no-store");
+  });
+
   test("el binding corta en el cuarto envío del mismo IP en un minuto", async ({ request, baseURL }) => {
     const sameIp = headers(baseURL);
     const statuses: number[] = [];

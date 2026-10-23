@@ -11,6 +11,13 @@
   // Each branch Preview gets <preview>-retama-landing.<subdomain>.workers.dev, also with workers_dev off.
   // wrangler deploy applies it, so it lives here and not in the dashboard.
   "preview_urls": true,
+  // Workers Logs and Traces, every invocation: the free plan keeps 200,000 events a day for 3 days, far above
+  // this site's traffic (the contact sends and the uptime check every 5 minutes). Previews log too.
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 1 }
+  },
   "assets": {
     "html_handling": "force-trailing-slash",
     // Serves the nearest 404.html walking up the path: /en/* gets /en/404.html.

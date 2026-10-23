@@ -91,8 +91,11 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 
 ## M6 — Operación y lanzamiento
 
-- Logs y alertas del Worker.
-- Uptime externo y errores de cliente: se elige proveedor gratis.
+- `observability` (hecho): Workers Logs y Traces al 100 %, con los fallos del contacto (`unavailable`, `delivery`) en
+  severidad de error, y UptimeRobot gratis cada 5 minutos sobre `/`, `/en/` y `GET /api/contact/`, que responde 200
+  con los secretos y el binding o 503 si falta alguno. Los avisos van por email a la cuenta, sin página de estado.
+- Errores de cliente: endpoint propio `/api/report` en Workers Logs, también para los informes de la CSP (requiere un
+  ADR que amplíe el 0002).
 - Cloudflare Web Analytics.
 - `domain` (hecho): producción en `retama.dev`, Custom Domain del Worker, y `www.retama.dev` con un 301 a `retama.dev`;
   la URL `workers.dev` de producción, apagada; las Previews siguen en `workers.dev`. En la zona, el robots.txt
@@ -114,6 +117,6 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 | Copy final es/en | Usuario | M2 |
 | Datos legales (razón social, NIF, domicilio) para el aviso legal: en M4 el titular es una persona física con nombre y municipio (`legal-pages`); faltan el NIF y el domicilio | Usuario | Checklist de lanzamiento (M6) |
 | Cuentas de Resend, Cal.com y WhatsApp Business; direcciones principal y de respaldo | Usuario | M3 |
-| Proveedores gratuitos de uptime y errores de cliente | Usuario | M6 |
+| Proveedores gratuitos de uptime y errores de cliente: UptimeRobot y un endpoint propio `/api/report` (elegidos en M6) | Usuario | M6 |
 | Herramienta y CMP de heatmaps | Usuario | v2 |
 | Confirmar que el plan gratuito de Cloudflare permite uso comercial (términos vigentes) | Usuario | Antes de S1 en producción |

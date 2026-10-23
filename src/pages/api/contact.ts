@@ -14,12 +14,25 @@
 //   429 { ok: false, error: "rate-limited" }             over 3 sends a minute from one IPv4 address or IPv6 /64
 //   502 { ok: false, error: "delivery" }                 Resend refused the email or did not answer in 8 s
 //   503 { ok: false, error: "unavailable" }              a secret or the rate-limit binding is missing
+//
+// GET /api/contact/: the health check of the external uptime monitor (UptimeRobot), no body, no Origin:
+//   200 { ok: true }                                     every secret and the rate-limit binding are set
+//   503 { ok: false, error: "unavailable" }              one of them is missing (not named)
+// Also JSON with Cache-Control: no-store. It calls neither Turnstile nor Resend and spends no send.
+// Failures (503 unavailable, 502 delivery) are logged at error severity in Workers Logs; the rest as info.
 // The behaviour lives in src/server/contact.ts and its contract test in tests/unit/contact.test.ts.
 import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
-import { handleContact } from "../../server/contact";
+import { contactHealth, handleContact } from "../../server/contact";
 
 export const prerender = false;
 
 export const POST: APIRoute = ({ request }) =>
-  handleContact(request, { env, fetch: (input, init) => fetch(input, init), log: console.log });
+  handleContact(request, {
+    env,
+    fetch: (input, init) => fetch(input, init),
+    log: console.log,
+    error: console.error,
+  });
+
+export const GET: APIRoute = () => contactHealth(env);
