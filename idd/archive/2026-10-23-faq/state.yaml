@@ -1,0 +1,540 @@
+{
+  "schema": "idd-state/v1",
+  "change": "faq",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "continua (siguiente change de M4: la FAQ, docs/roadmap.md:75)",
+    "kind": "feature",
+    "summary": "Capítulo de preguntas frecuentes en la portada (es y en), entre el método y el contacto",
+    "acceptance": "La portada en / y /en/ muestra el capítulo de preguntas con encabezado propio entre el método y el contacto, con plazos, garantías, trabajo remoto y propiedad del código, legible sin JavaScript y con los textos en es.ts y en.ts"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Home.astro",
+          "line": 57
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/es.ts",
+          "line": 13
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Qué preguntas lleva y qué dice cada respuesta (plazos, garantía, remoto, propiedad del código, precio, después de la entrega) sin prometer lo que Retama aún no puede cumplir, y se repiten como FAQPage en el JSON-LD y en llms.txt?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿Qué ancla lleva el capítulo y entra en el menú de la cabecera y en el índice de capítulos del móvil?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿Forma visual: acordeón nativo <details> (cuáles abiertas al cargar) o preguntas y respuestas siempre visibles en tiles?"
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0001-static-first-with-islands.md",
+          "line": 1
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/roadmap.md",
+      "src/components/Home.astro",
+      "src/components/board/Questions.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/lib/seo.ts",
+      "tests/e2e/header.spec.ts",
+      "tests/e2e/questions.spec.ts",
+      "tests/unit/seo.test.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "El capítulo es HTML estático: las preguntas son <details> nativos con la primera abierta, legibles y operables sin JavaScript (questions.spec.ts sin JS)."
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Colores, tipos y espaciados salen de los tokens de DESIGN.md (bg-surface-raised, type-statement, p-tile, ps-lg); DESIGN.md describe el capítulo y pnpm design:lint lo valida."
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Textos y anclas en es.ts y en.ts con las mismas claves (preguntas/questions); el JSON-LD y llms.txt toman el texto del idioma de cada página."
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "Un capítulo de una idea con poco texto, tiles planas y el cuadrado primario como marca; con movimiento reducido no pierde nada porque no anima."
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "Solo añade HTML estático y CSS de utilidades, sin JS ni imágenes; no toca el LCP (título del hero) y los details cerrados no desplazan contenido al cargar."
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Añade un FAQPage al grafo JSON-LD de la portada con el texto literal del capítulo y las preguntas a llms.txt; el HTML sigue completo sin JS."
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint pasa en ospec check (check design: exit 0): DESIGN.md con contraste, tema sincronizado y sin valores sueltos en src/ (Questions.astro usa solo tokens: bg-surface-raised, type-statement, p-tile, ps-lg, size-sm).",
+      "recorded_at": "2026-10-23T11:15:03.893Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "1. Plazos: diferenciar el tipo de web (landing page o aplicación web), su tamaño y complejidad; entregas cada una o dos semanas según alcance y complejidad. 2. Garantía de 6 meses, siempre que esté justificada. 3. Al pagar el código pasa a ser del cliente, siempre. 4. Remoto: con o sin vídeo; hacer hincapié en que hay un sistema de seguimiento dedicado para el cliente. 5. Presupuesto a medida: por fases con un primer MVP y escalar de forma ágil, o presupuesto cerrado con entrega final de lo propuesto. 6. Mantenimiento mensual de pago opcional, y también bajo petición, con coste algo más elevado según su complejidad. FAQPage en JSON-LD y llms.txt: sí. Forma: acordeón nativo <details> (opción A). Ancla preguntas/questions, en el menú de cabecera y en el índice de capítulos.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T11:16:01.734Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+        "fitness": [
+          "run-15",
+          "run-16",
+          "run-17",
+          "run-18"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T11:17:08.276Z",
+      "detail": {
+        "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+        "runs": [
+          "run-19",
+          "run-20",
+          "run-21",
+          "run-22",
+          "run-23"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-23T11:17:08.276Z",
+      "detail": {
+        "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+        "check": "ev-2",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/header.spec.ts",
+          "tests/e2e/questions.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/seo.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T11:17:08.276Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+        "fitness": [
+          "run-24",
+          "run-25",
+          "run-26",
+          "run-27"
+        ]
+      }
+    }
+  ],
+  "base": "4519197865f5e51b0ed8b81e5ebe9900772fcc85",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 1,
+      "output_sha256": "sha256:1adfdd8331f9f374af46b2efea919e4a87eb16d7f2f4668bafb7cc12057edf5e",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:238f164aeb980be8c4faa55d54678a98d5d8f336fd8003a57dfa5836050d91d1",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:637b150171233c6543a024e2ddfb58f6a71c225a10b618765fea24ed40b8aa72",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:9e1b57eb836309bf886c123a6a4aadb5238a615a2a7b51645868b9f2b4e72938",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 1,
+      "output_sha256": "sha256:e08525f7527e02c6ce764efadde611c54d9b494c7d0ba70548ebdc76f13f3fcc",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:5992d607821a2e7e07cb52c972373dc3dfeb9e798bcecabd024d39fb7865c19a",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:84e8dbc5b2b5e043807863a11edf8aa6a12cd2391b0c8496d70977e75a00e4c6",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a75815594c495585f10a475e592ffe53bac3f7c0e13d828ce9fe0ffc08f7b196",
+      "tree": "sha256:3acc42fca851345dbe64b2c6a0b23cca541a1bbe8e5ad9a226d853f3302b784b",
+      "recorded_at": "2026-10-23T11:14:53.772Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 1,
+      "output_sha256": "sha256:1adfdd8331f9f374af46b2efea919e4a87eb16d7f2f4668bafb7cc12057edf5e",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:930cd6afe935cdf861d7738a0e1123c9e7034b9c1766fe1f1f527801a1d1b929",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:7529738e5c71e0cde2f35b9c036789255c38d46c444bfc2a605a45f3bf1ac88a",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:f0e44b1ea6e145e448bf9a21f36a6dbd648f6f8fc931c186bf8c6d366c0f843f",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:1b5cd6be3c63521206329ca3be46390686da86cd1a8e5222815d162cca29bb64",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:aeb450daceb1c78ca0e5f6d87c32293a76a1a09366f9a01d99c05e36c5e2931a",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:6992e7aaaf108c7b6a1b0f4fafc0bc232b53cd418bff083e797f1b42c5e56fa6",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d8f94bd3deedc1c812986b9f2090448ed88c0522ce3c92650773d67ec2da508e",
+      "tree": "sha256:f224ded22d73eabbb2dd835b7ac1ccd260189735be6d5c59e02c08c85d6e013f",
+      "recorded_at": "2026-10-23T11:16:01.734Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:caae77f3c171f8184d302fc850528a0ed4058f9793d5bf5e863da09ea3cbc4dd",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:98c33c5567d307bfef99989eb2bffddc5998cc846b26541c38ce66ae123e3dbc",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:d407688b50899b7c9eaec80810f18b6464bee0cacd4575b3fbc406510dc011d2",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:e68fa4a40cfb1c4b4fbf853ffeb0e7401f1305188361301ca2776e33acc6e867",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:fa801834945aa9fd00ec0456e852ad7309fde6475f54fad2cc158c9318ba6aaa",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    },
+    {
+      "id": "run-25",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:ec8e656fede28cf7053e06bcd02cfcf6555c5183e9a62cba3f20aacedf47f9ee",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    },
+    {
+      "id": "run-26",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:42c6105d00f4b39f3acc041604ea1804f055d9e7016ae88c8a4a2464b8de5b04",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    },
+    {
+      "id": "run-27",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:1abe4d954061244c6ff91b80dbf39a972e4c1b4818980418f74b48c07d9d84b3",
+      "tree": "sha256:4fde024a5a8f94d99d7f0b099f59dcecf400a53e44dc2373bd6803e94133d82c",
+      "recorded_at": "2026-10-23T11:17:08.276Z"
+    }
+  ],
+  "assumptions": [
+    "La respuesta sobre el trabajo en remoto (faq.a3) anuncia un espacio de seguimiento dedicado a cada cliente que aún no existe: el propietario lo pidió así y será su próximo proyecto; hasta entonces la web promete algo que no se puede enseñar.",
+    "Con cinco capítulos, el índice del móvil necesita desplazarse en pantallas de 667 px de alto (iPhone SE: 771 px de contenido): Hablemos queda bajo el pliegue hasta que se desplaza."
+  ],
+  "closed_at": "2026-10-23T11:17:13.869Z"
+}
