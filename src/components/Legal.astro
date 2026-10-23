@@ -1,6 +1,6 @@
 ---
 import { PUBLIC_LEGAL_ADDRESS, PUBLIC_LEGAL_NAME, PUBLIC_LEGAL_NIF, PUBLIC_LEGAL_TOWN } from "astro:env/client";
-import { type Locale, t } from "../i18n/index";
+import { type Locale, localizedPath, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
 import { contactEmail, owner } from "../lib/board";
 import Footer from "./board/Footer.astro";
@@ -33,7 +33,12 @@ const mail = `mailto:${contactEmail}`;
 
 <!-- DESIGN.md Layout, the legal page: one page per language with the legal notice, the privacy policy and the cookie
      policy, each a section with its heading tile on the left and its running text on the right. -->
-<Base locale={locale} title={copy["legal.metaTitle"]} description={copy["legal.metaDescription"]}>
+<Base
+  locale={locale}
+  title={copy["legal.metaTitle"]}
+  description={copy["legal.metaDescription"]}
+  trail={[{ name: copy["legal.title"], path: localizedPath(locale, "/legal/") }]}
+>
   <div class="mt-(--header-height) grid gap-section px-margin pt-xl" data-grounds>
     <div class="grid grid-cols-2 gap-gap lg:grid-cols-12">
       <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-7">

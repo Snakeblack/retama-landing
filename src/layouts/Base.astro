@@ -1,7 +1,7 @@
 ---
 import { Font } from "astro:assets";
 import { type Locale, localizedPath } from "../i18n/index";
-import { alternates, canonicalUrl } from "../lib/seo";
+import { alternates, type Crumb, canonicalUrl, jsonLd, structuredData } from "../lib/seo";
 import "../styles/global.css";
 import theme from "../styles/theme.css?raw";
 import LangSwitch from "../components/LangSwitch.astro";
@@ -12,9 +12,11 @@ interface Props {
   title: string;
   description: string;
   noindex?: boolean;
+  /** The page's breadcrumb after the home page of its language, for the JSON-LD. */
+  trail?: Crumb[];
 }
 
-const { locale, title, description, noindex = false } = Astro.props;
+const { locale, title, description, noindex = false, trail } = Astro.props;
 const site = Astro.site ?? new URL(Astro.url.origin);
 // The browser chrome takes the page ground from the DESIGN.md tokens.
 const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
@@ -37,6 +39,8 @@ const themeColor = theme.match(/--color-surface:\s*([^;]+);/)?.[1];
           {alternates(site, Astro.url.pathname).map((alt) => (
             <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
           ))}
+          {/* A data block, never run: the CSP's script-src does not apply to it (ADR 0006). */}
+          <script type="application/ld+json" set:html={jsonLd(structuredData(site, locale, trail))} />
         </>
       )
     }
