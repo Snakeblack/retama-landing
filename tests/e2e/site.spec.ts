@@ -219,6 +219,13 @@ test("Open Graph con la imagen de su idioma, o la suya en los artículos, en tod
   }
 });
 
+// The other tests tie the canonicals, hreflang, robots.txt and llms.txt to the sitemap's URLs.
+test("el sitemap nombra el dominio de producción, https://retama.dev", async ({ request }) => {
+  const urls = await sitemapUrls(request);
+  expect(urls.length).toBeGreaterThanOrEqual(pages.length);
+  for (const url of urls) expect(new URL(url).origin).toBe("https://retama.dev");
+});
+
 test("robots.txt admite a todos los rastreadores y llms.txt enlaza las páginas del sitemap", async ({ request }) => {
   const urls = await sitemapUrls(request);
 

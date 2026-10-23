@@ -4,7 +4,11 @@
   // into dist/; this file only holds what the adapter does not set.
   "name": "retama-landing",
   "compatibility_date": "2026-10-01",
-  // Each branch Preview gets <preview>-retama-landing.<subdomain>.workers.dev.
+  // Production lives only on retama.dev: the Custom Domain brings its DNS record and certificate, and the
+  // workers.dev URL is off. www.retama.dev is a Redirect Rule of the zone (dashboard), not a route of the Worker.
+  "routes": [{ "pattern": "retama.dev", "custom_domain": true }],
+  "workers_dev": false,
+  // Each branch Preview gets <preview>-retama-landing.<subdomain>.workers.dev, also with workers_dev off.
   // wrangler deploy applies it, so it lives here and not in the dashboard.
   "preview_urls": true,
   "assets": {
