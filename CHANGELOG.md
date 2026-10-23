@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/Snakeblack/retama-landing/compare/v0.6.0...v0.6.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* **deps:** clear the new high advisories in pnpm audit ([09eb7be](https://github.com/Snakeblack/retama-landing/commit/09eb7bed7193d170f2c0897c4e2d060c06835636))
+
 ## [0.6.0](https://github.com/Snakeblack/retama-landing/compare/v0.5.0...v0.6.0) (2026-10-23)
 
 
