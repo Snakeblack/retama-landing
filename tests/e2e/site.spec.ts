@@ -157,11 +157,55 @@ test("hreflang recíproco con x-default en todas las páginas del sitemap (ADR 0
   }
 });
 
+test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga de pan en las legales", async ({
+  page,
+  request,
+}) => {
+  for (const url of await sitemapUrls(request)) {
+    await page.goto(new URL(url).pathname);
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(blocks, url).toHaveLength(1);
+    const graph: Record<string, unknown>[] = JSON.parse(blocks[0] ?? "")["@graph"];
+    const types = graph.flatMap((node) => [node["@type"]].flat());
+    expect(types, url).toEqual(expect.arrayContaining(["Organization", "ProfessionalService", "WebSite"]));
+    const retama = graph.find((node) => node["@id"] === new URL("/#organization", url).href);
+    expect(retama, url).not.toHaveProperty("address");
+
+    const trail = graph.find((node) => node["@type"] === "BreadcrumbList");
+    if (new URL(url).pathname.endsWith("/legal/")) {
+      const steps = trail?.itemListElement as { item: string }[];
+      expect(
+        steps.map((step) => step.item),
+        url,
+      ).toEqual([new URL("..", url).href, url]);
+    } else expect(trail, url).toBeUndefined();
+  }
+});
+
+test("robots.txt admite a todos los rastreadores y llms.txt enlaza las páginas del sitemap", async ({ request }) => {
+  const urls = await sitemapUrls(request);
+
+  const robots = await request.get("/robots.txt");
+  expect(robots.status()).toBe(200);
+  expect(robots.headers()["content-type"]).toContain("text/plain");
+  const rules = await robots.text();
+  expect(rules).toMatch(/^User-agent: \*\nAllow: \/$/m);
+  expect(rules).toContain(`Sitemap: ${new URL("/sitemap-index.xml", urls[0]).href}`);
+
+  const llms = await request.get("/llms.txt");
+  expect(llms.status()).toBe(200);
+  expect(llms.headers()["content-type"]).toContain("text/plain");
+  const text = await llms.text();
+  expect(text.startsWith("# Retama\n")).toBe(true);
+  for (const url of urls) expect(text).toContain(`](${url})`);
+});
+
 test("las rutas desconocidas devuelven la 404 de su idioma", async ({ page }) => {
   for (const { path, lang } of pages) {
     const response = await page.goto(`${path}no-existe/`);
     expect(response?.status()).toBe(404);
     await expect(page.locator("html")).toHaveAttribute("lang", lang);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
+    await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
   }
 });
