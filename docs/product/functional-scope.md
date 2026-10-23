@@ -29,7 +29,7 @@
 | Servicios | Web y CMS, software a medida, escritorio, agentes y automatización, SEO y analítica |
 | Sectores | Logística, empresa, gaming, otros |
 | Método | ADRs y documentación, comunicación para decidir, garantías, 100 % online |
-| FAQ | Plazos, garantías, trabajo remoto, propiedad del código |
+| FAQ | Plazos, presupuesto, trabajo remoto, propiedad del código, garantía, mantenimiento |
 | Contacto | Formulario, reserva, email, WhatsApp |
 | Blog | Artículos en es y en |
 | Legales | Aviso legal, privacidad, cookies |

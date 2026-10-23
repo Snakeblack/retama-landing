@@ -1,0 +1,37 @@
+---
+import { type Locale, t } from "../../i18n/index";
+import { questions } from "../../lib/board";
+
+interface Props {
+  locale: Locale;
+}
+
+const copy = t(Astro.props.locale);
+---
+
+<!-- DESIGN.md Layout, the questions: the heading tile on the left and the questions on the right, each a native
+     accordion that works without JS (ADR 0001). Not exclusive, so several stay open; the first is open on load. -->
+<section id={copy["anchor.questions"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="questions-title">
+  <!-- As tall as the questions: the heading at the top and the lead at its foot, so the tile has no hole. -->
+  <div class="col-span-2 flex flex-col justify-between gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-5">
+    <h2 id="questions-title" class="text-balance type-headline-sm md:type-headline">{copy["faq.title"]}</h2>
+    <p class="max-w-(--spacing-measure)">{copy["faq.lead"]}</p>
+  </div>
+
+  <div class="col-span-2 grid content-start gap-gap lg:col-span-7" data-rows>
+    {
+      questions.map(([question, answer], index) => (
+        <details class="group bg-surface-raised" open={index === 0}>
+          <summary class="feedback flex min-h-(--spacing-touch) cursor-pointer list-none items-start gap-md p-tile-sm type-statement-sm hover:text-primary md:p-tile md:type-statement [&::-webkit-details-marker]:hidden">
+            <span class="mt-sm size-sm shrink-0 bg-on-surface-muted group-open:bg-primary md:mt-md" aria-hidden="true" />
+            {copy[question]}
+          </summary>
+          <!-- The answer lines up with the question, past the square and its gap. -->
+          <div class="px-tile-sm pb-tile-sm md:px-tile md:pb-tile">
+            <p class="max-w-(--spacing-measure) ps-lg">{copy[answer]}</p>
+          </div>
+        </details>
+      ))
+    }
+  </div>
+</section>
