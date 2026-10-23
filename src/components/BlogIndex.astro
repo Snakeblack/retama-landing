@@ -1,0 +1,52 @@
+---
+import { type Locale, localizedPath, t } from "../i18n/index";
+import Base from "../layouts/Base.astro";
+import { articles } from "../lib/articles";
+import { articlePath, formatDate, readingMinutes } from "../lib/blog";
+import Footer from "./board/Footer.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = t(locale);
+const list = await articles(locale);
+---
+
+<!-- DESIGN.md Layout, the blog: like the questions, the heading tile on the left and the articles on the right, newest
+     first, one raised tile each that turns to the field under the pointer. -->
+<Base
+  locale={locale}
+  title={copy["blog.metaTitle"]}
+  description={copy["blog.metaDescription"]}
+  trail={[{ name: copy["nav.blog"], path: localizedPath(locale, "/blog/") }]}
+  blog
+>
+  <div class="mt-(--header-height) px-margin pt-xl" data-grounds>
+    <div class="grid grid-cols-2 gap-gap lg:grid-cols-12">
+      <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-5">
+        <h1 class="text-balance type-headline-sm md:type-headline">{copy["blog.title"]}</h1>
+        <p class="max-w-(--spacing-measure) type-statement-sm md:type-statement">{copy["blog.lead"]}</p>
+      </div>
+
+      <ul class="col-span-2 grid content-start gap-gap lg:col-span-7" aria-label={copy["blog.listLabel"]}>
+        {
+          list.map(({ entry, slug }) => (
+            <li>
+              <a class="group feedback grid gap-md bg-surface-raised p-tile-sm hover:bg-field hover:text-on-field md:p-tile" href={articlePath(locale, slug)}>
+                <h2 class="text-balance type-statement-sm md:type-statement">{entry.data.title}</h2>
+                <p class="max-w-(--spacing-measure)">{entry.data.description}</p>
+                <p class="type-small text-on-surface-muted group-hover:text-on-field">
+                  <time datetime={entry.data.published.toISOString().slice(0, 10)}>{formatDate(locale, entry.data.published)}</time>
+                  {` · ${readingMinutes(entry.body ?? "")} ${copy["blog.minutes"]}`}
+                </p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+  <Footer slot="footer" locale={locale} />
+</Base>

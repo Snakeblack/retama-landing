@@ -16,23 +16,29 @@ const links = [
 ] as const;
 ---
 
-<!-- DESIGN.md: the board's last row is the footer, with the legal links in quiet type under the wordmark. -->
+<!-- DESIGN.md: the board's last row is the footer, with the blog and the legal links in quiet type under the wordmark. -->
 <footer class="grid grid-cols-2 gap-gap px-margin pt-section pb-margin lg:grid-cols-12">
   <div class="col-span-2 grid gap-md bg-surface-raised p-tile-sm md:p-tile lg:col-span-9">
     <Wordmark class="block type-wordmark" />
-    <nav aria-label={copy["footer.legalLabel"]}>
-      <ul class="flex flex-wrap gap-x-lg">
-        {
-          links.map(([anchor, title]) => (
-            <li>
-              <a class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface-muted underline hover:text-on-surface" href={`${legal}#${copy[anchor]}`}>
-                {copy[title]}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
+    <!-- The blog leads the row of quiet links; the legal ones keep their own navigation. -->
+    <div class="flex flex-wrap gap-x-lg">
+      <a class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface-muted underline hover:text-on-surface" href={localizedPath(locale, "/blog/")}>
+        {copy["nav.blog"]}
+      </a>
+      <nav aria-label={copy["footer.legalLabel"]}>
+        <ul class="flex flex-wrap gap-x-lg">
+          {
+            links.map(([anchor, title]) => (
+              <li>
+                <a class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface-muted underline hover:text-on-surface" href={`${legal}#${copy[anchor]}`}>
+                  {copy[title]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
     <p class="type-small text-on-surface-muted">© {new Date().getFullYear()} Retama</p>
   </div>
 

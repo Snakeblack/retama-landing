@@ -14,6 +14,7 @@ export const es = {
   "anchor.method": "metodo",
   "anchor.questions": "preguntas",
   "anchor.contact": "contacto",
+  "nav.blog": "Blog",
   "nav.talk": "Hablemos",
   "nav.index": "Índice",
   "nav.close": "Cerrar",
@@ -303,6 +304,19 @@ export const es = {
   "notFound.title": "Página no encontrada",
   "notFound.lead": "La página que buscas no existe o ha cambiado de dirección.",
   "notFound.back": "Volver al inicio",
+
+  "blog.metaTitle": "Blog · Retama",
+  "blog.metaDescription":
+    "Cómo se encarga, se construye y se cuida un software a medida, contado por Retama para quien lo encarga.",
+  "blog.title": "Software, explicado",
+  "blog.lead":
+    "Cómo se encarga, se construye y se cuida un software a medida, contado para quien lo encarga y sin jerga.",
+  "blog.listLabel": "Artículos",
+  "blog.published": "Publicado el",
+  "blog.updated": "Actualizado el",
+  "blog.minutes": "min de lectura",
+  "blog.all": "Todos los artículos",
+  "blog.talk": "¿Tienes un proyecto entre manos? Cuéntanoslo y te respondemos en un día laborable.",
 } as const;
 
 export type Dictionary = Record<keyof typeof es, string>;

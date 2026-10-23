@@ -16,6 +16,7 @@ export const en = {
   "anchor.method": "method",
   "anchor.questions": "questions",
   "anchor.contact": "contact",
+  "nav.blog": "Blog",
   "nav.talk": "Let's talk",
   "nav.index": "Contents",
   "nav.close": "Close",
@@ -304,4 +305,17 @@ export const en = {
   "notFound.title": "Page not found",
   "notFound.lead": "The page you are looking for does not exist or has moved.",
   "notFound.back": "Back to home",
+
+  "blog.metaTitle": "Blog · Retama",
+  "blog.metaDescription":
+    "How custom software is commissioned, built and looked after, told by Retama for the people who commission it.",
+  "blog.title": "Software, explained",
+  "blog.lead":
+    "How custom software is commissioned, built and looked after, told for the people who commission it, without jargon.",
+  "blog.listLabel": "Articles",
+  "blog.published": "Published on",
+  "blog.updated": "Updated on",
+  "blog.minutes": "min read",
+  "blog.all": "All articles",
+  "blog.talk": "Got a project on your hands? Tell us about it and we reply within a working day.",
 } satisfies Dictionary;

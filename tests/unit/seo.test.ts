@@ -3,6 +3,7 @@ import { en } from "../../src/i18n/en";
 import { es } from "../../src/i18n/es";
 import { questions } from "../../src/lib/board";
 import {
+  type Article,
   alternates,
   type Crumb,
   canonicalUrl,
@@ -38,6 +39,16 @@ describe("alternates", () => {
 
   it("son recíprocos: la misma lista desde cualquier idioma de la página", () => {
     expect(alternates(site, "/en/servicios/")).toEqual(alternates(site, "/servicios/"));
+  });
+
+  it("usan las rutas traducidas de la página cuando las tiene, como un artículo del blog", () => {
+    const paths = { es: "/blog/cuanto-cuesta/", en: "/en/blog/what-it-costs/" };
+    expect(alternates(site, "/en/blog/what-it-costs/", paths)).toEqual([
+      { hreflang: "es", href: "https://retama.example/blog/cuanto-cuesta/" },
+      { hreflang: "en", href: "https://retama.example/en/blog/what-it-costs/" },
+      { hreflang: "x-default", href: "https://retama.example/blog/cuanto-cuesta/" },
+    ]);
+    expect(alternates(site, "/blog/cuanto-cuesta/", paths)).toEqual(alternates(site, "/en/blog/what-it-costs/", paths));
   });
 });
 
@@ -118,6 +129,43 @@ describe("structuredData", () => {
   });
 });
 
+describe("structuredData de un artículo", () => {
+  const article: Article = {
+    headline: "What custom software costs",
+    description: "What drives the cost.",
+    published: new Date("2026-10-23"),
+    path: "/en/blog/what-it-costs/",
+  };
+  const nodes = (item?: Article) => structuredData(site, "en", [], false, item)["@graph"] as Record<string, unknown>[];
+  const posting = (item?: Article) => nodes(item).find((node) => node["@type"] === "BlogPosting");
+
+  it("lo describe como BlogPosting de Retama, en su idioma y con la imagen del idioma", () => {
+    expect(posting()).toBeUndefined();
+    expect(posting(article)).toEqual({
+      "@type": "BlogPosting",
+      "@id": "https://retama.example/en/blog/what-it-costs/#article",
+      url: "https://retama.example/en/blog/what-it-costs/",
+      mainEntityOfPage: "https://retama.example/en/blog/what-it-costs/",
+      headline: "What custom software costs",
+      description: "What drives the cost.",
+      inLanguage: "en",
+      datePublished: "2026-10-23",
+      dateModified: "2026-10-23",
+      image: "https://retama.example/og/en.png",
+      author: { "@id": "https://retama.example/#organization" },
+      publisher: { "@id": "https://retama.example/#organization" },
+      isPartOf: { "@id": "https://retama.example/#website" },
+    });
+  });
+
+  it("da la fecha de actualización cuando la hay", () => {
+    expect(posting({ ...article, updated: new Date("2026-11-02") })).toMatchObject({
+      datePublished: "2026-10-23",
+      dateModified: "2026-11-02",
+    });
+  });
+});
+
 describe("jsonLd", () => {
   it("no deja cerrar el script desde un texto", () => {
     const html = jsonLd({ name: "</script><script>alert(1)</script>" });
@@ -135,7 +183,18 @@ describe("robotsTxt", () => {
 });
 
 describe("llmsTxt", () => {
-  const text = llmsTxt(site);
+  const text = llmsTxt(site, [
+    { locale: "es", title: "Cuánto cuesta", description: "Qué lo encarece.", path: "/blog/cuanto-cuesta/" },
+    { locale: "en", title: "What it costs", description: "What drives it.", path: "/en/blog/what-it-costs/" },
+  ]);
+
+  it("lista los artículos del blog, primero los de inglés, con su entradilla", () => {
+    expect(text).toMatch(/^## Blog$/m);
+    const english = text.indexOf("- [What it costs](https://retama.example/en/blog/what-it-costs/): What drives it.");
+    const spanish = text.indexOf("- [Cuánto cuesta](https://retama.example/blog/cuanto-cuesta/): Qué lo encarece.");
+    expect(english).toBeGreaterThan(-1);
+    expect(spanish).toBeGreaterThan(english);
+  });
 
   it("sigue llmstxt.org: título, resumen en cita y secciones de enlaces", () => {
     const lines = text.split("\n");
@@ -145,7 +204,8 @@ describe("llmsTxt", () => {
   });
 
   it("enlaza cada página indexable en los dos idiomas, con URL absoluta", () => {
-    for (const path of ["/", "/en/", "/legal/", "/en/legal/"]) expect(text).toContain(`](${new URL(path, site).href})`);
+    for (const path of ["/", "/en/", "/legal/", "/en/legal/", "/blog/", "/en/blog/"])
+      expect(text).toContain(`](${new URL(path, site).href})`);
   });
 
   it("da el correo de contacto y los servicios", () => {
@@ -177,6 +237,20 @@ describe("openGraph", () => {
       ["og:image:height", "630"],
       ["og:image:alt", en["og.imageAlt"]],
     ]);
+  });
+
+  it("marca un artículo como article, con sus fechas", () => {
+    const tags = openGraph(site, "en", "/en/blog/a/", "A", "B", {
+      headline: "A",
+      description: "B",
+      published: new Date("2026-10-23"),
+      updated: new Date("2026-11-02"),
+      path: "/en/blog/a/",
+    });
+    expect(new Map(tags).get("og:type")).toBe("article");
+    expect(tags).toContainEqual(["article:published_time", "2026-10-23"]);
+    expect(tags).toContainEqual(["article:modified_time", "2026-11-02"]);
+    expect(tags.filter(([property]) => property === "og:type")).toHaveLength(1);
   });
 
   it("usa la imagen y el territorio del español en las páginas en español", () => {

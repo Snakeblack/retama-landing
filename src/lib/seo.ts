@@ -11,30 +11,48 @@ export function canonicalUrl(site: URL, pathname: string): string {
   return new URL(localizedPath(defaultLocale, url.pathname), site).href;
 }
 
-// ADR 0008: every page lists every locale plus x-default, so the set is reciprocal.
-export function alternates(site: URL, pathname: string): Alternate[] {
+// ADR 0008: every page lists every locale plus x-default, so the set is reciprocal. A page whose path is translated,
+// like an article of the blog, gives its path in every locale.
+export function alternates(site: URL, pathname: string, paths?: Record<Locale, string>): Alternate[] {
   const page = pathWithoutLocale(new URL(pathname, site).pathname);
-  const links = locales.map((locale) => ({
-    hreflang: locale,
-    href: new URL(localizedPath(locale, page), site).href,
-  }));
-  return [...links, { hreflang: "x-default", href: new URL(localizedPath(defaultLocale, page), site).href }];
+  const path = (locale: Locale) => paths?.[locale] ?? localizedPath(locale, page);
+  const links = locales.map((locale) => ({ hreflang: locale, href: new URL(path(locale), site).href }));
+  return [...links, { hreflang: "x-default", href: new URL(path(defaultLocale), site).href }];
 }
+
+/** An article of the blog, as its Open Graph tags and its JSON-LD describe it. */
+export interface Article {
+  headline: string;
+  description: string;
+  published: Date;
+  updated?: Date | undefined;
+  /** Its path in the page's language. */
+  path: string;
+}
+
+const isoDate = (date: Date) => date.toISOString().slice(0, 10);
 
 // Open Graph wants a territory with the language: Spain for Spanish, the international default for English.
 const ogLocales: Record<Locale, string> = { es: "es_ES", en: "en_US" };
 
 /** The Open Graph tags of an indexable page, as [property, content]. The image is its language's, drawn at build time
- * by scripts/postbuild.mjs into og/<locale>.png at 1200×630. */
+ * by scripts/postbuild.mjs into og/<locale>.png at 1200×630; an article shares it until blog-feed draws its own. */
 export function openGraph(
   site: URL,
   locale: Locale,
   pathname: string,
   title: string,
   description: string,
+  article?: Article,
 ): [string, string][] {
+  const dates: [string, string][] = article
+    ? [
+        ["article:published_time", isoDate(article.published)],
+        ["article:modified_time", isoDate(article.updated ?? article.published)],
+      ]
+    : [];
   return [
-    ["og:type", "website"],
+    ["og:type", article ? "article" : "website"],
     ["og:site_name", "Retama"],
     ["og:title", title],
     ["og:description", description],
@@ -48,6 +66,7 @@ export function openGraph(
     ["og:image:width", "1200"],
     ["og:image:height", "630"],
     ["og:image:alt", t(locale)["og.imageAlt"]],
+    ...dates,
   ];
 }
 
@@ -59,14 +78,15 @@ export interface Crumb {
 
 const services = ["services.web", "services.custom", "services.agents", "services.seo"] as const;
 
-/** The JSON-LD of a page: Retama, the site, when the page gives a trail its breadcrumb and, when it holds the questions
- * chapter, its FAQPage. Only data that exists: no company yet, so no address, tax ID or founder, and no profiles or
- * service area until the owner has them. */
+/** The JSON-LD of a page: Retama, the site, when the page gives a trail its breadcrumb, when it holds the questions
+ * chapter its FAQPage, and when it is an article its BlogPosting, signed by the brand. Only data that exists: no
+ * company yet, so no address, tax ID or founder, and no profiles or service area until the owner has them. */
 export function structuredData(
   site: URL,
   locale: Locale,
   trail: Crumb[] = [],
   withQuestions = false,
+  article?: Article,
 ): Record<string, unknown> {
   const copy = t(locale);
   const home = new URL("/", site).href;
@@ -127,6 +147,24 @@ export function structuredData(
       })),
     });
   }
+  if (article) {
+    const url = new URL(article.path, site).href;
+    graph.push({
+      "@type": "BlogPosting",
+      "@id": `${url}#article`,
+      url,
+      mainEntityOfPage: url,
+      headline: article.headline,
+      description: article.description,
+      inLanguage: locale,
+      datePublished: isoDate(article.published),
+      dateModified: isoDate(article.updated ?? article.published),
+      image: new URL(`/og/${locale}.png`, site).href,
+      author: { "@id": organization },
+      publisher: { "@id": organization },
+      isPartOf: { "@id": `${home}#website` },
+    });
+  }
   return { "@context": "https://schema.org", "@graph": graph };
 }
 
@@ -140,8 +178,17 @@ export function robotsTxt(site: URL): string {
   return `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${new URL("/sitemap-index.xml", site).href}\n`;
 }
 
-/** llms.txt (llmstxt.org) in English, the language models default to, linking the pages of both languages. */
-export function llmsTxt(site: URL): string {
+/** An article as llms.txt lists it. */
+export interface ArticleLink {
+  locale: Locale;
+  title: string;
+  description: string;
+  path: string;
+}
+
+/** llms.txt (llmstxt.org) in English, the language models default to, linking the pages of both languages and the
+ * articles of the blog, English first. */
+export function llmsTxt(site: URL, articles: ArticleLink[] = []): string {
   const copy = t("en");
   const url = (locale: Locale, path: string) => new URL(localizedPath(locale, path), site).href;
   return [
@@ -167,6 +214,14 @@ export function llmsTxt(site: URL): string {
     `- [Inicio](${url("es", "/")}): the home page in Spanish.`,
     `- [Legal information](${url("en", "/legal/")}): ${copy["legal.metaDescription"]}`,
     `- [Información legal](${url("es", "/legal/")}): the legal information in Spanish, which prevails.`,
+    `- [Blog](${url("en", "/blog/")}): ${copy["blog.metaDescription"]}`,
+    `- [Blog en español](${url("es", "/blog/")}): the blog in Spanish.`,
+    "",
+    "## Blog",
+    "",
+    ...[...articles]
+      .sort((a, b) => Number(b.locale === "en") - Number(a.locale === "en"))
+      .map((article) => `- [${article.title}](${new URL(article.path, site).href}): ${article.description}`),
     "",
     "## Contact",
     "",

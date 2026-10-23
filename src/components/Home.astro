@@ -35,20 +35,18 @@ if (PUBLIC_BOOKING) Astro.csp?.insertDirective(bookingFrameDirective(bookingUrl)
 
 <!-- DESIGN.md Layout: the home is a sequence of chapters, 128px apart, more than any gap inside one. -->
 <Base locale={locale} title={copy["meta.title"]} description={copy["meta.description"]} questions>
-  <!-- From md the links sit in the header; on phones the chapter index holds them. -->
-  <nav slot="nav" class="hidden md:block" aria-label={copy["nav.label"]}>
-    <ul class="flex gap-lg">
-      {
-        chapters.map(({ anchor, name }) => (
-          <li>
-            <a class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface hover:text-primary" href={`#${anchor}`}>
-              {name}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
+  <!-- From md the chapters lead the header's links; on phones the chapter index holds them. -->
+  <Fragment slot="nav">
+    {
+      chapters.map(({ anchor, name }) => (
+        <li>
+          <a class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface hover:text-primary" href={`#${anchor}`}>
+            {name}
+          </a>
+        </li>
+      ))
+    }
+  </Fragment>
   <ChapterIndex slot="menu" locale={locale} chapters={chapters} />
   <!-- DESIGN.md Layout: the one action stays at hand, fixed to the lower right corner; global.css hides it while the
        first chapter or the contact chapter is on screen. -->

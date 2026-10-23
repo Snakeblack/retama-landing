@@ -543,3 +543,64 @@ footer,
 [data-brand]:first-child {
   z-index: 1;
 }
+
+/* DESIGN.md Layout, the article: its Markdown body in the board's type, running text held to measure. Its sections
+   open at statement size, its lists carry the muted square, and a quote is the field tile. Articles hold no code
+   (src/lib/blog.ts, checkArticles). */
+[data-article] {
+  display: grid;
+  align-content: start;
+  gap: var(--spacing-lg);
+
+  & > * {
+    max-width: var(--spacing-measure);
+  }
+
+  & h2 {
+    @apply text-balance type-statement-sm md:type-statement;
+    margin-top: var(--spacing-lg);
+  }
+
+  & h3 {
+    @apply type-body-strong;
+  }
+
+  & strong {
+    @apply type-body-strong;
+  }
+
+  & a {
+    text-decoration: underline;
+    transition: text-decoration-color var(--t-hover) var(--ease-out);
+
+    &:hover {
+      text-decoration-color: var(--color-primary);
+    }
+  }
+
+  & ul,
+  & ol {
+    display: grid;
+    gap: var(--spacing-sm);
+    padding-inline-start: var(--spacing-lg);
+  }
+
+  & ul {
+    list-style: square;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li::marker {
+    color: var(--color-on-surface-muted);
+  }
+
+  & blockquote {
+    @apply type-statement-sm md:type-statement;
+    background-color: var(--color-field);
+    color: var(--color-on-field);
+    padding: var(--spacing-tile-sm);
+  }
+}
