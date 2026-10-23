@@ -186,3 +186,24 @@ for (const { lang, index, article, headline } of blogs) {
     expect(response.headers()["content-type"]).toBe("image/png");
   });
 }
+
+test.describe("artículos en pantallas táctiles", () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  for (const { article } of blogs) {
+    test(`${article} deja seleccionar y copiar su texto, aunque el tablero no lo deje`, async ({ page }) => {
+      await page.goto(article);
+      // global.css turns selection off in main on touch screens; an article is read and quoted, so it opts back in.
+      for (const selector of ["h1", "header p", "[data-article] p", "[data-article] li"])
+        expect(
+          await page
+            .locator(selector)
+            .first()
+            .evaluate((node) => getComputedStyle(node).userSelect),
+          selector,
+        ).not.toBe("none");
+      await page.goto(article.startsWith("/en/") ? "/en/" : "/");
+      expect(await page.locator("main h1").evaluate((node) => getComputedStyle(node).userSelect)).toBe("none");
+    });
+  }
+});
