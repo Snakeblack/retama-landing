@@ -64,9 +64,12 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 
 ## M4 — SEO completo y legal
 
-- JSON-LD (`Organization`, `ProfessionalService`, `WebSite`, `BreadcrumbList`).
+- JSON-LD (`Organization`, `ProfessionalService`, `WebSite`, `BreadcrumbList`) (hecho, `seo-structured-data`): un
+  grafo por página con la marca Retama (sin domicilio, NIF, fundador, perfiles ni zona de servicio mientras no existan),
+  sus servicios en el idioma de la página y la miga de pan en las páginas legales.
 - Imágenes OG por idioma generadas en build.
-- robots.txt (crawlers de IA permitidos) y llms.txt.
+- robots.txt (crawlers de IA permitidos) y llms.txt (hecho, `seo-structured-data`): los dos se generan en el build con
+  el origen del sitio; llms.txt va en inglés y enlaza las páginas de los dos idiomas.
 - FAQ.
 - Aviso legal, privacidad y cookies (LSSI/RGPD) (hecho, `legal-pages`): una página `/legal/` por idioma con las tres secciones, el titular por variables de build y los enlaces en el pie y bajo el formulario.
 
@@ -81,7 +84,8 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 - Logs y alertas del Worker.
 - Uptime externo y errores de cliente: se elige proveedor gratis.
 - Cloudflare Web Analytics.
-- Dominio y DNS.
+- Dominio y DNS. Al poner el dominio en Cloudflare, comprobar que el robots.txt gestionado y el bloqueo de bots de IA
+  de la zona están apagados, para que no contradigan el robots.txt del sitio.
 - Checklist de lanzamiento, con el NIF y el domicilio en el aviso legal (`PUBLIC_LEGAL_NIF`, `PUBLIC_LEGAL_ADDRESS`; art. 10 de la LSSI) y los textos legales revisados por un gestor.
 
 ## v2 (aplazado)
