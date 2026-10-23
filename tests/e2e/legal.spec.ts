@@ -90,3 +90,22 @@ for (const { path, home, anchors, form } of pages) {
     else await expect(line).not.toContainText(":");
   });
 }
+
+test.describe("información legal en pantallas táctiles", () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  for (const { path } of pages) {
+    test(`${path} deja seleccionar y copiar su texto y el correo`, async ({ page }) => {
+      await page.goto(path);
+      // global.css turns selection off in main on touch screens; legal text is read and copied, so it opts back in.
+      for (const selector of ["h1", "main section h2", "main section p", "[data-owner] dd"])
+        expect(
+          await page
+            .locator(selector)
+            .first()
+            .evaluate((node) => getComputedStyle(node).userSelect),
+          selector,
+        ).not.toBe("none");
+    });
+  }
+});
