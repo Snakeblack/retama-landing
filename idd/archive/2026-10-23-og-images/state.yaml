@@ -1,0 +1,398 @@
+{
+  "schema": "idd-state/v1",
+  "change": "og-images",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "feature",
+    "summary": "Generate one Open Graph image per language at build time and declare it, with the Open Graph and Twitter card tags, on every indexable page",
+    "acceptance": "After pnpm build, dist/client/og/es.png and dist/client/og/en.png are 1200x630 PNGs drawn in the DESIGN.md tokens with the copy of their language; every indexable page carries og:title, og:description, og:url, og:locale, og:image (absolute URL to its language's image) with width, height and alt, and twitter:card summary_large_image; the 404 pages carry none"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "which territory goes with og:locale for English (en_US or en_GB); Spanish is es_ES?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "one image per language shared by the home and the legal page, or one per page?"
+      },
+      {
+        "category": "persistence",
+        "question": "images are build output only (dist/client/og), never committed; dev serves none?"
+      },
+      {
+        "category": "copy",
+        "question": "what does the image show (wordmark, the two-tone title, the lead, the retama poster)?"
+      },
+      {
+        "category": "url-state",
+        "question": "fixed URLs /og/es.png and /og/en.png with no hash, so a changed image keeps its URL?"
+      },
+      {
+        "category": "accessibility",
+        "question": "og:image:alt comes from a new i18n key in es.ts and en.ts?"
+      },
+      {
+        "category": "errors",
+        "question": "may the build add satori, sharp and a static Stack Sans font as dev dependencies, and fail the build when the image cannot be drawn?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "scripts/lib/og-image.mjs",
+      "scripts/postbuild.mjs",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/lib/seo.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/og-image.test.ts",
+      "tests/unit/seo.test.ts"
+    ],
+    "work_units": 2,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 2 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0002, 0005, 0006, 0008 and quality scenario brand-impact, perf-mobile, seo-discovery",
+      "source": "declaration"
+    },
+    {
+      "id": "persistent-data",
+      "reason": "persistent data: scripts/postbuild.mjs adds writeFile",
+      "source": "diff"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The images and the tags are static build output; no text depends on JS"
+    },
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "The PNGs are static assets of the same Worker; no new service or binding"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Colours, sizes, leading, tracking and spacing are read from the generated theme.css; DESIGN.md describes the image and design:lint passes"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "none",
+      "reason": "Meta tags only; the page loads no image, script or style of its own for them, so the CSP is unchanged"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Each locale gets its own image and og:locale, with the other locale as og:locale:alternate; the alt text has the same key in es.ts and en.ts"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "The card is the home's first chapter in small, in the DESIGN.md tokens, with the poster's retama"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "none",
+      "reason": "Nothing loads on the page; the images are drawn after the build"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Shared links get a title, description, canonical URL and image in their language"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "migration-compat-and-test",
+      "signal": "persistent-data",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Título y retama: wordmark, barra, Software en tinta y a medida en naranja, la frase del hero y la retama del póster. Una imagen por idioma compartida por portada y legal. en_US (es_ES para español). Satori 0.33.5 + sharp 0.35.5 + @fontsource/stack-sans-headline 5.3.0 como devDependencies, dibujadas en postbuild en Node, URLs fijas /og/es.png y /og/en.png sin hash, solo salida del build (dev no las sirve), alt en clave nueva de i18n, y el build falla si no se pueden dibujar.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T10:20:54.384Z",
+      "detail": {
+        "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-23T10:20:54.384Z",
+      "detail": {
+        "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/site.spec.ts",
+          "tests/unit/og-image.test.ts",
+          "tests/unit/seo.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T10:20:54.384Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0002 conforms",
+          "adr:0005 conforms",
+          "adr:0006 none",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile none",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "migration-test",
+      "obligation": "migration-compat-and-test",
+      "recorded_at": "2026-10-23T10:21:36.212Z",
+      "detail": {
+        "run": "run-12",
+        "tree": "sha256:cc727acc3f7df279ff6ee48f91325e1859146debfb8ceb87ecc20dc6f76fefb6",
+        "plan": "Falso positivo como en S1 y M1: la señal sale de writeFile en scripts/postbuild.mjs, que escribe salida del build (dist/client/og/es.png y en.png) y la regenera en cada build. No hay almacén persistente (ADR 0003) ni datos que migrar; el comando construye el sitio y demuestra que las imágenes declaradas existen con su tamaño. Rollback: revertir el commit; el siguiente build deja de generarlas."
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-23T10:21:44.428Z"
+    }
+  ],
+  "base": "e2c823120b3559f178c4e2ceb2561f4ac8218756",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:b5c9b1043682bf642ab4b94382d516d56ffbe9f745e82b499115a1b4b8f86f8b",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:5c60b3f6f3b2e3c4cd94aca01c0dec144e5f1fae8adc34e26d6aece439cfc810",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:1eb69765b7b9459305e5f6aaeedbc44e2f67efae5792c6e8f22b4c3c5819f452",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:4fe322ede09e29788b952febc75cdee35645a4b2561724ae2009658b5d2b494a",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:3893b8a41df998d1accccb86a80d38d74823379d0d065ad25e19bca22c91d76d",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:ede484a8e50137231d289b6ccd5e82db0d2f6e068d917a1c8aa962d42ec82c0c",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a771132b011d715ad1b62b953057bf8e0d34a1b2555f930f1e771c7a107ec77b",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:2376cb22af8fc65d663c6c4135e682cf90864daa5db952e73077cb19fd42de57",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:763b14ab93b1a8a76426a2122a1c49e6299b0c94a8af881dd645949bfc8aad5c",
+      "tree": "sha256:ab3f8bab758d81513af6821a4cf206a2e250b9021c924c5f8cb6a22b3e30f0a7",
+      "recorded_at": "2026-10-23T10:20:54.384Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "migration-test",
+      "command": "pnpm exec playwright test tests/e2e/site.spec.ts -g 'Open Graph'",
+      "exit_code": 0,
+      "output_sha256": "sha256:ba93ab4560cb48612e279138f9edd7f34cf11aca88415039bd4602ec1bbf6d9b",
+      "tree": "sha256:cc727acc3f7df279ff6ee48f91325e1859146debfb8ceb87ecc20dc6f76fefb6",
+      "recorded_at": "2026-10-23T10:21:36.212Z"
+    }
+  ],
+  "closed_at": "2026-10-23T10:21:44.428Z"
+}

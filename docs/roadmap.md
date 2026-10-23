@@ -67,7 +67,9 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 - JSON-LD (`Organization`, `ProfessionalService`, `WebSite`, `BreadcrumbList`) (hecho, `seo-structured-data`): un
   grafo por página con la marca Retama (sin domicilio, NIF, fundador, perfiles ni zona de servicio mientras no existan),
   sus servicios en el idioma de la página y la miga de pan en las páginas legales.
-- Imágenes OG por idioma generadas en build.
+- Imágenes OG por idioma generadas en build (hecho, `og-images`): `/og/es.png` y `/og/en.png`, 1200×630, la portada en
+  pequeño (wordmark, título a dos tonos, la frase del hero y la retama del póster), declaradas con Open Graph y
+  `twitter:card` en cada página indexable; la 404 no lleva ninguna.
 - robots.txt (crawlers de IA permitidos) y llms.txt (hecho, `seo-structured-data`): los dos se generan en el build con
   el origen del sitio; llms.txt va en inglés y enlaza las páginas de los dos idiomas.
 - FAQ.
