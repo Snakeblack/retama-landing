@@ -1,0 +1,188 @@
+{
+  "schema": "idd-state/v1",
+  "change": "article-select",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "En pantallas táctiles el texto de los artículos del blog no se puede seleccionar, porque la regla que lo impide en el tablero se aplica a todo main",
+    "acceptance": "En un móvil (pointer: coarse) el título, la entradilla y el cuerpo de un artículo se pueden seleccionar y copiar; el tablero de la portada sigue sin selección salvo el contacto"
+  },
+  "facts": {
+    "basis": "El usuario aceptó la recomendación (2026-10-23): hacer seleccionable el artículo con el mismo mecanismo que ya usa el contacto (data-selectable, global.css); el resto del comportamiento táctil no cambia"
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/Article.astro",
+      "tests/e2e/blog.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0005",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md records that an article stays selectable on touch screens, like the contact; no token or style changes"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-23T17:43:38.038Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T17:44:26.069Z",
+      "detail": {
+        "tree": "sha256:8bcef4f55439bbfd82667c114dad680b84b6b9131c8fa75fb8a573f36c6a3942",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T17:44:26.069Z",
+      "detail": {
+        "refs": [
+          "adr:0005 conforms"
+        ],
+        "records": []
+      }
+    }
+  ],
+  "base": "e8b89409ade6f96dfbd996af7b598032faf0982f",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/blog.spec.ts -g 'pantallas táctiles'",
+      "exit_code": 1,
+      "output_sha256": "sha256:86a3c4b2291ca9016b33c9ca9eeb8515bbb567a04b2a11926518aae3f2192948",
+      "tree": "sha256:f5a31a2f9b4d1f74a1c41e25c3db71dca3637e21eaba3c3dd157de1a0d7af1f0",
+      "recorded_at": "2026-10-23T17:43:17.645Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/blog.spec.ts -g 'pantallas táctiles'",
+      "exit_code": 0,
+      "output_sha256": "sha256:63898cf88aae593b56aaea56d9d7ca6cba0d669fe26627c8562179a5c75fdb3e",
+      "tree": "sha256:d4c51999c83298e8d965f836ff691f89245cb7b088dfb2d297e501198c1f2234",
+      "recorded_at": "2026-10-23T17:43:38.038Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:014d7e3b9de04b6e7746171ad93cb5fe63e05738922b6e04002be1545c98206d",
+      "tree": "sha256:8bcef4f55439bbfd82667c114dad680b84b6b9131c8fa75fb8a573f36c6a3942",
+      "recorded_at": "2026-10-23T17:44:26.069Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:895b94856d0a70e6bf49ad526e67f0e3f1a818afcf80e8da8acdc31684aeb7a5",
+      "tree": "sha256:8bcef4f55439bbfd82667c114dad680b84b6b9131c8fa75fb8a573f36c6a3942",
+      "recorded_at": "2026-10-23T17:44:26.069Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:39f2f04d0e9e467b033d8cac6b87ff30ea15c6722d8798dca593e5c3c4a396b0",
+      "tree": "sha256:8bcef4f55439bbfd82667c114dad680b84b6b9131c8fa75fb8a573f36c6a3942",
+      "recorded_at": "2026-10-23T17:44:26.069Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:25bf48ab300f1f01d80b3372f905ea4a1ed970ff6ea6a68ce95c8c60e8c1e507",
+      "tree": "sha256:8bcef4f55439bbfd82667c114dad680b84b6b9131c8fa75fb8a573f36c6a3942",
+      "recorded_at": "2026-10-23T17:44:26.069Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8bcef4f55439bbfd82667c114dad680b84b6b9131c8fa75fb8a573f36c6a3942",
+      "recorded_at": "2026-10-23T17:44:26.069Z"
+    }
+  ],
+  "closed_at": "2026-10-23T17:44:34.346Z"
+}
