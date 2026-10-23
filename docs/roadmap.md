@@ -94,8 +94,9 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 - Logs y alertas del Worker.
 - Uptime externo y errores de cliente: se elige proveedor gratis.
 - Cloudflare Web Analytics.
-- Dominio y DNS. Al poner el dominio en Cloudflare, comprobar que el robots.txt gestionado y el bloqueo de bots de IA
-  de la zona están apagados, para que no contradigan el robots.txt del sitio.
+- `domain` (hecho): producción en `retama.dev`, Custom Domain del Worker, y `www.retama.dev` con un 301 a `retama.dev`;
+  la URL `workers.dev` de producción, apagada; las Previews siguen en `workers.dev`. En la zona, el robots.txt
+  gestionado y el bloqueo de bots de IA se dejan apagados, para que no contradigan el robots.txt del sitio.
 - Checklist de lanzamiento, con el NIF y el domicilio en el aviso legal (`PUBLIC_LEGAL_NIF`, `PUBLIC_LEGAL_ADDRESS`; art. 10 de la LSSI) y los textos legales revisados por un gestor.
 
 ## v2 (aplazado)
@@ -108,7 +109,6 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 
 | Decisión | Dueño | Último momento responsable |
 | --- | --- | --- |
-| Dominio definitivo y DNS en Cloudflare | Usuario | Antes de M6 (S1 puede usar `*.workers.dev`) |
 | Versión exacta de TypeScript compatible con `astro check` | Usuario + agente | S1 |
 | Dirección de arte, tipografías y logotipo | Usuario (con taste-skill) | Inicio de M1 |
 | Copy final es/en | Usuario | M2 |
