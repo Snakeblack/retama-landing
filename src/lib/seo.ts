@@ -21,6 +21,36 @@ export function alternates(site: URL, pathname: string): Alternate[] {
   return [...links, { hreflang: "x-default", href: new URL(localizedPath(defaultLocale, page), site).href }];
 }
 
+// Open Graph wants a territory with the language: Spain for Spanish, the international default for English.
+const ogLocales: Record<Locale, string> = { es: "es_ES", en: "en_US" };
+
+/** The Open Graph tags of an indexable page, as [property, content]. The image is its language's, drawn at build time
+ * by scripts/postbuild.mjs into og/<locale>.png at 1200×630. */
+export function openGraph(
+  site: URL,
+  locale: Locale,
+  pathname: string,
+  title: string,
+  description: string,
+): [string, string][] {
+  return [
+    ["og:type", "website"],
+    ["og:site_name", "Retama"],
+    ["og:title", title],
+    ["og:description", description],
+    ["og:url", canonicalUrl(site, pathname)],
+    ["og:locale", ogLocales[locale]],
+    ...locales
+      .filter((other) => other !== locale)
+      .map((other): [string, string] => ["og:locale:alternate", ogLocales[other]]),
+    ["og:image", new URL(`/og/${locale}.png`, site).href],
+    ["og:image:type", "image/png"],
+    ["og:image:width", "1200"],
+    ["og:image:height", "630"],
+    ["og:image:alt", t(locale)["og.imageAlt"]],
+  ];
+}
+
 /** A step of a page's breadcrumb after the home page of its language. */
 export interface Crumb {
   name: string;

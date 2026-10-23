@@ -1,7 +1,10 @@
 // Post-build steps over the static output in dist/client.
-import { readdir, readFile, rename, rmdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, rmdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { en } from "../src/i18n/en.ts";
+import { es } from "../src/i18n/es.ts";
 import { extractMetaCsp, mergePolicies, serializePolicy } from "./lib/csp.mjs";
+import { ogImage, themeTokens } from "./lib/og-image.mjs";
 
 const root = new URL("../dist/client/", import.meta.url).pathname;
 
@@ -39,5 +42,15 @@ async function cspHeader() {
   await writeFile(path, rules.replace(PLACEHOLDER, header));
 }
 
+// The Open Graph image of each language, og/<locale>.png, which Base.astro declares (src/lib/seo.ts, openGraph). A
+// failure fails the build: no page links an image that is not there.
+async function ogImages() {
+  const theme = themeTokens(await readFile(new URL("../src/styles/theme.css", import.meta.url), "utf8"));
+  await mkdir(join(root, "og"), { recursive: true });
+  for (const [locale, copy] of Object.entries({ es, en }))
+    await writeFile(join(root, "og", `${locale}.png`), await ogImage(copy, theme));
+}
+
 await flattenLocale404();
 await cspHeader();
+await ogImages();
