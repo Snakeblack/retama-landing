@@ -79,9 +79,13 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 
 ## M5 — Blog
 
-- Content collections por idioma.
-- Índice, artículos y RSS.
-- SEO por artículo.
+**Entra (un change por PR, encadenados):**
+1. `blog` (hecho): colección de Markdown por idioma en el repositorio, con el slug traducido y las traducciones unidas
+   por una clave; el build falla si un artículo no está en todos los idiomas. Índice (`/blog/`, `/en/blog/`) y artículo
+   con canónica, hreflang recíproco, Open Graph `article` con la imagen del idioma, JSON-LD `BlogPosting` y miga de
+   pan; en el sitemap y en llms.txt. «Blog» en la cabecera, el índice de capítulos y el pie. Dos artículos iniciales
+   para clientes, firmados por Retama.
+2. `blog-feed`: RSS por idioma (`/blog/rss.xml`, `/en/blog/rss.xml`) e imagen Open Graph propia de cada artículo.
 
 ## M6 — Operación y lanzamiento
 
