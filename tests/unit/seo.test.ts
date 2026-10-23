@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { en } from "../../src/i18n/en";
 import { es } from "../../src/i18n/es";
-import { alternates, type Crumb, canonicalUrl, jsonLd, llmsTxt, robotsTxt, structuredData } from "../../src/lib/seo";
+import {
+  alternates,
+  type Crumb,
+  canonicalUrl,
+  jsonLd,
+  llmsTxt,
+  openGraph,
+  robotsTxt,
+  structuredData,
+} from "../../src/lib/seo";
 
 const site = new URL("https://retama.example/");
 
@@ -121,5 +130,32 @@ describe("llmsTxt", () => {
     expect(text).toContain("hola@retama.dev");
     for (const key of ["services.web", "services.custom", "services.agents", "services.seo"] as const)
       expect(text).toContain(en[key]);
+  });
+});
+
+describe("openGraph", () => {
+  it("describe la página con su URL canónica y la imagen absoluta de su idioma", () => {
+    expect(openGraph(site, "en", "/en/legal/?utm_source=x", "Legal · Retama", "What is in it.")).toEqual([
+      ["og:type", "website"],
+      ["og:site_name", "Retama"],
+      ["og:title", "Legal · Retama"],
+      ["og:description", "What is in it."],
+      ["og:url", "https://retama.example/en/legal/"],
+      ["og:locale", "en_US"],
+      ["og:locale:alternate", "es_ES"],
+      ["og:image", "https://retama.example/og/en.png"],
+      ["og:image:type", "image/png"],
+      ["og:image:width", "1200"],
+      ["og:image:height", "630"],
+      ["og:image:alt", en["og.imageAlt"]],
+    ]);
+  });
+
+  it("usa la imagen y el territorio del español en las páginas en español", () => {
+    const tags = new Map(openGraph(site, "es", "/", "Retama", "Qué hace."));
+    expect(tags.get("og:locale")).toBe("es_ES");
+    expect(tags.get("og:locale:alternate")).toBe("en_US");
+    expect(tags.get("og:image")).toBe("https://retama.example/og/es.png");
+    expect(tags.get("og:image:alt")).toBe(es["og.imageAlt"]);
   });
 });

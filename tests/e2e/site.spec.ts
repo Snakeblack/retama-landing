@@ -182,6 +182,31 @@ test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga 
   }
 });
 
+test("Open Graph con la imagen de su idioma en todas las páginas del sitemap", async ({ page, request }) => {
+  for (const url of await sitemapUrls(request)) {
+    await page.goto(new URL(url).pathname);
+    const lang = (await page.locator("html").getAttribute("lang")) ?? "";
+    const og = async (property: string) => page.locator(`meta[property="${property}"]`).getAttribute("content");
+    expect(await og("og:url"), url).toBe(url);
+    expect(await og("og:title"), url).toBe(await page.title());
+    expect(await og("og:locale"), url).toBe(lang === "es" ? "es_ES" : "en_US");
+    expect(await og("og:image:alt"), url).toBeTruthy();
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
+
+    const image = await og("og:image");
+    expect(image, url).toBe(new URL(`/og/${lang}.png`, url).href);
+    const response = await request.get(new URL(image ?? "").pathname);
+    expect(response.status(), image ?? "").toBe(200);
+    expect(response.headers()["content-type"]).toBe("image/png");
+    // The size from the PNG header (IHDR), as the tags declare it.
+    const png = await response.body();
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([
+      Number(await og("og:image:width")),
+      Number(await og("og:image:height")),
+    ]);
+  }
+});
+
 test("robots.txt admite a todos los rastreadores y llms.txt enlaza las páginas del sitemap", async ({ request }) => {
   const urls = await sitemapUrls(request);
 
@@ -207,5 +232,6 @@ test("las rutas desconocidas devuelven la 404 de su idioma", async ({ page }) =>
     await expect(page.locator("html")).toHaveAttribute("lang", lang);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
     await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
+    await expect(page.locator('meta[property^="og:"]')).toHaveCount(0);
   }
 });
