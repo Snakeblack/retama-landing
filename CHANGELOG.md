@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/Snakeblack/retama-landing/compare/v0.4.1...v0.5.0) (2026-10-23)
+
+
+### Features
+
+* **platform:** serve production on retama.dev ([d187995](https://github.com/Snakeblack/retama-landing/commit/d187995c576e5f60e3e666976e8c2dd794517b07))
+
 ## [0.4.1](https://github.com/Snakeblack/retama-landing/compare/v0.4.0...v0.4.1) (2026-10-23)
 
 
