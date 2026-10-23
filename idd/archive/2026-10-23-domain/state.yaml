@@ -1,0 +1,600 @@
+{
+  "schema": "idd-state/v1",
+  "change": "domain",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "Dominio primero: retama.dev en el Worker. Cuando retama.dev esté activo, apagar retama-landing.retamozogpt.workers.dev",
+    "kind": "feature",
+    "summary": "Serve the site on its definitive domain retama.dev: a Custom Domain on the Worker, retama.dev as the production origin for canonicals, hreflang, sitemap, robots.txt and llms.txt, and the workers.dev URL turned off while branch Previews keep working",
+    "acceptance": "https://retama.dev/ and https://retama.dev/en/ serve the site with every security header; canonicals, hreflang, sitemap, robots.txt and llms.txt name https://retama.dev; the production workers.dev URL no longer serves the site; branch Preview URLs still deploy"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "Is SITE_URL set in the Workers Builds environment (production or Previews)? It overrides the fallback origin and must be removed or set to https://retama.dev"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "wrangler.jsonc",
+          "line": 9
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "wrangler.jsonc",
+          "line": 17
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/board.ts",
+          "line": 6
+        }
+      },
+      {
+        "category": "url-state",
+        "question": "Should www.retama.dev answer with a 301 to https://retama.dev (a Redirect Rule plus a proxied placeholder DNS record, made in the dashboard), or stay unresolved?"
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "src/layouts/Base.astro",
+          "line": 50
+        }
+      },
+      {
+        "category": "errors",
+        "question": "If the Workers Builds deploy cannot create the Custom Domain (its token lacks the permission), is it added by hand in the dashboard and kept in wrangler.jsonc as the source of truth?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "public/_headers",
+      "wrangler.jsonc"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches public/_headers and 1 more (matches public/_headers)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0002, 0006, 0008 and quality scenario privacy-security, seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "Still one deployable with /api/contact as its only on-demand route; the Custom Domain only adds a hostname to the same Worker"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Every header and the CSP stay in the single /* block of public/_headers; HSTS keeps includeSubDomains and needs no preload because .dev is a preloaded TLD; the CSP names no host of its own"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Locale routing is unchanged; canonicals and hreflang move to the https://retama.dev origin and stay reciprocal (E2E ADR 0008)"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "No header is weakened; the contact Origin check compares with the request's own origin (src/server/contact.ts:163), so it holds on the new host"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "One public origin: canonicals, hreflang, sitemap, robots.txt and llms.txt name https://retama.dev and the duplicate workers.dev host is turned off"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "SITE_URL: No la tengo (the origin comes only from astro.config.mjs). www: 301 a retama.dev (AAAA www -> 100:: proxied plus a Redirect Rule that keeps the path, made by the user in the dashboard). Deploy failure: Añadirlo a mano en el dashboard (Settings -> Domains & Routes), and wrangler.jsonc keeps declaring it as the source of truth",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T19:10:21.924Z",
+      "detail": {
+        "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T19:10:21.924Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-23T19:11:25.806Z",
+      "detail": {
+        "lineage_id": "sha256:6b749fa89ed478e46ea70064e2ebd34acfecd3bb10b72120f097bd6c5bbe08a1",
+        "candidate_id": "sha256:cc153e82cff9b6ed350efe616a295a0848c7408af91361f789bd2bdbf690ce91",
+        "candidate_tree": "b0c01279a2f8c884ba29198527580ac89a3516ab",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "relayed"
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-23T19:12:26.897Z",
+      "detail": {
+        "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+        "runs": [
+          "run-10",
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-23T19:12:26.897Z",
+      "detail": {
+        "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+        "check": "ev-4",
+        "documents": [
+          "docs/architecture/technical-baseline.md"
+        ],
+        "tests": [
+          "tests/e2e/site.spec.ts",
+          "tests/unit/wrangler-config.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-23T19:12:26.897Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+        "fitness": [
+          "run-15",
+          "run-16",
+          "run-17",
+          "run-18"
+        ]
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-23T19:12:32.316Z"
+    }
+  ],
+  "base": "94203f3e44c3fa1dedae637b12055fda1e1ea637",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:ffcca1a58704af7b69b18b24752463f90ff729d30946def95d3d967790adae01",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:2dff1e540a446efc26422be35837908fd989856a8dd8dd1530a525c73f974fbf",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:a29f60b98d27c3653100f62d6898e013f89c987e7f936afca353768997f1a9e5",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:4ecfcdbaea544fb9d74c7f15bd642a0660bc729eab5014638c2049f570f557a3",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:4a1285a1260c7a6171b1189e5e5b753e21073131cb2678e499e511f6c8052540",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:7ead7ab95e72a04a03c1225c3469bcfae5fe4c9cfad304a113cd50ddb7e346ba",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:85efa9a22c849c191c6977a49fc267a553f158fe8b354f683b73fc04e19d2b33",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:10:21.924Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:324fc29d48928011e6e01544f3f6d7ca13bcd0ff13e3439a29451c044d5f41ef",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:aa1ca5e3bbbb368aa6acff06fece10ae4d8f78d5ece3e472403d9ff49c84b7de",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:28b75d6538aafca85e2a2d8a76d325b16b0464718639a401cc3e42c231de2675",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:c549577d43a2fc26b231d690a0417b17077645ee23cf4e34db454b74dac11573",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3f1f045300380440bae1e610b2d2c36d0532b9212775c5fa8f8087534816dfd",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:421cf0f1af938cc7adc0057da2a54112538529104bba40d4f0a70135000698ea",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:f7f4d0b12dca12af5b3251245945d270a72a0c55179d9822581070fc5732ccf7",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:8a59af0d928084349e3054c62a441878c73c9dab111a589690a136eb844c64fc",
+      "tree": "sha256:561bbb5ba23a3af31ff52eec4939c5449410effc1911149f226ff54dd298155f",
+      "recorded_at": "2026-10-23T19:12:26.897Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:6b749fa89ed478e46ea70064e2ebd34acfecd3bb10b72120f097bd6c5bbe08a1",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "e338dda5dccd0fb101b198b4afdc3f5c266f298e",
+          "candidate_tree": "b0c01279a2f8c884ba29198527580ac89a3516ab",
+          "paths": [
+            "astro.config.mjs",
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "public/_headers",
+            "tests/e2e/site.spec.ts",
+            "tests/unit/wrangler-config.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:d6f5181dc895fa9efe7aefacd4274307801ac59df2ca2b1f86a1b8c6f9adcef4",
+          "paths_digest": "sha256:1d76543504f36f0cd291d68e2f9731efdb959db680d6f8063f2fec67f43836fd",
+          "authored_lines": 33,
+          "original_changed_lines": 43
+        },
+        "candidate_id": "sha256:cc153e82cff9b6ed350efe616a295a0848c7408af91361f789bd2bdbf690ce91",
+        "paths": [
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "public/_headers",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "b0c01279a2f8c884ba29198527580ac89a3516ab",
+        "original_changed_lines": 43,
+        "authored_lines": 33
+      },
+      "current_candidate_id": "sha256:cc153e82cff9b6ed350efe616a295a0848c7408af91361f789bd2bdbf690ce91",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "e338dda5dccd0fb101b198b4afdc3f5c266f298e",
+        "candidate_tree": "b0c01279a2f8c884ba29198527580ac89a3516ab",
+        "paths": [
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "public/_headers",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:d6f5181dc895fa9efe7aefacd4274307801ac59df2ca2b1f86a1b8c6f9adcef4",
+        "paths_digest": "sha256:1d76543504f36f0cd291d68e2f9731efdb959db680d6f8063f2fec67f43836fd",
+        "authored_lines": 33,
+        "original_changed_lines": 43
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "domain:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "domain:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 22,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-23T19:12:32.316Z"
+}

@@ -14,10 +14,12 @@ checks:
   e2e: pnpm test:e2e
   design: pnpm design:lint
 
-# Contract documents: the design system, the i18n keys and the contact endpoint.
+# Contract documents: the design system, the i18n keys, the contact endpoint and the technical baseline, which records
+# the platform, the domain and the integrations that astro.config and wrangler.jsonc set (approved 2026-10-23, domain).
 contracts:
   documents:
     - DESIGN.md
+    - docs/architecture/technical-baseline.md
     - src/i18n/**
     - src/pages/api/**
 
