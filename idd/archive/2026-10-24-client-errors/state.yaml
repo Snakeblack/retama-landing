@@ -1,0 +1,1532 @@
+{
+  "schema": "idd-state/v1",
+  "change": "client-errors",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "continua",
+    "kind": "feature",
+    "summary": "Errores de cliente: endpoint /api/report/ que registra en Workers Logs los errores de JavaScript de las páginas y los informes de violación de la CSP, sin datos personales (M6, 4.ª pieza; ADR nuevo que amplía el 0002)",
+    "acceptance": "Un error de JavaScript no capturado o una violación de la CSP en cualquier página del build produce una línea JSON sin datos personales en Workers Logs vía /api/report/; los informes inválidos, ajenos o por encima del límite se descartan; el fitness de rutas bajo demanda admite exactamente /api/contact y /api/report con un ADR que lo justifica"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "\"¿Qué recoge /api/report/? Propuesta: (a) errores de JS (eventos error y unhandledrejection) que un script pequeño envía con sendBeacon desde todas las páginas, también en las Previews; (b) informes de la CSP que manda el propio navegador, con report-to + Reporting-Endpoints (Chromium) y report-uri (Firefox y Safari). Cuerpo de 8 KB como máximo; de cada informe solo el tipo, el mensaje (300 caracteres como máximo), el archivo si es de la web, la línea, la columna y la primera línea de la pila; de la CSP, la directiva y el origen bloqueado. Ni user agent ni IP.\""
+      },
+      {
+        "category": "uniqueness",
+        "question": "\"¿Cómo se frena el ruido? Propuesta: el script manda como mucho 5 informes por carga de página y cada mensaje idéntico una sola vez; descarta «Script error.» y lo que viene de otros orígenes o de extensiones (chrome-extension://, moz-extension://, safari-web-extension://). En el servidor, un límite propio REPORT_LIMITER de 20 informes por minuto por IP (IPv6 por /64), con contador aparte del contacto y otro para las Previews.\""
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/technical-baseline.md",
+          "line": 36
+        }
+      },
+      {
+        "category": "copy",
+        "question": "\"¿Lo cuenta la política de privacidad (es y en)? Propuesta: sí, una frase en «Qué datos»: si algo falla en la página, tu navegador envía a esta web un informe técnico del fallo, sin datos tuyos, que queda 3 días en los registros de Cloudflare.\""
+      },
+      {
+        "category": "url-state",
+        "question": "\"¿Qué URL se registra? Propuesta: de la página, solo la ruta, sin query ni fragmento; de la CSP, la URL bloqueada reducida a su origen (o a inline/eval).\""
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "docs/roadmap.md",
+          "line": 97
+        }
+      },
+      {
+        "category": "errors",
+        "question": "\"¿Qué responde y con qué severidad registra? Propuesta: 204 tanto si el informe se acepta como si se descarta por inválido o ajeno (sin pistas para quien abuse); 413 por encima de 8 KB, 429 por encima del límite y 503 sin el binding (fail-closed, como el contacto). Los informes propios exigen Origin del sitio; los de la CSP, que la página informada sea del sitio. En Workers Logs salen con severidad warn, para que error siga marcando solo los fallos del contacto que piden actuar.\""
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "docs/architecture/decisions/0011-client-error-reports.md",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "public/_headers",
+      "scripts/fitness.mjs",
+      "scripts/postbuild.mjs",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/lib/report.ts",
+      "src/pages/api/report.ts",
+      "src/scripts/report.ts",
+      "src/server/report.ts",
+      "tests/e2e/security.spec.ts",
+      "tests/unit/headers.test.ts",
+      "tests/unit/report.test.ts",
+      "tests/unit/wrangler-config.test.ts",
+      "wrangler.jsonc"
+    ],
+    "work_units": 2,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 2 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 2 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches public/_headers and 3 more (matches public/_headers)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0002, 0003, 0006, 0007 and quality scenario perf-mobile, privacy-security",
+      "source": "declaration"
+    },
+    {
+      "id": "persistent-data",
+      "reason": "persistent data: scripts/postbuild.mjs uses writeFile",
+      "source": "diff"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "El script de informes es pequeño y no pinta texto; entra en el presupuesto de 60 KB del JavaScript de inicio que comprueba js-budget"
+    },
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "amends",
+      "reason": "Añade una segunda ruta bajo demanda, /api/report/, sin estado, para los informes de errores de cliente y de la CSP; un ADR nuevo (0011) la justifica y amplía la lista permitida del fitness on-demand-routes",
+      "record": "docs/architecture/decisions/0011-client-error-reports.md"
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "impact": "conforms",
+      "reason": "No guarda nada: registra una línea sin datos personales en Workers Logs y el límite de peticiones es un contador por ubicación, no un almacén"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Solo añade report-to y report-uri a la cabecera de la CSP y Reporting-Endpoints a _headers; ni unsafe-inline ni terceros nuevos"
+    },
+    {
+      "kind": "adr",
+      "id": "0007",
+      "impact": "conforms",
+      "reason": "Los informes van al propio origen, sin cookies, almacenamiento ni identificadores"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "sendBeacon tras el fallo, sin trabajo en el arranque más allá de dos listeners"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "Endpoint con validación, límite por IP y sin datos personales en los registros"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-13"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-17"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-14"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-16"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-15"
+      ]
+    },
+    {
+      "id": "migration-compat-and-test",
+      "signal": "persistent-data",
+      "status": "satisfied",
+      "evidence": [
+        "ev-12"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "si, vamos con las propuestas",
+      "source": "user"
+    },
+    {
+      "id": "adr-amend-or-contradict",
+      "status": "resolved",
+      "reason": "ADR 0002 amends: Añade una segunda ruta bajo demanda, /api/report/, sin estado, para los informes de errores de cliente y de la CSP; un ADR nuevo (0011) la justifica y amplía la lista permitida del fitness on-demand-routes",
+      "answer": "si, vamos con las propuestas",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T00:36:06.565Z",
+      "detail": {
+        "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-24T00:36:06.565Z",
+      "detail": {
+        "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+        "check": "ev-1",
+        "documents": [
+          "docs/architecture/technical-baseline.md",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/pages/api/report.ts"
+        ],
+        "tests": [
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-24T00:36:06.565Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0002 amends",
+          "adr:0003 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [
+          "docs/architecture/decisions/0011-client-error-reports.md"
+        ],
+        "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "migration-test",
+      "obligation": "migration-compat-and-test",
+      "recorded_at": "2026-10-24T00:36:29.748Z",
+      "detail": {
+        "run": "run-11",
+        "tree": "sha256:86d70b74396db674df87e13ae2f0879b379f0ab9de920f875a2a1462767bfc31",
+        "plan": "Sin migración de datos: el diff solo cambia la constante HEADER_ONLY de scripts/postbuild.mjs (su writeFile ya existía y escribe el build en dist/). No hay almacén (ADR 0003): el fitness no-persistent-bindings lo comprueba sobre wrangler.jsonc y la configuración generada, y los tests de la CSP y de _headers el contrato de cabeceras. Reversión: revertir el commit; el navegador deja de enviar informes al desaparecer report-to y report-uri"
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-24T16:25:53.769Z",
+      "detail": {
+        "lineage_id": "sha256:f6f48561a4b8ac06c0f04913bc0fbd057143485bea130e4d79512b7c8c5d6507",
+        "candidate_id": "sha256:93452aa3913e32b00524dffb9e10559c568e1ef57b1533dd2b6dd61505cb8e1d",
+        "candidate_tree": "62c11178c9183761a38679f27b14cbdbac2205b5",
+        "findings_digest": "sha256:bd25b68a8ad54853117b7a7f631a484decc01e1ff6fe987e84f36fa8ab0236cd",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-24T16:25:33.758Z",
+          "result_digest": "sha256:2bc1fb60cbc7ffa3d2423ac4cd0ebdcd952135c98afa591083d19c12677b29c5"
+        }
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-24T16:31:23.441Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0002 amends",
+          "adr:0003 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [
+          "docs/architecture/decisions/0011-client-error-reports.md"
+        ],
+        "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+        "fitness": [
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20",
+          "run-21"
+        ]
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "migration-test",
+      "obligation": "migration-compat-and-test",
+      "recorded_at": "2026-10-24T16:32:21.933Z",
+      "detail": {
+        "run": "run-22",
+        "tree": "sha256:fc61fd3d18a683ec4e58d846d4e7c31fa6c8953f0787f8d4c56b1f8321e2d44e",
+        "plan": "Sin migración de datos: el diff solo cambia la constante HEADER_ONLY de scripts/postbuild.mjs (su writeFile ya existía y escribe el build en dist/). No hay almacén (ADR 0003): el fitness no-persistent-bindings lo comprueba sobre wrangler.jsonc y la configuración generada, y los tests de la CSP y de _headers el contrato de cabeceras. Reversión: revertir el commit; el navegador deja de enviar informes al desaparecer report-to y report-uri"
+      }
+    },
+    {
+      "id": "ev-8",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T16:33:34.272Z",
+      "detail": {
+        "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+        "runs": [
+          "run-23",
+          "run-24",
+          "run-25",
+          "run-26",
+          "run-27"
+        ]
+      }
+    },
+    {
+      "id": "ev-9",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-24T16:33:34.272Z",
+      "detail": {
+        "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+        "check": "ev-8",
+        "documents": [
+          "docs/architecture/technical-baseline.md",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/pages/api/report.ts"
+        ],
+        "tests": [
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-10",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-24T16:33:34.272Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0002 amends",
+          "adr:0003 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [
+          "docs/architecture/decisions/0011-client-error-reports.md"
+        ],
+        "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+        "fitness": [
+          "run-28",
+          "run-29",
+          "run-30",
+          "run-31",
+          "run-32"
+        ]
+      }
+    },
+    {
+      "id": "ev-11",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-24T16:35:24.417Z",
+      "detail": {
+        "lineage_id": "sha256:6db66e2b9cfb20cf4235af461f33b062422d8a0c3a8d7b6eee00a9b814ddd530",
+        "candidate_id": "sha256:fd689ba9bbcd3a64772cf9e838d20f1d92170bdf89f6994ca87a50ec039c69d5",
+        "candidate_tree": "54d96bf5c35ab09b582157ab668feb98014c3cde",
+        "findings_digest": "sha256:514ab1a94eeacc2f38da667c95dad716eb0ada6f63802c2f58cb0ff69ee9dae9",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-24T16:34:50.925Z",
+          "result_digest": "sha256:901d58b24ab5b4955ea509b5a8f12f5e9d7829d60d6cc023bdc94cf2b88f85a9"
+        }
+      }
+    },
+    {
+      "id": "ev-12",
+      "kind": "migration-test",
+      "obligation": "migration-compat-and-test",
+      "recorded_at": "2026-10-24T17:35:41.570Z",
+      "detail": {
+        "run": "run-33",
+        "tree": "sha256:ba3c35caaface4eb4329cde3cd5f5832d76f19747e3d19f00cf1543cef707e70",
+        "plan": "Sin migración de datos: el diff solo cambia la constante HEADER_ONLY de scripts/postbuild.mjs (su writeFile ya existía y escribe el build en dist/). No hay almacén (ADR 0003): el fitness no-persistent-bindings lo comprueba sobre wrangler.jsonc y la configuración generada, y los tests de la CSP y de _headers el contrato de cabeceras. Reversión: revertir el commit; el navegador deja de enviar informes al desaparecer report-to y report-uri"
+      }
+    },
+    {
+      "id": "ev-13",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T17:36:51.267Z",
+      "detail": {
+        "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+        "runs": [
+          "run-34",
+          "run-35",
+          "run-36",
+          "run-37",
+          "run-38"
+        ]
+      }
+    },
+    {
+      "id": "ev-14",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-24T17:36:51.267Z",
+      "detail": {
+        "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+        "check": "ev-13",
+        "documents": [
+          "docs/architecture/technical-baseline.md",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/pages/api/report.ts"
+        ],
+        "tests": [
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-15",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-24T17:36:51.267Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0002 amends",
+          "adr:0003 conforms",
+          "adr:0006 conforms",
+          "adr:0007 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [
+          "docs/architecture/decisions/0011-client-error-reports.md"
+        ],
+        "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+        "fitness": [
+          "run-39",
+          "run-40",
+          "run-41",
+          "run-42",
+          "run-43"
+        ]
+      }
+    },
+    {
+      "id": "ev-16",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-24T17:38:45.268Z",
+      "detail": {
+        "lineage_id": "sha256:b7c042cd55efe61617649e805b35c9bce689b48c464cf9f13663eaae0f599a6c",
+        "candidate_id": "sha256:867d9cc2b2e03bddaeff3937ee56ce866d119b9e7e2524ee6fd02184ce7e5727",
+        "candidate_tree": "cc7241d8369b2912dc886950883f53ef737ba924",
+        "findings_digest": "sha256:f97c2d1b783e361cf4e6039cee18dadb1f014290d315ccbb9934cc09024c832d",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-24T17:38:30.002Z",
+          "result_digest": "sha256:b8a4ee06373385f6aae7ad459b27d773fbc5354315f7b8d50c81fe98ca275bc8"
+        }
+      }
+    },
+    {
+      "id": "ev-17",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-24T17:52:09.647Z"
+    }
+  ],
+  "base": "5146cefe1d5c6ac659b6261be2c578fc580511d4",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:a90f9a1e0552775ab2ce506563d9f8b0bcdb873e9003a9dab2bd8620011fedc5",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:0db50ba29e8d81b318bd2022266f1f1d02100d43dc6947b06111070ed8f56fa6",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:27bcce2d24b0c14a8c194676392d26f8eb032d074d23d3dc72db9deb9ce245ab",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:be8995058228fc10a48f688ef8db516b48efbcbe1e66c31bf96e6da5944305c2",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:ad188ec6478611981377d0a3fa40e75ab2ace2afa64f375a0bf9e6a64336a625",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:5c8ed2909509376f0e6f56420cba19509a702fc22d2807c4dc11f1e44d433e07",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:f8805874a0c76b5e5d828cee4c3d99c2fb4203d872f3943401c14f2ea7f35f7f",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a48ed372835ded71a1020484676fbfd6ac6d79e4a17ee1cf628d535014e1ae07",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:c997ad1350078425a1423fa6f3b0e5c4d7a356851d6bbaae47caed7492c4111e",
+      "tree": "sha256:40970b2fd121ae6c5ff3e71ac21d7c713c4039599e4fe6959fa19330dc093cea",
+      "recorded_at": "2026-10-24T00:36:06.565Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "migration-test",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings && pnpm vitest run tests/unit/csp.test.ts tests/unit/headers.test.ts tests/unit/wrangler-config.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:5a0fc207280f5c9adaade9b35e9dec8ad4d28695ed4e0ad6f0afd503f5563c05",
+      "tree": "sha256:86d70b74396db674df87e13ae2f0879b379f0ab9de920f875a2a1462767bfc31",
+      "recorded_at": "2026-10-24T00:36:29.748Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 1,
+      "output_sha256": "sha256:177cb48c8c4dedf41de7b0b4f6ad462951888211e161794d9ecb3e20e77a1734",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c806d45ab537bb017cb86b8e0de10a305150e2cf668201f1f7b943f19ae1c1e2",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:af9fcb5ea616cbfb48a27c244ae29ba0607ce5529f5b8db117422af25e236690",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:c16bd916cc9cb29669cbdedb40757f16b47853c22b8c642eabef271d51ae0d95",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:758cdf878137b6be69ddfda9661593844ae09c1fada07451c8d0288f0645776b",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:a74066c2ce1e0f9e935b62a4b62bd1c315597f820da2c499501fb3eaebbf64a9",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:0c120ff3470641efff8d867d42e7aa28a48c5e6a899bb163078f6f975143e791",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:cb1842cedc1ea763d46dc92269163b3fb634f91edc493232f7dc42c1d6668cb2",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:1fa5155cd18d111b11b94108f3e9b336c78c3327264a6893e0fc6f4cc8d3f24f",
+      "tree": "sha256:bc79dd22ef99b1fcd80463b054f6cca14bd348d8d60a2c4bc758f0110df1c67d",
+      "recorded_at": "2026-10-24T16:31:23.441Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "migration-test",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings && pnpm vitest run tests/unit/csp.test.ts tests/unit/headers.test.ts tests/unit/wrangler-config.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:e2a7e4b0ac28222a6f28f783e28d6690e8859bc224fa7ff474a1d72c3fe5a02c",
+      "tree": "sha256:fc61fd3d18a683ec4e58d846d4e7c31fa6c8953f0787f8d4c56b1f8321e2d44e",
+      "recorded_at": "2026-10-24T16:32:21.933Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:88b467674d04a9b28d0780d16800d1aa6ff5aee3c5ab936f94dd2cce5de2faaa",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:0cdcd3d3bef9c24df099582304061d2f3606044322c0e7488ffae8428e850249",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-25",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:29c17848033fcde3cf1c216ba0bba96646028e4f158ed81645fa77365ffd40a0",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-26",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:d2f4429ed8dbcff83d6c8b44c019ac4081e1c05194c97368ecabd4ecd7eb0067",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-27",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-28",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:bb5004b5e5e15d8dcf2141b239f238e7a9cb790f731458fba6de9ff20ebd7d5e",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-29",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:432b8700cfe0ddd0fd78c1c587e265dc3c179002b495011d4ab180d0425cb86b",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-30",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:d5af425fdaa90916ba07bb2673b084b068b915127b3d819a3ed7733ab849ac55",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-31",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:c4fcc953bfb842842778024f765bde525cf02acb4d4a433d77605c7860b1d2bf",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-32",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:462900180b57a2dc7169cb89a7b56bdaa075e001f3f6dd12a16d7aaf78ddad5f",
+      "tree": "sha256:8e1fa425415b30f462f85ba9a458fee50be817c96289847b608c5804c70af30b",
+      "recorded_at": "2026-10-24T16:33:34.272Z"
+    },
+    {
+      "id": "run-33",
+      "purpose": "migration-test",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings && pnpm vitest run tests/unit/csp.test.ts tests/unit/headers.test.ts tests/unit/wrangler-config.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:ff142999d32ddaa805c81157733907435363609239f304063f5cbcb826fcb44c",
+      "tree": "sha256:ba3c35caaface4eb4329cde3cd5f5832d76f19747e3d19f00cf1543cef707e70",
+      "recorded_at": "2026-10-24T17:35:41.570Z"
+    },
+    {
+      "id": "run-34",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:a90f9a1e0552775ab2ce506563d9f8b0bcdb873e9003a9dab2bd8620011fedc5",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-35",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:3381ae4f82c136a5df7865e9183be633607bfdc86da3ce40f743d7f41bb54def",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-36",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:9c6c356688af3011eb529fc687386e86d98ef9574a67cd371b0285cb4fafbd01",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-37",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3b5f9e4a85fb2a0aad5f51fa3c40b951ecf46574f369a3bd067e6d32dedd97f",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-38",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-39",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:5628b69ad859c02d9009cb9876bbb4b6e7488f8293d59203c48e88b6a1eabff6",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-40",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:3e170b83bbe0da1b5e0cacb3bca45cec4427787dfcc9cf098c1ca6af388e58e1",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-41",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:23e7e98a5bcf678500d3bea11bbb2606d2ed4a4f7ebd51f6932a614afd66b8d9",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-42",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:21983863ae102a595e020942eda65ae88bce6f67334f9703992d83d173807c30",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    },
+    {
+      "id": "run-43",
+      "purpose": "fitness",
+      "ref": "adr:0007",
+      "command": "pnpm test:e2e --grep \"ADR 0007\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:10b0ce45fb393443830c909ad36a6551aa7f5fad6134d68ec74e61b825a3b59d",
+      "tree": "sha256:0f561f2882ace10ea88fd7dcd9ca84e7ae29da4ad908d40fa713b669ea97df26",
+      "recorded_at": "2026-10-24T17:36:51.267Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:f6f48561a4b8ac06c0f04913bc0fbd057143485bea130e4d79512b7c8c5d6507",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "07ca9db6d2a0abdd33a6c620801a0211e1f41db3",
+          "candidate_tree": "62c11178c9183761a38679f27b14cbdbac2205b5",
+          "paths": [
+            "docs/architecture/decisions/0011-client-error-reports.md",
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "public/_headers",
+            "scripts/fitness.mjs",
+            "scripts/postbuild.mjs",
+            "src/env.d.ts",
+            "src/i18n/en.ts",
+            "src/i18n/es.ts",
+            "src/layouts/Base.astro",
+            "src/lib/report.ts",
+            "src/pages/api/report.ts",
+            "src/scripts/report.ts",
+            "src/server/contact.ts",
+            "src/server/report.ts",
+            "tests/e2e/report.spec.ts",
+            "tests/e2e/security.spec.ts",
+            "tests/unit/headers.test.ts",
+            "tests/unit/report.test.ts",
+            "tests/unit/wrangler-config.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:dbcc5219b83f4cdfe5422745aa43a81ba5d98d515ccd731007dd5a5cd32e2757",
+          "paths_digest": "sha256:74decc7abf802b5a053bae59830ae5ade9701c194e0cf4c2f6b6a58b5dbcdc75",
+          "authored_lines": 747,
+          "original_changed_lines": 773
+        },
+        "candidate_id": "sha256:93452aa3913e32b00524dffb9e10559c568e1ef57b1533dd2b6dd61505cb8e1d",
+        "paths": [
+          "docs/architecture/decisions/0011-client-error-reports.md",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "public/_headers",
+          "scripts/fitness.mjs",
+          "scripts/postbuild.mjs",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/layouts/Base.astro",
+          "src/lib/report.ts",
+          "src/pages/api/report.ts",
+          "src/scripts/report.ts",
+          "src/server/contact.ts",
+          "src/server/report.ts",
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "62c11178c9183761a38679f27b14cbdbac2205b5",
+        "original_changed_lines": 773,
+        "authored_lines": 747
+      },
+      "current_candidate_id": "sha256:93452aa3913e32b00524dffb9e10559c568e1ef57b1533dd2b6dd61505cb8e1d",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "07ca9db6d2a0abdd33a6c620801a0211e1f41db3",
+        "candidate_tree": "62c11178c9183761a38679f27b14cbdbac2205b5",
+        "paths": [
+          "docs/architecture/decisions/0011-client-error-reports.md",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "public/_headers",
+          "scripts/fitness.mjs",
+          "scripts/postbuild.mjs",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/layouts/Base.astro",
+          "src/lib/report.ts",
+          "src/pages/api/report.ts",
+          "src/scripts/report.ts",
+          "src/server/contact.ts",
+          "src/server/report.ts",
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:dbcc5219b83f4cdfe5422745aa43a81ba5d98d515ccd731007dd5a5cd32e2757",
+        "paths_digest": "sha256:74decc7abf802b5a053bae59830ae5ade9701c194e0cf4c2f6b6a58b5dbcdc75",
+        "authored_lines": 747,
+        "original_changed_lines": 773
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "client-errors:lens-start:1:0",
+          "result_digest": "sha256:c033e66ddf3ec33963905f1f8488d8754237ef6eb67cf53402afcac7e2a0a334",
+          "result": {
+            "findings": [
+              {
+                "severity": "WARNING",
+                "summary": "src/lib/report.ts:44-52,71,74 run backtracking regexes (EMAIL, the Firefox frame test, FRAME_URL) over attacker-controlled text of up to 8 KB before truncating it to MAX_TEXT. Input such as 8000 repeated characters without '@' makes them quadratic, so one 8 KB POST to /api/report/ can cost far more CPU than an ordinary report. Trigger: a POST with a very long message or stack line. Impact: CPU exhaustion of that request on a CPU-limited plan.",
+                "acceptance_criteria": "A unit test with 8 KB adversarial inputs (a long run of word characters without '@', many '@', a long 'at ' line with no '://') passes through errorReport/clip within a small fixed time bound, showing near-linear cost. Emails are still fully masked and never partly leaked by truncation: the existing masking tests still pass."
+              },
+              {
+                "severity": "SUGGESTION",
+                "summary": "The normalization in src/lib/report.ts does not strip the query or fragment of URLs that appear inside `message`. It also does not clip or mask the `page`, `file` and `blocked` values that come from sitePath and url.origin. This is a conditional gap against ADR 0011:27 and the no-personal-data claim, not a proven exposure.",
+                "acceptance_criteria": "Unit tests show that a message containing a URL with ?query or #fragment is logged without them. They also show that page, file and blocked values are bounded in length, and that an email-like path segment is masked or dropped. Alternatively, the ADR states the reduced guarantee explicitly. The existing report tests still pass."
+              }
+            ]
+          },
+          "operation": null,
+          "result_request_id": "client-errors:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [
+        {
+          "id": "F-84fd2550f5736196",
+          "owner": "trust",
+          "severity": "WARNING",
+          "summary": "src/lib/report.ts:44-52,71,74 run backtracking regexes (EMAIL, the Firefox frame test, FRAME_URL) over attacker-controlled text of up to 8 KB before truncating it to MAX_TEXT. Input such as 8000 repeated characters without '@' makes them quadratic, so one 8 KB POST to /api/report/ can cost far more CPU than an ordinary report. Trigger: a POST with a very long message or stack line. Impact: CPU exhaustion of that request on a CPU-limited plan.",
+          "acceptance_criteria": "A unit test with 8 KB adversarial inputs (a long run of word characters without '@', many '@', a long 'at ' line with no '://') passes through errorReport/clip within a small fixed time bound, showing near-linear cost. Emails are still fully masked and never partly leaked by truncation: the existing masking tests still pass.",
+          "blocking": false,
+          "resolution": "advisory"
+        },
+        {
+          "id": "F-d3f46555be4c2c0b",
+          "owner": "trust",
+          "severity": "SUGGESTION",
+          "summary": "The normalization in src/lib/report.ts does not strip the query or fragment of URLs that appear inside `message`. It also does not clip or mask the `page`, `file` and `blocked` values that come from sitePath and url.origin. This is a conditional gap against ADR 0011:27 and the no-personal-data claim, not a proven exposure.",
+          "acceptance_criteria": "Unit tests show that a message containing a URL with ?query or #fragment is logged without them. They also show that page, file and blocked values are bounded in length, and that an email-like path segment is masked or dropped. Alternatively, the ADR states the reduced guarantee explicitly. The existing report tests still pass.",
+          "blocking": false,
+          "resolution": "advisory"
+        }
+      ],
+      "findings_digest": "sha256:bd25b68a8ad54853117b7a7f631a484decc01e1ff6fe987e84f36fa8ab0236cd",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:6db66e2b9cfb20cf4235af461f33b062422d8a0c3a8d7b6eee00a9b814ddd530",
+      "generation": 2,
+      "predecessor_lineage_id": "sha256:f6f48561a4b8ac06c0f04913bc0fbd057143485bea130e4d79512b7c8c5d6507",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "07ca9db6d2a0abdd33a6c620801a0211e1f41db3",
+          "candidate_tree": "54d96bf5c35ab09b582157ab668feb98014c3cde",
+          "paths": [
+            "docs/architecture/decisions/0011-client-error-reports.md",
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "public/_headers",
+            "scripts/fitness.mjs",
+            "scripts/postbuild.mjs",
+            "src/env.d.ts",
+            "src/i18n/en.ts",
+            "src/i18n/es.ts",
+            "src/layouts/Base.astro",
+            "src/lib/report.ts",
+            "src/pages/api/report.ts",
+            "src/scripts/report.ts",
+            "src/server/contact.ts",
+            "src/server/report.ts",
+            "tests/e2e/report.spec.ts",
+            "tests/e2e/security.spec.ts",
+            "tests/unit/headers.test.ts",
+            "tests/unit/report.test.ts",
+            "tests/unit/wrangler-config.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:6dde7eaad9e00545f36e513663ee8bb3aade9c91dc17af645c9de58b0fc38159",
+          "paths_digest": "sha256:74decc7abf802b5a053bae59830ae5ade9701c194e0cf4c2f6b6a58b5dbcdc75",
+          "authored_lines": 815,
+          "original_changed_lines": 841
+        },
+        "candidate_id": "sha256:fd689ba9bbcd3a64772cf9e838d20f1d92170bdf89f6994ca87a50ec039c69d5",
+        "paths": [
+          "docs/architecture/decisions/0011-client-error-reports.md",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "public/_headers",
+          "scripts/fitness.mjs",
+          "scripts/postbuild.mjs",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/layouts/Base.astro",
+          "src/lib/report.ts",
+          "src/pages/api/report.ts",
+          "src/scripts/report.ts",
+          "src/server/contact.ts",
+          "src/server/report.ts",
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "54d96bf5c35ab09b582157ab668feb98014c3cde",
+        "original_changed_lines": 841,
+        "authored_lines": 815
+      },
+      "current_candidate_id": "sha256:fd689ba9bbcd3a64772cf9e838d20f1d92170bdf89f6994ca87a50ec039c69d5",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "07ca9db6d2a0abdd33a6c620801a0211e1f41db3",
+        "candidate_tree": "54d96bf5c35ab09b582157ab668feb98014c3cde",
+        "paths": [
+          "docs/architecture/decisions/0011-client-error-reports.md",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "public/_headers",
+          "scripts/fitness.mjs",
+          "scripts/postbuild.mjs",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/layouts/Base.astro",
+          "src/lib/report.ts",
+          "src/pages/api/report.ts",
+          "src/scripts/report.ts",
+          "src/server/contact.ts",
+          "src/server/report.ts",
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:6dde7eaad9e00545f36e513663ee8bb3aade9c91dc17af645c9de58b0fc38159",
+        "paths_digest": "sha256:74decc7abf802b5a053bae59830ae5ade9701c194e0cf4c2f6b6a58b5dbcdc75",
+        "authored_lines": 815,
+        "original_changed_lines": 841
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "client-errors:lens-start:2:0",
+          "result_digest": "sha256:e840a2e92a484c97ff4242c9590a399d9f5492d09fadff7ffdadcd0ce14564c2",
+          "result": {
+            "findings": [
+              {
+                "severity": "WARNING",
+                "summary": "src/lib/report.ts:49 FRAME_URL uses an unbounded lazy repetition `[^\\s()]+?` with an optional group and a lookahead, although the comment at lines 44-45 says every repetition is bounded. Trigger (from static analysis, not executed): POST application/json with a forged `Origin` header (curl, no authentication) and a `stack` of about 8 KB such as `at ` + `a://` x ~2000 + `(`. firstFrame (line 90) tries a start at each `a://`, and each start scans to the `(` before failing. That is roughly n^2/8, about 8M steps, on attacker-controlled input. The adversarial set in tests/unit/report.test.ts:83-92 has no repeated `scheme://` case, so the 50 ms guard at line 100 does not cover it. Impact: one request can burn far more CPU than the others, and on the free plan's 10 ms limit it would fail with CPU exceeded. The endpoint's own rate limit (20 requests a minute per IP) is the only cap.",
+                "acceptance_criteria": "errorReport called with an 8 KB stack of the form `at ` + `a://` repeated + `(` (and a variant ending in `)`) returns in about the same time as the other adversarial inputs of tests/unit/report.test.ts:83-92, covered by a new case in that test. Existing outputs for valid V8 and Firefox/Safari frames (report.test.ts:21-57) stay unchanged."
+              },
+              {
+                "severity": "SUGGESTION",
+                "summary": "POST /api/report/ is unauthenticated: the Origin check is forgeable, and the application/reports+json and application/csp-report types do not require it. The only control on log volume is REPORT_LIMITER, 20 requests a minute per IP, counted per request and not per line. Each accepted request writes up to PAGE_REPORT_LIMIT=5 warn lines (src/server/report.ts:97), plus its invocation log. Every discarded, too-large or rate-limited request also writes a log line (lines 33-36). Worked figure: one IP at the limit can produce about 20 x 6 x 1440 = 172,800 events a day. That is about 86% of the 200,000 events a day that wrangler.jsonc:14-15 and technical-baseline.md:38 name as the free-plan quota, which is shared with the contact function's logs (the baseline line says its error-severity lines are the owner's diagnostics). Two IPs are enough to exceed the quota, and the 3-day retention would then hold little else. The ADR's review trigger (line 35) only notices this afterwards.",
+                "acceptance_criteria": "The ADR or the code states and bounds the maximum Workers Logs events a single IP can produce through /api/report/ per day (including the invocation and outcome lines), either well below the 200,000-event quota or with an explicit external control (WAF rule) named as the mitigation. If the code changes, a unit test in tests/unit/report.test.ts asserts the new per-request bound."
+              }
+            ]
+          },
+          "operation": null,
+          "result_request_id": "client-errors:lens-result:2:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [
+        {
+          "id": "F-89d650e06285f0fe",
+          "owner": "trust",
+          "severity": "WARNING",
+          "summary": "src/lib/report.ts:49 FRAME_URL uses an unbounded lazy repetition `[^\\s()]+?` with an optional group and a lookahead, although the comment at lines 44-45 says every repetition is bounded. Trigger (from static analysis, not executed): POST application/json with a forged `Origin` header (curl, no authentication) and a `stack` of about 8 KB such as `at ` + `a://` x ~2000 + `(`. firstFrame (line 90) tries a start at each `a://`, and each start scans to the `(` before failing. That is roughly n^2/8, about 8M steps, on attacker-controlled input. The adversarial set in tests/unit/report.test.ts:83-92 has no repeated `scheme://` case, so the 50 ms guard at line 100 does not cover it. Impact: one request can burn far more CPU than the others, and on the free plan's 10 ms limit it would fail with CPU exceeded. The endpoint's own rate limit (20 requests a minute per IP) is the only cap.",
+          "acceptance_criteria": "errorReport called with an 8 KB stack of the form `at ` + `a://` repeated + `(` (and a variant ending in `)`) returns in about the same time as the other adversarial inputs of tests/unit/report.test.ts:83-92, covered by a new case in that test. Existing outputs for valid V8 and Firefox/Safari frames (report.test.ts:21-57) stay unchanged.",
+          "blocking": false,
+          "resolution": "advisory"
+        },
+        {
+          "id": "F-3cee1aa882f0325a",
+          "owner": "trust",
+          "severity": "SUGGESTION",
+          "summary": "POST /api/report/ is unauthenticated: the Origin check is forgeable, and the application/reports+json and application/csp-report types do not require it. The only control on log volume is REPORT_LIMITER, 20 requests a minute per IP, counted per request and not per line. Each accepted request writes up to PAGE_REPORT_LIMIT=5 warn lines (src/server/report.ts:97), plus its invocation log. Every discarded, too-large or rate-limited request also writes a log line (lines 33-36). Worked figure: one IP at the limit can produce about 20 x 6 x 1440 = 172,800 events a day. That is about 86% of the 200,000 events a day that wrangler.jsonc:14-15 and technical-baseline.md:38 name as the free-plan quota, which is shared with the contact function's logs (the baseline line says its error-severity lines are the owner's diagnostics). Two IPs are enough to exceed the quota, and the 3-day retention would then hold little else. The ADR's review trigger (line 35) only notices this afterwards.",
+          "acceptance_criteria": "The ADR or the code states and bounds the maximum Workers Logs events a single IP can produce through /api/report/ per day (including the invocation and outcome lines), either well below the 200,000-event quota or with an explicit external control (WAF rule) named as the mitigation. If the code changes, a unit test in tests/unit/report.test.ts asserts the new per-request bound.",
+          "blocking": false,
+          "resolution": "advisory"
+        }
+      ],
+      "findings_digest": "sha256:514ab1a94eeacc2f38da667c95dad716eb0ada6f63802c2f58cb0ff69ee9dae9",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:b7c042cd55efe61617649e805b35c9bce689b48c464cf9f13663eaae0f599a6c",
+      "generation": 3,
+      "predecessor_lineage_id": "sha256:6db66e2b9cfb20cf4235af461f33b062422d8a0c3a8d7b6eee00a9b814ddd530",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "07ca9db6d2a0abdd33a6c620801a0211e1f41db3",
+          "candidate_tree": "cc7241d8369b2912dc886950883f53ef737ba924",
+          "paths": [
+            "docs/architecture/decisions/0011-client-error-reports.md",
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "public/_headers",
+            "scripts/fitness.mjs",
+            "scripts/postbuild.mjs",
+            "src/env.d.ts",
+            "src/i18n/en.ts",
+            "src/i18n/es.ts",
+            "src/layouts/Base.astro",
+            "src/lib/report.ts",
+            "src/pages/api/report.ts",
+            "src/scripts/report.ts",
+            "src/server/contact.ts",
+            "src/server/report.ts",
+            "tests/e2e/report.spec.ts",
+            "tests/e2e/security.spec.ts",
+            "tests/unit/headers.test.ts",
+            "tests/unit/report.test.ts",
+            "tests/unit/wrangler-config.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:6cf2e536be679bac1e7a30e430cea1751404895226033717a46620f6038510aa",
+          "paths_digest": "sha256:74decc7abf802b5a053bae59830ae5ade9701c194e0cf4c2f6b6a58b5dbcdc75",
+          "authored_lines": 835,
+          "original_changed_lines": 861
+        },
+        "candidate_id": "sha256:867d9cc2b2e03bddaeff3937ee56ce866d119b9e7e2524ee6fd02184ce7e5727",
+        "paths": [
+          "docs/architecture/decisions/0011-client-error-reports.md",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "public/_headers",
+          "scripts/fitness.mjs",
+          "scripts/postbuild.mjs",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/layouts/Base.astro",
+          "src/lib/report.ts",
+          "src/pages/api/report.ts",
+          "src/scripts/report.ts",
+          "src/server/contact.ts",
+          "src/server/report.ts",
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "cc7241d8369b2912dc886950883f53ef737ba924",
+        "original_changed_lines": 861,
+        "authored_lines": 835
+      },
+      "current_candidate_id": "sha256:867d9cc2b2e03bddaeff3937ee56ce866d119b9e7e2524ee6fd02184ce7e5727",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "07ca9db6d2a0abdd33a6c620801a0211e1f41db3",
+        "candidate_tree": "cc7241d8369b2912dc886950883f53ef737ba924",
+        "paths": [
+          "docs/architecture/decisions/0011-client-error-reports.md",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "public/_headers",
+          "scripts/fitness.mjs",
+          "scripts/postbuild.mjs",
+          "src/env.d.ts",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts",
+          "src/layouts/Base.astro",
+          "src/lib/report.ts",
+          "src/pages/api/report.ts",
+          "src/scripts/report.ts",
+          "src/server/contact.ts",
+          "src/server/report.ts",
+          "tests/e2e/report.spec.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/headers.test.ts",
+          "tests/unit/report.test.ts",
+          "tests/unit/wrangler-config.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:6cf2e536be679bac1e7a30e430cea1751404895226033717a46620f6038510aa",
+        "paths_digest": "sha256:74decc7abf802b5a053bae59830ae5ade9701c194e0cf4c2f6b6a58b5dbcdc75",
+        "authored_lines": 835,
+        "original_changed_lines": 861
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "client-errors:lens-start:3:0",
+          "result_digest": "sha256:08d6bf0fd7aaa300536db360ab0bfc545ab236694df84236ba7053b2394ec6c1",
+          "result": {
+            "findings": [
+              {
+                "severity": "SUGGESTION",
+                "summary": "src/lib/report.ts:47 and :58 (clip). The EMAIL mask is ASCII-only: the local part is [\\w.%+-] and the domain is [a-z0-9-], with no u flag. A Spanish address such as \"josé@empresa.es\" or \"ana@münchen.de\" is not masked at all, because the character before @ is not in the class, or the domain label is broken by a non-ASCII letter. \"muñoz@gmail.com\" is only partly masked, leaving \"muñ[email]\". Such text would reach the warn log line in message, page, file, stack and the CSP page path, which the ADR 0011 and the privacy text (src/i18n/es.ts:268) say carry no personal data. Reachability is low. No site code puts form input into an Error, as src/ has no such throw. It would take a third-party or browser error or rejection message, or a hand-made POST, that embeds a non-ASCII address. Logs are kept 3 days and are not exposed. The tests (tests/unit/report.test.ts:59-79) cover only ASCII addresses.",
+                "acceptance_criteria": "clip() masks an address whose local part or domain contains non-ASCII letters (for example josé@empresa.es, muñoz@gmail.com, ana@münchen.de) and leaves no part of the local part in the output, while Firefox frames such as fn@/path:1:2 are still not masked. The unit test in tests/unit/report.test.ts covers these cases. The adversarial-timing test still passes, so every repetition stays bounded."
+              }
+            ]
+          },
+          "operation": null,
+          "result_request_id": "client-errors:lens-result:3:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [
+        {
+          "id": "F-57c62da5c89320d3",
+          "owner": "trust",
+          "severity": "SUGGESTION",
+          "summary": "src/lib/report.ts:47 and :58 (clip). The EMAIL mask is ASCII-only: the local part is [\\w.%+-] and the domain is [a-z0-9-], with no u flag. A Spanish address such as \"josé@empresa.es\" or \"ana@münchen.de\" is not masked at all, because the character before @ is not in the class, or the domain label is broken by a non-ASCII letter. \"muñoz@gmail.com\" is only partly masked, leaving \"muñ[email]\". Such text would reach the warn log line in message, page, file, stack and the CSP page path, which the ADR 0011 and the privacy text (src/i18n/es.ts:268) say carry no personal data. Reachability is low. No site code puts form input into an Error, as src/ has no such throw. It would take a third-party or browser error or rejection message, or a hand-made POST, that embeds a non-ASCII address. Logs are kept 3 days and are not exposed. The tests (tests/unit/report.test.ts:59-79) cover only ASCII addresses.",
+          "acceptance_criteria": "clip() masks an address whose local part or domain contains non-ASCII letters (for example josé@empresa.es, muñoz@gmail.com, ana@münchen.de) and leaves no part of the local part in the output, while Firefox frames such as fn@/path:1:2 are still not masked. The unit test in tests/unit/report.test.ts covers these cases. The adversarial-timing test still passes, so every repetition stays bounded.",
+          "blocking": false,
+          "resolution": "advisory"
+        }
+      ],
+      "findings_digest": "sha256:f97c2d1b783e361cf4e6039cee18dadb1f014290d315ccbb9934cc09024c832d",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-24T17:52:09.647Z"
+}

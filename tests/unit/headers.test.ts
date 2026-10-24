@@ -26,4 +26,9 @@ describe("cabeceras de los archivos de texto", () => {
     expect(rules.get("/*")?.["content-security-policy"]).toBe("__CSP__");
     expect([...rules.values()].filter((headers) => "content-security-policy" in headers)).toHaveLength(1);
   });
+
+  // The policy's report-to csp (scripts/postbuild.mjs) points here; relative, so each Preview reports to itself.
+  it("las violaciones de la CSP van a /api/report/ de la propia web (ADR 0011)", () => {
+    expect(rules.get("/*")?.["reporting-endpoints"]).toBe('csp="/api/report/"');
+  });
 });

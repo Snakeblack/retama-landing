@@ -2,8 +2,11 @@
 # a later block with the same pattern replaces this one in Cloudflare.
 # scripts/postbuild.mjs fills the CSP value with the policy built from the page hashes.
 # HSTS without preload: the whole .dev TLD is on the browsers' preload list, retama.dev included.
+# Reporting-Endpoints names the csp endpoint of the policy's report-to (ADR 0011); a relative URL resolves against the
+# page's own origin, so production and the Previews each report to themselves.
 /*
   Content-Security-Policy: __CSP__
+  Reporting-Endpoints: csp="/api/report/"
   Strict-Transport-Security: max-age=63072000; includeSubDomains
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY

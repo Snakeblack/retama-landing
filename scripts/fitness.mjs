@@ -1,5 +1,5 @@
 // Architecture fitness checks behind the ADRs' `- Check:` lines.
-//   node scripts/fitness.mjs on-demand-routes        ADR 0002
+//   node scripts/fitness.mjs on-demand-routes        ADR 0002, ADR 0011
 //   node scripts/fitness.mjs no-persistent-bindings  ADR 0003 (run after pnpm build)
 //   node scripts/fitness.mjs branch-protection       ADR 0009 (needs gh auth)
 //   node scripts/fitness.mjs js-budget               ADR 0001 (run after pnpm build)
@@ -9,8 +9,8 @@ import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { initialScripts } from "./lib/js-budget.mjs";
 
-// ADR 0002: the only route rendered on demand. Adding one needs an ADR.
-const ON_DEMAND_ALLOWED = ["src/pages/api/contact.ts"];
+// ADR 0002 and ADR 0011: the routes rendered on demand, the contact and the client error reports. Adding one needs an ADR.
+const ON_DEMAND_ALLOWED = ["src/pages/api/contact.ts", "src/pages/api/report.ts"];
 const PERSISTENT_BINDINGS = [
   "kv_namespaces",
   "d1_databases",
@@ -44,7 +44,7 @@ function onDemandRoutes() {
     /export\s+const\s+prerender\s*=\s*false/.test(readFileSync(file, "utf8")),
   );
   const extra = onDemand.filter((file) => !ON_DEMAND_ALLOWED.includes(file));
-  if (extra.length > 0) fail(`on-demand routes outside the ADR 0002 allowlist: ${extra.join(", ")}`);
+  if (extra.length > 0) fail(`on-demand routes outside the ADR 0002/0011 allowlist: ${extra.join(", ")}`);
   console.log(`on-demand routes: ${onDemand.length === 0 ? "none" : onDemand.join(", ")}`);
 }
 

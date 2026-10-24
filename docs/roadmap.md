@@ -94,8 +94,9 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 - `observability` (hecho): Workers Logs y Traces al 100 %, con los fallos del contacto (`unavailable`, `delivery`) en
   severidad de error, y UptimeRobot gratis cada 5 minutos sobre `/`, `/en/` y `GET /api/contact/`, que responde 200
   con los secretos y el binding o 503 si falta alguno. Los avisos van por email a la cuenta, sin página de estado.
-- Errores de cliente: endpoint propio `/api/report` en Workers Logs, también para los informes de la CSP (requiere un
-  ADR que amplíe el 0002).
+- `client-errors` (hecho): endpoint propio `POST /api/report/` (ADR 0011, que amplía el 0002) que registra en Workers
+  Logs, con severidad `warn` y sin datos personales, los errores de JavaScript de las páginas (`sendBeacon`, como mucho 5
+  por carga) y las violaciones de la CSP (`report-to` y `report-uri`), con su propio límite de 20 informes por minuto e IP.
 - `web-analytics` (hecho): Cloudflare Web Analytics puesto a mano tras el evento `load`, con el token en
   `PUBLIC_CF_ANALYTICS_TOKEN` (Workers Builds); sin token, ni beacon ni Cloudflare en la CSP. La política de privacidad
   cuenta la medición.
