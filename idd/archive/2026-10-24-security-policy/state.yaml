@@ -1,0 +1,205 @@
+{
+  "schema": "idd-state/v1",
+  "change": "security-policy",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "docs",
+    "summary": "Add SECURITY.md with the scope of the site (static landing, /api/contact/, /api/report/) and a channel to report vulnerabilities",
+    "acceptance": "SECURITY.md exists at the repo root, names /api/contact/ and /api/report/, states CSP is only tested on the build, gives a reporting channel, and GitHub shows it as the security policy"
+  },
+  "facts": {
+    "open": [
+      "Reporting channel: hola@retama.dev (site contact), a dedicated security@ address, GitHub private vulnerability reporting (currently disabled), or a combination?",
+      "Language of SECURITY.md: Spanish only (like the repo docs), English only, or both?",
+      "Response commitment: promise an acknowledgement time (e.g. 7 days) or no fixed deadline?",
+      "Out of scope list: third parties (Cal.com, Resend, Turnstile, Cloudflare), volumetric DoS/rate-limit tests, findings only reproducible in astro dev; include all, and add a good-faith/safe-harbor sentence?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "SECURITY.md"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    }
+  ],
+  "retracted": [
+    {
+      "id": "public-contract",
+      "reason": "public contract: SECURITY.md adds API",
+      "source": "diff",
+      "retract_reason": "SECURITY.md names the existing /api/contact/ and /api/report/ routes without an HTTP verb; it adds or changes no API, and the current diff no longer derives the signal"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "withdrawn",
+      "evidence": [],
+      "withdrawn_reason": "SECURITY.md names the existing /api/contact/ and /api/report/ routes without an HTTP verb; it adds or changes no API, and the current diff no longer derives the signal"
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Canal: GitHub privado + hola@retama.dev. Idioma: español e inglés. Plazo: acuse en 7 días. Fuera de alcance: terceros, DoS y pruebas de carga, solo en astro dev, y frase de buena fe.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T20:19:38.793Z",
+      "detail": {
+        "tree": "sha256:6e291c9e11d54bf9e8f66b1242a27e53859c991dd7046f71338b4e42bd17f849",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T20:21:40.420Z",
+      "detail": {
+        "tree": "sha256:4a56e570bcc2963fa60db729b8164835e8521d4557cb48ec775b7201cf62c0fb",
+        "runs": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    }
+  ],
+  "base": "2405777924ebdcd735292ae6eddc6e145e7fafcf",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0c483f3533d18ad1f0d428ccfa6f1c6bb2d27c77492f5bfda905aeda16135f9c",
+      "tree": "sha256:6e291c9e11d54bf9e8f66b1242a27e53859c991dd7046f71338b4e42bd17f849",
+      "recorded_at": "2026-10-24T20:19:38.793Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:497557f87ff46457ba58e06edaf5b455009d800f6b417c37615236f2119a357c",
+      "tree": "sha256:6e291c9e11d54bf9e8f66b1242a27e53859c991dd7046f71338b4e42bd17f849",
+      "recorded_at": "2026-10-24T20:19:38.793Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:d10850a7f253f22f44220cb0bdd88b1aacfcb493ba06bb629d0e2c054b482ba8",
+      "tree": "sha256:6e291c9e11d54bf9e8f66b1242a27e53859c991dd7046f71338b4e42bd17f849",
+      "recorded_at": "2026-10-24T20:19:38.793Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:36b68344ee3e5297d82a90d738441a8058ee342737c3f071fe402db24d7ee508",
+      "tree": "sha256:6e291c9e11d54bf9e8f66b1242a27e53859c991dd7046f71338b4e42bd17f849",
+      "recorded_at": "2026-10-24T20:19:38.793Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:6e291c9e11d54bf9e8f66b1242a27e53859c991dd7046f71338b4e42bd17f849",
+      "recorded_at": "2026-10-24T20:19:38.793Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:88b467674d04a9b28d0780d16800d1aa6ff5aee3c5ab936f94dd2cce5de2faaa",
+      "tree": "sha256:4a56e570bcc2963fa60db729b8164835e8521d4557cb48ec775b7201cf62c0fb",
+      "recorded_at": "2026-10-24T20:21:40.420Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:dbc1fc1621ab49efb1b40ca4bf538ba2caa6376ed08ad52e297158b5678d165b",
+      "tree": "sha256:4a56e570bcc2963fa60db729b8164835e8521d4557cb48ec775b7201cf62c0fb",
+      "recorded_at": "2026-10-24T20:21:40.420Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:0a6dd49c9bb96632a0583d865e48c29de084b0b179a9f8f13921331dadc94d84",
+      "tree": "sha256:4a56e570bcc2963fa60db729b8164835e8521d4557cb48ec775b7201cf62c0fb",
+      "recorded_at": "2026-10-24T20:21:40.420Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:fd1469b0da6468ee8ec5e21e76dec53dc8a25c1765bc064fd1a3812cc2371928",
+      "tree": "sha256:4a56e570bcc2963fa60db729b8164835e8521d4557cb48ec775b7201cf62c0fb",
+      "recorded_at": "2026-10-24T20:21:40.420Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:4a56e570bcc2963fa60db729b8164835e8521d4557cb48ec775b7201cf62c0fb",
+      "recorded_at": "2026-10-24T20:21:40.420Z"
+    }
+  ],
+  "closed_at": "2026-10-24T22:46:50.501Z"
+}
