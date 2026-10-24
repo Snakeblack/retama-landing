@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/Snakeblack/retama-landing/compare/v0.6.1...v0.7.0) (2026-10-24)
+
+
+### Features
+
+* **analytics:** measure visits with Cloudflare Web Analytics after load ([5146cef](https://github.com/Snakeblack/retama-landing/commit/5146cefe1d5c6ac659b6261be2c578fc580511d4))
+* **report:** log client errors and CSP violations through /api/report/ ([1099411](https://github.com/Snakeblack/retama-landing/commit/109941128790a721c729905c7878e99bc1975f71))
+
+
+### Bug Fixes
+
+* **deps:** override undici to clear its new high advisory ([c21b5d3](https://github.com/Snakeblack/retama-landing/commit/c21b5d3e1a8605ccfd5d6e6cc7cfdd74f3a397a3))
+
 ## [0.6.1](https://github.com/Snakeblack/retama-landing/compare/v0.6.0...v0.6.1) (2026-10-23)
 
 
