@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/Snakeblack/retama-landing/compare/v0.6.1...v0.7.0) (2026-10-24)
+
+
+### Features
+
+* **analytics:** measure visits with Cloudflare Web Analytics after load ([5146cef](https://github.com/Snakeblack/retama-landing/commit/5146cefe1d5c6ac659b6261be2c578fc580511d4))
+
 ## [0.6.1](https://github.com/Snakeblack/retama-landing/compare/v0.6.0...v0.6.1) (2026-10-23)
 
 
