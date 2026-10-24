@@ -43,8 +43,11 @@ export interface RawError {
 
 // The regexes read up to MAX_REPORT_BYTES of what anyone may send, so each repetition is bounded: an unbounded one
 // backtracks from every position, and 8 KB of it costs more CPU than a Worker gets.
-// An address with a dotted domain, also percent-encoded in a path: a Firefox frame (fn@/path or fn@https://…) is not one.
-const EMAIL = /[\w.%+-]{1,64}(?:@|%40)[a-z0-9-]{1,63}(?:\.[a-z0-9-]{1,63}){1,8}/gi;
+// An address with a dotted domain, in letters of any script and also percent-encoded in a path, as URL.pathname leaves
+// one: a Firefox frame (fn@/path or fn@https://…) is not one. A domain is only ever encoded as the UTF-8 bytes of a
+// letter outside ASCII (%80 to %FF), so a run of %40 cannot fill every label before the dot that fails it.
+const EMAIL =
+  /[\p{L}\p{M}\p{N}_.%+-]{1,64}(?:@|%40)(?:[\p{L}\p{M}\p{N}-]|%[89A-F][0-9A-F]){1,63}(?:\.(?:[\p{L}\p{M}\p{N}-]|%[89A-F][0-9A-F]){1,63}){1,8}/giu;
 // A URL in a stack frame, without the :line:column that follows it. It ends where its characters end, so a match
 // never fails after a long scan.
 const FRAME_URL = /([a-z][a-z0-9+.-]{0,31}:\/\/[^\s()]+?)(:\d+(?::\d+)?)?(?=[\s()]|$)/gi;
