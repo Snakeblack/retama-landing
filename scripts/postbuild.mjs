@@ -8,8 +8,9 @@ import { blogPostings, ogArticleImage, ogImage, themeTokens } from "./lib/og-ima
 
 const root = new URL("../dist/client/", import.meta.url).pathname;
 
-// Directives a <meta> CSP ignores, so they only exist in the header.
-const HEADER_ONLY = ["frame-ancestors 'none'"];
+// Directives a <meta> CSP ignores, so they only exist in the header. The violations go to /api/report/ (ADR 0011):
+// report-to names the endpoint of the Reporting-Endpoints header (public/_headers); browsers without it use report-uri.
+const HEADER_ONLY = ["frame-ancestors 'none'", "report-uri /api/report/", "report-to csp"];
 const PLACEHOLDER = "__CSP__";
 
 // Astro emits non-root 404 pages as <locale>/404/index.html; Workers'

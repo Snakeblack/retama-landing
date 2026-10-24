@@ -26,11 +26,19 @@
   // /api/contact counts sends per visitor IP: 3 a minute (ADR 0002). It is a counter per Cloudflare
   // location, not storage (ADR 0003). The secrets the function needs are set with `wrangler secret put`:
   // TURNSTILE_SECRET_KEY, RESEND_API_KEY, CONTACT_FROM, CONTACT_TO and CONTACT_BACKUP.
-  "ratelimits": [{ "name": "CONTACT_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } }],
+  // /api/report counts the client error and CSP reports per visitor IP: 20 a minute, its own counter (ADR 0011).
+  // In front of it, a WAF rate limiting rule of the zone, set in the dashboard, stops floods before the Worker.
+  "ratelimits": [
+    { "name": "CONTACT_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
+    { "name": "REPORT_LIMITER", "namespace_id": "1003", "simple": { "limit": 20, "period": 60 } }
+  ],
   // Previews do not inherit the production bindings: without their own limiter, /api/contact answers 503.
   // Same limit, but their own counter, so trying a Preview does not spend the sends of the real site.
   // Their secrets are set apart too, with `wrangler preview base-config secret put`.
   "previews": {
-    "ratelimits": [{ "name": "CONTACT_LIMITER", "namespace_id": "1002", "simple": { "limit": 3, "period": 60 } }]
+    "ratelimits": [
+      { "name": "CONTACT_LIMITER", "namespace_id": "1002", "simple": { "limit": 3, "period": 60 } },
+      { "name": "REPORT_LIMITER", "namespace_id": "1004", "simple": { "limit": 20, "period": 60 } }
+    ]
   }
 }

@@ -266,13 +266,13 @@ export const en = {
   "legal.privacy.controllerText": "The owner named in the legal notice. For anything about your data, write to",
   "legal.privacy.data": "What data.",
   "legal.privacy.dataText":
-    "What the form asks for: your name, your email, what you need and your message, which we need to reply to you. To stop spam, Cloudflare checks that you are a person, and the website uses your IP address to count your sends over one minute, without storing it. If you book a call, what you give Cal.com. When you visit the website, Cloudflare Web Analytics receives the technical side of each visit (the page, the website you came from, your browser, your country and how long it takes to load) to count visits in aggregate, without cookies, without storing anything in your browser and without following you from one website to another.",
+    "What the form asks for: your name, your email, what you need and your message, which we need to reply to you. To stop spam, Cloudflare checks that you are a person, and the website uses your IP address to count your sends over one minute, without storing it. If you book a call, what you give Cal.com. When you visit the website, Cloudflare Web Analytics receives the technical side of each visit (the page, the website you came from, your browser, your country and how long it takes to load) to count visits in aggregate, without cookies, without storing anything in your browser and without following you from one website to another. If something fails on a page, your browser sends this website a technical report of the failure (what failed and on which page), which carries no data about you and stays 3 days in Cloudflare's logs.",
   "legal.privacy.purpose": "What for.",
   "legal.privacy.purposeText":
-    "To answer your enquiry and, if you ask us to, prepare a proposal. The visits, to learn which pages are read and whether the website loads fast. We send you no advertising, and we build no profiles and make no automated decisions with your data.",
+    "To answer your enquiry and, if you ask us to, prepare a proposal. The visits, to learn which pages are read and whether the website loads fast, and the failure reports, to fix them. We send you no advertising, and we build no profiles and make no automated decisions with your data.",
   "legal.privacy.basis": "Legal basis.",
   "legal.privacy.basisText":
-    "Replying to you is a pre-contractual step you ask for (Article 6(1)(b) GDPR). Checking that you are a person and limiting sends protects the website from abuse, and counting visits in aggregate helps us improve it: both are legitimate interests (Article 6(1)(f)).",
+    "Replying to you is a pre-contractual step you ask for (Article 6(1)(b) GDPR). Checking that you are a person and limiting sends protects the website from abuse, and counting visits in aggregate and receiving failure reports help us improve it: both are legitimate interests (Article 6(1)(f)).",
   "legal.privacy.retention": "How long.",
   "legal.privacy.retentionText":
     "While your enquiry lasts. If it does not lead to a project, we delete the message within 12 months at most; if it does, we keep what the law requires us to keep.",

@@ -265,13 +265,13 @@ export const es = {
   "legal.privacy.controllerText": "El titular del aviso legal. Para cualquier cosa sobre tus datos, escribe a",
   "legal.privacy.data": "Qué datos.",
   "legal.privacy.dataText":
-    "Los del formulario: tu nombre, tu correo, qué necesitas y tu mensaje, que hacen falta para responderte. Para frenar el spam, Cloudflare comprueba que eres una persona y la web usa tu dirección IP para contar tus envíos durante un minuto, sin guardarla. Si reservas una llamada, los datos que des en Cal.com. Al visitar la web, Cloudflare Web Analytics recibe lo técnico de cada visita (la página, la web de la que vienes, tu navegador, tu país y cuánto tarda en cargar) para contar las visitas en conjunto, sin cookies, sin guardar nada en tu navegador y sin seguirte de una web a otra.",
+    "Los del formulario: tu nombre, tu correo, qué necesitas y tu mensaje, que hacen falta para responderte. Para frenar el spam, Cloudflare comprueba que eres una persona y la web usa tu dirección IP para contar tus envíos durante un minuto, sin guardarla. Si reservas una llamada, los datos que des en Cal.com. Al visitar la web, Cloudflare Web Analytics recibe lo técnico de cada visita (la página, la web de la que vienes, tu navegador, tu país y cuánto tarda en cargar) para contar las visitas en conjunto, sin cookies, sin guardar nada en tu navegador y sin seguirte de una web a otra. Si algo falla en la página, tu navegador envía a esta web un informe técnico del fallo (qué falló y en qué página), que no lleva datos tuyos y queda 3 días en los registros de Cloudflare.",
   "legal.privacy.purpose": "Para qué.",
   "legal.privacy.purposeText":
-    "Para responder a tu consulta y, si nos lo pides, preparar una propuesta. Las visitas, para saber qué páginas se leen y si la web carga rápido. No te enviamos publicidad ni hacemos perfiles ni decisiones automatizadas con tus datos.",
+    "Para responder a tu consulta y, si nos lo pides, preparar una propuesta. Las visitas, para saber qué páginas se leen y si la web carga rápido, y los informes de fallos, para arreglarlos. No te enviamos publicidad ni hacemos perfiles ni decisiones automatizadas con tus datos.",
   "legal.privacy.basis": "Base legal.",
   "legal.privacy.basisText":
-    "Responderte es una medida precontractual que tú pides (artículo 6.1.b del RGPD). Comprobar que eres una persona y limitar los envíos protege la web del abuso, y contar las visitas en conjunto sirve para mejorarla: los dos son intereses legítimos (artículo 6.1.f).",
+    "Responderte es una medida precontractual que tú pides (artículo 6.1.b del RGPD). Comprobar que eres una persona y limitar los envíos protege la web del abuso, y contar las visitas en conjunto y recibir los informes de fallos sirven para mejorarla: los dos son intereses legítimos (artículo 6.1.f).",
   "legal.privacy.retention": "Cuánto tiempo.",
   "legal.privacy.retentionText":
     "Mientras dura tu consulta. Si no acaba en un encargo, borramos el mensaje en un plazo máximo de 12 meses; si acaba en uno, guardamos lo que la ley obligue a conservar.",

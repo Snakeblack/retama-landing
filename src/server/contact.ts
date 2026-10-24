@@ -91,9 +91,9 @@ export function contactHealth(env: ContactEnv): Response {
     : Response.json({ ok: false, error: "unavailable" }, { status: 503, headers: HEADERS });
 }
 
-/** The body as text, or undefined past MAX_BODY_BYTES: a declared length is refused unread, a stream is cut. */
-async function boundedText(request: Request): Promise<string | undefined> {
-  if (Number(request.headers.get("Content-Length") ?? 0) > MAX_BODY_BYTES) return undefined;
+/** The body as text, or undefined past `maxBytes`: a declared length is refused unread, a stream is cut. */
+export async function boundedText(request: Request, maxBytes: number): Promise<string | undefined> {
+  if (Number(request.headers.get("Content-Length") ?? 0) > maxBytes) return undefined;
   if (!request.body) return "";
   const reader = request.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -102,7 +102,7 @@ async function boundedText(request: Request): Promise<string | undefined> {
     const { done, value } = await reader.read();
     if (done) break;
     size += value.byteLength;
-    if (size > MAX_BODY_BYTES) {
+    if (size > maxBytes) {
       await reader.cancel();
       return undefined;
     }
@@ -118,7 +118,7 @@ async function boundedText(request: Request): Promise<string | undefined> {
 }
 
 async function readBody(request: Request): Promise<ParseResult> {
-  const text = await boundedText(request);
+  const text = await boundedText(request, MAX_BODY_BYTES);
   if (text === undefined) return { ok: false, fields: [] };
   try {
     return parseContact(JSON.parse(text));

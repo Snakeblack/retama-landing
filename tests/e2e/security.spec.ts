@@ -32,6 +32,10 @@ test.describe("cabeceras de seguridad (ADR 0006)", () => {
       expect(csp).not.toContain(",");
       expect(csp).toContain("frame-ancestors 'none'");
       expect(csp).toContain("object-src 'none'");
+      // ADR 0011: violations go to the site's own /api/report/, through report-to and, where it is missing, report-uri.
+      expect(csp).toContain("report-uri /api/report/");
+      expect(csp).toContain("report-to csp");
+      expect(headers["reporting-endpoints"]).toBe('csp="/api/report/"');
       // ADR 0006 allowlist: Turnstile for the contact form and, only while the booking is on (PUBLIC_BOOKING), the
       // Cal.com calendar as a frame.
       const insights = analyticsToken ? " https://static.cloudflareinsights.com" : "";

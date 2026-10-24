@@ -8,7 +8,8 @@ const config = JSON.parse(
 
 type RateLimit = { name: string; namespace_id: string; simple: { limit: number; period: number } };
 
-const limiter = (ratelimits?: RateLimit[]) => ratelimits?.find(({ name }) => name === "CONTACT_LIMITER");
+const limiter = (ratelimits?: RateLimit[], name = "CONTACT_LIMITER") =>
+  ratelimits?.find((ratelimit) => ratelimit.name === name);
 
 describe("dominio de producción (M6)", () => {
   it("producción se sirve solo en retama.dev, como Custom Domain del Worker", () => {
@@ -43,5 +44,23 @@ describe("límite de envíos en las Previews (ADR 0002)", () => {
     const preview = limiter(config.previews?.ratelimits);
     expect(preview?.namespace_id).toBeDefined();
     expect(preview?.namespace_id).not.toBe(limiter(config.ratelimits)?.namespace_id);
+  });
+});
+
+describe("límite de informes de errores (ADR 0011)", () => {
+  it("producción admite 20 informes por minuto e IP, con un contador aparte del contacto", () => {
+    const report = limiter(config.ratelimits, "REPORT_LIMITER");
+    expect(report?.simple).toEqual({ limit: 20, period: 60 });
+    expect(report?.namespace_id).not.toBe(limiter(config.ratelimits)?.namespace_id);
+  });
+
+  it("las Previews tienen su REPORT_LIMITER, igual que producción pero con su propio contador", () => {
+    const preview = limiter(config.previews?.ratelimits, "REPORT_LIMITER");
+    const production = limiter(config.ratelimits, "REPORT_LIMITER");
+    expect(preview?.simple).toEqual(production?.simple);
+    const ids = [...config.ratelimits, ...config.previews.ratelimits].map(
+      ({ namespace_id }: RateLimit) => namespace_id,
+    );
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });

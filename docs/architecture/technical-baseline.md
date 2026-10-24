@@ -7,7 +7,8 @@
 ```
  Visitante / Rastreador ──HTTPS──▶ [Plataforma de borde]
                                     ├─ Activos prerenderizados (HTML/CSS/JS/imágenes, es + en)
-                                    └─ /api/contact (única ruta on-demand)
+                                    ├─ /api/contact (ruta on-demand, ADR 0002)
+                                    └─ /api/report (ruta on-demand, ADR 0011) ─▶ Workers Logs
                                           ├─▶ Verificación anti-bot (siteverify)
                                           └─▶ Email transaccional ─▶ Bandeja principal + respaldo
  Navegador ──(clic)──▶ Calendario de reservas embebido
@@ -24,6 +25,7 @@
 | Sitio estático | Páginas, i18n, blog (colección `blog` de Markdown en `src/content/blog/<idioma>/`, `src/content.config.ts`; el build falla si un artículo no está en todos los idiomas, `src/lib/blog.ts`), SEO (canónica, hreflang, sitemap, JSON-LD en `src/lib/seo.ts`, `robots.txt` y `llms.txt` generados en el build), escena 3D, animaciones | Contenido, artículos y traducciones (repo) | Editor, mediante PR |
 | Isla 3D | Escena progresiva (ADR 0004) | Ninguno | — |
 | Isla de contacto | Formulario, validación en cliente con las reglas de la función (`src/lib/contact.ts`), token anti-bot. Sin script, el botón queda desactivado y se ofrecen el correo y WhatsApp | Ninguno (estado efímero) | — |
+| Función de informes | Recibir los errores de JavaScript de las páginas y las violaciones de la CSP, limpiarlos y registrarlos en Workers Logs (ADR 0011) | Ninguno; una línea de log sin datos personales (ADR 0003) | — |
 | Función de contacto | Validar, verificar el anti-bot, limitar, entregar por email; con GET, responder la comprobación de salud del uptime (200 con los secretos y el binding, 503 si falta alguno, sin terceros ni envíos) | Ninguno; tránsito (ADR 0003) | — |
 | DESIGN.md | Tokens y justificación visual (ADR 0005) | Sistema de diseño | Editor y agentes, mediante PR |
 | Skills vendorizadas | Guía para los agentes (ADR 0010) | `.claude/skills/` + manifiesto | Editor, mediante PR |
@@ -41,7 +43,7 @@
 | WhatsApp | Meta | Enlace `wa.me`; el número llega en la variable de build `PUBLIC_WHATSAPP_NUMBER` (Workers Builds), fuera del repositorio público | Sin dependencia en tiempo de ejecución. Sin número, la página no muestra WhatsApp |
 | Titular del aviso legal | Usuario | Variables de build `PUBLIC_LEGAL_NAME` y `PUBLIC_LEGAL_TOWN` (obligatorias) y `PUBLIC_LEGAL_NIF` y `PUBLIC_LEGAL_ADDRESS` (cuando existan), en Workers Builds, producción y Previews; fuera del repositorio público | El build de Workers Builds (`WORKERS_CI=1`) falla sin nombre o sin municipio (`scripts/lib/legal-owner.mjs`), así que nunca se publica un aviso legal sin titular. En local y en GitHub Actions se construye sin ellos y el aviso no nombra a nadie; el E2E usa unos de prueba |
 | Medición sin cookies | Cloudflare Web Analytics | Beacon puesto a mano (`src/lib/analytics.ts`) tras el evento `load`, en todas las páginas; el token del sitio llega en la variable de build `PUBLIC_CF_ANALYTICS_TOKEN` (Workers Builds). Sin token no hay beacon ni Cloudflare en la CSP. Las Previews lo cargan con el mismo token, pero Cloudflare descarta los hostnames que no acaban en `retama.dev` | Si falla o lo bloquea el navegador, se pierden métricas; nunca afecta a la página |
-| Errores de cliente | Por decidir en M6 (plan gratis) | HTTPS | Si falla, no se reporta; nunca afecta a la página |
+| Errores de cliente | Propio: `POST /api/report/` en el mismo Worker (ADR 0011), con Workers Logs como destino | `sendBeacon` de un script de cada página (`src/scripts/report.ts`) para los errores de JavaScript, y `report-to` (`Reporting-Endpoints: csp="/api/report/"`) más `report-uri` de la CSP para las violaciones. Cuerpo de 8 KB como máximo; límite propio `REPORT_LIMITER` de 20 informes por minuto e IP (en IPv6, por /64), contados por informe, con otro contador en las Previews; delante, la regla de rate limiting del WAF de la zona en `/api/report/` (10 peticiones cada 10 s por IP, bloqueo de 10 s) | Cada informe sale como una línea JSON con severidad `warn`, con rutas cortas sin query, un mensaje corto con sus URLs reducidas y los correos enmascarados, y sin IP ni user agent (`src/lib/report.ts`). Responde 204 tanto si lo acepta como si lo descarta, 413, 429 o 503 sin el binding; solo el 503 escribe una línea propia, con severidad de error. Unos 115.000 eventos al día por IP en el peor caso (ADR 0011). Si falla o lo bloquea el navegador, se pierde el informe; nunca afecta a la página |
 | Uptime | UptimeRobot (plan gratis) | HTTPS GET cada 5 minutos a `/`, `/en/` y `/api/contact/` (comprobación de salud) | Avisa por email a la cuenta; sin página de estado pública. El plan gratis solo hace GET o HEAD y da por caído lo que no es 2xx o 3xx: por eso la función responde al GET. Si UptimeRobot falla, no hay aviso; nunca afecta al sitio |
 | Heatmaps (v2) | PostHog EU | Script tras consentimiento | Aplazado |
 

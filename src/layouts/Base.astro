@@ -130,6 +130,8 @@ if (analytics) {
     </main>
     <slot name="footer" />
     <script>
+      // The error reports first, so they hear the errors of the scripts after them (ADR 0011).
+      import "../scripts/report";
       import "../scripts/header";
     </script>
     {analytics && <Analytics />}
