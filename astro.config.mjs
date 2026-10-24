@@ -4,11 +4,15 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField, fontProviders } from "astro/config";
 import { missingOwner } from "./scripts/lib/legal-owner.mjs";
+import { refusedSiteKey, TEST_SITE_KEY } from "./scripts/lib/turnstile-key.mjs";
 
 // The legal notice must name its owner (LSSI art. 10): Workers Builds, which publishes the site, never builds without.
 const missing = missingOwner(process.env);
 if (missing.length > 0)
   throw new Error(`The legal notice needs its owner: set ${missing.join(" and ")} in Workers Builds.`);
+// The contact widget must not publish a Turnstile test key, which always gives the same answer.
+if (refusedSiteKey(process.env))
+  throw new Error("The contact form needs a real Turnstile widget: set PUBLIC_TURNSTILE_SITE_KEY in Workers Builds.");
 
 // Production origin for canonicals, hreflang and the sitemap, the Custom Domain of wrangler.jsonc.
 // SITE_URL overrides it.
@@ -31,12 +35,9 @@ export default defineConfig({
       // environment (Workers Builds) to show it; the CSP admits Cal.com only then.
       PUBLIC_BOOKING: envField.boolean({ context: "client", access: "public", default: false }),
       // The site key of the Turnstile widget made by hand in the Cloudflare dashboard, set in the build environment
-      // (Workers Builds). Without it the build keeps Turnstile's test key, which always passes: dev, CI and E2E.
-      PUBLIC_TURNSTILE_SITE_KEY: envField.string({
-        context: "client",
-        access: "public",
-        default: "1x00000000000000000000AA",
-      }),
+      // (Workers Builds). Without it the build keeps Turnstile's test key, which always passes: dev, CI and E2E. A
+      // Workers Builds build refuses the test keys (scripts/lib/turnstile-key.mjs).
+      PUBLIC_TURNSTILE_SITE_KEY: envField.string({ context: "client", access: "public", default: TEST_SITE_KEY }),
       // The owner's WhatsApp, international format (34…), set in the build environment (Workers Builds) so it stays out
       // of the public repository. Without it the page shows no WhatsApp.
       PUBLIC_WHATSAPP_NUMBER: envField.string({ context: "client", access: "public", optional: true }),

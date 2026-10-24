@@ -80,6 +80,11 @@ test.describe("reserva de llamada (ADR 0006, ADR 0007)", () => {
       const src = new URL((await calendar.getAttribute("src")) ?? "");
       expect(src.origin + src.pathname).toBe(BOOKING_PAGE);
       expect(src.searchParams.get("embed")).toBe("true");
+      // Cal.com may run its page, post the booking form and open its links in a new tab, but never navigate this one.
+      await expect(calendar).toHaveAttribute(
+        "sandbox",
+        "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox",
+      );
       expect(page.url()).toBe(new URL(path, page.url()).href);
 
       await tile.getByRole("button", { name: close }).click();

@@ -24,6 +24,14 @@ if (action && tile && slot && dismiss) {
     event.preventDefault();
     if (!frame) {
       frame = document.createElement("iframe");
+      // Cal.com runs its page, posts the booking and opens its links in a new tab, but never navigates this one.
+      frame.sandbox.add(
+        "allow-scripts",
+        "allow-same-origin",
+        "allow-forms",
+        "allow-popups",
+        "allow-popups-to-escape-sandbox",
+      );
       frame.src = src;
       frame.title = title;
       frame.className = "size-full";

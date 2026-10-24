@@ -33,6 +33,9 @@ const env: ContactEnv = {
   CONTACT_BACKUP: "respaldo@retama.example",
 };
 
+const ELSEWHERE = "https://elsewhere.example/";
+const moved = () => new Response(null, { status: 307, headers: { Location: ELSEWHERE } });
+
 interface Call {
   url: string;
   init: RequestInit;
@@ -51,6 +54,11 @@ function setup(
     [SITEVERIFY_URL]:
       options.siteverify ?? Response.json({ success: true, hostname: "retama.example", action: "contact" }),
     [RESEND_URL]: options.resend ?? Response.json({ id: "email-1" }),
+    // Where a provider's redirect would lead: it answers as the real one would, so following it would pass.
+    [ELSEWHERE]: (init) =>
+      init.body instanceof FormData
+        ? Response.json({ success: true, hostname: "retama.example", action: "contact" })
+        : Response.json({ id: "email-1" }),
   };
   const limiter = options.limiter ?? "allow";
   const deps: ContactDeps = {
@@ -67,13 +75,19 @@ function setup(
             },
           }),
     },
-    fetch: async (input, init = {}) => {
+    fetch: async function fetch(input, init = {}): Promise<Response> {
       const target = String(input);
       calls.push({ url: target, init });
       const reply = replies[target];
       if (reply === undefined) throw new Error(`unexpected fetch to ${target}`);
       if (reply instanceof Error) throw reply;
-      return typeof reply === "function" ? reply(init) : reply.clone();
+      const response = typeof reply === "function" ? await reply(init) : reply.clone();
+      // Like the platform's fetch, it follows a 3xx unless told not to, with the same headers and body.
+      const location = response.headers.get("Location");
+      if (response.status >= 300 && response.status < 400 && location && init.redirect !== "manual") {
+        return fetch(location, init);
+      }
+      return response;
     },
     log: (line) => logs.push(line),
     // Error lines are log lines too, kept apart to check their severity.
@@ -318,6 +332,13 @@ describe("handleContact", () => {
       });
     }
 
+    it("no sigue una redirección de siteverify", async () => {
+      const { response, json, calls } = await send(body, { siteverify: moved() });
+      expect(response.status).toBe(403);
+      expect(json).toEqual({ ok: false, error: "verification" });
+      expect(calls.map((call) => call.url)).toEqual([SITEVERIFY_URL]);
+    });
+
     it("no llama a siteverify cuando no hay token", async () => {
       const { calls } = await send({ ...body, turnstileToken: "" });
       expect(calls).toEqual([]);
@@ -347,6 +368,15 @@ describe("handleContact", () => {
         expect(json).toEqual({ ok: false, error: "delivery" });
       });
     }
+
+    // A redirect to another host would take the Authorization header with it.
+    it("no sigue una redirección de Resend ni le pasa la clave a otro host", async () => {
+      const { response, json, calls, logs } = await send(body, { resend: moved() });
+      expect(response.status).toBe(502);
+      expect(json).toEqual({ ok: false, error: "delivery" });
+      expect(calls.map((call) => call.url)).toEqual([SITEVERIFY_URL, RESEND_URL]);
+      expect(logs.map((line) => JSON.parse(line))).toEqual([{ event: "contact", outcome: "delivery", status: 307 }]);
+    });
 
     it("pasa una señal de espera a Resend", async () => {
       let signal: AbortSignal | null | undefined;

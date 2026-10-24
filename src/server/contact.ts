@@ -151,6 +151,8 @@ async function verified(deps: ContactDeps, secret: string, input: ContactInput, 
     const response = await deps.fetch(SITEVERIFY_URL, {
       method: "POST",
       body: form,
+      // A redirect is never followed: it fails as any other non-2xx answer.
+      redirect: "manual",
       signal: AbortSignal.timeout(TIMEOUTS.siteverify),
     });
     if (!response.ok) return false;
@@ -208,6 +210,8 @@ export async function handleContact(request: Request, deps: ContactDeps): Promis
         reply_to: input.email,
         ...email(input),
       }),
+      // A redirect to another host would take the Authorization header with it.
+      redirect: "manual",
       signal: AbortSignal.timeout(TIMEOUTS.resend),
     });
     if (!response.ok) return reply(deps, "delivery", { status: response.status });
