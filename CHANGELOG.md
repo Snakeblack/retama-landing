@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/Snakeblack/retama-landing/compare/v0.7.1...v0.7.2) (2026-10-24)
+
+
+### Bug Fixes
+
+* **report:** mask email addresses written in any script ([fd59e85](https://github.com/Snakeblack/retama-landing/commit/fd59e85584aed189a83fbd8710df6afc90de0f7b))
+
 ## [0.7.1](https://github.com/Snakeblack/retama-landing/compare/v0.7.0...v0.7.1) (2026-10-24)
 
 
