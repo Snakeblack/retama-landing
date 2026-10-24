@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/Snakeblack/retama-landing/compare/v0.7.0...v0.7.1) (2026-10-24)
+
+
+### Bug Fixes
+
+* **contact:** stop following redirects, sandbox the booking frame and refuse test site keys ([c9c6f94](https://github.com/Snakeblack/retama-landing/commit/c9c6f941b39f640f442114999627d3f330976934)), closes [#59](https://github.com/Snakeblack/retama-landing/issues/59)
+
 ## [0.7.0](https://github.com/Snakeblack/retama-landing/compare/v0.6.1...v0.7.0) (2026-10-24)
 
 
