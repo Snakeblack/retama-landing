@@ -10,6 +10,7 @@ import {
   MAX_TEXT,
   PAGE_REPORT_LIMIT,
   type RawError,
+  sitePath,
 } from "../../src/lib/report";
 import { handleReport, type ReportDeps } from "../../src/server/report";
 
@@ -61,6 +62,13 @@ describe("informe de un error de la página (ADR 0011)", () => {
     expect(errorReport({ message: "x".repeat(1000) }, `${origin}/`, origin)?.message).toHaveLength(MAX_TEXT);
   });
 
+  it("enmascara entero un correo con letras de cualquier escritura, también con el dominio codificado", () => {
+    expect(clip("para josé@empresa.es, muñoz@gmail.com y ana@münchen.de")).toBe("para [email], [email] y [email]");
+    expect(clip("josé@empresa.es y 李@例子.中国")).toBe("[email] y [email]");
+    expect(sitePath(`${origin}/x/ana@münchen.de/jos%C3%A9%40empresa.es/`, origin)).toBe("/x/[email]/[email]/");
+    expect(clip("open@/_astro/header.js:3:9 y ana＠empresa.es")).toBe("open@/_astro/header.js:3:9 y ana＠empresa.es");
+  });
+
   it("reduce las URLs del mensaje a ruta del sitio u origen, sin query ni fragmento", () => {
     const message = `Failed to fetch https://api.example/v1?token=abc#f, then ${origin}/contacto/?email=x and http://[x`;
     expect(errorReport({ message }, `${origin}/`, origin)?.message).toBe(
@@ -91,6 +99,10 @@ describe("informe de un error de la página (ADR 0011)", () => {
       [{ message: "boom", stack: `at ${"a://".repeat(n / 4)}(` }, `${origin}/`],
       [{ message: "boom", stack: `at ${"a://".repeat(n / 4)})` }, `${origin}/`],
       [{ message: "boom" }, `${origin}/${"a".repeat(n)}`],
+      [{ message: `${"é".repeat(n / 2)}@${"ü".repeat(n / 2)}` }, `${origin}/`],
+      [{ message: "%40".repeat(n / 3) }, `${origin}/`],
+      [{ message: "boom", stack: `at ${"%40".repeat(n / 3)}` }, `${origin}/`],
+      [{ message: "boom" }, `${origin}/${"%40".repeat(n / 3)}`],
     ];
     const read = () => {
       for (const [raw, page] of inputs) errorReport(raw, page, origin);

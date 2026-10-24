@@ -1,0 +1,327 @@
+{
+  "schema": "idd-state/v1",
+  "change": "unicode-email-mask",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "La máscara EMAIL de src/lib/report.ts solo reconoce ASCII: josé@empresa.es y ana@münchen.de llegan al log sin enmascarar y muñoz@gmail.com queda como muñ[email] (F-57c62da5)",
+    "acceptance": "clip() enmascara entera una dirección con letras no ASCII en la parte local o en el dominio (josé@empresa.es, muñoz@gmail.com, ana@münchen.de) sin dejar nada de la parte local; los marcos de Firefox (fn@/path:1:2) siguen sin enmascararse; el test de tiempo adversario sigue pasando"
+  },
+  "facts": {
+    "open": [
+      "¿Qué caracteres admite la parte local y el dominio: letras, dígitos y marcas de cualquier escritura más ._%+- en la parte local y - en el dominio, o también el resto de símbolos que permite el RFC 5322 (!#$&'*/=?^`{|}~)?",
+      "¿Se enmascara también un dominio no ASCII codificado con porcentajes, como el que deja URL.pathname en la ruta de la página o del archivo (ana@m%C3%BCnchen.de)?",
+      "¿Se enmascaran arrobas alternativas como la de ancho completo (＠, U+FF20) o quedan fuera?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "src/lib/report.ts",
+      "tests/unit/report.test.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0011",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0011",
+      "impact": "conforms",
+      "reason": "El ADR 0011 exige que los informes salgan con los correos enmascarados; el cambio cumple esa regla también con direcciones no ASCII y con dominios codificados con porcentajes, y su fitness (tests/unit/report.test.ts) los cubre ahora"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1",
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Caracteres: Unicode + ._%+- (letras, dígitos y marcas de cualquier escritura más ._%+- en la parte local y - en el dominio). Porcentajes: sí, el dominio admite %XX. Arroba: no, ＠ queda fuera; solo @ y %40.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-24T23:16:09.372Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T23:17:15.986Z",
+      "detail": {
+        "tree": "sha256:8180f01a9e43dda856545e83d3ac408731c49e674ed04e5f3fa21abe5de123d6",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-24T23:17:15.986Z",
+      "detail": {
+        "refs": [
+          "adr:0011 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:8180f01a9e43dda856545e83d3ac408731c49e674ed04e5f3fa21abe5de123d6",
+        "fitness": [
+          "run-8"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-24T23:19:06.916Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-9"
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T23:19:55.099Z",
+      "detail": {
+        "tree": "sha256:913b670a7356fd60cb55db24d89f5f2e9e88925c1913e72e71ab397a9ae3ca7e",
+        "runs": [
+          "run-10",
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-24T23:19:55.099Z",
+      "detail": {
+        "refs": [
+          "adr:0011 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:913b670a7356fd60cb55db24d89f5f2e9e88925c1913e72e71ab397a9ae3ca7e",
+        "fitness": [
+          "run-15"
+        ]
+      }
+    }
+  ],
+  "base": "3359d65f04ee2ecb1bc885cb6c657d203a669564",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/report.test.ts -t 'cualquier escritura'",
+      "exit_code": 1,
+      "output_sha256": "sha256:54c69a76c8c8995926a932b918b704377b1409dfe6745f3ec8e367a3bba497a2",
+      "tree": "sha256:f400b3dc2e59d298cf4337cfbeba7d996bce6148a99edd8b6d80d9aba34a0652",
+      "recorded_at": "2026-10-24T23:15:59.512Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/report.test.ts -t 'cualquier escritura'",
+      "exit_code": 0,
+      "output_sha256": "sha256:ea3ef80fac1e5472a070720f62e012c9e802244bfc830d8a23622981958d4c0c",
+      "tree": "sha256:887f9731a64c7c860452bf8cce9dba1360b85e1c1e5525b1b542f27e97d81d5c",
+      "recorded_at": "2026-10-24T23:16:09.372Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:8576d1df9ff2343b4133981f24484711df69275109372d416a96f4f1c1fe5a59",
+      "tree": "sha256:8180f01a9e43dda856545e83d3ac408731c49e674ed04e5f3fa21abe5de123d6",
+      "recorded_at": "2026-10-24T23:17:15.986Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:fe92e2a5bda7fc715dd1f12734e46cea0b50e27fcc3cb128401f3ebf0aabd9bb",
+      "tree": "sha256:8180f01a9e43dda856545e83d3ac408731c49e674ed04e5f3fa21abe5de123d6",
+      "recorded_at": "2026-10-24T23:17:15.986Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:0687c298cc4ca8898eec004d50239933800e1a0c69437a0c25a71a58b5d4210b",
+      "tree": "sha256:8180f01a9e43dda856545e83d3ac408731c49e674ed04e5f3fa21abe5de123d6",
+      "recorded_at": "2026-10-24T23:17:15.986Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:ea96e703489f57d1ec385bfa2d20776dcad1361c8ecdc233d1fdff0d74e605d8",
+      "tree": "sha256:8180f01a9e43dda856545e83d3ac408731c49e674ed04e5f3fa21abe5de123d6",
+      "recorded_at": "2026-10-24T23:17:15.986Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8180f01a9e43dda856545e83d3ac408731c49e674ed04e5f3fa21abe5de123d6",
+      "recorded_at": "2026-10-24T23:17:15.986Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0011",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:ba15b7e3ef83ffaa4c71465c2a44b4cdec5c7a1219feaada5f73f8c0da546342",
+      "tree": "sha256:8180f01a9e43dda856545e83d3ac408731c49e674ed04e5f3fa21abe5de123d6",
+      "recorded_at": "2026-10-24T23:17:15.986Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/report.test.ts -t 'cualquier escritura'",
+      "exit_code": 0,
+      "output_sha256": "sha256:784f30398442b0f2326600bc89bcc450215f1b5d7a7969ca34997c81d8130f1e",
+      "tree": "sha256:2a115a05ec86fbd91f396ba9619b10d8a0e47c3afad848ad63cf5482347a73f7",
+      "recorded_at": "2026-10-24T23:19:06.916Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:e7ccff9d4d5362d7afd10a86645645ba6e4e998a577bbc67fdca5e09d9ba2436",
+      "tree": "sha256:913b670a7356fd60cb55db24d89f5f2e9e88925c1913e72e71ab397a9ae3ca7e",
+      "recorded_at": "2026-10-24T23:19:55.099Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:9d91612f4057ce2876ed1d9c928255371a057338efd3ebe850e47577cc528d46",
+      "tree": "sha256:913b670a7356fd60cb55db24d89f5f2e9e88925c1913e72e71ab397a9ae3ca7e",
+      "recorded_at": "2026-10-24T23:19:55.099Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:d2f14994622b8df260c775ab14d57411acd396ccb0fd95eaba04cbf21c7e51a5",
+      "tree": "sha256:913b670a7356fd60cb55db24d89f5f2e9e88925c1913e72e71ab397a9ae3ca7e",
+      "recorded_at": "2026-10-24T23:19:55.099Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:d63c65cf4ecfa72a935dce86ada1a052dd5690a9cfd55a71e534aa83b900d530",
+      "tree": "sha256:913b670a7356fd60cb55db24d89f5f2e9e88925c1913e72e71ab397a9ae3ca7e",
+      "recorded_at": "2026-10-24T23:19:55.099Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:913b670a7356fd60cb55db24d89f5f2e9e88925c1913e72e71ab397a9ae3ca7e",
+      "recorded_at": "2026-10-24T23:19:55.099Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0011",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:ba15b7e3ef83ffaa4c71465c2a44b4cdec5c7a1219feaada5f73f8c0da546342",
+      "tree": "sha256:913b670a7356fd60cb55db24d89f5f2e9e88925c1913e72e71ab397a9ae3ca7e",
+      "recorded_at": "2026-10-24T23:19:55.099Z"
+    }
+  ],
+  "assumptions": [
+    "Un dominio codificado con porcentajes en una ruta solo lleva los bytes UTF-8 de letras no ASCII (%80 a %FF): URL.pathname no codifica letras ASCII, dígitos, guion ni punto. Por eso el dominio admite %[89A-F][0-9A-F] y no % suelto, que con 8 KB de %40 costaba ~27 ms frente a ~2 ms."
+  ],
+  "closed_at": "2026-10-24T23:20:01.205Z"
+}
