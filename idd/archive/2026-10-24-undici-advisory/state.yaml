@@ -1,0 +1,154 @@
+{
+  "schema": "idd-state/v1",
+  "change": "undici-advisory",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "Clear the new high undici advisory (GHSA-xjj6-f33q-929c) that fails pnpm audit in CI",
+    "acceptance": "pnpm audit --audit-level high exits 0: undici 7 resolves to 7.30.1 or later through an override in pnpm-workspace.yaml, with its justification"
+  },
+  "facts": {
+    "basis": "The user chose on 2026-10-24 a separate fix(deps) PR with the override undici@7 ^7.30.1, following the body-parser precedent of 09eb7be; miniflare 4.20260730.0, the latest, still pins undici 7.28.0"
+  },
+  "plan": {
+    "paths": [
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-24T18:13:07.093Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T18:13:55.231Z",
+      "detail": {
+        "tree": "sha256:ade8170fce69f7c1e302b2bbd874520322a9396d195e0d7d75a5c2d83d903db6",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    }
+  ],
+  "base": "5146cefe1d5c6ac659b6261be2c578fc580511d4",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm audit --audit-level high",
+      "exit_code": 1,
+      "output_sha256": "sha256:6942219d7a83df48c1039459e21b6b395fa3164643a0e7a7326672443b224437",
+      "tree": "sha256:0127883bcd8fc4a471953894b487b79349f04be144e17c70a9729d4a7308b392",
+      "recorded_at": "2026-10-24T18:12:43.261Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm audit --audit-level high",
+      "exit_code": 0,
+      "output_sha256": "sha256:1254aa122b1d5bf7b583a1f54d8d61a22d888e2918f42fe3dd6dec546442b88c",
+      "tree": "sha256:a2220bf34e5eccdb9d82064235e88f65a8380c944ab330efad69bb360bb978fc",
+      "recorded_at": "2026-10-24T18:13:07.093Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:c677944f51796bbf0c8c53d1d7f50c0972cc0fd755a2c8adc5a6e372e934db77",
+      "tree": "sha256:ade8170fce69f7c1e302b2bbd874520322a9396d195e0d7d75a5c2d83d903db6",
+      "recorded_at": "2026-10-24T18:13:55.231Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:2853f23ede05c5f3df6671bfecf39af456ee70096b177ccf242044b796e63984",
+      "tree": "sha256:ade8170fce69f7c1e302b2bbd874520322a9396d195e0d7d75a5c2d83d903db6",
+      "recorded_at": "2026-10-24T18:13:55.231Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:9e5e4b0c636c0925d49d330adcfa2cb053a594ca52d70db71090ef0a4ef79631",
+      "tree": "sha256:ade8170fce69f7c1e302b2bbd874520322a9396d195e0d7d75a5c2d83d903db6",
+      "recorded_at": "2026-10-24T18:13:55.231Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:7881f460ff18950e2d8d30ebf2eb34eef40d2fd92ce882ce12034430ede2f38a",
+      "tree": "sha256:ade8170fce69f7c1e302b2bbd874520322a9396d195e0d7d75a5c2d83d903db6",
+      "recorded_at": "2026-10-24T18:13:55.231Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:ade8170fce69f7c1e302b2bbd874520322a9396d195e0d7d75a5c2d83d903db6",
+      "recorded_at": "2026-10-24T18:13:55.231Z"
+    }
+  ],
+  "closed_at": "2026-10-24T18:13:58.757Z"
+}
