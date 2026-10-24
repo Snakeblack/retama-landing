@@ -1,0 +1,463 @@
+{
+  "schema": "idd-state/v1",
+  "change": "contact-hardening",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "Harden the contact surface (#59): fetch to Resend and Turnstile siteverify never follow redirects, the Cal.com iframe is sandboxed, and a Workers Builds build refuses Turnstile's test site key",
+    "acceptance": "Contact unit tests prove a 3xx from Resend or siteverify is not followed and fails closed; the booking iframe carries a sandbox attribute and the booking flow still works in a browser; a build with WORKERS_CI=1 and no site key or a test site key fails, while local, CI and E2E builds do not"
+  },
+  "facts": {
+    "open": [
+      "Sandbox tokens for the Cal.com iframe: allow-scripts allow-same-origin allow-forms allow-popups, plus allow-popups-to-escape-sandbox so links Cal.com opens in a new tab work normally?",
+      "Manual booking test: I drive a real booking on a local build with real Cal.com and cancel it afterwards through the Cal.com MCP, or the user books by hand on a Preview?",
+      "Which Turnstile site keys does a WORKERS_CI=1 build refuse: only a missing key or the default 1x00000000000000000000AA, or every Turnstile test key (1x/2x/3x00000000000000000000xx)? And Preview builds too, as with the legal owner?",
+      "The optional hardening of /api/contact/ response headers (HSTS, X-Frame-Options): include it or leave it out?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "scripts/lib/turnstile-key.mjs",
+      "src/scripts/booking.ts",
+      "src/server/contact.ts",
+      "tests/e2e/booking.spec.ts",
+      "tests/unit/contact.test.ts",
+      "tests/unit/turnstile-key.test.ts"
+    ],
+    "work_units": 3,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches src/server/contact.ts (matches src/server/**)",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Sandbox: base + escape de popups (allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox). Prueba: lo hago yo y la cancelo (reserva real con Playwright y cancelación por el MCP de Cal.com). Turnstile: todas las de prueba, también en las Previews. Cabeceras opcionales: dejarlo fuera.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-24T20:27:54.614Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T20:32:47.344Z",
+      "detail": {
+        "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-24T20:32:47.344Z",
+      "detail": {
+        "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+        "check": "ev-2",
+        "documents": [
+          "docs/architecture/technical-baseline.md"
+        ],
+        "tests": [
+          "tests/e2e/booking.spec.ts",
+          "tests/unit/contact.test.ts",
+          "tests/unit/turnstile-key.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-24T20:33:23.513Z",
+      "detail": {
+        "lineage_id": "sha256:d106fba6b3c574fa0c1f369759cf01228e0096d7b174cf4512a6939e93bba6a5",
+        "candidate_id": "sha256:109818c2216c65e1adf105017109779c62b89fa6aa1e90ff46b534e7d2a09175",
+        "candidate_tree": "92915ef1ac335f5e82e6af854d230742caf8ffe5",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-24T20:33:16.605Z",
+          "result_digest": "sha256:eaba30f2b39c09cbe063c2d98927b5b16378f5159297e1ef1bd71b199d8f0616"
+        }
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-24T20:34:11.653Z",
+      "detail": {
+        "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+        "runs": [
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-24T20:34:11.653Z",
+      "detail": {
+        "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+        "check": "ev-5",
+        "documents": [
+          "docs/architecture/technical-baseline.md"
+        ],
+        "tests": [
+          "tests/e2e/booking.spec.ts",
+          "tests/unit/contact.test.ts",
+          "tests/unit/turnstile-key.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-24T20:34:18.330Z"
+    }
+  ],
+  "base": "2405777924ebdcd735292ae6eddc6e145e7fafcf",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/contact.test.ts tests/unit/turnstile-key.test.ts; u=$?; env PUBLIC_BOOKING=true pnpm exec playwright test tests/e2e/booking.spec.ts; e=$?; [ $u -eq 0 ] && [ $e -eq 0 ]",
+      "exit_code": 1,
+      "output_sha256": "sha256:0658143164c6fd8ae1b450402cab5ca9dc3fd3b612e0c179ac5fef813f5e12d4",
+      "tree": "sha256:881485cb6863e206f5b2a3a9a9a968010ecb3d54d73972ccf710df0fa62a64f1",
+      "recorded_at": "2026-10-24T20:27:08.529Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/contact.test.ts tests/unit/turnstile-key.test.ts; u=$?; env PUBLIC_BOOKING=true pnpm exec playwright test tests/e2e/booking.spec.ts; e=$?; [ $u -eq 0 ] && [ $e -eq 0 ]",
+      "exit_code": 0,
+      "output_sha256": "sha256:3fcef96d295641b62341a68f786e6472e19d8f53f1f419c0bd465add651f1727",
+      "tree": "sha256:0675bae4b8cfd9ef852ec4b1c9f17a7a16f66e21d3282882bcf346059766f2c0",
+      "recorded_at": "2026-10-24T20:27:54.614Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:e7ccff9d4d5362d7afd10a86645645ba6e4e998a577bbc67fdca5e09d9ba2436",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:32:47.344Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:947a6bb534462ff9f18885169643a5f1f5cc7c4f40ed7821f1fa46f2123c8e57",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:32:47.344Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:54b7b510bd3facd16e756963baec9d32cc00678d5e6a1ae026b5e69a1f33cc6e",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:32:47.344Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:7e293dbdbd6b0e4fce0a766051b8bad0abb7e8e730946c4164d914932ec564ea",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:32:47.344Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:32:47.344Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:e7ccff9d4d5362d7afd10a86645645ba6e4e998a577bbc67fdca5e09d9ba2436",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:34:11.653Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c0cd51ba5bcff8eab147855a9cbdda115bb05784e117e43a312f450d250e3e82",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:34:11.653Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:0fd627b220a150b214c07bc00b2318f922c28ce653c0c61b7bd2f010830b2542",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:34:11.653Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:811bcd450f1f0d36684e260ea2e894683dade3f14ad2a7d03e8dabaf5ce71acf",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:34:11.653Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:ccfb6038a6fedc5fcc841d4c2e23bd5932679024fe9803556e96edf939d87244",
+      "recorded_at": "2026-10-24T20:34:11.653Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:d106fba6b3c574fa0c1f369759cf01228e0096d7b174cf4512a6939e93bba6a5",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "0cbbee6a4bfcafa4b8faeb7c11c867965a71196a",
+          "candidate_tree": "92915ef1ac335f5e82e6af854d230742caf8ffe5",
+          "paths": [
+            "astro.config.mjs",
+            "docs/architecture/technical-baseline.md",
+            "scripts/lib/turnstile-key.mjs",
+            "src/scripts/booking.ts",
+            "src/server/contact.ts",
+            "tests/e2e/booking.spec.ts",
+            "tests/unit/contact.test.ts",
+            "tests/unit/turnstile-key.test.ts"
+          ],
+          "diff_hash": "sha256:b7ff14e1ef16c7c0fc5f01d3977e11d1f61cf40017c7fcd8b3a17e792e9b764b",
+          "paths_digest": "sha256:2ac94e93ae4849d8552bb5cc62310305481b1496ba8ee2e67e26188da04bb40c",
+          "authored_lines": 115,
+          "original_changed_lines": 126
+        },
+        "candidate_id": "sha256:109818c2216c65e1adf105017109779c62b89fa6aa1e90ff46b534e7d2a09175",
+        "paths": [
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "scripts/lib/turnstile-key.mjs",
+          "src/scripts/booking.ts",
+          "src/server/contact.ts",
+          "tests/e2e/booking.spec.ts",
+          "tests/unit/contact.test.ts",
+          "tests/unit/turnstile-key.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "92915ef1ac335f5e82e6af854d230742caf8ffe5",
+        "original_changed_lines": 126,
+        "authored_lines": 115
+      },
+      "current_candidate_id": "sha256:109818c2216c65e1adf105017109779c62b89fa6aa1e90ff46b534e7d2a09175",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "0cbbee6a4bfcafa4b8faeb7c11c867965a71196a",
+        "candidate_tree": "92915ef1ac335f5e82e6af854d230742caf8ffe5",
+        "paths": [
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "scripts/lib/turnstile-key.mjs",
+          "src/scripts/booking.ts",
+          "src/server/contact.ts",
+          "tests/e2e/booking.spec.ts",
+          "tests/unit/contact.test.ts",
+          "tests/unit/turnstile-key.test.ts"
+        ],
+        "diff_hash": "sha256:b7ff14e1ef16c7c0fc5f01d3977e11d1f61cf40017c7fcd8b3a17e792e9b764b",
+        "paths_digest": "sha256:2ac94e93ae4849d8552bb5cc62310305481b1496ba8ee2e67e26188da04bb40c",
+        "authored_lines": 115,
+        "original_changed_lines": 126
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "contact-hardening:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "contact-hardening:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 63,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "assumptions": [
+    "A 3xx with redirect manual reaches the existing !response.ok paths: Resend gives the delivery outcome with its status logged, siteverify gives the verification outcome, as any other non-2xx does today",
+    "Workers Builds gives Preview builds the same PUBLIC_TURNSTILE_SITE_KEY build variable as production; the PR's Preview build confirms it"
+  ],
+  "closed_at": "2026-10-24T20:34:18.330Z"
+}
