@@ -1,0 +1,460 @@
+{
+  "schema": "idd-state/v1",
+  "change": "team-section",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "Manuel Michael Retamozo García, Producto y desarrollo, en la frase me tienes que ayudar, tengo mucha experiencia en distintos campos, full stack, experincia creando desde cero y criterio arquitectonico, linkedin: www.linkedin.com/in/mmretamozo -- Paul Macorny Retamozo García, Clientes y ventas, años de experiencia en el sector logistico y comercial (puedes adornarlo un poco más), no tiene linkedin de momento, las fotos ya las pondremos, dime como quieres que se llamen las fotos y el formato y más adelante los añado, de momento haz un placeholder image que vaya acorde al diseño",
+    "kind": "feature",
+    "summary": "Present the two partners on the home, with name, role, one sentence each, LinkedIn for Michael and a design-consistent placeholder where each photo will go",
+    "acceptance": "In es and en, the home shows both partners with their full names, roles and sentences, a LinkedIn link for Michael only and a placeholder image per partner that follows DESIGN.md, all in the HTML without JavaScript; DESIGN.md records the section; all checks pass"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "request",
+          "text": "no tiene linkedin de momento"
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "request",
+          "text": "Manuel Michael Retamozo García, Producto y desarrollo"
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 41
+        }
+      },
+      {
+        "category": "copy",
+        "question": "Which sentence describes each partner, in es and en, and where does the section go (its own chapter, inside the contact or inside the method), with what placeholder, and does the figure '1 person to talk to' stay?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 255
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 232
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "tests/unit/i18n.test.ts",
+          "line": 8
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/product/functional-scope.md",
+      "src/components/Home.astro",
+      "src/components/board/Team.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/board.ts",
+      "tests/e2e/header.spec.ts",
+      "tests/e2e/questions.spec.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/e2e/team.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0008 and quality scenario brand-impact, perf-mobile",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Names, roles, sentences and the placeholder are static HTML; no script carries them"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Only existing tokens: display-sm, statement, small, surface-raised, field and the primary square"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "The Picture output has no inline style (checked on a build with a temporary photo); the profile link is a plain anchor"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Every visible text is in es.ts and en.ts, with a translated anchor; the names are proper nouns kept once in board.ts"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "Portrait and text tiles alternate with one field tile, on the board's grid and tokens"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "The chapter is below the first screen; photos are lazy, sized and in AVIF/WebP, and the portrait tile keeps its aspect, so no layout shift"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Ubicación: Capítulo propio antes de Preguntas (Recomendado). Placeholder: Iniciales en grande (Recomendado). Interlocutor: Se queda: Paul es ese interlocutor (Recomendado). Frase Paul: Sí, déjalo así (almacén, ruta y venta). Frases propuestas aceptadas al no pedir cambios.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-25T23:55:25.590Z",
+      "detail": {
+        "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+        "runs": [
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-25T23:55:25.590Z",
+      "detail": {
+        "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/header.spec.ts",
+          "tests/e2e/questions.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/e2e/team.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-25T23:55:25.590Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+        "fitness": [
+          "run-16",
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-25T23:55:32.540Z"
+    }
+  ],
+  "base": "0bb83dd47771a98260fe4eb71086b6e18c82e994",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:102648880a047949608165ea1d9230d9e6abfe4eb92f09edb2eaa94774c68e97",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:d2e409927d07b70491abb38dccd67b700a1174729677417f325f02478905810a",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:a94380534f1cdc7794472b240ff3bf4dbab0c9548286e5e1fe195f970f85b396",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:3a8c015538e6096725e78d33253f8a3c9a8f45e100745da2e59aa6ce8cc38dc5",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 1,
+      "output_sha256": "sha256:8fcf65734bc8f4d6c5d08352436f9197aba4730f285e08499eacdc960d7e04b4",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:e558d484bb70dcd5374f1d596fae53828c03a964df5649f1f814ac92b043ea30",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:f74d6985e9ef41f85655be064cc7aeac34d41f774bd438f748e97ab57d707583",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:3664402b94b16c093f044475c48822eefe4b54c12981ff6d10c221f80dcaf821",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:86685dd8a381dd37f6cfebe34e3f4e028ae8439dc15baa040786de0d458d727a",
+      "tree": "sha256:a8ec80913525efa499d53c6308048d2672932976bbe44c16905ae7d249535236",
+      "recorded_at": "2026-10-25T23:53:19.096Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:102648880a047949608165ea1d9230d9e6abfe4eb92f09edb2eaa94774c68e97",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:e4fbd2b544ddefebdc7bfe3d96f07da6965e2afdcb18529d9f3804af527baac0",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:046e0c2c373ac40fff2ae6e7ec99fbe61ff6f5205ec4100944de30d8b1db3c7c",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:4af195dcefbfc68ad1e46dcfb0523e7acf33a9c03db0ccb220839be0f9620119",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a382248da443869eacacb1d6f1b19945b94e585937ca8c6b4bd98ffa36d75688",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:6a6e2a1b60d715ee321dd83ec2654919a36c5c0944ba9856fa9b43079e100a1e",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a5a9fb1182c44ec9e936f332102d6ecc8bf9e21a72e65a54b6b6706cb6f90659",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:0ad49924b0e379afeb65b87a959d58165c5ad538db1985dcfddea3d7acf066e4",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:1467c2848e98318f18ee2732953260055f2e0f4bf3a775bf2743024bd12c85e5",
+      "tree": "sha256:70770444bef9d67502e2011f9773dbce19b0e238b42f7504f9ef1318ebd7b5a1",
+      "recorded_at": "2026-10-25T23:55:25.590Z"
+    }
+  ],
+  "closed_at": "2026-10-25T23:55:32.540Z"
+}

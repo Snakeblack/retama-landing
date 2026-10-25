@@ -8,10 +8,12 @@ export const es = {
   "nav.services": "Servicios",
   "nav.sectors": "Sectores",
   "nav.method": "Método",
+  "nav.team": "Nosotros",
   "nav.questions": "Preguntas",
   "anchor.services": "servicios",
   "anchor.sectors": "sectores",
   "anchor.method": "metodo",
+  "anchor.team": "nosotros",
   "anchor.questions": "preguntas",
   "anchor.contact": "contacto",
   "nav.blog": "Blog",
@@ -166,6 +168,16 @@ export const es = {
   "live.agents.r2": "Si algo sale mal, se sabe por qué y desde cuándo.",
   "live.agents.d3": "Medimos el ahorro antes de ampliar.",
   "live.agents.r3": "Solo automatizamos más lo que ya te ha devuelto horas.",
+
+  "team.title": "Quiénes somos",
+  "team.lead": "Dos hermanos: uno está contigo de principio a fin y el otro construye.",
+  "team.michaelRole": "Producto y desarrollo",
+  "team.michaelLine":
+    "Full stack, de la primera línea a producción. Ha creado productos desde cero en campos muy distintos y decide la arquitectura pensando en los años que tendrá que aguantar.",
+  "team.paulRole": "Clientes y ventas",
+  "team.paulLine":
+    "Años en el sector logístico y comercial, al lado del cliente. Sabe cómo se trabaja en el almacén, en la ruta y en la venta, y te acompaña desde la primera llamada hasta la entrega.",
+  "team.linkedin": "LinkedIn",
 
   "faq.title": "Lo que nos preguntan",
   "faq.lead": "Si tu duda no está aquí, escríbenos: te respondemos en un día laborable.",

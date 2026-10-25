@@ -10,6 +10,20 @@ export const contactEmail = "hola@retama.dev";
  * here: it comes from the build environment (PUBLIC_TURNSTILE_SITE_KEY, astro.config.mjs). */
 export const bookingUrl = "https://cal.com/retama/llamada";
 
+/** The two partners of the team chapter (owner, 2026-10-26): the name as they sign it, the initials that hold the
+ * portrait's place until its photograph is in src/assets/team/<key>.jpg, and a public profile only where one exists. */
+export const partners = [
+  {
+    key: "michael",
+    name: "Manuel Michael Retamozo García",
+    initials: "MR",
+    role: "team.michaelRole",
+    line: "team.michaelLine",
+    linkedin: "https://www.linkedin.com/in/mmretamozo/",
+  },
+  { key: "paul", name: "Paul Macorny Retamozo García", initials: "PR", role: "team.paulRole", line: "team.paulLine" },
+] as const;
+
 /** The owner the legal notice names (src/components/Legal.astro): today a person, whose trade name is Retama; once the
  * company exists, its data. */
 export interface Owner {

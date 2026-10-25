@@ -29,6 +29,7 @@
 | Servicios | Web y CMS, software a medida, escritorio, agentes y automatización, SEO y analítica, cada uno con su precio «desde» |
 | Sectores | Logística, empresa, gaming, otros |
 | Método | ADRs y documentación, comunicación para decidir, garantías, 100 % online |
+| Quiénes somos | Los dos socios: nombre, función, una frase, retrato (sus iniciales hasta tener la foto) y su perfil público si lo tiene |
 | FAQ | Plazos, presupuesto con sus mínimos y el diagnóstico, trabajo remoto, propiedad del código, garantía, mantenimiento |
 | Contacto | Formulario, reserva, email, WhatsApp |
 | Blog | Artículos en es y en |
