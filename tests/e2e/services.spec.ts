@@ -6,6 +6,7 @@ const pages = [
     title: "Lo que construimos",
     method: "Cómo trabajamos",
     services: ["Webs y CMS", "Software a medida", "Agentes y automatizaciones", "SEO y analítica"],
+    from: /^Desde \d{1,3}(\.\d{3})? € \+ IVA/,
     contact: "Hablemos",
   },
   {
@@ -13,6 +14,7 @@ const pages = [
     title: "What we build",
     method: "How we work",
     services: ["Websites and CMS", "Custom software", "Agents and automation", "SEO and analytics"],
+    from: /^From €\d{1,3}(,\d{3})? \+ VAT/,
     contact: "Let's talk",
   },
 ];
@@ -36,8 +38,8 @@ test.describe("el capítulo Servicios (DESIGN.md Layout e Imagery)", () => {
   test.describe("sin JavaScript (ADR 0001)", () => {
     test.use({ javaScriptEnabled: false });
 
-    for (const { path, title, services } of pages) {
-      test(`${path} muestra cuatro tarjetas, cada una con su nombre, su frase y su trama de la retama`, async ({
+    for (const { path, title, services, from } of pages) {
+      test(`${path} muestra cuatro tarjetas, cada una con su nombre, su frase, su precio y su trama de la retama`, async ({
         page,
       }) => {
         await page.goto(path);
@@ -46,7 +48,11 @@ test.describe("el capítulo Servicios (DESIGN.md Layout e Imagery)", () => {
         const cards = chapter.getByRole("listitem");
         await expect(cards).toHaveCount(4);
         await expect(chapter.getByRole("heading", { level: 3 })).toHaveText(services);
-        for (const card of await cards.all()) await expect(card.locator("p")).not.toBeEmpty();
+        for (const card of await cards.all()) {
+          await expect(card.locator("p").first()).not.toBeEmpty();
+          // The starting price, excluding VAT, under the sentence (owner, 2026-10-26).
+          await expect(card.locator("p").nth(1)).toHaveText(from);
+        }
 
         const drawn = await screens(page, title);
         expect(drawn.every(({ drawn }) => drawn > 0)).toBe(true);

@@ -78,7 +78,13 @@ export interface Crumb {
   path: string;
 }
 
-const services = ["services.web", "services.custom", "services.agents", "services.seo"] as const;
+// Each service with its minimum in euros excluding VAT, the figure its card's "From" text gives (business proposal 1.4).
+const services = [
+  ["services.web", 1500],
+  ["services.custom", 8000],
+  ["services.agents", 4000],
+  ["services.seo", 800],
+] as const;
 
 /** The JSON-LD of a page: Retama, the site, when the page gives a trail its breadcrumb, when it holds the questions
  * chapter its FAQPage, and when it is an article its BlogPosting, signed by the brand. Only data that exists: no
@@ -106,9 +112,15 @@ export function structuredData(
       hasOfferCatalog: {
         "@type": "OfferCatalog",
         name: copy["services.title"],
-        itemListElement: services.map((key) => ({
+        itemListElement: services.map(([key, minPrice]) => ({
           "@type": "Offer",
           itemOffered: { "@type": "Service", name: copy[key], description: copy[`${key}Line`] },
+          priceSpecification: {
+            "@type": "PriceSpecification",
+            minPrice,
+            priceCurrency: "EUR",
+            valueAddedTaxIncluded: false,
+          },
         })),
       },
     },
@@ -202,7 +214,7 @@ export function llmsTxt(site: URL, articles: ArticleLink[] = []): string {
     "",
     "## Services",
     "",
-    ...services.map((key) => `- ${copy[key]}: ${copy[`${key}Line`]}`),
+    ...services.map(([key]) => `- ${copy[key]}: ${copy[`${key}Line`]} ${copy[`${key}From`]}.`),
     "",
     "## Questions",
     "",

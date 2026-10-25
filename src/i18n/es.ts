@@ -38,12 +38,16 @@ export const es = {
   "services.title": "Lo que construimos",
   "services.web": "Webs y CMS",
   "services.webLine": "Webs rápidas que tu equipo edita solo.",
+  "services.webFrom": "Desde 1.500 € + IVA",
   "services.custom": "Software a medida",
   "services.customLine": "En web o escritorio, cuando Excel ya no da más.",
+  "services.customFrom": "Desde 8.000 € + IVA",
   "services.agents": "Agentes y automatizaciones",
   "services.agentsLine": "Se quedan el trabajo repetitivo y dejan las decisiones a las personas.",
+  "services.agentsFrom": "Desde 4.000 € + IVA, más una cuota mensual",
   "services.seo": "SEO y analítica",
   "services.seoLine": "Que te encuentren, y saber qué funciona sin cookies de seguimiento.",
+  "services.seoFrom": "Desde 800 € + IVA",
   "services.figure": "1",
   "services.figureCaption": "interlocutor, de la primera llamada a la entrega.",
 
@@ -167,22 +171,22 @@ export const es = {
   "faq.lead": "Si tu duda no está aquí, escríbenos: te respondemos en un día laborable.",
   "faq.q1": "¿Cuánto tarda un proyecto?",
   "faq.a1":
-    "Depende de qué sea, de su tamaño y de su complejidad: una landing page se cuenta en semanas; una aplicación web o un software a medida, en meses. La propuesta fija el plazo por escrito, y recibes una entrega cada una o dos semanas, según el alcance.",
+    "Lo habitual: una landing page, de una a dos semanas; una web con gestor de contenidos, de dos a cuatro; una automatización o un agente, de una a tres; el MVP de una aplicación web, de cuatro a ocho, y una aplicación de escritorio, de seis a diez. La propuesta fija el plazo por escrito, recibes una entrega cada una o dos semanas y el calendario cuenta con que nos des a tiempo los textos, los accesos y tu revisión.",
   "faq.q2": "¿Cómo se presupuesta?",
   "faq.a2":
-    "A medida, como el software. Puedes ir por fases: un primer MVP y, sobre él, ampliar el alcance en ciclos cortos, decidiendo en cada uno. O cerrar el presupuesto desde el principio, con la entrega final de lo que proponemos.",
+    "Con precio cerrado, nunca por horas. Los mínimos, sin IVA: una landing page, 1.500 €; una web con gestor de contenidos, 3.500 €; SEO y analítica, 800 €; una automatización o un agente, 4.000 € más una cuota mensual; un software a medida, 8.000 €, y una aplicación de escritorio, 10.000 €. El software a medida y las automatizaciones empiezan por un diagnóstico de precio fijo, desde 900 €: te llevas el documento de decisiones, el presupuesto cerrado y un prototipo de la pantalla clave, y se descuenta si seguimos. Después puedes ir por fases, con un primer MVP que se amplía en ciclos cortos, o cerrar todo el alcance desde el principio.",
   "faq.q3": "¿Cómo es trabajar en remoto?",
   "faq.a3":
-    "Hablamos en llamadas cortas, con vídeo o sin él, y lo importante queda por escrito. Tienes un espacio de seguimiento solo para tu proyecto, donde ves en qué estamos, lo que hemos decidido y lo que viene.",
+    "Hablamos en llamadas cortas, con vídeo o sin él, y lo importante queda por escrito. Cada una o dos semanas recibes una entrega que abres en tu navegador, con lo que hemos decidido y lo que viene.",
   "faq.q4": "¿De quién es el código?",
   "faq.a4":
-    "Tuyo, siempre. Al pagar, el código, la documentación y las decisiones escritas pasan a ser tuyos: puedes seguir con nosotros o con quien quieras.",
+    "Tuyo cuando lo pagas entero: el código, la documentación y las decisiones escritas de tu proyecto. Las piezas genéricas que reutilizamos de un proyecto a otro siguen siendo nuestras, pero puedes usarlas para siempre sin pagar más. Así puedes seguir con nosotros o con quien quieras.",
   "faq.q5": "¿Qué garantía tengo?",
   "faq.a5":
-    "Seis meses desde la entrega, en los que corregimos sin coste cualquier fallo de lo que hemos construido. Es el tiempo que tarda el uso real en sacar lo que las pruebas no ven. Los cambios y las funciones nuevas se presupuestan aparte.",
+    "Las dos primeras semanas desde que empiezas a usarlo te acompañamos de cerca, porque es cuando aparece casi todo. Y tres meses de garantía desde ese mismo día, en los que corregimos sin coste los fallos de lo que hemos construido frente a lo acordado en la propuesta. Los cambios, las funciones nuevas y lo que rompan los cambios de otros proveedores se presupuestan aparte.",
   "faq.q6": "¿Y después de la entrega?",
   "faq.a6":
-    "Puedes contratar un mantenimiento mensual, opcional. Si prefieres no tenerlo, atendemos lo que necesites bajo petición, con un coste algo más alto que depende de su complejidad.",
+    "Puedes contratar un mantenimiento mensual, opcional: desde 120 € al mes para una web y desde 250 € para un software a medida, sin IVA. Mientras lo tengas, la garantía sigue en vigor. Sin mantenimiento, atendemos lo que necesites bajo petición, a 90 € la hora más IVA.",
 
   "contact.title": "Hablemos",
   "contact.lead": "Escríbenos con lo que tengas, aunque sea una idea a medias. Te contestamos con preguntas concretas.",
@@ -224,7 +228,8 @@ export const es = {
   "contact.step2": "Una llamada corta, si hace falta,",
   "contact.step2Rest": "para ver contigo lo que no cabe en un correo.",
   "contact.step3": "Una propuesta por escrito,",
-  "contact.step3Rest": "con las opciones, lo que cuesta cada una y lo que descartaríamos.",
+  "contact.step3Rest":
+    "con las opciones, lo que cuesta cada una y lo que descartaríamos. En software a medida y agentes, sale de un diagnóstico de precio fijo, desde 900 € + IVA, que se descuenta si seguimos.",
 
   "footer.top": "Volver arriba",
   "footer.legalLabel": "Información legal",

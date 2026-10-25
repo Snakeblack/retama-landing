@@ -53,7 +53,10 @@ test.describe("blog sin JavaScript (ADR 0001)", () => {
       await expect(page.getByRole("heading", { level: 1, name: headline })).toBeVisible();
       await expect(page.locator("[data-article] h2").first()).toBeVisible();
       await expect(page.locator("[data-article] li").first()).toBeVisible();
-      await expect(page.locator("dl time")).toHaveAttribute("datetime", "2026-10-23");
+      // Published, then updated when its warranty and its floor price followed proposal 1.4.
+      await expect(page.locator("dl time")).toHaveCount(2);
+      await expect(page.locator("dl time").first()).toHaveAttribute("datetime", "2026-10-23");
+      await expect(page.locator("dl time").last()).toHaveAttribute("datetime", "2026-10-26");
       await expect(page.getByRole("link", { name: all })).toHaveAttribute("href", index);
       // No code in an article (DESIGN.md: no monospace outside the first chapter).
       await expect(page.locator("[data-article] code, [data-article] pre")).toHaveCount(0);

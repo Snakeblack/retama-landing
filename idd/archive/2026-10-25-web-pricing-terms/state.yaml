@@ -1,0 +1,430 @@
+{
+  "schema": "idd-state/v1",
+  "change": "web-pricing-terms",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "Precios: En cada servicio + diagnóstico (Recomendado). Publicación: Preparar ya, fusionar tras su sí (Recomendado). Producto: No, todavía no (Recomendado).",
+    "kind": "feature",
+    "summary": "Align the home's services, contact steps and questions with business proposal 1.4: 'from' prices per service, the fixed-price diagnosis, the new warranty, code ownership with licensed generic parts, and no promise of a tracking space",
+    "acceptance": "In es and en, each priced service card shows its 'from' price, the contact steps present the diagnosis, and faq.a2-a6 state prices, the warranty (2 weeks of close support + 3 months from go-live), code ownership on full payment with generic parts licensed, and no tracking space; the JSON-LD FAQPage repeats the answers word for word; all checks pass"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/contact.ts",
+          "line": 5
+        }
+      },
+      {
+        "category": "uniqueness",
+        "question": "How are prices written per locale: '1.500 € + IVA' in es and 'EUR 1,500 + VAT' or 'from €1,500 excl. VAT' in en?"
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 41
+        }
+      },
+      {
+        "category": "copy",
+        "question": "Which 'from' price goes on the SEO and analytics card (proposal 1.4 sets none), is the diagnosis required for every project or only for custom software and automation, and which other figures are published (lead times in faq.a1, maintenance from 120 EUR/month and 90 EUR/h in faq.a6, prices in llms.txt and JSON-LD)?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 255
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 232
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "tests/unit/i18n.test.ts",
+          "line": 8
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/product/brief.md",
+      "docs/product/functional-scope.md",
+      "src/components/board/Services.astro",
+      "src/content/blog/en/what-custom-software-costs.md",
+      "src/content/blog/en/why-we-write-every-decision-down.md",
+      "src/content/blog/es/cuanto-cuesta-un-software-a-medida.md",
+      "src/content/blog/es/por-que-escribimos-cada-decision.md",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/seo.ts",
+      "tests/unit/seo.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0008 and quality scenario brand-impact, seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The prices and answers are static text in the HTML; no script carries them"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "The price uses the existing type-body-strong token and the card's own ink; no new colour or size"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Every new key exists in es.ts and en.ts, and the i18n parity test holds"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "One line of text per card, in the existing type scale; the board layout does not change"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "JSON-LD offers gain a PriceSpecification and the FAQPage keeps repeating the answers word for word; llms.txt lists the prices"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "SEO: Investiga y propón cifra, then Desde 800 € (Recomendado). Diagnóstico: Solo software y automatización (Recomendado). Cifras: Plazos orientativos (faq.a1), Mantenimiento desde 120 €/mes (faq.a6), Horas sueltas a 90 €/h (faq.a6), Precios en llms.txt y JSON-LD. Formato: «desde 1.500 € + IVA» / «from €1,500 + VAT» (Recomendado).",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-25T23:26:25.791Z",
+      "detail": {
+        "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+        "runs": [
+          "run-10",
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-25T23:26:25.791Z",
+      "detail": {
+        "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/blog.spec.ts",
+          "tests/e2e/services.spec.ts",
+          "tests/unit/seo.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-25T23:26:25.791Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+        "fitness": [
+          "run-15",
+          "run-16",
+          "run-17",
+          "run-18"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-25T23:26:33.419Z"
+    }
+  ],
+  "base": "01713fc5bb925736249033b957d66658123a85eb",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 1,
+      "output_sha256": "sha256:6761789a424b68dc5adaf361cf21e17984f2ae9f18e2f058eed9b6cb1d39d651",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:1962a4fb39c7dee6176d308cd008b0b76173fc04d81885d367a4b3e60f38e868",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:19bc7379f039679f0c369d95fa836f0dd57336c78b66de45f7bab6c8abf4f366",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:7b8d4a8767fb6a1266294e6dbd7f21ac5455de6e72db115061b01e83bd2b703a",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 1,
+      "output_sha256": "sha256:62dc1f5271ccfe082a27374485eb56d5dfb372d5f14d881f91109e21c1799ca2",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:b61545e884311bf507d6a68538f28f5769805f38c0d5f7f95a6a5d862c9e1c3f",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:e15c01e135fd39ae70337e4e054ef2dcba3107a896b2faedd122f61e58b37e59",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:ef181f79be5d3bc9ac98d98f63a0df0099626b993179ffcd2a83c7e1529da77a",
+      "tree": "sha256:cefca1de9864a6d829c0afad73aed3b29cb25720e91cc7e36e9039b5fde86a88",
+      "recorded_at": "2026-10-25T23:22:23.470Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:e7ccff9d4d5362d7afd10a86645645ba6e4e998a577bbc67fdca5e09d9ba2436",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:6cba558b70c1bd11b00ce798294f4135f93e3ffac47b5fdc980d209add5458de",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:67239c93d89b29c45dbc5ef38d8b350030e21bab1a5db3901005b6db40af0cfb",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:52ad0c8d8da71fcd2daaa711a8d75da32bd4e13a8c2be10446ffbb5573736763",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:f9a720c3eaba5e5cd3e441bacd4963be56db96a8143136f0a337f8c96d41c589",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:956fc76c8edc067159929af857f44510398700b9e5699b6b0b0fcc17c77f2b07",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:e39f95a1eff7595f896547b96fef7266e18dfa5b330c403a797cb5feca6d5ecf",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:314e3443944d1011a0115900973637451e057b2e7e87dfe2de76bdacf9274a3c",
+      "tree": "sha256:a384d52d88fecb0710378fab8dc86ba70346e0d6dcb65d7a8f2279fe22d6a8b3",
+      "recorded_at": "2026-10-25T23:26:25.791Z"
+    }
+  ],
+  "closed_at": "2026-10-25T23:26:33.419Z"
+}

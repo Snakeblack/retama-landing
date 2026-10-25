@@ -3,9 +3,12 @@ key: software-cost
 title: What custom software costs
 description: Why nobody serious quotes a price without asking first, what makes a project cost more or less, and how to ask for a quote you can compare.
 published: 2026-10-23
+updated: 2026-10-26
 ---
 
 It is the first question almost every client asks, and the honest answer starts with another one: what exactly does it have to do? Custom software has no catalogue price, because no two projects are the same. What can be explained is what the price depends on, so you know what you are paying for and can compare proposals.
+
+What it does have is a floor. With us, custom software starts at €8,000 excluding VAT, and its fixed price comes out of a fixed-price diagnosis, from €900, deducted if we carry on.
 
 ## What drives the price
 
@@ -36,7 +39,7 @@ Building it is not the only expense. Always ask about:
 - **Hosting**, which is small in many projects, but is paid every month.
 - **Licences** for third-party services: email, maps, payments.
 - **Maintenance**: security updates, adjustments and small improvements, as a monthly fee or on request.
-- **The warranty**: what happens if something fails after delivery. Ours covers six months of fixes at no cost.
+- **The warranty**: what happens if something fails after delivery. With ours, we stay close for the first two weeks after you start using it, and from that same day you have three months of fixes at no cost.
 
 ## How to ask for a quote you can compare
 
