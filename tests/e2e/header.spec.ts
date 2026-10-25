@@ -41,8 +41,8 @@ test.describe("cabecera flotante e índice de capítulos en el móvil (DESIGN.md
       expect(await dialog.evaluate((node) => node.matches(":modal"))).toBe(true);
       await expect(dialog.getByRole("button", { name: close })).toBeFocused();
       await iconOnly(dialog.getByRole("button", { name: close }));
-      // The five entries of the home and its chapters, then the blog.
-      await expect(dialog.getByRole("navigation").getByRole("link")).toHaveCount(6);
+      // The six entries of the home and its chapters, then the blog.
+      await expect(dialog.getByRole("navigation").getByRole("link")).toHaveCount(7);
       // Above every chapter, the first entry is the one on screen.
       await expect(dialog.locator('[aria-current="location"]')).toHaveCount(1);
       await expect(dialog.locator("[data-index-link]").first()).toHaveAttribute("aria-current", "location");
@@ -126,8 +126,8 @@ test.describe("cabecera en escritorio (DESIGN.md Layout)", () => {
   test("los enlaces siguen en la cabecera, a la derecha junto al idioma, y el índice no aparece", async ({ page }) => {
     await page.goto("/");
     const nav = page.getByRole("banner").getByRole("navigation");
-    // The four chapters, then the blog.
-    await expect(nav.getByRole("link")).toHaveCount(5);
+    // The five chapters, then the blog.
+    await expect(nav.getByRole("link")).toHaveCount(6);
     await expect(page.getByRole("button", { name: "Índice" })).toBeHidden();
     // The wordmark stands alone on the left; the links gather on the right, next to the language switch.
     const links = await nav.boundingBox();

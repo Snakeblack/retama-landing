@@ -12,6 +12,7 @@ import Method from "./board/Method.astro";
 import Questions from "./board/Questions.astro";
 import Sectors from "./board/Sectors.astro";
 import Services from "./board/Services.astro";
+import Team from "./board/Team.astro";
 
 interface Props {
   locale: Locale;
@@ -24,6 +25,7 @@ const chapters = (
     ["anchor.services", "nav.services", "services.title"],
     ["anchor.sectors", "nav.sectors", "sectors.title"],
     ["anchor.method", "nav.method", "method.title"],
+    ["anchor.team", "nav.team", "team.title"],
     ["anchor.questions", "nav.questions", "faq.title"],
   ] as const
 ).map(([anchor, name, title]) => ({ anchor: copy[anchor], name: copy[name], title: copy[title] }));
@@ -59,6 +61,7 @@ if (PUBLIC_BOOKING) Astro.csp?.insertDirective(bookingFrameDirective(bookingUrl)
     <Services locale={locale} />
     <Sectors locale={locale} />
     <Method locale={locale} />
+    <Team locale={locale} />
     <Questions locale={locale} />
     <Contact locale={locale} />
   </div>

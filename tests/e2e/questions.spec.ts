@@ -4,7 +4,7 @@ const pages = [
   {
     path: "/",
     anchor: "preguntas",
-    before: "metodo",
+    before: "nosotros",
     after: "contacto",
     title: "Lo que nos preguntan",
     first: "¿Cuánto tarda un proyecto?",
@@ -14,7 +14,7 @@ const pages = [
   {
     path: "/en/",
     anchor: "questions",
-    before: "method",
+    before: "about-us",
     after: "contact",
     title: "What clients ask us",
     first: "How long does a project take?",
@@ -27,11 +27,11 @@ test.describe("las preguntas sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false });
 
   for (const { path, anchor, before, after, title, first, second } of pages) {
-    test(`${path} tiene las seis preguntas entre el método y el contacto, la primera abierta`, async ({ page }) => {
+    test(`${path} tiene las seis preguntas entre quiénes somos y el contacto, la primera abierta`, async ({ page }) => {
       await page.goto(path);
       const chapter = page.locator(`main section#${anchor}`);
       await expect(chapter.getByRole("heading", { level: 2, name: title })).toBeVisible();
-      // DESIGN.md Layout: the chapters run services, sectors, method, questions, contact.
+      // DESIGN.md Layout: the chapters run services, sectors, method, team, questions, contact.
       const order = await page.locator("main section[id]").evaluateAll((sections) => sections.map((s) => s.id));
       expect(order.indexOf(anchor)).toBe(order.indexOf(before) + 1);
       expect(order.indexOf(after)).toBe(order.indexOf(anchor) + 1);

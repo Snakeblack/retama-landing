@@ -84,8 +84,8 @@ test.describe("sin JavaScript (ADR 0001)", () => {
       await page.goto(path);
 
       const groups = page.locator("main section[id]");
-      // Services, sectors, method, questions and contact (DESIGN.md Layout).
-      await expect(groups).toHaveCount(5);
+      // Services, sectors, method, team, questions and contact (DESIGN.md Layout).
+      await expect(groups).toHaveCount(6);
       for (const group of await groups.all()) {
         await expect(group.locator("h2")).toHaveCount(1);
         await expect(group.locator("h2")).not.toBeEmpty();
@@ -93,9 +93,9 @@ test.describe("sin JavaScript (ADR 0001)", () => {
 
       // The header's chapter links, then the blog's; the footer's legal links lead to another page.
       const links = page.getByRole("banner").getByRole("navigation").getByRole("link");
-      await expect(links).toHaveCount(5);
+      await expect(links).toHaveCount(6);
       const hrefs = await links.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href") ?? ""));
-      expect(hrefs.filter((href) => href.startsWith("#"))).toHaveLength(4);
+      expect(hrefs.filter((href) => href.startsWith("#"))).toHaveLength(5);
       for (const href of hrefs.filter((href) => href.startsWith("#"))) {
         await expect(page.locator(`main ${href}`)).toHaveCount(1);
       }
