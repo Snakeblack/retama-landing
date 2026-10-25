@@ -10,10 +10,12 @@ export const en = {
   "nav.services": "Services",
   "nav.sectors": "Sectors",
   "nav.method": "Method",
+  "nav.team": "About us",
   "nav.questions": "Questions",
   "anchor.services": "services",
   "anchor.sectors": "sectors",
   "anchor.method": "method",
+  "anchor.team": "about-us",
   "anchor.questions": "questions",
   "anchor.contact": "contact",
   "nav.blog": "Blog",
@@ -167,6 +169,16 @@ export const en = {
   "live.agents.r2": "If something goes wrong, you know why and since when.",
   "live.agents.d3": "We measure the savings before we scale.",
   "live.agents.r3": "We only automate more of what has already given you hours back.",
+
+  "team.title": "Who we are",
+  "team.lead": "Two brothers: one is with you from start to finish, the other builds.",
+  "team.michaelRole": "Product and development",
+  "team.michaelLine":
+    "Full stack, from the first line to production. Has built products from scratch across very different fields, and shapes the architecture for the years it has to last.",
+  "team.paulRole": "Clients and sales",
+  "team.paulLine":
+    "Years in logistics and sales, by the client's side. Knows how the work gets done in the warehouse, on the route and in sales, and is with you from the first call to delivery.",
+  "team.linkedin": "LinkedIn",
 
   "faq.title": "What clients ask us",
   "faq.lead": "If your question is not here, write to us: we reply within one working day.",
