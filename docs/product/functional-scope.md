@@ -26,10 +26,10 @@
 | Sección o capacidad | Contenido |
 | --- | --- |
 | Hero | Escena 3D progresiva, titular, una acción principal |
-| Servicios | Web y CMS, software a medida, escritorio, agentes y automatización, SEO y analítica |
+| Servicios | Web y CMS, software a medida, escritorio, agentes y automatización, SEO y analítica, cada uno con su precio «desde» |
 | Sectores | Logística, empresa, gaming, otros |
 | Método | ADRs y documentación, comunicación para decidir, garantías, 100 % online |
-| FAQ | Plazos, presupuesto, trabajo remoto, propiedad del código, garantía, mantenimiento |
+| FAQ | Plazos, presupuesto con sus mínimos y el diagnóstico, trabajo remoto, propiedad del código, garantía, mantenimiento |
 | Contacto | Formulario, reserva, email, WhatsApp |
 | Blog | Artículos en es y en |
 | Legales | Aviso legal, privacidad, cookies |

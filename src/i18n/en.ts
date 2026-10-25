@@ -40,12 +40,16 @@ export const en = {
   "services.title": "What we build",
   "services.web": "Websites and CMS",
   "services.webLine": "Fast websites your team edits on its own.",
+  "services.webFrom": "From €1,500 + VAT",
   "services.custom": "Custom software",
   "services.customLine": "On the web or the desktop, for when Excel gives out.",
+  "services.customFrom": "From €8,000 + VAT",
   "services.agents": "Agents and automation",
   "services.agentsLine": "They take the repetitive work and leave the decisions to people.",
+  "services.agentsFrom": "From €4,000 + VAT, plus a monthly fee",
   "services.seo": "SEO and analytics",
   "services.seoLine": "Get found, and know what works without tracking cookies.",
+  "services.seoFrom": "From €800 + VAT",
   "services.figure": "1",
   "services.figureCaption": "person to talk to, from the first call to delivery.",
 
@@ -168,22 +172,22 @@ export const en = {
   "faq.lead": "If your question is not here, write to us: we reply within one working day.",
   "faq.q1": "How long does a project take?",
   "faq.a1":
-    "It depends on what it is, its size and its complexity: a landing page takes weeks; a web application or custom software, months. The proposal sets the timeline in writing, and you get a delivery every one or two weeks, depending on the scope.",
+    "As a rule: a landing page, one to two weeks; a website with a content manager, two to four; an automation or an agent, one to three; the MVP of a web application, four to eight, and a desktop application, six to ten. The proposal sets the timeline in writing, you get a delivery every one or two weeks, and the schedule counts on you sending the texts, the access and your review on time.",
   "faq.q2": "How is it priced?",
   "faq.a2":
-    "Made to measure, like the software. You can go in phases: a first MVP and, on top of it, a wider scope in short cycles, deciding at each one. Or fix the budget from the start, with the final delivery of what we propose.",
+    "At a fixed price, never by the hour. The minimums, excluding VAT: a landing page, €1,500; a website with a content manager, €3,500; SEO and analytics, €800; an automation or an agent, €4,000 plus a monthly fee; custom software, €8,000, and a desktop application, €10,000. Custom software and automation start with a fixed-price diagnosis, from €900: you get the decision document, the fixed quote and a prototype of the key screen, and it is deducted if we carry on. Then you can go in phases, with a first MVP that grows in short cycles, or fix the whole scope from the start.",
   "faq.q3": "What is working remotely like?",
   "faq.a3":
-    "We talk in short calls, with or without video, and what matters is written down. You get a tracking space for your project alone, where you see what we are working on, what we have decided and what comes next.",
+    "We talk in short calls, with or without video, and what matters is written down. Every one or two weeks you get a delivery you open in your browser, with what we have decided and what comes next.",
   "faq.q4": "Who owns the code?",
   "faq.a4":
-    "You do, always. Once paid, the code, the documentation and the written decisions are yours: you can carry on with us or with anyone you like.",
+    "You do, once it is paid in full: the code, the documentation and the written decisions of your project. The generic pieces we reuse from one project to the next stay ours, but you can use them forever at no extra cost. So you can carry on with us or with anyone you like.",
   "faq.q5": "What warranty do I get?",
   "faq.a5":
-    "Six months from delivery, during which we fix any fault in what we have built at no cost. That is how long real use takes to bring out what testing does not. Changes and new features are quoted separately.",
+    "For the first two weeks after you start using it we stay close, because that is when almost everything shows up. Then three months of warranty from that same day, during which we fix at no cost the faults in what we have built against what the proposal agreed. Changes, new features and what other providers' changes break are quoted separately.",
   "faq.q6": "And after delivery?",
   "faq.a6":
-    "You can take out an optional monthly maintenance plan. If you would rather not, we handle what you need on request, at a somewhat higher cost that depends on its complexity.",
+    "You can take out an optional monthly maintenance plan: from €120 a month for a website and from €250 for custom software, excluding VAT. While you have it, the warranty stays in force. Without maintenance, we handle what you need on request, at €90 an hour plus VAT.",
 
   "contact.title": "Let's talk",
   "contact.lead": "Write to us with whatever you have, even a half-formed idea. We reply with specific questions.",
@@ -225,7 +229,8 @@ export const en = {
   "contact.step2": "A short call, if it helps,",
   "contact.step2Rest": "to go over what does not fit in an email.",
   "contact.step3": "A written proposal,",
-  "contact.step3Rest": "with the options, what each one costs and what we would rule out.",
+  "contact.step3Rest":
+    "with the options, what each one costs and what we would rule out. For custom software and agents, it comes out of a fixed-price diagnosis, from €900 + VAT, deducted if we carry on.",
 
   "footer.top": "Back to top",
   "footer.legalLabel": "Legal information",

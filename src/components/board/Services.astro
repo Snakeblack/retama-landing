@@ -8,10 +8,10 @@ interface Props {
 
 const copy = t(Astro.props.locale);
 const services = [
-  ["services.web", "services.webLine"],
-  ["services.custom", "services.customLine"],
-  ["services.agents", "services.agentsLine"],
-  ["services.seo", "services.seoLine"],
+  ["services.web", "services.webLine", "services.webFrom"],
+  ["services.custom", "services.customLine", "services.customFrom"],
+  ["services.agents", "services.agentsLine", "services.agentsFrom"],
+  ["services.seo", "services.seoLine", "services.seoFrom"],
 ] as const;
 // DESIGN.md Imagery: the cards read the hero's retama from the top down, as a dot screen drawn at build time. From lg
 // each card frames its own part of the plant (x, y, width and height in the frame of HERO): the crown, its base with
@@ -47,11 +47,12 @@ const shape = retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots);
 
   <ul class="grid gap-gap lg:grid-cols-4">
     {
-      services.map(([name, line], index) => (
+      services.map(([name, line, from], index) => (
         <li class:list={["flex flex-col", index === FIELD ? "bg-field text-on-field" : "bg-surface-raised"]}>
           <div class="grid gap-sm p-tile-sm md:p-tile">
             <h3 class="text-balance type-statement-sm md:type-statement">{copy[name]}</h3>
             <p class="max-w-(--spacing-measure)">{copy[line]}</p>
+            <p class="type-body-strong">{copy[from]}</p>
           </div>
           <svg class="mt-auto aspect-5/2 w-full lg:hidden" viewBox={slice(index)} aria-hidden="true" data-dots>
             <use href="#retama-dots" />

@@ -85,6 +85,30 @@ describe("structuredData", () => {
     ]);
   });
 
+  it("da el precio mínimo de cada servicio sin IVA, el mismo que su tarjeta", () => {
+    for (const [locale, copy, amount] of [
+      ["es", es, (value: number) => `${value.toLocaleString("de-DE")} €`],
+      ["en", en, (value: number) => `€${value.toLocaleString("en-GB")}`],
+    ] as const) {
+      const retama = node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "ProfessionalService");
+      const catalog = retama?.hasOfferCatalog as {
+        itemListElement: { itemOffered: { name: string }; priceSpecification: Record<string, unknown> }[];
+      };
+      const prices = catalog.itemListElement.map((offer) => offer.priceSpecification);
+      expect(prices.map((price) => price.minPrice)).toEqual([1500, 8000, 4000, 800]);
+      for (const price of prices)
+        expect(price).toMatchObject({
+          "@type": "PriceSpecification",
+          priceCurrency: "EUR",
+          valueAddedTaxIncluded: false,
+        });
+      const cards = ["services.webFrom", "services.customFrom", "services.agentsFrom", "services.seoFrom"] as const;
+      cards.forEach((key, index) => {
+        expect(copy[key]).toContain(amount(prices[index]?.minPrice as number));
+      });
+    }
+  });
+
   it("declara el sitio bilingüe publicado por Retama", () => {
     expect(node(graph(), "WebSite")).toEqual({
       "@type": "WebSite",
@@ -212,7 +236,7 @@ describe("llmsTxt", () => {
   it("da el correo de contacto y los servicios", () => {
     expect(text).toContain("hola@retama.dev");
     for (const key of ["services.web", "services.custom", "services.agents", "services.seo"] as const)
-      expect(text).toContain(en[key]);
+      expect(text).toContain(`- ${en[key]}: ${en[`${key}Line`]} ${en[`${key}From`]}.`);
   });
 
   it("responde las preguntas de la portada, cada una enlazada a su capítulo", () => {

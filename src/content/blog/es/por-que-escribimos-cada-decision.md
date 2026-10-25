@@ -3,6 +3,7 @@ key: written-decisions
 title: Por qué escribimos cada decisión
 description: Qué es una decisión por escrito, qué te ahorra cuando el proyecto crece o cambia de manos y por qué es tuya, igual que el código.
 published: 2026-10-23
+updated: 2026-10-26
 ---
 
 En cualquier proyecto de software se toman cientos de decisiones. Casi todas son pequeñas, pero unas cuantas marcan todo lo demás: con qué se construye, dónde se guardan los datos, cómo se conecta con tus otros sistemas, qué se deja para más adelante. En muchos proyectos esas decisiones viven solo en la cabeza de quien las tomó. Nosotros las escribimos.
@@ -31,6 +32,6 @@ Al pagar, el código pasa a ser tuyo, y la documentación y estas decisiones tam
 
 ## Cómo se ve en la práctica
 
-Antes de construir algo importante, te contamos las opciones con su coste y decidimos juntos. Esa conversación acaba en una decisión por escrito, que puedes leer cuando quieras en el espacio de seguimiento de tu proyecto. Si más adelante algo cambia, no se borra: se escribe otra que explica qué cambió y por qué, y la anterior queda como historia.
+Antes de construir algo importante, te contamos las opciones con su coste y decidimos juntos. Esa conversación acaba en una decisión por escrito, que te llega con la entrega y puedes leer cuando quieras. Si más adelante algo cambia, no se borra: se escribe otra que explica qué cambió y por qué, y la anterior queda como historia.
 
 Es un hábito pequeño que no se ve desde fuera, como las raíces de la retama, que aguanta en suelo pobre gracias a una raíz mucho más honda que la planta.

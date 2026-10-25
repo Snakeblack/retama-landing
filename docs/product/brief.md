@@ -11,6 +11,7 @@ Retama es una empresa de ingeniería de software que trabaja **solo en remoto**.
 
 - **Servicios:** aplicaciones web, landing pages y webs con CMS en varios lenguajes; software a medida; aplicaciones de escritorio; flujos agénticos y automatizaciones; SEO y analítica.
 - **Sectores:** logística, empresa, gaming y otros.
+- **Precios:** el mínimo de cada servicio («desde», sin IVA), el diagnóstico de precio fijo con el que empiezan el software a medida y las automatizaciones, el mantenimiento y las horas sueltas. El precio final se fija en la propuesta (usuario, 2026-10-26).
 - **Método:** arquitectura documentada con ADRs, documentación, trato directo y comunicación orientada a tomar decisiones con criterio, garantías y trabajo 100 % online.
 
 ## Usuarios
@@ -45,7 +46,6 @@ Retama es una empresa de ingeniería de software que trabaja **solo en remoto**.
 
 ## Fuera de alcance
 
-- Precios públicos.
 - Chat con IA en v1.
 - E-commerce y pagos.
 - Área de clientes y login.
