@@ -127,14 +127,15 @@ ajustes de configuración y defensa en profundidad.
    entrega a Astro `/api/contact` y `/api/report`, manda lo demás a los assets y añade a todas sus respuestas las
    cabeceras de seguridad, con una CSP que no carga nada. La fitness `on-demand-routes` lee las rutas del build, no solo
    `src/pages`, y corre en el CI tras el build.
-4. `zone-hardening` (baja, A04 y A02): en la zona, *Always Use HTTPS*, para que `http://` redirija también fuera de los
-   navegadores (estos ya van a HTTPS por el preload de `.dev`), y DMARC con informes `rua` como primer paso; CAA
-   opcional.
+4. `zone-hardening` (hecho; baja, A04 y A02): en la zona, *Always Use HTTPS*, para que `http://` redirija también fuera
+   de los navegadores (estos ya van a HTTPS por el preload de `.dev`), y DMARC con informes `rua` a DMARC Management de
+   Cloudflare. Al leer la zona salió que aceptaba TLS 1.0 y 1.1 (la auditoría los dio por rechazados porque OpenSSL 3 no
+   los ofrece por defecto): el mínimo pasa a TLS 1.2. Un CAA deja emitir solo a las CAs de Cloudflare.
 5. `worker-quota` (baja, A06): las peticiones que no son una navegación ni coinciden con un asset invocan el Worker y
    gastan la cuota diaria del plan gratuito, y la regla del WAF solo cubre `/api/report/`. Se decide entre aceptarlo por
    escrito en un ADR que amplíe el 0011, Workers Paid o ampliar la regla.
-6. `dmarc-enforce` (baja, A02): tras dos a cuatro semanas de informes sin fallos legítimos, DMARC de `p=none` a
-   `p=quarantine`.
+6. `dmarc-enforce` (baja, A02): tras dos a cuatro semanas de informes sin fallos legítimos en DMARC Management (desde
+   el 2026-10-26), DMARC de `p=none` a `p=quarantine`.
 
 **Riesgos aceptados:**
 - `/api/report/` registra un mensaje corto de quien falsifique el `Origin`: sin datos personales, con el JSON intacto y

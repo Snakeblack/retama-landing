@@ -1,0 +1,157 @@
+{
+  "schema": "idd-state/v1",
+  "change": "zone-hardening",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "docs",
+    "summary": "Endurecer la zona retama.dev en Cloudflare (M7 4/6, OWASP A04 y A02): Always Use HTTPS para que http:// redirija también fuera de los navegadores, informes DMARC (rua) como primer paso hacia dmarc-enforce, y los hallazgos que salen al leer la zona por el MCP cloudflare-api: TLS mínimo 1.0 (la auditoría lo dio por rechazado por error) y ningún CAA",
+    "acceptance": "La API de Cloudflare muestra always_use_https en on y el registro _dmarc.retama.dev con rua; curl http://retama.dev/ responde 301 a https; lo que el usuario decida sobre el TLS mínimo y el CAA queda aplicado y comprobado con openssl y dig; docs/roadmap.md marca zone-hardening hecho y docs/architecture/technical-baseline.md recoge los ajustes de la zona"
+  },
+  "facts": {
+    "open": [
+      "DMARC rua: ¿DMARC Management de Cloudflare (gratis, informes en el dashboard, sin buzón) o un buzón dmarc@retama.dev reenviado a Gmail con Email Routing?",
+      "TLS mínimo: la zona acepta TLS 1.0 y 1.1 (comprobado con openssl). ¿Se sube a 1.2 en este change o queda como riesgo aceptado?",
+      "CAA: ¿se añade un CAA (Cloudflare completa los de sus CAs, ocultos en el dashboard) o se deja sin CAA, como dice el roadmap que es opcional?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared quality scenario privacy-security",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "Refuerza el transporte y el correo de la zona: http:// redirige a https:// para todo cliente, TLS 1.2 como mínimo, CAA solo con las CAs de Cloudflare y DMARC con informes. No cambia la CSP, las cabeceras, el rastreo ni el código"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "DMARC rua: DMARC Management (Recommended). TLS mínimo: Subir a 1.2 (Recommended). CAA: Añadir CAA (Recommended).",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T15:00:28.101Z",
+      "detail": {
+        "tree": "sha256:06dc0791cc27fcc106be1a14baf5e54a2d3c3b8c98800d3303617b5cc31341c4",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T15:00:28.101Z",
+      "detail": {
+        "refs": [
+          "scenario:privacy-security conforms"
+        ],
+        "records": []
+      }
+    }
+  ],
+  "base": "18b2b85fd3e5481ca5346a17879bf300236d5d6c",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:42bfb38afd99d6b564ebac8e1e3fd36c21ef67a18d9d4c6a89fc967965b7b90c",
+      "tree": "sha256:06dc0791cc27fcc106be1a14baf5e54a2d3c3b8c98800d3303617b5cc31341c4",
+      "recorded_at": "2026-10-26T15:00:28.101Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:43bed11923cde5effdd29cde21372c5949fd95b467547f8b846f7eae1af0f19d",
+      "tree": "sha256:06dc0791cc27fcc106be1a14baf5e54a2d3c3b8c98800d3303617b5cc31341c4",
+      "recorded_at": "2026-10-26T15:00:28.101Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:9316edc1ebcb961bebbdbdfa6112a92a6ed659740eb1c47eab6bc443492fece6",
+      "tree": "sha256:06dc0791cc27fcc106be1a14baf5e54a2d3c3b8c98800d3303617b5cc31341c4",
+      "recorded_at": "2026-10-26T15:00:28.101Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:128f25a42e46354d1da49dca9a8bd3149ebbc82e12069fb00671f3628d198507",
+      "tree": "sha256:06dc0791cc27fcc106be1a14baf5e54a2d3c3b8c98800d3303617b5cc31341c4",
+      "recorded_at": "2026-10-26T15:00:28.101Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:06dc0791cc27fcc106be1a14baf5e54a2d3c3b8c98800d3303617b5cc31341c4",
+      "recorded_at": "2026-10-26T15:00:28.101Z"
+    }
+  ],
+  "closed_at": "2026-10-26T15:00:37.134Z"
+}
