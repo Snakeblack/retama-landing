@@ -1,0 +1,433 @@
+{
+  "schema": "idd-state/v1",
+  "change": "worker-headers",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "Las respuestas que genera el Worker (API, redirecciones y las rutas /_image/ y /_server-islands/ que inyectan Astro y el adaptador) salen sin las cabeceras de seguridad de public/_headers, y la fitness on-demand-routes no ve esas rutas porque solo mira src/pages (M7 3/6, auditoría OWASP A02)",
+    "acceptance": "En el build servido por workerd, toda respuesta del Worker lleva HSTS, nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy, COOP y una CSP (la de los assets si ya la trae, y si no una que lo bloquea todo); /_image/ y /_server-islands/ responden como una ruta que no existe; y node scripts/fitness.mjs on-demand-routes falla si el build tiene una ruta bajo demanda fuera de /api/contact y /api/report que el Worker no retire"
+  },
+  "facts": {
+    "basis": "El punto 3 de M7 en docs/roadmap.md fija el alcance (cabeceras en toda respuesta del Worker, retirar las rutas del adaptador que el sitio no usa y la fitness sobre las rutas del build). El código fija el resto: una ruta que no existe responde con la página 404 del sitio desde los assets, con sus cabeceras (comprobado con wrangler dev sobre el build); las cabeceras son las del bloque /* de public/_headers; el build no referencia /_image ni /_server-islands (imageService compile, ningún server:defer); y la documentación de Astro da el entrypoint propio del Worker (main en wrangler y handle de @astrojs/cloudflare/handler)"
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/ci.yml",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "scripts/fitness.mjs",
+      "src/server/edge.ts",
+      "src/worker.ts",
+      "tests/e2e/security.spec.ts",
+      "tests/unit/edge.test.ts",
+      "wrangler.jsonc"
+    ],
+    "work_units": 2,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 2 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/ci.yml and 2 more (matches .github/workflows/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0002, 0006, 0011",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "El entrypoint del Worker no añade ninguna ruta: solo entrega a Astro /api/contact y manda lo demás a los assets, así que las rutas que Astro inyecta en el build quedan fuera de alcance y las rutas bajo demanda alcanzables vuelven a ser exactamente las de la lista. La fitness on-demand-routes hace la revisión del build que pide el ADR sobre las rutas del build, no sobre src/pages."
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "La CSP de páginas con hashes sigue como cabecera estática de _headers y el Worker nunca la sustituye. Lo que responde el Worker, que no son páginas, recibe HSTS, nosniff, Referrer-Policy, Permissions-Policy, X-Frame-Options, COOP y una CSP que no carga nada, con frame-ancestors 'none'; sin unsafe-inline ni unsafe-eval."
+    },
+    {
+      "kind": "adr",
+      "id": "0011",
+      "impact": "conforms",
+      "reason": "/api/report/ sigue siendo la segunda y última ruta bajo demanda, sin cambios en su comportamiento; ahora sus respuestas llevan también las cabeceras de seguridad. La fitness on-demand-routes mantiene su lista permitida (/api/contact y /api/report) y además exige que la lista del Worker sea la misma."
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-26T12:59:27.807Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T13:04:03.005Z",
+      "detail": {
+        "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T13:04:03.005Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0006 conforms",
+          "adr:0011 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+        "fitness": [
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-26T13:09:27.917Z",
+      "detail": {
+        "lineage_id": "sha256:7ea56b916a822907a22ad37a0d09dd4d6b1d2563e5951d298465b2858b723031",
+        "candidate_id": "sha256:f62dcbafef553ed22cd0aece9d0856c545f6cfb188c51961c6a31aed86eb7adf",
+        "candidate_tree": "8bbb6aed7f24f2bdaca981ba0cdfbaa9024326d1",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-26T13:09:19.911Z",
+          "result_digest": "sha256:c57509dd05484ee1d6d640c92b3574374283f994f81034834774316c5d330b93"
+        }
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-26T13:09:32.826Z"
+    }
+  ],
+  "base": "cf14f0d7a9960bd6242638cae272d041db04f780",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm test:e2e --grep \"respuestas del Worker\"",
+      "exit_code": 1,
+      "output_sha256": "sha256:2a016eb8d602a79b0454bed33aebb33d30db5fdd6174d1857a97aac6b023143c",
+      "tree": "sha256:f4dd2703f8a06e43eeb9cb61d6f5a21644fc26db94076b2e24183da0d835bdef",
+      "recorded_at": "2026-10-26T12:58:29.157Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm test:e2e --grep \"respuestas del Worker\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:6835abff518818f7febdde81e8e5e7b73892a844257bd0021de72abdbde0b970",
+      "tree": "sha256:b810c66f23b8ed3376b09f0fb5066bbbef122e27dc52d9884d2d1137c710b507",
+      "recorded_at": "2026-10-26T12:59:27.807Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:19b63c9763b6c7dcea2b0c87c863d6a87bdc23ec488e740d2df8a2411b1e1e4a",
+      "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+      "recorded_at": "2026-10-26T13:04:03.005Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:b1ba08737617ac23280c700c8e4241efe611554f91a383032095de1a67446f14",
+      "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+      "recorded_at": "2026-10-26T13:04:03.005Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:3a501cf9f33366d8a7920a9fd4cc054d3522c882b8a09859e91c06b71e494490",
+      "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+      "recorded_at": "2026-10-26T13:04:03.005Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:92d3b98fa19a500c6eded70bf66286a4c48622f441ac47d7f100acb24e737b58",
+      "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+      "recorded_at": "2026-10-26T13:04:03.005Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+      "recorded_at": "2026-10-26T13:04:03.005Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:8889ce4c59526613a3c1e5351b2f2b5fba836a94c5a4bf6236e506c4a018dc51",
+      "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+      "recorded_at": "2026-10-26T13:04:03.005Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:0f4df5103b875989e35c140430876e0ad9812426dc8ffc0e54987e9bfa38a664",
+      "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+      "recorded_at": "2026-10-26T13:04:03.005Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0011",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:8889ce4c59526613a3c1e5351b2f2b5fba836a94c5a4bf6236e506c4a018dc51",
+      "tree": "sha256:10395950ee48c6d1498dcba8c071751e0207f95151bae8a891c4a79e1fab10ca",
+      "recorded_at": "2026-10-26T13:04:03.005Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:7ea56b916a822907a22ad37a0d09dd4d6b1d2563e5951d298465b2858b723031",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "67ab9220816dda439c92ef0b256869112ddf7c81",
+          "candidate_tree": "8bbb6aed7f24f2bdaca981ba0cdfbaa9024326d1",
+          "paths": [
+            ".github/workflows/ci.yml",
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "scripts/fitness.mjs",
+            "scripts/lib/build-routes.mjs",
+            "src/server/edge.ts",
+            "src/worker.ts",
+            "tests/e2e/security.spec.ts",
+            "tests/unit/build-routes.test.ts",
+            "tests/unit/edge.test.ts",
+            "tests/unit/headers.test.ts",
+            "wrangler.jsonc"
+          ],
+          "diff_hash": "sha256:06a75657ad2b6771216a088d1b76ff507e5fa34d45fe74c496180938f3403ef2",
+          "paths_digest": "sha256:8cfc1c48eff8892e3cd605e81dc6975d27439794bf9bfd599403b62b15b2f22c",
+          "authored_lines": 248,
+          "original_changed_lines": 271
+        },
+        "candidate_id": "sha256:f62dcbafef553ed22cd0aece9d0856c545f6cfb188c51961c6a31aed86eb7adf",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "scripts/fitness.mjs",
+          "scripts/lib/build-routes.mjs",
+          "src/server/edge.ts",
+          "src/worker.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/build-routes.test.ts",
+          "tests/unit/edge.test.ts",
+          "tests/unit/headers.test.ts",
+          "wrangler.jsonc"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "8bbb6aed7f24f2bdaca981ba0cdfbaa9024326d1",
+        "original_changed_lines": 271,
+        "authored_lines": 248
+      },
+      "current_candidate_id": "sha256:f62dcbafef553ed22cd0aece9d0856c545f6cfb188c51961c6a31aed86eb7adf",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "67ab9220816dda439c92ef0b256869112ddf7c81",
+        "candidate_tree": "8bbb6aed7f24f2bdaca981ba0cdfbaa9024326d1",
+        "paths": [
+          ".github/workflows/ci.yml",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "scripts/fitness.mjs",
+          "scripts/lib/build-routes.mjs",
+          "src/server/edge.ts",
+          "src/worker.ts",
+          "tests/e2e/security.spec.ts",
+          "tests/unit/build-routes.test.ts",
+          "tests/unit/edge.test.ts",
+          "tests/unit/headers.test.ts",
+          "wrangler.jsonc"
+        ],
+        "diff_hash": "sha256:06a75657ad2b6771216a088d1b76ff507e5fa34d45fe74c496180938f3403ef2",
+        "paths_digest": "sha256:8cfc1c48eff8892e3cd605e81dc6975d27439794bf9bfd599403b62b15b2f22c",
+        "authored_lines": 248,
+        "original_changed_lines": 271
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "worker-headers:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "worker-headers:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 136,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "assumptions": [
+    "Las respuestas propias del Worker sin CSP (JSON, cuerpos vacíos y redirecciones; ninguna es una página) llevan una CSP que lo bloquea todo: default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'. Las de los assets, la 404 incluida, conservan la CSP de páginas de _headers.",
+    "En astro dev el Worker propio no hace nada: dev renderiza todas las páginas en el Worker, sin CSP, y sirve los <Picture> por /_image.",
+    "La fitness on-demand-routes lee las rutas del build, así que en el CI pasa del job quality al job lighthouse, que ya construye y corre las otras dos fitness de después del build."
+  ],
+  "closed_at": "2026-10-26T13:09:32.826Z"
+}
