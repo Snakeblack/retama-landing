@@ -92,7 +92,7 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
 ## M6 — Operación y lanzamiento
 
 - `observability` (hecho): Workers Logs y Traces al 100 %, con los fallos del contacto (`unavailable`, `delivery`) en
-  severidad de error, y UptimeRobot gratis cada 5 minutos sobre `/`, `/en/` y `GET /api/contact/`, que responde 200
+  severidad de error, y UptimeRobot gratis cada 5 minutos sobre `/`, `/en/` y `HEAD /api/contact/`, que responde 200
   con los secretos y el binding o 503 si falta alguno. Los avisos van por email a la cuenta, sin página de estado.
 - `client-errors` (hecho): endpoint propio `POST /api/report/` (ADR 0011, que amplía el 0002) que registra en Workers
   Logs, con severidad `warn` y sin datos personales, los errores de JavaScript de las páginas (`sendBeacon`, como mucho 5
