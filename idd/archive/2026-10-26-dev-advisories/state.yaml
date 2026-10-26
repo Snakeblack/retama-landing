@@ -1,0 +1,383 @@
+{
+  "schema": "idd-state/v1",
+  "change": "dev-advisories",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "Two moderate Dependabot alerts stay open on development dependencies with a patch: fflate 0.7.3 (GHSA-px8p-9vwx-vf98, fixed in 0.7.5), pinned exactly by satori even in its latest release, and uuid 8.3.2 (GHSA-w5hq-g745-h8pq, fixed in 11.1.1), required by @lhci/cli 0.15.1, its latest release",
+    "acceptance": "pnpm overrides resolve fflate 0.7 to ^0.7.5 and uuid 8 to ^11.1.1; pnpm audit --audit-level moderate reports only the 3 ignored highs; a unit test keeps those versions out of the lockfile; the build still renders the OG images with satori and Lighthouse CI still collects; Dependabot alerts #1 and #3 close after the merge"
+  },
+  "facts": {
+    "basis": "pnpm-workspace.yaml already overrides the vulnerable transitive versions that @lhci/cli pins and keeps auditConfig.ignoreGhsas for advisories without a patched release; the hand-off of 2026-10-26 asks for an override when it fits. fflate 0.7.5 is a patch release; @lhci/cli only calls require('uuid').v4() (src/collect/node-runner.js:11 and 65), which uuid 11 keeps in its CommonJS build"
+  },
+  "plan": {
+    "paths": [
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "tests/unit/dependency-alerts.test.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0009",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": "conforms",
+      "reason": "The dependency gate of the pull requests and the scheduled audit keep pnpm audit --audit-level high and the same ignored advisories; the change only resolves two moderate development advisories that have a patch, through overrides, as pnpm-workspace.yaml already does for @lhci/cli"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1",
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-26T16:20:56.630Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T16:21:54.475Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:cb0ec022e39017a2a38d7c8ed6c3b04017e763d0100eb81550ad7ec41c220f33",
+        "fitness": [
+          "run-8"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T16:23:25.497Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:fac1031479aab80487158ff60e9cfe4af34d8898c3b2224f2091b0bb36d9ce68",
+        "fitness": [
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-26T16:23:51.883Z",
+      "detail": {
+        "red": "run-15",
+        "green": "run-16"
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T16:24:46.106Z",
+      "detail": {
+        "tree": "sha256:e2c5aa3af7848acadcaee495e678be7e41decbadb8d16b2c8ab6dda6c10d60ea",
+        "runs": [
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20",
+          "run-21"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T16:24:46.106Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:e2c5aa3af7848acadcaee495e678be7e41decbadb8d16b2c8ab6dda6c10d60ea",
+        "fitness": [
+          "run-22"
+        ]
+      }
+    }
+  ],
+  "base": "9acdcbd67208da9ca1c55ac512464787d5aca190",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec vitest run tests/unit/dependency-alerts.test.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:09590fcc273da1ac87ff54d2a22f9a7efd3b0bfa22ce2b6a5159a25038f9f536",
+      "tree": "sha256:467abb125ad41bb5f29faf2d1e43db11e9f1d92a3991c704995a7bd5b48013a1",
+      "recorded_at": "2026-10-26T16:20:27.428Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm exec vitest run tests/unit/dependency-alerts.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:a1ea2f3c07d3cf1a84d459eb3e0fd5dd69bcf73ba22a7dc7d62aade754809992",
+      "tree": "sha256:8526b8284779c6dbb96229c3d4c6ba8a5a740e8408c4b624388f356573b7a819",
+      "recorded_at": "2026-10-26T16:20:56.630Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:d0d26928db8b139d3c2522e71c9fbe4a236ca89f24f7c42d5af298ff238ba569",
+      "tree": "sha256:cb0ec022e39017a2a38d7c8ed6c3b04017e763d0100eb81550ad7ec41c220f33",
+      "recorded_at": "2026-10-26T16:21:54.475Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 1,
+      "output_sha256": "sha256:f5c561c82cae70aff0c52034006c48aab02f3388e352314cd43f8f879995dbed",
+      "tree": "sha256:cb0ec022e39017a2a38d7c8ed6c3b04017e763d0100eb81550ad7ec41c220f33",
+      "recorded_at": "2026-10-26T16:21:54.475Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:38e0dc3eb8dda2e135c2a787e68d535c1d6092347e0ea0fa31ba04d2d57e5ae0",
+      "tree": "sha256:cb0ec022e39017a2a38d7c8ed6c3b04017e763d0100eb81550ad7ec41c220f33",
+      "recorded_at": "2026-10-26T16:21:54.475Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:fb9c9e4306665348e1effe80458363e8d5d0accc6d267e9612f279d4135ca187",
+      "tree": "sha256:cb0ec022e39017a2a38d7c8ed6c3b04017e763d0100eb81550ad7ec41c220f33",
+      "recorded_at": "2026-10-26T16:21:54.475Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:cb0ec022e39017a2a38d7c8ed6c3b04017e763d0100eb81550ad7ec41c220f33",
+      "recorded_at": "2026-10-26T16:21:54.475Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:cb0ec022e39017a2a38d7c8ed6c3b04017e763d0100eb81550ad7ec41c220f33",
+      "recorded_at": "2026-10-26T16:21:54.475Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:d0d26928db8b139d3c2522e71c9fbe4a236ca89f24f7c42d5af298ff238ba569",
+      "tree": "sha256:fac1031479aab80487158ff60e9cfe4af34d8898c3b2224f2091b0bb36d9ce68",
+      "recorded_at": "2026-10-26T16:23:25.497Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 1,
+      "output_sha256": "sha256:1acf67cf330c134e9590cc6d8182f481dfbcc1bb27a476dfcfb40d383f88b72a",
+      "tree": "sha256:fac1031479aab80487158ff60e9cfe4af34d8898c3b2224f2091b0bb36d9ce68",
+      "recorded_at": "2026-10-26T16:23:25.497Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:30daeeb8285006563c7f0d9dae3d2e10e8792d0ac42aff69d4edc73fe254fe57",
+      "tree": "sha256:fac1031479aab80487158ff60e9cfe4af34d8898c3b2224f2091b0bb36d9ce68",
+      "recorded_at": "2026-10-26T16:23:25.497Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:97899bd07116a4dd420f18d364cf7aec05d06bee9c06eaebc5ca0bcf37883e9f",
+      "tree": "sha256:fac1031479aab80487158ff60e9cfe4af34d8898c3b2224f2091b0bb36d9ce68",
+      "recorded_at": "2026-10-26T16:23:25.497Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:fac1031479aab80487158ff60e9cfe4af34d8898c3b2224f2091b0bb36d9ce68",
+      "recorded_at": "2026-10-26T16:23:25.497Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:fac1031479aab80487158ff60e9cfe4af34d8898c3b2224f2091b0bb36d9ce68",
+      "recorded_at": "2026-10-26T16:23:25.497Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "repro-test",
+      "command": "./node_modules/.bin/vitest run tests/unit/dependency-alerts.test.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:fe9cfb330d8e0d845a32f10a24bd70160daea08d59c81aee40a6c83a93cfe6b6",
+      "tree": "sha256:d2cfebb576b04bc0a5260a5910b0d13a120a814348607211e5abe445435f1495",
+      "recorded_at": "2026-10-26T16:23:51.597Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "repro-test",
+      "command": "./node_modules/.bin/vitest run tests/unit/dependency-alerts.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:3cce6e6211cfaba8c5c9cbc96956b8cdda5d3b192cdc4022dd0ce8312c082a28",
+      "tree": "sha256:69fa55042c8c6ce91506ae38b3d47069f7142fc9264bcb8d9bf6803f026e7aa8",
+      "recorded_at": "2026-10-26T16:23:51.883Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:19b63c9763b6c7dcea2b0c87c863d6a87bdc23ec488e740d2df8a2411b1e1e4a",
+      "tree": "sha256:e2c5aa3af7848acadcaee495e678be7e41decbadb8d16b2c8ab6dda6c10d60ea",
+      "recorded_at": "2026-10-26T16:24:46.106Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:bae441a1320922a48a824fc1162fcf91c0add5dcb14bd0fdcd58105c556f6add",
+      "tree": "sha256:e2c5aa3af7848acadcaee495e678be7e41decbadb8d16b2c8ab6dda6c10d60ea",
+      "recorded_at": "2026-10-26T16:24:46.106Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:1dc0f99d4625e796cf43ea410ab002b4a7bd27ef4862d96d82ec72d46d7aadee",
+      "tree": "sha256:e2c5aa3af7848acadcaee495e678be7e41decbadb8d16b2c8ab6dda6c10d60ea",
+      "recorded_at": "2026-10-26T16:24:46.106Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:36a17a3afaa6e1ea901e768198f83277df0e0e60342bf3b7fdfd8a21eb6f38c9",
+      "tree": "sha256:e2c5aa3af7848acadcaee495e678be7e41decbadb8d16b2c8ab6dda6c10d60ea",
+      "recorded_at": "2026-10-26T16:24:46.106Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:e2c5aa3af7848acadcaee495e678be7e41decbadb8d16b2c8ab6dda6c10d60ea",
+      "recorded_at": "2026-10-26T16:24:46.106Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:e2c5aa3af7848acadcaee495e678be7e41decbadb8d16b2c8ab6dda6c10d60ea",
+      "recorded_at": "2026-10-26T16:24:46.106Z"
+    }
+  ],
+  "closed_at": "2026-10-26T16:25:05.706Z"
+}
