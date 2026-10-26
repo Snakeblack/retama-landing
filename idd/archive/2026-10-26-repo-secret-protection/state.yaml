@@ -1,0 +1,183 @@
+{
+  "schema": "idd-state/v1",
+  "change": "repo-secret-protection",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "docs",
+    "summary": "Apartado M7 del roadmap con los hallazgos de la auditoría OWASP Top 10:2025 ordenados por prioridad, y su primer change: secret scanning, push protection, alertas de Dependabot y SHA obligatorio en Actions en el repositorio público",
+    "acceptance": "docs/roadmap.md tiene la sección M7 con los changes de la auditoría en orden de prioridad y los riesgos aceptados, y repo-secret-protection marcado hecho; gh api muestra secret scanning y push protection en enabled, las alertas de Dependabot activas (vulnerability-alerts 204) y sha_pinning_required en true, y el CI sigue en verde"
+  },
+  "facts": {
+    "open": [
+      "Dependabot: ¿solo alertas, o también PRs automáticos de seguridad (security updates)?",
+      "Secret scanning: ¿solo los patrones de proveedores, o también los genéricos (non-provider patterns) si GitHub los da gratis en un repo público?",
+      "Repo público: ¿el roadmap da una línea por hallazgo con severidad y remedio sin pasos de reproducción, o se publica un informe completo con evidencias en docs/security/?",
+      "¿Aplico yo los ajustes de GitHub con gh api (reversibles, con el antes y el después), o los haces tú a mano con una guía?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "docs/roadmap.md"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0009 and quality scenario privacy-security",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": "conforms",
+      "reason": "main sigue cambiando solo por PR con los mismos checks obligatorios; exigir SHA completo en Actions y las alertas de Dependabot refuerzan las puertas sin cambiarlas"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "Añade protección de secretos y avisos de dependencias en el repositorio público; no cambia la CSP, las cabeceras ni el rastreo"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Dependabot: solo alertas. Secret scanning: solo patrones de proveedores. Detalle: una línea por hallazgo en el roadmap, sin pasos de reproducción. Aplicar: yo (el agente) con gh api, mostrando antes y después.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T09:59:23.931Z",
+      "detail": {
+        "tree": "sha256:ac671af57b3b663b45c47c52d584b3fa01e2783de1f55079d60f677f4d1f752b",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T09:59:23.931Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [],
+        "tree": "sha256:ac671af57b3b663b45c47c52d584b3fa01e2783de1f55079d60f677f4d1f752b",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    }
+  ],
+  "base": "5e250711d6e0942183522e23d133bf62c5ff7852",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:ee3f71277304aa28b2d486a963c5d75bafc6fb4fe53ab5372ca2d4f40eda1858",
+      "tree": "sha256:ac671af57b3b663b45c47c52d584b3fa01e2783de1f55079d60f677f4d1f752b",
+      "recorded_at": "2026-10-26T09:59:23.931Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:0ad00205c08efcccb17a2df249c0ec33e0e46ead1554ed4b481a7c61ab0216c3",
+      "tree": "sha256:ac671af57b3b663b45c47c52d584b3fa01e2783de1f55079d60f677f4d1f752b",
+      "recorded_at": "2026-10-26T09:59:23.931Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:3db08b8fb47246b126f4a42895aa6704bb132d06bbbd29779fdc011e5d6044eb",
+      "tree": "sha256:ac671af57b3b663b45c47c52d584b3fa01e2783de1f55079d60f677f4d1f752b",
+      "recorded_at": "2026-10-26T09:59:23.931Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:5b5dee93abcb88fda4374d7d572f494d3c74a8523dd00135b35775d07f64fff0",
+      "tree": "sha256:ac671af57b3b663b45c47c52d584b3fa01e2783de1f55079d60f677f4d1f752b",
+      "recorded_at": "2026-10-26T09:59:23.931Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:ac671af57b3b663b45c47c52d584b3fa01e2783de1f55079d60f677f4d1f752b",
+      "recorded_at": "2026-10-26T09:59:23.931Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:ac671af57b3b663b45c47c52d584b3fa01e2783de1f55079d60f677f4d1f752b",
+      "recorded_at": "2026-10-26T09:59:23.931Z"
+    }
+  ],
+  "assumptions": [
+    "Orden de M7 por severidad y luego esfuerzo, con los pequeños agrupados: 1 repo-secret-protection, 2 worker-headers, 3 zone-hardening, 4 worker-quota, 5 dmarc-enforce (este, tras semanas de informes DMARC); el usuario delegó el orden y la agrupación",
+    "Sin fitness nueva para estos ajustes de GitHub: se verifican con gh api al aplicarlos y la evidencia queda en change.md",
+    "Ajustes aplicados con gh api el 2026-10-26 (antes: secret scanning y push protection disabled, vulnerability-alerts 404, sha_pinning_required false; después: enabled, enabled, 204, true). El dependency graph aún da 0 dependencias en pnpm-lock.yaml: tras fusionar en main hay que ver que Dependabot lista los avisos que pnpm audit conoce; si no, el lockfile de pnpm 12 no está cubierto y hace falta un pnpm audit programado en CI"
+  ],
+  "closed_at": "2026-10-26T09:59:46.328Z"
+}

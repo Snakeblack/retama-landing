@@ -105,6 +105,40 @@ Cada hito es una o más changes de IDD que llegan por PR a `main` con todas las 
   gestionado y el bloqueo de bots de IA se dejan apagados, para que no contradigan el robots.txt del sitio.
 - Checklist de lanzamiento, con el NIF y el domicilio en el aviso legal (`PUBLIC_LEGAL_NIF`, `PUBLIC_LEGAL_ADDRESS`; art. 10 de la LSSI) y los textos legales revisados por un gestor.
 
+## M7 — Seguridad: auditoría OWASP Top 10:2025
+
+**Objetivo:** cerrar los hallazgos de la auditoría del 2026-10-26 (código, build, producción, repositorio y zona) por
+orden de prioridad: primero la severidad y, a igualdad, el esfuerzo. Ninguno es una vulnerabilidad explotable; son
+ajustes de configuración y defensa en profundidad.
+
+**Entra (un change por PR, encadenados):**
+1. `repo-secret-protection` (hecho; media, A03 y A08): en el repositorio público, secret scanning con los patrones de
+   proveedores y push protection; alertas de Dependabot, sin PRs automáticos, que avisan de un aviso nuevo aunque no
+   haya push (el `pnpm audit` del CI solo mira en cada PR), y Actions con SHA completo obligatorio, que los dos workflows
+   ya cumplían.
+2. `worker-headers` (media, A02): el adaptador de Cloudflare añade al Worker rutas propias (`/_image/`,
+   `/_server-islands/`) que no están en la lista de los ADR 0002 y 0011, y sus respuestas no llevan las cabeceras de
+   `public/_headers`, que solo cubren los assets. Lleva cabeceras de seguridad en toda respuesta del Worker, la retirada
+   de las rutas del adaptador que el sitio no usa y la fitness `on-demand-routes` sobre las rutas del build, no solo
+   sobre `src/pages`.
+3. `zone-hardening` (baja, A04 y A02): en la zona, *Always Use HTTPS*, para que `http://` redirija también fuera de los
+   navegadores (estos ya van a HTTPS por el preload de `.dev`), y DMARC con informes `rua` como primer paso; CAA
+   opcional.
+4. `worker-quota` (baja, A06): las peticiones que no son una navegación ni coinciden con un asset invocan el Worker y
+   gastan la cuota diaria del plan gratuito, y la regla del WAF solo cubre `/api/report/`. Se decide entre aceptarlo por
+   escrito en un ADR que amplíe el 0011, Workers Paid o ampliar la regla.
+5. `dmarc-enforce` (baja, A02): tras dos a cuatro semanas de informes sin fallos legítimos, DMARC de `p=none` a
+   `p=quarantine`.
+
+**Riesgos aceptados:**
+- `/api/report/` registra un mensaje corto de quien falsifique el `Origin`: sin datos personales, con el JSON intacto y
+  con su límite por IP (ADR 0011).
+- Turnstile y el beacon de Web Analytics se cargan sin SRI: Cloudflare exige cargar `api.js` desde su URL, sin copiarlo
+  ni fijarlo, porque lo actualiza, y los dos scripts son del mismo proveedor que el hosting.
+
+**Hecho cuando:** los cinco changes están en `main` y una nueva pasada de la auditoría no da hallazgos de severidad
+media.
+
 ## v2 (aplazado)
 
 - Heatmaps, grabaciones y funnels con **PostHog EU** tras consentimiento, con CMP ligero (ADR 0007).
