@@ -40,18 +40,20 @@ export const en = {
   "manifesto.line2": "That is what holds our software up: written decisions.",
 
   "services.title": "What we build",
+  "services.note":
+    "Starting prices, excluding VAT, and indicative timelines: the final price and timeline are set in the proposal.",
   "services.web": "Websites and CMS",
-  "services.webLine": "Fast websites your team edits on its own.",
-  "services.webFrom": "From €1,500 + VAT",
+  "services.webLine": "Fast websites, from a landing page to a site your team edits on its own.",
+  "services.webFrom": "From €1,500 + VAT · 1 to 4 weeks",
   "services.custom": "Custom software",
   "services.customLine": "On the web or the desktop, for when Excel gives out.",
-  "services.customFrom": "From €8,000 + VAT",
+  "services.customFrom": "From €8,000 + VAT · 4 to 10 weeks",
   "services.agents": "Agents and automation",
   "services.agentsLine": "They take the repetitive work and leave the decisions to people.",
-  "services.agentsFrom": "From €4,000 + VAT, plus a monthly fee",
+  "services.agentsFrom": "From €4,000 + VAT and a fee from €150 a month · 1 to 3 weeks",
   "services.seo": "SEO and analytics",
   "services.seoLine": "Get found, and know what works without tracking cookies.",
-  "services.seoFrom": "From €800 + VAT",
+  "services.seoFrom": "From €800 + VAT · no monthly fee",
   "services.figure": "1",
   "services.figureCaption": "person to talk to, from the first call to delivery.",
 
@@ -124,7 +126,7 @@ export const en = {
   "sectors.item3Build3": "A link to your ERP, your scales and your label printers, without changing systems.",
   "sectors.item4": "Others",
   "sectors.item4Problem":
-    "Agencies that need a technical team without putting its name on the work, and startups that have to ship on time.",
+    "Agencies that need a technical team working under their brand, and startups that have to ship on time.",
   "sectors.item4Build1": "White-label development for agencies.",
   "sectors.item4Build2": "One product for several brands.",
   "sectors.item4Build3": "MVPs and product work for startups, from idea to launch.",
@@ -135,21 +137,21 @@ export const en = {
   "method.lead": "We decide with you before we build, and it all goes in writing.",
   "method.d1": "We decide in writing.",
   "method.d1Reason": "What we chose, why and what we turned down, in a document that is yours.",
-  "method.d2": "Options with their cost.",
+  "method.d2": "Options with their cost and their savings.",
   "method.d2Reason": "Compared alternatives, in plain words, so you make the call.",
   "method.d3": "Quality you can check.",
   "method.d3Reason": "Every delivery is reviewed and tested before it reaches you.",
-  "method.d4": "Fully remote.",
-  "method.d4Reason": "Short meetings and progress you open in your browser.",
+  "method.d4": "Fully remote, but close when you need us.",
+  "method.d4Reason": "Short meetings and progress you open in your browser; if something cannot wait, you call us.",
 
   "live.title": "What are you working on?",
   "live.lead": "Pick your project and read the first things we would decide with you.",
   "live.sheet": "Decisions",
   "live.web": "A website",
   "live.web.d1": "Fast even on a poor connection.",
-  "live.web.r1": "We load only what is needed, and that speed also lifts you on Google.",
+  "live.web.r1": "We load only what is needed, and Google takes that speed into account too.",
   "live.web.d2": "Your team changes the text without calling us.",
-  "live.web.r2": "With a content editor only if someone will use it every week.",
+  "live.web.r2": "With a content management system only if someone will use it every week.",
   "live.web.d3": "If a release makes it slower, it does not ship.",
   "live.web.r3": "Speed is measured on every change, before you see it.",
   "live.custom": "Custom",
@@ -160,8 +162,8 @@ export const en = {
   "live.custom.d3": "Every link to other systems, with its plan B.",
   "live.custom.r3": "We know what happens when a provider goes down, before it does.",
   "live.desktop": "Desktop",
-  "live.desktop.d1": "The technology is chosen by whoever will maintain it.",
-  "live.desktop.r1": "We decide with the team that will look after it later in mind.",
+  "live.desktop.d1": "The technology, chosen for whoever will maintain it.",
+  "live.desktop.r1": "We pick something your team, or whoever comes next, can look after without rebuilding it.",
   "live.desktop.d2": "Safe updates from day one.",
   "live.desktop.r2": "Every version arrives signed, so nobody can pass for you.",
   "live.desktop.d3": "Works offline when your job demands it.",
@@ -181,17 +183,17 @@ export const en = {
     "Full stack, from the first line to production. Has built products from scratch across very different fields, and shapes the architecture for the years it has to last.",
   "team.paulRole": "Clients and sales",
   "team.paulLine":
-    "Years in logistics and sales, by the client's side. Knows how the work gets done in the warehouse, on the route and in sales, and is with you from the first call to delivery.",
+    "Over ten years in logistics solving problems by the client's side: an order that does not arrive, a route that changes at the last minute. With you from the first call to delivery.",
   "team.linkedin": "LinkedIn",
 
-  "faq.title": "What clients ask us",
+  "faq.title": "Common questions",
   "faq.lead": "If your question is not here, write to us: we reply within one working day.",
   "faq.q1": "How long does a project take?",
   "faq.a1":
-    "As a rule: a landing page, one to two weeks; a website with a content manager, two to four; an automation or an agent, one to three; the MVP of a web application, four to eight, and a desktop application, six to ten. The proposal sets the timeline in writing, you get a delivery every one or two weeks, and the schedule counts on you sending the texts, the access and your review on time.",
+    "As a rule: a diagnosis or a landing page, one to two weeks; a website with a CMS, two to four; an automation or an agent, one to three; the MVP of a web application, four to eight, and a desktop application, six to ten. The proposal sets the timeline in writing, you get a delivery every one or two weeks, and the schedule counts on you sending the texts, the access and your review on time.",
   "faq.q2": "How is it priced?",
   "faq.a2":
-    "At a fixed price, never by the hour. The minimums, excluding VAT: a landing page, €1,500; a website with a content manager, €3,500; SEO and analytics, €800; an automation or an agent, €4,000 plus a monthly fee; custom software, €8,000, and a desktop application, €10,000. Custom software and automation start with a fixed-price diagnosis, from €900: you get the decision document, the fixed quote and a prototype of the key screen, and it is deducted if we carry on. Then you can go in phases, with a first MVP that grows in short cycles, or fix the whole scope from the start.",
+    "Projects at a fixed price, never by the hour. Excluding VAT: a landing page, from €1,500; a website with a CMS, from €3,500; one-off SEO and analytics, from €800; an automation or an agent, from €4,000 plus a monthly fee from €150; custom software, from €8,000, and a desktop application, from €10,000. The final price of each project is set in writing in its proposal. For a website, the proposal is free. Custom software and automation start with a fixed-price diagnosis, from €900: you get the decision document, the fixed quote and a prototype of the key screen, and it is deducted if we carry on. Then you can go in phases, with a first MVP that grows in short cycles, or fix the whole scope from the start.",
   "faq.q3": "What is working remotely like?",
   "faq.a3":
     "We talk in short calls, with or without video, and what matters is written down. Every one or two weeks you get a delivery you open in your browser, with what we have decided and what comes next.",
@@ -200,10 +202,10 @@ export const en = {
     "You do, once it is paid in full: the code, the documentation and the written decisions of your project. The generic pieces we reuse from one project to the next stay ours, but you can use them forever at no extra cost. So you can carry on with us or with anyone you like.",
   "faq.q5": "What warranty do I get?",
   "faq.a5":
-    "For the first two weeks after you start using it we stay close, because that is when almost everything shows up. Then three months of warranty from that same day, during which we fix at no cost the faults in what we have built against what the proposal agreed. Changes, new features and what other providers' changes break are quoted separately.",
+    "For the first two weeks after you start using it we stay close, because that is when almost everything shows up. Then three months of warranty from that same day, once the project is paid, during which we fix at no cost the faults in what we have built against what the proposal agreed. Changes, new features and what other providers' changes break are quoted separately.",
   "faq.q6": "And after delivery?",
   "faq.a6":
-    "You can take out an optional monthly maintenance plan: from €120 a month for a website and from €250 for custom software, excluding VAT. While you have it, the warranty stays in force. Without maintenance, we handle what you need on request, at €90 an hour plus VAT.",
+    "You can take out an optional monthly maintenance plan, for three months at least: from €120 a month for a website and from €250 for custom software, excluding VAT. While you have it, the warranty stays in force. Without maintenance, we handle what you need on request, at €90 an hour plus VAT.",
 
   "contact.title": "Let's talk",
   "contact.lead": "Write to us with whatever you have, even a half-formed idea. We reply with specific questions.",
@@ -221,7 +223,7 @@ export const en = {
   "form.honeypot": "Leave this field empty",
   "form.privacyOwner": "Controller:",
   "form.privacy":
-    "We only use this to reply to you, because you ask us to, and we share it with no one. You can see it, correct it or have it deleted.",
+    "We only use this to reply to you, because you ask us to, and we do not pass it on to anyone else. You can see it, correct it or have it deleted.",
   "form.privacyLink": "Privacy policy",
   "form.submit": "Send",
   "form.sending": "Sending…",
@@ -246,7 +248,7 @@ export const en = {
   "contact.step2Rest": "to go over what does not fit in an email.",
   "contact.step3": "A written proposal,",
   "contact.step3Rest":
-    "with the options, what each one costs and what we would rule out. For custom software and agents, it comes out of a fixed-price diagnosis, from €900 + VAT, deducted if we carry on.",
+    "with the options, what each one costs, what it saves you and what we would rule out. For a website it is free; for custom software and automation, it comes out of a fixed-price diagnosis, from €900 + VAT, deducted if we carry on.",
 
   "footer.top": "Back to top",
   "footer.legalLabel": "Legal information",
@@ -259,7 +261,7 @@ export const en = {
     "Retama's legal notice, privacy policy and cookie policy: who is behind it, what happens to your data and what the website keeps in your browser.",
   "legal.title": "Legal information",
   "legal.lead": "Who is behind Retama, what we do with your data and what this website keeps in your browser.",
-  "legal.updated": "Updated on 24 October 2026.",
+  "legal.updated": "Updated on 26 October 2026.",
 
   "legal.notice.title": "Legal notice",
   "legal.notice.lead":
@@ -299,7 +301,7 @@ export const en = {
     "While your enquiry lasts. If it does not lead to a project, we delete the message within 12 months at most; if it does, we keep what the law requires us to keep.",
   "legal.privacy.recipients": "Who else handles it.",
   "legal.privacy.recipientsText":
-    "Only the providers that help us do this, as processors: Cloudflare (hosts the website, counts visits, checks that you are a person and forwards the email), Resend (sends your message, from its EU region), Google (the Gmail inbox it lands in) and, if you book, Cal.com. We do not sell or share your data.",
+    "Only the providers that help us do this, as processors: Cloudflare (hosts the website, counts visits, checks that you are a person and forwards the email), Resend (sends your message, from its EU region), Google (the Gmail inbox it lands in) and, if you book, Cal.com. We do not sell your data or pass it on to third parties.",
   "legal.privacy.transfers": "Outside the EU.",
   "legal.privacy.transfersText":
     "These providers are US companies. Their contracts cover the transfer with the European Commission's standard contractual clauses or the EU-US Data Privacy Framework, as the case may be.",

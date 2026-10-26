@@ -28,7 +28,7 @@ Va en tu idioma y en lenguaje llano, porque está pensado para que lo leas tú, 
 
 ## Por qué es tuya
 
-Al pagar, el código pasa a ser tuyo, y la documentación y estas decisiones también. Es lo que te permite seguir con nosotros porque quieres, y no porque nadie más entienda tu sistema.
+Al pagarlo entero, el código de tu proyecto pasa a ser tuyo, y la documentación y estas decisiones también. Es lo que te permite seguir con nosotros porque quieres, y no porque nadie más entienda tu sistema.
 
 ## Cómo se ve en la práctica
 

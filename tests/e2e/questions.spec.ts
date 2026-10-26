@@ -16,7 +16,7 @@ const pages = [
     anchor: "questions",
     before: "about-us",
     after: "contact",
-    title: "What clients ask us",
+    title: "Common questions",
     first: "How long does a project take?",
     second: "How is it priced?",
     owner: "Who owns the code?",

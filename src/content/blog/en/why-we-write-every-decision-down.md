@@ -28,7 +28,7 @@ It is in your language and in plain words, because it is meant for you to read, 
 
 ## Why it is yours
 
-Once paid for, the code is yours, and so are the documentation and these decisions. That is what lets you stay with us because you want to, not because nobody else understands your system.
+Once it is paid in full, your project's code is yours, and so are the documentation and these decisions. That is what lets you stay with us because you want to, not because nobody else understands your system.
 
 ## What it looks like in practice
 

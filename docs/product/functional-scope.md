@@ -26,10 +26,10 @@
 | Sección o capacidad | Contenido |
 | --- | --- |
 | Hero | Escena 3D progresiva, titular, una acción principal |
-| Servicios | Web y CMS, software a medida, escritorio, agentes y automatización, SEO y analítica, cada uno con su precio «desde» |
+| Servicios | Web y CMS, software a medida, escritorio, agentes y automatización, SEO y analítica, cada uno con su precio «desde» y su plazo orientativo, tras una frase que lo deja claro |
 | Sectores | Logística, empresa, hortofrutícola, otros |
-| Método | ADRs y documentación, comunicación para decidir, garantías, 100 % online |
-| Quiénes somos | Los dos socios: nombre, función, una frase, retrato (sus iniciales hasta tener la foto) y su perfil público si lo tiene |
+| Método | ADRs y documentación, comunicación para decidir con el coste y el ahorro de cada opción, garantías, 100 % en remoto pero cerca |
+| Quiénes somos | Los dos socios, primero el que atiende al cliente: nombre, función, una frase, retrato (sus iniciales hasta tener la foto) y su perfil público si lo tiene |
 | FAQ | Plazos, presupuesto con sus mínimos y el diagnóstico, trabajo remoto, propiedad del código, garantía, mantenimiento |
 | Contacto | Formulario, reserva, email, WhatsApp |
 | Blog | Artículos en es y en |
