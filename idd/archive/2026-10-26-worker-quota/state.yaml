@@ -1,0 +1,254 @@
+{
+  "schema": "idd-state/v1",
+  "change": "worker-quota",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "The Workers Free daily request limit (100,000/day per account, shared with retama-app) is undecided, and the contact form shows any 429, Cloudflare's included, as 'wait a minute' (M7 5/6)",
+    "acceptance": "A 429 without the function's rate-limited body shows the unavailable failure with mail and WhatsApp; ADR 0012, amending 0011, records the accepted daily limit, its impact (landing and retama-app), detection and review trigger; docs/roadmap.md marks worker-quota done"
+  },
+  "facts": {
+    "basis": "The user answered the four open facts on 2026-10-26: accept the risk in ADR 0012 amending 0011; review trigger whichever comes first of retama-app opening to clients or above 25 % of the limit for several days; a 429 without the function's body is unavailable; no WAF rule for scanner paths"
+  },
+  "plan": {
+    "paths": [
+      "docs/architecture/decisions/0012-workers-daily-request-limit.md",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "src/lib/contact-form.ts",
+      "tests/unit/contact-form.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0002, 0011 and quality scenario privacy-security",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "The Worker keeps exactly the two on-demand routes; the form change is client-side and the review trigger of 0002 (the platform stops meeting constraint:low-cost) is what ADR 0012 keeps by staying on Workers Free"
+    },
+    {
+      "kind": "adr",
+      "id": "0011",
+      "impact": "amends",
+      "reason": "0011 accepts that a few IPs exhaust the Workers Logs quota; 0012 extends that acceptance to the Workers Free daily request limit of the account (100,000/day, shared with retama-app), records its impact, detection and review trigger, and why the zone's single rate limiting rule cannot protect a global quota",
+      "record": "docs/architecture/decisions/0012-workers-daily-request-limit.md"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "The form still filters abuse server-side; a 429 without the API's body now offers mail and WhatsApp instead of waiting, and no new data is collected"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Medida: ADR que acepta el riesgo (ADR 0012 que amplía el 0011). Disparador: lo primero de los dos, retama-app abre a clientes reales o la cuenta supera 25.000 invocaciones diarias (25 % de la cuota) varios días seguidos. Formulario: sí, un 429 sin el JSON de la API se muestra como no disponible. Escáneres: no por ahora, sin regla personalizada del WAF.",
+      "source": "user"
+    },
+    {
+      "id": "adr-amend-or-contradict",
+      "status": "resolved",
+      "reason": "ADR 0011 amends: 0011 accepts that a few IPs exhaust the Workers Logs quota; 0012 extends that acceptance to the Workers Free daily request limit of the account (100,000/day, shared with retama-app), records its impact, detection and review trigger, and why the zone's single rate limiting rule cannot protect a global quota",
+      "answer": "El usuario eligió «ADR que acepta (Recomendado)», cuya opción decía: «ADR 0012 que amplía el 0011: deja escritos el riesgo, el impacto (la landing pierde el formulario, retama-app cae entera), cómo se detecta (el uptime de /api/contact/) y cuándo se revisa. Coste cero.»",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T15:59:17.539Z",
+      "detail": {
+        "tree": "sha256:27678f5cdb63b9e7ed2b1eaf66fe9948beabb467a6b02800540b52c94f14f516",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T15:59:17.539Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0011 amends",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [
+          "docs/architecture/decisions/0012-workers-daily-request-limit.md"
+        ],
+        "tree": "sha256:27678f5cdb63b9e7ed2b1eaf66fe9948beabb467a6b02800540b52c94f14f516",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-26T15:59:28.761Z",
+      "detail": {
+        "red": "run-7",
+        "green": "run-8"
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-26T15:59:42.886Z"
+    }
+  ],
+  "base": "f9a61cd0d07e3e65368c2babc22a4fd1b5ae01ab",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:7db71f569f25791f5a10588112e43d7e679362739e4241fdeb52d9126c5334a6",
+      "tree": "sha256:27678f5cdb63b9e7ed2b1eaf66fe9948beabb467a6b02800540b52c94f14f516",
+      "recorded_at": "2026-10-26T15:59:17.539Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:8132249c6fa4347435e98e00ed2fdd4b1541b26125e66b6d40cb687eb66521f6",
+      "tree": "sha256:27678f5cdb63b9e7ed2b1eaf66fe9948beabb467a6b02800540b52c94f14f516",
+      "recorded_at": "2026-10-26T15:59:17.539Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:9e7ee40b497f1694c6456eae3da857242832838999cbbbb97c7fc837cd69a1d9",
+      "tree": "sha256:27678f5cdb63b9e7ed2b1eaf66fe9948beabb467a6b02800540b52c94f14f516",
+      "recorded_at": "2026-10-26T15:59:17.539Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:7e927e04ff5e7b568d6603acac1ae331744e0b5c8f7a11f286875f7659ff643e",
+      "tree": "sha256:27678f5cdb63b9e7ed2b1eaf66fe9948beabb467a6b02800540b52c94f14f516",
+      "recorded_at": "2026-10-26T15:59:17.539Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:27678f5cdb63b9e7ed2b1eaf66fe9948beabb467a6b02800540b52c94f14f516",
+      "recorded_at": "2026-10-26T15:59:17.539Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:8889ce4c59526613a3c1e5351b2f2b5fba836a94c5a4bf6236e506c4a018dc51",
+      "tree": "sha256:27678f5cdb63b9e7ed2b1eaf66fe9948beabb467a6b02800540b52c94f14f516",
+      "recorded_at": "2026-10-26T15:59:17.539Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/contact-form.test.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:8ce0531eded3bb630c13bd30f96484eb43ddea2db9a7fdcdf3684dfde3d60ea4",
+      "tree": "sha256:801324b343721f8fa5f1a79b9bc5c19d9049171ea95f8a0d3b1e5f53544090fa",
+      "recorded_at": "2026-10-26T15:59:24.019Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "repro-test",
+      "command": "pnpm vitest run tests/unit/contact-form.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:d22a5be36d6e396166cd2248f8771aa3808b1b5157f4f386a3fea354ef0fabb6",
+      "tree": "sha256:31a7976815c2fbed16d2a8cb6dbfec7e60f1320631f627640659d0628fd1267f",
+      "recorded_at": "2026-10-26T15:59:28.761Z"
+    }
+  ],
+  "closed_at": "2026-10-26T15:59:42.886Z"
+}
