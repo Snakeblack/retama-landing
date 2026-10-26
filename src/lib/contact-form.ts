@@ -19,7 +19,9 @@ export function failureOf(status: number | null, body: unknown): Failure {
     if (fields.length > 0) return { kind: "invalid", fields };
   }
   if (status === 403 && error.error === "verification") return { kind: "verification", fields: [] };
-  if (status === 429) return { kind: "rate-limited", fields: [] };
+  // Only the function's own limit is worth a wait. A 429 without its body comes from Cloudflare, such as the daily
+  // request limit of Workers, which lasts until midnight UTC (ADR 0012).
+  if (status === 429 && error.error === "rate-limited") return { kind: "rate-limited", fields: [] };
   return { kind: "unavailable", fields: [] };
 }
 
