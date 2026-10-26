@@ -1,0 +1,673 @@
+{
+  "schema": "idd-state/v1",
+  "change": "dependency-alerts",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "Las alertas de Dependabot de repo-secret-protection no ven ninguna dependencia npm, porque pnpm 12 escribe el lockfile en dos documentos YAML y GitHub solo lee el primero (dependabot-core#15904), así que un aviso nuevo entre pushes no avisa a nadie. Un pnpm audit programado en CI cubre ese hueco con el mismo umbral e ignorados que la puerta de los PR, y la línea 1 de M7 se corrige",
+    "acceptance": "Un workflow programado a diario y lanzable a mano ejecuta pnpm audit --audit-level high sin instalar dependencias y falla ante un aviso alto nuevo; un test fija que el lockfile tenga un solo documento y que use el mismo comando de audit que el CI; docs/roadmap.md M7 describe la cobertura real; tras fusionar, el SBOM del dependency graph lista las dependencias npm del proyecto"
+  },
+  "facts": {
+    "open": [
+      "Además del audit programado, ¿restauro Dependabot para npm con pmOnFail: ignore y el lockfile en un solo documento? Coste: pnpm deja de imponer la versión 12.14.0 en local; el CI y Workers Builds siguen fijados por packageManager",
+      "Cuando el audit programado falle, ¿basta el email de GitHub del workflow fallido, o además abre o actualiza una issue?",
+      "Cuando Dependabot vea las dependencias, ¿descarto las 3 alertas altas que pnpm-workspace.yaml ya acepta (extract-zip y zod) con el mismo motivo, dejando abiertas las 2 moderadas de desarrollo?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/audit.yml",
+      "astro.config.mjs",
+      "docs/roadmap.md",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "scripts/lib/pnpm-pin.mjs",
+      "tests/unit/dependency-alerts.test.ts",
+      "tests/unit/pnpm-pin.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/audit.yml (matches .github/workflows/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0009 and quality scenario privacy-security",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs (matches astro.config.*)",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": "conforms",
+      "reason": "La puerta de los PR no cambia: el audit programado repite su mismo comando sobre main a diario, no es un check obligatorio y no despliega; pnpm sigue fijado por packageManager en el CI y en Workers Builds"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "Recupera los avisos de dependencias vulnerables entre pushes; no toca la CSP, las cabeceras ni el rastreo"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-8"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-9"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Sí, los dos: audit programado y restaurar Dependabot con pmOnFail: ignore y el lockfile en un documento. Aviso: el email de GitHub del workflow fallido. Descartar las 3 alertas altas ya aceptadas en pnpm-workspace.yaml con el mismo motivo; las 2 moderadas quedan abiertas.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-26T11:05:53.011Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T11:07:03.538Z",
+      "detail": {
+        "tree": "sha256:c72d0ab2204a066839bced334ff56532ac4113c932547080350a26decb3953d5",
+        "runs": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T11:07:03.538Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [],
+        "tree": "sha256:c72d0ab2204a066839bced334ff56532ac4113c932547080350a26decb3953d5",
+        "fitness": [
+          "run-8"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-26T11:10:01.440Z",
+      "detail": {
+        "lineage_id": "sha256:9ba5311ff824180be98065aa2ff5ef11b9561a64bf6369cf2914195486328d92",
+        "candidate_id": "sha256:a638e8dd5b7c196f95155d225c0149c4b0b0f2a71b9602d52093c32a21c1d536",
+        "candidate_tree": "bb576dde5bbcae34f2e274817acb18cfa4092d41",
+        "findings_digest": "sha256:98aa5f56f62fab243034d7bf31b42f7ffd1a648811f8336bf2cc71576008af87",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-26T11:08:56.465Z",
+          "result_digest": "sha256:8026e31d3e8ff1003fd11b76a8454bf18a31c313fea4205476d19ed367b343da"
+        }
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T11:12:22.108Z",
+      "detail": {
+        "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+        "runs": [
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12",
+          "run-13"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-26T11:12:22.108Z",
+      "detail": {
+        "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+        "check": "ev-5",
+        "documents": [
+          "docs/architecture/technical-baseline.md"
+        ],
+        "tests": [
+          "tests/unit/dependency-alerts.test.ts",
+          "tests/unit/pnpm-pin.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T11:12:22.108Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms",
+          "scenario:privacy-security conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+        "fitness": [
+          "run-14"
+        ]
+      }
+    },
+    {
+      "id": "ev-8",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-26T11:15:00.099Z",
+      "detail": {
+        "lineage_id": "sha256:22ad4c5ba4a1c6aabec796901da4a018b0f14ca474cc7279f7fede9a21b2601b",
+        "candidate_id": "sha256:3b3d8c03718441d0c8bdc142f44dd2aec295a0127fbc2dbdf4e952043537dcfd",
+        "candidate_tree": "40b9388af2ed58e4c0db0c52f8a06520f8a94cbf",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-26T11:14:51.597Z",
+          "result_digest": "sha256:3015ca5171abdbd0cb53876db87676d8973c32f2ffbee28d614669881710912e"
+        }
+      }
+    },
+    {
+      "id": "ev-9",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-26T11:15:06.143Z"
+    }
+  ],
+  "base": "f0e06fe58c856ddde450ecc11508268df9ddf71e",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec vitest run tests/unit/dependency-alerts.test.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:46b0caa6ef7265a139b59d72492b95b7547e397a7f35dabcea731bc2087ee405",
+      "tree": "sha256:dc7b00c0815237cadcadce642a45a5dcb70e291756cffca7bb55858f50c46000",
+      "recorded_at": "2026-10-26T11:03:52.919Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm exec vitest run tests/unit/dependency-alerts.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:5addb9600e5a5b3ec265a10cdbd0f8c5ae319260d4e4a7fe3854e75ec564c1de",
+      "tree": "sha256:d70f82a015f24e72e9d910df84509ccfdc2638250ff629ec3212cf27128b05c6",
+      "recorded_at": "2026-10-26T11:05:53.011Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:cfc2a3d4da10868fac00660e62a67195e66e287901aac338b8ca1425f1a320d6",
+      "tree": "sha256:c72d0ab2204a066839bced334ff56532ac4113c932547080350a26decb3953d5",
+      "recorded_at": "2026-10-26T11:07:03.538Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:5b661e212734a22bbab3ed3a45085ddc632070941a32b24ea9d7075b27e8eedc",
+      "tree": "sha256:c72d0ab2204a066839bced334ff56532ac4113c932547080350a26decb3953d5",
+      "recorded_at": "2026-10-26T11:07:03.538Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:78a1847abdac6b7dc405fd17a7be41fb526639725ae9aa7e90168b146f023c1e",
+      "tree": "sha256:c72d0ab2204a066839bced334ff56532ac4113c932547080350a26decb3953d5",
+      "recorded_at": "2026-10-26T11:07:03.538Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:b16fbb7d562616491b3819396c59ecf0e3beedffd74e3cb44e945f0f5feddf89",
+      "tree": "sha256:c72d0ab2204a066839bced334ff56532ac4113c932547080350a26decb3953d5",
+      "recorded_at": "2026-10-26T11:07:03.538Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:c72d0ab2204a066839bced334ff56532ac4113c932547080350a26decb3953d5",
+      "recorded_at": "2026-10-26T11:07:03.538Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:c72d0ab2204a066839bced334ff56532ac4113c932547080350a26decb3953d5",
+      "recorded_at": "2026-10-26T11:07:03.538Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:4601fef93d2c25e275e4303e90731f095d8cf0a8e2bb7977a836f94a813cd8fc",
+      "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+      "recorded_at": "2026-10-26T11:12:22.108Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:8dd55ed04eae011cf42a107d2b8ee756964607d7dbb0b3f7d8c66d4c1a64d153",
+      "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+      "recorded_at": "2026-10-26T11:12:22.108Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:236be4cf0cfae7172d494b4f0331e8cd37ea83593de951ff321e36d7b2988edc",
+      "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+      "recorded_at": "2026-10-26T11:12:22.108Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:aee138648d307e48519466d710c5c82af086acb547cfb44a7799c8789af9857c",
+      "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+      "recorded_at": "2026-10-26T11:12:22.108Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+      "recorded_at": "2026-10-26T11:12:22.108Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:0e088254971c4811e2d52886f362897b08c40aecefb3252d497522f3ba045cd5",
+      "recorded_at": "2026-10-26T11:12:22.108Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:9ba5311ff824180be98065aa2ff5ef11b9561a64bf6369cf2914195486328d92",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "ac9141dbf6bf0550015ecfab0d2ecebb4370eabd",
+          "candidate_tree": "bb576dde5bbcae34f2e274817acb18cfa4092d41",
+          "paths": [
+            ".github/workflows/audit.yml",
+            "docs/roadmap.md",
+            "pnpm-lock.yaml",
+            "pnpm-workspace.yaml",
+            "tests/unit/dependency-alerts.test.ts"
+          ],
+          "diff_hash": "sha256:f073e934fe644ccd09e04c2da818edd218b566c0a1f39677c9d50d7a0a0450c7",
+          "paths_digest": "sha256:df3f76309faac118753295b22a4f064c3f94e3901513bec1266fd0773d640d3a",
+          "authored_lines": 94,
+          "original_changed_lines": 260
+        },
+        "candidate_id": "sha256:a638e8dd5b7c196f95155d225c0149c4b0b0f2a71b9602d52093c32a21c1d536",
+        "paths": [
+          ".github/workflows/audit.yml",
+          "docs/roadmap.md",
+          "pnpm-lock.yaml",
+          "pnpm-workspace.yaml",
+          "tests/unit/dependency-alerts.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "bb576dde5bbcae34f2e274817acb18cfa4092d41",
+        "original_changed_lines": 260,
+        "authored_lines": 94
+      },
+      "current_candidate_id": "sha256:a638e8dd5b7c196f95155d225c0149c4b0b0f2a71b9602d52093c32a21c1d536",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "ac9141dbf6bf0550015ecfab0d2ecebb4370eabd",
+        "candidate_tree": "bb576dde5bbcae34f2e274817acb18cfa4092d41",
+        "paths": [
+          ".github/workflows/audit.yml",
+          "docs/roadmap.md",
+          "pnpm-lock.yaml",
+          "pnpm-workspace.yaml",
+          "tests/unit/dependency-alerts.test.ts"
+        ],
+        "diff_hash": "sha256:f073e934fe644ccd09e04c2da818edd218b566c0a1f39677c9d50d7a0a0450c7",
+        "paths_digest": "sha256:df3f76309faac118753295b22a4f064c3f94e3901513bec1266fd0773d640d3a",
+        "authored_lines": 94,
+        "original_changed_lines": 260
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "dependency-alerts:lens-start:1:0",
+          "result_digest": "sha256:87d8f659f2ec39bd7c6db438ed4293b1a66c2b099c4e4ace6a2dc20a2c01ffb5",
+          "result": {
+            "findings": [
+              {
+                "severity": "WARNING",
+                "summary": "pnpm-workspace.yaml:5-8 sets pmOnFail: ignore, and pnpm-lock.yaml loses its env document (former lines 1-158, the integrity hashes for pnpm 12.14.0 and @pnpm/exe.*). pnpm stops switching itself to packageManager, and the lockfile no longer records a hash for the pnpm tool. The committed claim 'the CI and Workers Builds still take the exact pnpm version from packageManager' holds for CI, where pnpm/action-setup without `version` reads packageManager (ci.yml:23). Nothing in the repo shows how Workers Builds gets pnpm 12.14.0 for the production build: there is no PNPM_VERSION or Corepack config, and the S1 change drops Corepack. If it has no such mechanism, production builds run whichever pnpm the image ships, and that tool is not hash-checked.",
+                "acceptance_criteria": "The repo names, and the owner has checked in the Workers Builds settings, the mechanism that gives the production build pnpm 12.14.0 (for example a PNPM_VERSION build variable). Otherwise the comment at pnpm-workspace.yaml:7 and the test comment at dependency-alerts.test.ts:27 stop claiming Workers Builds pinning. Either way, the accepted loss of the lockfile-recorded integrity of pnpm itself is written next to pmOnFail: ignore."
+              }
+            ]
+          },
+          "operation": null,
+          "result_request_id": "dependency-alerts:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [
+        {
+          "id": "F-53c8baa3eaf54631",
+          "owner": "trust",
+          "severity": "WARNING",
+          "summary": "pnpm-workspace.yaml:5-8 sets pmOnFail: ignore, and pnpm-lock.yaml loses its env document (former lines 1-158, the integrity hashes for pnpm 12.14.0 and @pnpm/exe.*). pnpm stops switching itself to packageManager, and the lockfile no longer records a hash for the pnpm tool. The committed claim 'the CI and Workers Builds still take the exact pnpm version from packageManager' holds for CI, where pnpm/action-setup without `version` reads packageManager (ci.yml:23). Nothing in the repo shows how Workers Builds gets pnpm 12.14.0 for the production build: there is no PNPM_VERSION or Corepack config, and the S1 change drops Corepack. If it has no such mechanism, production builds run whichever pnpm the image ships, and that tool is not hash-checked.",
+          "acceptance_criteria": "The repo names, and the owner has checked in the Workers Builds settings, the mechanism that gives the production build pnpm 12.14.0 (for example a PNPM_VERSION build variable). Otherwise the comment at pnpm-workspace.yaml:7 and the test comment at dependency-alerts.test.ts:27 stop claiming Workers Builds pinning. Either way, the accepted loss of the lockfile-recorded integrity of pnpm itself is written next to pmOnFail: ignore.",
+          "blocking": false,
+          "resolution": "advisory"
+        }
+      ],
+      "findings_digest": "sha256:98aa5f56f62fab243034d7bf31b42f7ffd1a648811f8336bf2cc71576008af87",
+      "correction_budget": {
+        "limit_lines": 130,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:22ad4c5ba4a1c6aabec796901da4a018b0f14ca474cc7279f7fede9a21b2601b",
+      "generation": 2,
+      "predecessor_lineage_id": "sha256:9ba5311ff824180be98065aa2ff5ef11b9561a64bf6369cf2914195486328d92",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "ac9141dbf6bf0550015ecfab0d2ecebb4370eabd",
+          "candidate_tree": "40b9388af2ed58e4c0db0c52f8a06520f8a94cbf",
+          "paths": [
+            ".github/workflows/audit.yml",
+            "astro.config.mjs",
+            "docs/architecture/technical-baseline.md",
+            "docs/roadmap.md",
+            "pnpm-lock.yaml",
+            "pnpm-workspace.yaml",
+            "scripts/lib/pnpm-pin.mjs",
+            "tests/unit/dependency-alerts.test.ts",
+            "tests/unit/pnpm-pin.test.ts"
+          ],
+          "diff_hash": "sha256:c1ee484b676a32e96837ea56f6d23010d4e71e648ce14272dd080acce22fd799",
+          "paths_digest": "sha256:6e8431f38099c149c01ec42cfffb83a9d1d62aef8aa5cf0632a9ff70f029fbda",
+          "authored_lines": 161,
+          "original_changed_lines": 327
+        },
+        "candidate_id": "sha256:3b3d8c03718441d0c8bdc142f44dd2aec295a0127fbc2dbdf4e952043537dcfd",
+        "paths": [
+          ".github/workflows/audit.yml",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "pnpm-lock.yaml",
+          "pnpm-workspace.yaml",
+          "scripts/lib/pnpm-pin.mjs",
+          "tests/unit/dependency-alerts.test.ts",
+          "tests/unit/pnpm-pin.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "40b9388af2ed58e4c0db0c52f8a06520f8a94cbf",
+        "original_changed_lines": 327,
+        "authored_lines": 161
+      },
+      "current_candidate_id": "sha256:3b3d8c03718441d0c8bdc142f44dd2aec295a0127fbc2dbdf4e952043537dcfd",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "ac9141dbf6bf0550015ecfab0d2ecebb4370eabd",
+        "candidate_tree": "40b9388af2ed58e4c0db0c52f8a06520f8a94cbf",
+        "paths": [
+          ".github/workflows/audit.yml",
+          "astro.config.mjs",
+          "docs/architecture/technical-baseline.md",
+          "docs/roadmap.md",
+          "pnpm-lock.yaml",
+          "pnpm-workspace.yaml",
+          "scripts/lib/pnpm-pin.mjs",
+          "tests/unit/dependency-alerts.test.ts",
+          "tests/unit/pnpm-pin.test.ts"
+        ],
+        "diff_hash": "sha256:c1ee484b676a32e96837ea56f6d23010d4e71e648ce14272dd080acce22fd799",
+        "paths_digest": "sha256:6e8431f38099c149c01ec42cfffb83a9d1d62aef8aa5cf0632a9ff70f029fbda",
+        "authored_lines": 161,
+        "original_changed_lines": 327
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "dependency-alerts:lens-start:2:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "dependency-alerts:lens-result:2:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 164,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "assumptions": [
+    "El audit programado usa el umbral y los ignorados de la puerta de los PR: pnpm audit --audit-level high (.github/workflows/ci.yml:35) con auditConfig.ignoreGhsas de pnpm-workspace.yaml; corre a diario a una hora fuera del minuto 0 y también con workflow_dispatch",
+    "Probado en copias aisladas el 2026-10-26: el lockfile de un documento es el segundo documento sin el separador inicial (con '---' pnpm lo toma por el de entorno y re-resuelve todo); pnpm 12.14.0 y 12.15.0 lo aceptan congelado y sin congelar sin cambiar un byte; pmOnFail warn vuelve a añadir el documento de entorno, solo ignore lo evita; pnpm audit funciona sin node_modules",
+    "En un repo público GitHub desactiva un cron tras 60 días sin actividad, y avisa de los fallos a quien cambió el cron por última vez (docs.github.com)"
+  ],
+  "closed_at": "2026-10-26T11:15:06.143Z"
+}
