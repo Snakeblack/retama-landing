@@ -1,0 +1,350 @@
+{
+  "schema": "idd-state/v1",
+  "change": "seo-business-model",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "quiero que me reportes incoherencias, y puntos de mejora para SEO y concordancia con la propuesta de negocio, que ya esta aceptada / 3. si, hazlo, firma el blog como Manuel M. / continua",
+    "kind": "feature",
+    "summary": "SEO of the copy review (points 23-30): home and blog titles for the searches clients make, a meta description without the fully-remote claim, a complete JSON-LD (every offer with its starting price, the partners as Person and the area served if the owner wants it), the blog signed as Manuel M. visibly and as its author, and a sitemap with lastmod and the articles' language pairs",
+    "acceptance": "In es and en: the home and blog titles name custom software and Retama; the meta description no longer says fully remote; the JSON-LD lists every service of the FAQ with its starting price and the two partners as Person (Michael with his LinkedIn); each article shows Manuel M. as its author and its BlogPosting names him; the sitemap gives each article its lastmod and its translation; all checks pass"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿Qué ofertas lista el catálogo del JSON-LD (las cuatro tarjetas más diagnóstico 900, web con gestor 3.500, escritorio 10.000 y mantenimiento 120 al mes, con la cuota de agentes de 150 al mes), lleva areaServed (el 23-10 se decidió que no) y qué fecha da el lastmod del sitemap y si los artículos llevan su par de idioma allí?"
+      },
+      {
+        "category": "uniqueness",
+        "question": "¿Los socios van como member o como founder de Retama (el 25-10: sin founder hasta que exista la empresa), y el autor de los artículos es el mismo Person que Michael (nombre completo y LinkedIn) o un Person «Manuel M.» propio que enlaza al capítulo del equipo?"
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Valen los títulos «Software a medida y aplicaciones web para empresas · Retama» / «Custom software and web apps for businesses · Retama» y «Software a medida, explicado · Blog de Retama» / «Custom software, explained · Retama blog» (el RSS toma el mismo título), qué meta description sustituye a la que dice «100 % en remoto», y la firma visible del artículo es «Escrito por / Written by: Manuel M.» en el panel de las fechas?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0008-locale-routing.md",
+          "line": 15
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/Article.astro",
+          "line": 55
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/technical-baseline.md",
+          "line": 25
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "src/components/Article.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/board.ts",
+      "src/lib/seo.ts",
+      "src/lib/sitemap.ts",
+      "tests/e2e/blog.spec.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/seo.test.ts",
+      "tests/unit/sitemap.test.ts"
+    ],
+    "work_units": 4,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 4 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs and 2 more (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0008 and quality scenario seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The byline is plain text in the article's HTML, and the titles and JSON-LD are written at build time; nothing waits for a script"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "The byline row reuses the classes of the date rows (bg-surface, p-md, type-small, text-on-surface-muted); no new token, colour or type style"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "The JSON-LD stays a data block written through jsonLd(); no inline script, style or handler, and the CSP is unchanged"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Every new or changed key exists in es.ts and en.ts; the sitemap now pairs each article with its translation, as the page's hreflang already did"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Same canonical, hreflang and full HTML; the sitemap gains the blog's lastmod and the articles' pairs, and the JSON-LD the full catalog, the area served and the partners"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "todos las recomendadas menos zona de servicio, quiero que sea visible para hispanoamerica y portugal tambien, no solo españa",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T19:31:31.054Z",
+      "detail": {
+        "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-26T19:31:31.054Z",
+      "detail": {
+        "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "docs/architecture/technical-baseline.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/blog.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/seo.test.ts",
+          "tests/unit/sitemap.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T19:31:31.054Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-26T19:31:40.821Z"
+    }
+  ],
+  "base": "d31588fb52af5edc8db3a4b2f0a788bbfb103d9c",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:f056798b2d3edecc1feb0d1fa561223e9db719af53a3ef244e6dab373562ddd9",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c5360616ddba3577b1018d909194d9400f88c9980dc44c0731d9330ff171a446",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:459d4756e142d00ebe9a850e0f3d2378ff799718bfefe648660a3ab386de1931",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:22e1068e4b6d0a100e3f215ed9d71f01be517e652d1f01db5796690875da6681",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:3aa052f5b5565d7ef1b71218affe940b8640c57b0f1038e625734f754bc7f124",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:3cdd9568bfdf22e85be77cfe8e3840086c3752a7884094d540848cc1ded633c4",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:90707a4df2ba1bceff3090c75d4a3718acf5f4c95938990cf0f1af9b0d4860b5",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:51007226dd00b3d09cee321e003515d00ef368184fa695c335b8f6b52eff0657",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:f360ef164b49d44e6f02a7b0ac8f4ce33383041dc0f060856898a3372535748f",
+      "tree": "sha256:1c3f4190d3209763b419fbd3247339d017498aefd54dd16f283dd877abe66c04",
+      "recorded_at": "2026-10-26T19:31:31.054Z"
+    }
+  ],
+  "closed_at": "2026-10-26T19:31:40.821Z"
+}

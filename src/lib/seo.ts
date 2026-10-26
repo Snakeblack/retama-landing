@@ -1,5 +1,5 @@
 import { defaultLocale, type Locale, locales, localizedPath, pathWithoutLocale, t } from "../i18n/index";
-import { contactEmail, questions } from "./board";
+import { areaServed, blogAuthor, contactEmail, partners, questions } from "./board";
 
 export interface Alternate {
   hreflang: string;
@@ -78,17 +78,43 @@ export interface Crumb {
   path: string;
 }
 
-// Each service with its minimum in euros excluding VAT, the figure its card's "From" text gives (business proposal 1.4).
+// Each service card with its minimums in euros excluding VAT, once and a month, the figures its "From" text gives
+// (business proposal 1.4).
 const services = [
-  ["services.web", 1500],
-  ["services.custom", 8000],
-  ["services.agents", 4000],
-  ["services.seo", 800],
+  ["services.web", 1500, null],
+  ["services.custom", 8000, null],
+  ["services.agents", 4000, 150],
+  ["services.seo", 800, null],
 ] as const;
 
+// What only the questions price (faq.a2, faq.a6), with the same figures.
+const questionOffers = [
+  ["offers.diagnosis", 900, null],
+  ["offers.cms", 3500, null],
+  ["offers.desktop", 10000, null],
+  ["offers.maintenance", null, 120],
+] as const;
+
+/** An offer of the catalog with its minimum excluding VAT, once and, when it has one, a month (UN/CEFACT MON). */
+function offer(name: string, description: string | null, once: number | null, monthly: number | null) {
+  const price = (minPrice: number, unit: boolean) => ({
+    "@type": unit ? "UnitPriceSpecification" : "PriceSpecification",
+    minPrice,
+    priceCurrency: "EUR",
+    valueAddedTaxIncluded: false,
+    ...(unit ? { unitCode: "MON" } : {}),
+  });
+  const prices = [...(once === null ? [] : [price(once, false)]), ...(monthly === null ? [] : [price(monthly, true)])];
+  return {
+    "@type": "Offer",
+    itemOffered: { "@type": "Service", name, ...(description === null ? {} : { description }) },
+    priceSpecification: prices.length === 1 ? prices[0] : prices,
+  };
+}
+
 /** The JSON-LD of a page: Retama, the site, when the page gives a trail its breadcrumb, when it holds the questions
- * chapter its FAQPage, and when it is an article its BlogPosting, signed by the brand. Only data that exists: no
- * company yet, so no address, tax ID or founder, and no profiles or service area until the owner has them. */
+ * chapter its FAQPage, and when it is an article its BlogPosting, signed by Manuel M. Only data that exists: no
+ * company yet, so no address, tax ID or founder; the partners are its members, and only Michael has a profile. */
 export function structuredData(
   site: URL,
   locale: Locale,
@@ -99,6 +125,8 @@ export function structuredData(
   const copy = t(locale);
   const home = new URL("/", site).href;
   const organization = `${home}#organization`;
+  const team = `${new URL(localizedPath(locale, "/"), site).href}#${copy["anchor.team"]}`;
+  const countries = new Intl.DisplayNames([locale], { type: "region" });
   const graph: Record<string, unknown>[] = [
     {
       "@type": ["Organization", "ProfessionalService"],
@@ -109,19 +137,21 @@ export function structuredData(
       email: contactEmail,
       description: copy["meta.description"],
       knowsLanguage: [...locales],
+      areaServed: areaServed.map((code) => ({ "@type": "Country", name: countries.of(code) })),
+      member: partners.map((partner) => ({
+        "@type": "Person",
+        "@id": `${home}#${partner.key}`,
+        name: partner.name,
+        jobTitle: copy[partner.role],
+        ...("linkedin" in partner ? { sameAs: [partner.linkedin] } : {}),
+      })),
       hasOfferCatalog: {
         "@type": "OfferCatalog",
         name: copy["services.title"],
-        itemListElement: services.map(([key, minPrice]) => ({
-          "@type": "Offer",
-          itemOffered: { "@type": "Service", name: copy[key], description: copy[`${key}Line`] },
-          priceSpecification: {
-            "@type": "PriceSpecification",
-            minPrice,
-            priceCurrency: "EUR",
-            valueAddedTaxIncluded: false,
-          },
-        })),
+        itemListElement: [
+          ...services.map(([key, once, monthly]) => offer(copy[key], copy[`${key}Line`], once, monthly)),
+          ...questionOffers.map(([key, once, monthly]) => offer(copy[key], null, once, monthly)),
+        ],
       },
     },
     {
@@ -174,7 +204,7 @@ export function structuredData(
       datePublished: isoDate(article.published),
       dateModified: isoDate(article.updated ?? article.published),
       image: new URL(article.image, site).href,
-      author: { "@id": organization },
+      author: { "@type": "Person", name: blogAuthor, url: team },
       publisher: { "@id": organization },
       isPartOf: { "@id": `${home}#website` },
     });

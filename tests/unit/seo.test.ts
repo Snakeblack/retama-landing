@@ -69,42 +69,103 @@ describe("structuredData", () => {
       description: en["meta.description"],
       knowsLanguage: ["es", "en"],
     });
-    // No company yet: no address, tax ID, founder, profiles or service area (seo-structured-data, owner's answers).
-    for (const missing of ["address", "taxID", "legalName", "founder", "sameAs", "areaServed"])
+    // No company yet: no address, tax ID, legal name or founder, and no profile of its own (seo-structured-data,
+    // team-section).
+    for (const missing of ["address", "taxID", "legalName", "founder", "sameAs"])
       expect(retama).not.toHaveProperty(missing);
   });
 
-  it("lista los servicios de la portada en el idioma de la página", () => {
+  it("sirve a España, Portugal e Hispanoamérica, cada país con su nombre en el idioma de la página", () => {
+    const area = (locale: "es" | "en") =>
+      node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "ProfessionalService")
+        ?.areaServed as Record<string, unknown>[];
+    expect(area("es")).toHaveLength(21);
+    for (const country of area("es")) expect(country["@type"]).toBe("Country");
+    const names = (locale: "es" | "en") => area(locale).map((country) => country.name);
+    expect(names("es").slice(0, 2)).toEqual(["España", "Portugal"]);
+    expect(names("es")).toEqual(expect.arrayContaining(["México", "Argentina", "Colombia", "Puerto Rico"]));
+    expect(names("es")).not.toContain("Brasil");
+    expect(names("en").slice(0, 2)).toEqual(["Spain", "Portugal"]);
+    expect(names("en")).toContain("Mexico");
+  });
+
+  it("presenta a los dos socios como miembros de Retama, con su cargo y, si lo hay, su perfil", () => {
+    const members = (locale: "es" | "en") =>
+      node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "ProfessionalService")
+        ?.member as Record<string, unknown>[];
+    expect(members("es")).toEqual([
+      {
+        "@type": "Person",
+        "@id": "https://retama.example/#paul",
+        name: "Paul Macorny Retamozo García",
+        jobTitle: es["team.paulRole"],
+      },
+      {
+        "@type": "Person",
+        "@id": "https://retama.example/#michael",
+        name: "Manuel Michael Retamozo García",
+        jobTitle: es["team.michaelRole"],
+        sameAs: ["https://www.linkedin.com/in/mmretamozo/"],
+      },
+    ]);
+    expect(members("en").map((member) => member.jobTitle)).toEqual([en["team.paulRole"], en["team.michaelRole"]]);
+  });
+
+  it("lista las cuatro tarjetas y lo que solo precian las preguntas, en el idioma de la página", () => {
     const retama = node(structuredData(site, "es")["@graph"] as Record<string, unknown>[], "ProfessionalService");
-    const catalog = retama?.hasOfferCatalog as { itemListElement: { itemOffered: { name: string } }[] };
+    const catalog = retama?.hasOfferCatalog as { itemListElement: { itemOffered: Record<string, unknown> }[] };
     expect(catalog.itemListElement.map((offer) => offer.itemOffered.name)).toEqual([
       es["services.web"],
       es["services.custom"],
       es["services.agents"],
       es["services.seo"],
+      es["offers.diagnosis"],
+      es["offers.cms"],
+      es["offers.desktop"],
+      es["offers.maintenance"],
     ]);
+    // A card's offer carries its line; the others have no text of their own on the page.
+    expect(catalog.itemListElement[0]?.itemOffered.description).toBe(es["services.webLine"]);
+    expect(catalog.itemListElement[4]?.itemOffered).not.toHaveProperty("description");
   });
 
-  it("da el precio mínimo de cada servicio sin IVA, el mismo que su tarjeta", () => {
+  it("da el precio mínimo de cada oferta sin IVA, el mismo que su tarjeta o sus preguntas, y al mes lo mensual", () => {
     for (const [locale, copy, amount] of [
       ["es", es, (value: number) => `${value.toLocaleString("de-DE")} €`],
       ["en", en, (value: number) => `€${value.toLocaleString("en-GB")}`],
     ] as const) {
       const retama = node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "ProfessionalService");
-      const catalog = retama?.hasOfferCatalog as {
-        itemListElement: { itemOffered: { name: string }; priceSpecification: Record<string, unknown> }[];
-      };
-      const prices = catalog.itemListElement.map((offer) => offer.priceSpecification);
-      expect(prices.map((price) => price.minPrice)).toEqual([1500, 8000, 4000, 800]);
-      for (const price of prices)
-        expect(price).toMatchObject({
-          "@type": "PriceSpecification",
-          priceCurrency: "EUR",
-          valueAddedTaxIncluded: false,
-        });
-      const cards = ["services.webFrom", "services.customFrom", "services.agentsFrom", "services.seoFrom"] as const;
-      cards.forEach((key, index) => {
-        expect(copy[key]).toContain(amount(prices[index]?.minPrice as number));
+      const catalog = retama?.hasOfferCatalog as { itemListElement: { priceSpecification: unknown }[] };
+      const prices = catalog.itemListElement.map(
+        (offer) => [offer.priceSpecification].flat() as Record<string, unknown>[],
+      );
+      const once = (minPrice: number) => ({ "@type": "PriceSpecification", minPrice });
+      const monthly = (minPrice: number) => ({ "@type": "UnitPriceSpecification", minPrice, unitCode: "MON" });
+      expect(prices).toMatchObject([
+        [once(1500)],
+        [once(8000)],
+        [once(4000), monthly(150)],
+        [once(800)],
+        [once(900)],
+        [once(3500)],
+        [once(10000)],
+        [monthly(120)],
+      ]);
+      for (const price of prices.flat())
+        expect(price).toMatchObject({ priceCurrency: "EUR", valueAddedTaxIncluded: false });
+      // Each figure is the one the page gives: the card's "From" text, else the questions on prices and maintenance.
+      const sources = [
+        "services.webFrom",
+        "services.customFrom",
+        "services.agentsFrom",
+        "services.seoFrom",
+        "faq.a2",
+        "faq.a2",
+        "faq.a2",
+        "faq.a6",
+      ] as const;
+      sources.forEach((key, index) => {
+        for (const price of prices[index] ?? []) expect(copy[key], key).toContain(amount(price.minPrice as number));
       });
     }
   });
@@ -164,6 +225,20 @@ describe("structuredData de un artículo", () => {
   const nodes = (item?: Article) => structuredData(site, "en", [], false, item)["@graph"] as Record<string, unknown>[];
   const posting = (item?: Article) => nodes(item).find((node) => node["@type"] === "BlogPosting");
 
+  it("lo firma Manuel M., con su enlace al capítulo del equipo, en el idioma de la página", () => {
+    expect(posting(article)?.author).toEqual({
+      "@type": "Person",
+      name: "Manuel M.",
+      url: "https://retama.example/en/#about-us",
+    });
+    const spanish = structuredData(site, "es", [], false, { ...article, path: "/blog/cuanto-cuesta/" })[
+      "@graph"
+    ] as Record<string, unknown>[];
+    expect(spanish.find((node) => node["@type"] === "BlogPosting")?.author).toMatchObject({
+      url: "https://retama.example/#nosotros",
+    });
+  });
+
   it("lo describe como BlogPosting de Retama, en su idioma y con su propia imagen", () => {
     expect(posting()).toBeUndefined();
     expect(posting(article)).toEqual({
@@ -177,7 +252,7 @@ describe("structuredData de un artículo", () => {
       datePublished: "2026-10-23",
       dateModified: "2026-10-23",
       image: "https://retama.example/og/en/what-it-costs.png",
-      author: { "@id": "https://retama.example/#organization" },
+      author: { "@type": "Person", name: "Manuel M.", url: "https://retama.example/en/#about-us" },
       publisher: { "@id": "https://retama.example/#organization" },
       isPartOf: { "@id": "https://retama.example/#website" },
     });

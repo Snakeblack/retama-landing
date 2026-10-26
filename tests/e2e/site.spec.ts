@@ -219,6 +219,46 @@ test("Open Graph con la imagen de su idioma, o la suya en los artículos, en tod
   }
 });
 
+test("los títulos de la portada y del blog nombran el software a medida y a Retama", async ({ page }) => {
+  for (const [path, title] of [
+    ["/", "Software a medida y aplicaciones web para empresas · Retama"],
+    ["/en/", "Custom software and web apps for businesses · Retama"],
+    ["/blog/", "Software a medida, explicado · Blog de Retama"],
+    ["/en/blog/", "Custom software, explained · Retama blog"],
+  ] as const) {
+    await page.goto(path);
+    await expect(page, path).toHaveTitle(title);
+  }
+});
+
+test("el sitemap fecha y empareja los artículos y fecha los índices del blog, no las páginas sin fecha", async ({
+  request,
+}) => {
+  const index = await (await request.get("/sitemap-index.xml")).text();
+  const entries = new Map<string, string>();
+  for (const [, sitemap] of index.matchAll(/<loc>([^<]+)<\/loc>/g)) {
+    const body = await (await request.get(new URL(sitemap ?? "").pathname)).text();
+    for (const [entry, loc] of body.matchAll(/<url><loc>([^<]+)<\/loc>.*?<\/url>/g)) entries.set(loc ?? "", entry);
+  }
+  const entry = (path: string) => {
+    const url = new URL(path, "https://retama.dev").href;
+    expect(entries.has(url), url).toBe(true);
+    return entries.get(url) ?? "";
+  };
+  // Each language has its own slug, so only the article's own data can pair it with its translation (ADR 0008).
+  const pair = [
+    '<xhtml:link rel="alternate" hreflang="es" href="https://retama.dev/blog/cuanto-cuesta-un-software-a-medida/"/>',
+    '<xhtml:link rel="alternate" hreflang="en" href="https://retama.dev/en/blog/what-custom-software-costs/"/>',
+  ];
+  for (const path of ["/blog/cuanto-cuesta-un-software-a-medida/", "/en/blog/what-custom-software-costs/"]) {
+    expect(entry(path), path).toMatch(/<lastmod>2026-10-26/);
+    for (const link of pair) expect(entry(path), path).toContain(link);
+  }
+  for (const path of ["/blog/", "/en/blog/"]) expect(entry(path), path).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}/);
+  // A build date would change on every deploy: a page with no date of its own gets none.
+  for (const path of ["/", "/en/", "/legal/", "/en/legal/"]) expect(entry(path), path).not.toContain("<lastmod>");
+});
+
 // The other tests tie the canonicals, hreflang, robots.txt and llms.txt to the sitemap's URLs.
 test("el sitemap nombra el dominio de producción, https://retama.dev", async ({ request }) => {
   const urls = await sitemapUrls(request);

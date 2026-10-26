@@ -1,9 +1,9 @@
 import type { Dictionary } from "./es";
 
 export const en = {
-  "meta.title": "Retama · Software engineering",
+  "meta.title": "Custom software and web apps for businesses · Retama",
   "meta.description":
-    "Retama designs and builds web applications, custom software and automation for companies. Documented architecture and fully remote work.",
+    "Retama designs and builds custom software, web applications and automation for businesses, at a fixed price and with every decision in writing.",
   "og.imageAlt": "“Software made to measure” beside a drawn retama on a graphite ground, with the Retama wordmark.",
   "nav.switchLabel": "Leer en español",
   "nav.label": "Sections",
@@ -54,6 +54,10 @@ export const en = {
   "services.seo": "SEO and analytics",
   "services.seoLine": "Get found, and know what works without tracking cookies.",
   "services.seoFrom": "From €800 + VAT · no monthly fee",
+  "offers.diagnosis": "Diagnosis",
+  "offers.cms": "Website with a CMS",
+  "offers.desktop": "Desktop application",
+  "offers.maintenance": "Monthly maintenance",
   "services.figure": "1",
   "services.figureCaption": "person to talk to, from the first call to delivery.",
 
@@ -329,13 +333,14 @@ export const en = {
   "notFound.lead": "The page you are looking for does not exist or has moved.",
   "notFound.back": "Back to home",
 
-  "blog.metaTitle": "Blog · Retama",
+  "blog.metaTitle": "Custom software, explained · Retama blog",
   "blog.metaDescription":
     "How custom software is commissioned, built and looked after, told by Retama for the people who commission it.",
   "blog.title": "Software, explained",
   "blog.lead":
     "How custom software is commissioned, built and looked after, told for the people who commission it, without jargon.",
   "blog.listLabel": "Articles",
+  "blog.author": "Written by",
   "blog.published": "Published on",
   "blog.updated": "Updated on",
   "blog.minutes": "min read",

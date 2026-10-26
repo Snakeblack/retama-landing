@@ -22,7 +22,7 @@
 
 | Componente | Responsabilidad | Datos que posee | Quién escribe |
 | --- | --- | --- | --- |
-| Sitio estático | Páginas, i18n, blog (colección `blog` de Markdown en `src/content/blog/<idioma>/`, `src/content.config.ts`; el build falla si un artículo no está en todos los idiomas, `src/lib/blog.ts`), SEO (canónica, hreflang, sitemap, JSON-LD en `src/lib/seo.ts`, `robots.txt` y `llms.txt` generados en el build), escena 3D, animaciones | Contenido, artículos y traducciones (repo) | Editor, mediante PR |
+| Sitio estático | Páginas, i18n, blog (colección `blog` de Markdown en `src/content/blog/<idioma>/`, `src/content.config.ts`; el build falla si un artículo no está en todos los idiomas, `src/lib/blog.ts`), SEO (canónica, hreflang, sitemap con la fecha del blog y la traducción de cada artículo en `src/lib/sitemap.ts`, JSON-LD en `src/lib/seo.ts`, `robots.txt` y `llms.txt` generados en el build), escena 3D, animaciones | Contenido, artículos y traducciones (repo) | Editor, mediante PR |
 | Isla 3D | Escena progresiva (ADR 0004) | Ninguno | — |
 | Isla de contacto | Formulario, validación en cliente con las reglas de la función (`src/lib/contact.ts`), token anti-bot. Sin script, el botón queda desactivado y se ofrecen el correo y WhatsApp | Ninguno (estado efímero) | — |
 | Función de informes | Recibir los errores de JavaScript de las páginas y las violaciones de la CSP, limpiarlos y registrarlos en Workers Logs (ADR 0011) | Ninguno; una línea de log sin datos personales (ADR 0003) | — |

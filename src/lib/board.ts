@@ -25,6 +25,35 @@ export const partners = [
   },
 ] as const;
 
+/** The name the blog's articles are signed with (owner, 2026-10-26): Michael's, as the blog gives it. */
+export const blogAuthor = "Manuel M.";
+
+/** Where Retama works (owner, 2026-10-26): Spain, Portugal and the Spanish-speaking countries of the Americas, Puerto
+ * Rico included, as ISO 3166-1 codes. The JSON-LD names each one in the page's language (src/lib/seo.ts). */
+export const areaServed = [
+  "ES",
+  "PT",
+  "AR",
+  "BO",
+  "CL",
+  "CO",
+  "CR",
+  "CU",
+  "DO",
+  "EC",
+  "SV",
+  "GT",
+  "HN",
+  "MX",
+  "NI",
+  "PA",
+  "PY",
+  "PE",
+  "PR",
+  "UY",
+  "VE",
+] as const;
+
 /** The owner the legal notice names (src/components/Legal.astro): today a person, whose trade name is Retama; once the
  * company exists, its data. */
 export interface Owner {
