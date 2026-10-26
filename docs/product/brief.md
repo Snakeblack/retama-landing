@@ -10,7 +10,7 @@ Retama es una empresa de ingeniería de software que trabaja **solo en remoto**.
 ## Qué ofrece Retama (lo que la web debe comunicar)
 
 - **Servicios:** aplicaciones web, landing pages y webs con CMS en varios lenguajes; software a medida; aplicaciones de escritorio; flujos agénticos y automatizaciones; SEO y analítica.
-- **Sectores:** logística, empresa, gaming y otros.
+- **Sectores:** logística, empresa, hortofrutícola y otros. El hortofrutícola es el sector de entrada del modelo de negocio, sin destacarlo sobre los demás (usuario, 2026-10-26).
 - **Precios:** el mínimo de cada servicio («desde», sin IVA), el diagnóstico de precio fijo con el que empiezan el software a medida y las automatizaciones, el mantenimiento y las horas sueltas. El precio final se fija en la propuesta (usuario, 2026-10-26).
 - **Método:** arquitectura documentada con ADRs, documentación, trato directo y comunicación orientada a tomar decisiones con criterio, garantías y trabajo 100 % online.
 
@@ -20,7 +20,7 @@ Retama es una empresa de ingeniería de software que trabaja **solo en remoto**.
 | --- | --- |
 | Dirección de pymes y empresas | Software a medida, web o automatización con un interlocutor fiable |
 | Startups y producto (fundadores, CTO) | Un equipo técnico que construya o escale |
-| Estudios y gaming | Herramientas, experiencias interactivas |
+| Distribución hortofrutícola (mayoristas, mercados) | Pedidos, stock por lote e integraciones con su ERP |
 | Agencias (marca blanca) | Desarrollo subcontratado con garantías |
 
 ## Objetivos y medidas de éxito

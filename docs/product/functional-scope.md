@@ -4,7 +4,7 @@
 
 | Actor | Tipo | Notas |
 | --- | --- | --- |
-| Visitante decisor (pyme, startup, estudio, agencia) | Primario | Llega por búsqueda, recomendación o enlace directo |
+| Visitante decisor (pyme, startup, distribuidor, agencia) | Primario | Llega por búsqueda, recomendación o enlace directo |
 | Rastreador de buscadores y de motores de IA | Secundario | Necesita HTML completo sin JS |
 | Editor (el usuario) | Interno | Edita contenido e i18n en el repo mediante PR |
 
@@ -27,7 +27,7 @@
 | --- | --- |
 | Hero | Escena 3D progresiva, titular, una acción principal |
 | Servicios | Web y CMS, software a medida, escritorio, agentes y automatización, SEO y analítica, cada uno con su precio «desde» |
-| Sectores | Logística, empresa, gaming, otros |
+| Sectores | Logística, empresa, hortofrutícola, otros |
 | Método | ADRs y documentación, comunicación para decidir, garantías, 100 % online |
 | Quiénes somos | Los dos socios: nombre, función, una frase, retrato (sus iniciales hasta tener la foto) y su perfil público si lo tiene |
 | FAQ | Plazos, presupuesto con sus mínimos y el diagnóstico, trabajo remoto, propiedad del código, garantía, mantenimiento |
