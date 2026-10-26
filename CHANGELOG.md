@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/Snakeblack/retama-landing/compare/v0.9.3...v0.10.0) (2026-10-26)
+
+
+### Features
+
+* **copy:** align the home and the blog with the agreed business model ([2b8b4c5](https://github.com/Snakeblack/retama-landing/commit/2b8b4c5a9f3f8e012ab1eba146f1b7250d80e747))
+
 ## [0.9.3](https://github.com/Snakeblack/retama-landing/compare/v0.9.2...v0.9.3) (2026-10-26)
 
 
