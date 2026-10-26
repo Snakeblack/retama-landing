@@ -31,6 +31,30 @@ describe("lockfile legible por el dependency graph de GitHub (M7)", () => {
   });
 });
 
+describe("avisos de desarrollo con parche (M7)", () => {
+  const lockfile = read("pnpm-lock.yaml");
+  // The versions the lockfile resolves for a package, from its keys in packages and snapshots ("  name@x.y.z:").
+  const resolved = (name: string) => [
+    ...new Set(
+      [...lockfile.matchAll(new RegExp(`^ {2}${name}@(\\d+\\.\\d+\\.\\d+)[(:]`, "gm"))].flatMap(([, v]) => v ?? []),
+    ),
+  ];
+  // x.y.z as one comparable number; no part of these versions reaches 1000.
+  const order = (version: string) => version.split(".").reduce((n, part) => n * 1000 + Number(part), 0);
+  const below = (version: string, patched: string) => order(version) < order(patched);
+
+  // satori fija fflate 0.7.3 incluso en su última versión; el override de pnpm-workspace.yaml lo sube al parche.
+  it("fflate 0.7 está en 0.7.5 o más (GHSA-px8p-9vwx-vf98, Dependabot #3)", () => {
+    expect(resolved("fflate").filter((v) => v.startsWith("0.7.") && below(v, "0.7.5"))).toEqual([]);
+  });
+
+  // @lhci/cli, sin versiones desde 06-2025, pide uuid ^8.3.1 y solo llama a require("uuid").v4(), que uuid 11 mantiene
+  // en CommonJS.
+  it("uuid está en 11.1.1 o más (GHSA-w5hq-g745-h8pq, Dependabot #1)", () => {
+    expect(resolved("uuid").filter((v) => below(v, "11.1.1"))).toEqual([]);
+  });
+});
+
 describe("audit programado de dependencias (M7)", () => {
   // Un aviso publicado entre dos pushes no lo ve la puerta de los PR hasta el siguiente cambio.
   it("corre a diario y también a mano", () => {
