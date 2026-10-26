@@ -44,7 +44,9 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
+      # Without --with-deps: the runner already has the libraries Chrome needs (it ships Google Chrome), and the apt
+      # mirror once took 7 min 50 s for the 25.9 MB those deps add. A missing library fails the launch and names it.
+      - run: pnpm exec playwright install chromium
       # The call booking, WhatsApp, the legal owner and Web Analytics are off by default; E2E builds with them on to prove
       # them (a local run proves them off). The number, the owner and the analytics token are test ones: the real ones
       # live only in Workers Builds.

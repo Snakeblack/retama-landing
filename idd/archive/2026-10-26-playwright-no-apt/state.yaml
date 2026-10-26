@@ -1,0 +1,383 @@
+{
+  "schema": "idd-state/v1",
+  "change": "playwright-no-apt",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "refactor",
+    "summary": "The e2e job installs Chromium with --with-deps, which downloads its system packages with apt from azure.archive.ubuntu.com; on 2026-10-26 that took 7 min 50 s for 25.9 MB in PR #83 and once ran a job of main into its 15-minute timeout, while the browser itself downloads in about 7 s",
+    "acceptance": "The e2e job installs only Playwright's Chromium, without apt packages; the same e2e suite passes in CI and the install step takes seconds"
+  },
+  "facts": {
+    "basis": "The user chose option 1 on 2026-10-26 («1. si»): drop --with-deps. The ubuntu-latest runner ships Google Chrome, which the lighthouse job already uses, and no e2e test compares screenshots, so the fonts --with-deps adds do not matter; a missing library would fail the launch at once and name it"
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/ci.yml"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/ci.yml (matches .github/workflows/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0009",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": "conforms",
+      "reason": "The three required checks (quality, e2e, lighthouse) and their commands stay; only the e2e job stops installing apt packages before the same Playwright Chromium runs the same suite"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T16:41:06.286Z",
+      "detail": {
+        "tree": "sha256:9df72a129ac6314118cf395a65605e8fa3c6c6beea6f1b774744e55d320aee1f",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T16:41:06.286Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:9df72a129ac6314118cf395a65605e8fa3c6c6beea6f1b774744e55d320aee1f",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-26T16:42:49.772Z",
+      "detail": {
+        "lineage_id": "sha256:bd542f0a88e0bb2a6ce3c1bdfdefa2ae62eda5dc5fa994448307d85ffcd16f0e",
+        "candidate_id": "sha256:31d4c0aec7e90e1ca7db4c6eb6bab43a95f1c4d3d70396fedc669012100437f6",
+        "candidate_tree": "f27680139a07f1e4d89e2042bce9c5992420fd43",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-26T16:41:44.288Z",
+          "result_digest": "sha256:bea00994ffe8c3419848d4a4b7b36903695774a73e99a86b5d1d849c376eef8b"
+        }
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T16:43:59.627Z",
+      "detail": {
+        "tree": "sha256:5483dcf2a6f18e0373f0e5dff43c1697191d0d8533d86ce6c9def8b63eb9b039",
+        "runs": [
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T16:43:59.627Z",
+      "detail": {
+        "refs": [
+          "adr:0009 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:5483dcf2a6f18e0373f0e5dff43c1697191d0d8533d86ce6c9def8b63eb9b039",
+        "fitness": [
+          "run-12"
+        ]
+      }
+    }
+  ],
+  "base": "f9a61cd0d07e3e65368c2babc22a4fd1b5ae01ab",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:50f85ac2f5703182221f39cec7f0e434cf6e10aa235e45db5701e8f7eb6056d3",
+      "tree": "sha256:9df72a129ac6314118cf395a65605e8fa3c6c6beea6f1b774744e55d320aee1f",
+      "recorded_at": "2026-10-26T16:41:06.286Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:c818042cd639be4c8b0abf99e1bbd72d2c2dde5cd93dc0437a1ba15cbd8fd715",
+      "tree": "sha256:9df72a129ac6314118cf395a65605e8fa3c6c6beea6f1b774744e55d320aee1f",
+      "recorded_at": "2026-10-26T16:41:06.286Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:8de456fbd9401ff944729b75e37bdcc73fd9495d02c43a7474da0d87f3cdbda6",
+      "tree": "sha256:9df72a129ac6314118cf395a65605e8fa3c6c6beea6f1b774744e55d320aee1f",
+      "recorded_at": "2026-10-26T16:41:06.286Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:e514837d364ba70fe0db63996261f7d71cfbcc0da4ec8a1a4a449b322714cb97",
+      "tree": "sha256:9df72a129ac6314118cf395a65605e8fa3c6c6beea6f1b774744e55d320aee1f",
+      "recorded_at": "2026-10-26T16:41:06.286Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:9df72a129ac6314118cf395a65605e8fa3c6c6beea6f1b774744e55d320aee1f",
+      "recorded_at": "2026-10-26T16:41:06.286Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:9df72a129ac6314118cf395a65605e8fa3c6c6beea6f1b774744e55d320aee1f",
+      "recorded_at": "2026-10-26T16:41:06.286Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:d0d26928db8b139d3c2522e71c9fbe4a236ca89f24f7c42d5af298ff238ba569",
+      "tree": "sha256:5483dcf2a6f18e0373f0e5dff43c1697191d0d8533d86ce6c9def8b63eb9b039",
+      "recorded_at": "2026-10-26T16:43:59.627Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:20530e4d9824538a100bda8b7a684abeddd992bdc7732cf4f24dc0e7ee7b495f",
+      "tree": "sha256:5483dcf2a6f18e0373f0e5dff43c1697191d0d8533d86ce6c9def8b63eb9b039",
+      "recorded_at": "2026-10-26T16:43:59.627Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:29c6a0745b8da11be037933dd832468fb80c5875b3b24aa770a9862d448fa275",
+      "tree": "sha256:5483dcf2a6f18e0373f0e5dff43c1697191d0d8533d86ce6c9def8b63eb9b039",
+      "recorded_at": "2026-10-26T16:43:59.627Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:eaa9f1c0b8813d56213af4dcac66809d30dec4f45a139f9b9de7a4a8f588e021",
+      "tree": "sha256:5483dcf2a6f18e0373f0e5dff43c1697191d0d8533d86ce6c9def8b63eb9b039",
+      "recorded_at": "2026-10-26T16:43:59.627Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:5483dcf2a6f18e0373f0e5dff43c1697191d0d8533d86ce6c9def8b63eb9b039",
+      "recorded_at": "2026-10-26T16:43:59.627Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "fitness",
+      "ref": "adr:0009",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:b32d883eed6b96b9844cd5d96b86bf0bdb78a18685ac46fbd2fbc7466d8b4e3c",
+      "tree": "sha256:5483dcf2a6f18e0373f0e5dff43c1697191d0d8533d86ce6c9def8b63eb9b039",
+      "recorded_at": "2026-10-26T16:43:59.627Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:bd542f0a88e0bb2a6ce3c1bdfdefa2ae62eda5dc5fa994448307d85ffcd16f0e",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "f814c485b22b2901062d65e7b8f6de29b2056448",
+          "candidate_tree": "f27680139a07f1e4d89e2042bce9c5992420fd43",
+          "paths": [
+            ".github/workflows/ci.yml"
+          ],
+          "diff_hash": "sha256:bc438ebadcfb3e1743be8eaec533e56c1348858a280b1c0173aa4b7a6c4e234f",
+          "paths_digest": "sha256:b803fcb7f17ed9235f1e5cb1fcd2f5d3b2838429d4368ae4c57ce4436577f03f",
+          "authored_lines": 3,
+          "original_changed_lines": 4
+        },
+        "candidate_id": "sha256:31d4c0aec7e90e1ca7db4c6eb6bab43a95f1c4d3d70396fedc669012100437f6",
+        "paths": [
+          ".github/workflows/ci.yml"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "f27680139a07f1e4d89e2042bce9c5992420fd43",
+        "original_changed_lines": 4,
+        "authored_lines": 3
+      },
+      "current_candidate_id": "sha256:31d4c0aec7e90e1ca7db4c6eb6bab43a95f1c4d3d70396fedc669012100437f6",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "f814c485b22b2901062d65e7b8f6de29b2056448",
+        "candidate_tree": "f27680139a07f1e4d89e2042bce9c5992420fd43",
+        "paths": [
+          ".github/workflows/ci.yml"
+        ],
+        "diff_hash": "sha256:bc438ebadcfb3e1743be8eaec533e56c1348858a280b1c0173aa4b7a6c4e234f",
+        "paths_digest": "sha256:b803fcb7f17ed9235f1e5cb1fcd2f5d3b2838429d4368ae4c57ce4436577f03f",
+        "authored_lines": 3,
+        "original_changed_lines": 4
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "playwright-no-apt:lens-start:1:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "playwright-no-apt:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 2,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-26T16:43:59.729Z"
+}
