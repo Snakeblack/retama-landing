@@ -1,0 +1,207 @@
+{
+  "schema": "idd-state/v1",
+  "change": "uptime-head",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "docs",
+    "summary": "The baseline, the roadmap, the endpoint contract and the test comments say UptimeRobot checks /api/contact/ with GET; its free HTTP monitors send HEAD, which Astro answers with the GET handler and no body",
+    "acceptance": "Docs and contract describe the HEAD check; an e2e test on the built Worker proves HEAD /api/contact/ answers the health status without body and with no-store"
+  },
+  "facts": {
+    "basis": "UptimeRobot help and blog: HTTP monitors use HEAD by default and choosing the method is Pro-only; astro 7.4.1 runtime/server/endpoint.js runs the GET handler for HEAD and drops the body; curl -I https://retama.dev/api/contact/ on 2026-10-26 answers 200 with no-store"
+  },
+  "plan": {
+    "paths": [
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "src/pages/api/contact.ts",
+      "src/server/contact.ts",
+      "tests/e2e/contact.spec.ts",
+      "tests/unit/contact.test.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0002, 0012",
+      "source": "declaration"
+    }
+  ],
+  "retracted": [
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches src/pages/api/contact.ts and 1 more (matches src/pages/api/**)",
+      "source": "declaration",
+      "retract_reason": "The plan dropped the comment edits in src/pages/api/contact.ts and src/server/contact.ts (a docs change may not touch product code); the diff no longer touches the security boundary"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/pages/api/contact.ts (matches **/api/**)",
+      "source": "declaration",
+      "retract_reason": "Same: without src/pages/api/contact.ts the diff touches no public_contract path; the baseline stays a contract document"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0002",
+      "impact": "conforms",
+      "reason": "No route changes: the Worker keeps the two on-demand routes; HEAD /api/contact/ already reaches the same GET handler through Astro, and only the documents and tests now say so"
+    },
+    {
+      "kind": "adr",
+      "id": "0012",
+      "impact": "conforms",
+      "reason": "Detection stays the uptime check of /api/contact/ every 5 minutes; whether it sends HEAD or GET, each check invokes the Worker once and is already in the 288 a day the ADR counts"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0012",
+      "evidence": "2026-10-26: pnpm test (34 files, 337 tests) passes, contact-form.test.ts and wrangler-config.test.ts included; this change touches neither the form nor wrangler.jsonc. The daily invocation review belongs to each security audit, not to this docs change (the GraphQL analytics API was rate limited today)",
+      "recorded_at": "2026-10-26T16:15:18.714Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "withdrawn",
+      "evidence": [],
+      "withdrawn_reason": "Same: without src/pages/api/contact.ts the diff touches no public_contract path; the baseline stays a contract document"
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "withdrawn",
+      "evidence": [],
+      "withdrawn_reason": "The plan dropped the comment edits in src/pages/api/contact.ts and src/server/contact.ts (a docs change may not touch product code); the diff no longer touches the security boundary"
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T16:17:05.282Z",
+      "detail": {
+        "tree": "sha256:cf54dff6a1bcef7ccf3d38922c2b3d27a5a18f183df89c9515950f64883e8d72",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T16:17:05.282Z",
+      "detail": {
+        "refs": [
+          "adr:0002 conforms",
+          "adr:0012 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:cf54dff6a1bcef7ccf3d38922c2b3d27a5a18f183df89c9515950f64883e8d72",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    }
+  ],
+  "base": "e7d43fe0f0f2fd371811a063688cfa4d67c22253",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:19b63c9763b6c7dcea2b0c87c863d6a87bdc23ec488e740d2df8a2411b1e1e4a",
+      "tree": "sha256:cf54dff6a1bcef7ccf3d38922c2b3d27a5a18f183df89c9515950f64883e8d72",
+      "recorded_at": "2026-10-26T16:17:05.282Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:505613320b8d5c32eac0f677f6e7de89f09d6eb68b5722537d25ab958d2c487d",
+      "tree": "sha256:cf54dff6a1bcef7ccf3d38922c2b3d27a5a18f183df89c9515950f64883e8d72",
+      "recorded_at": "2026-10-26T16:17:05.282Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:645a9ca28681bc5a5d8521d363d880aae393406ff54e08add5a2d4718523c74e",
+      "tree": "sha256:cf54dff6a1bcef7ccf3d38922c2b3d27a5a18f183df89c9515950f64883e8d72",
+      "recorded_at": "2026-10-26T16:17:05.282Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:eabd9586d18913aff0b8d9141daab983bcf11148d3d642b40854483f1e40f70f",
+      "tree": "sha256:cf54dff6a1bcef7ccf3d38922c2b3d27a5a18f183df89c9515950f64883e8d72",
+      "recorded_at": "2026-10-26T16:17:05.282Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:cf54dff6a1bcef7ccf3d38922c2b3d27a5a18f183df89c9515950f64883e8d72",
+      "recorded_at": "2026-10-26T16:17:05.282Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0002",
+      "command": "node scripts/fitness.mjs on-demand-routes",
+      "exit_code": 0,
+      "output_sha256": "sha256:8889ce4c59526613a3c1e5351b2f2b5fba836a94c5a4bf6236e506c4a018dc51",
+      "tree": "sha256:cf54dff6a1bcef7ccf3d38922c2b3d27a5a18f183df89c9515950f64883e8d72",
+      "recorded_at": "2026-10-26T16:17:05.282Z"
+    }
+  ],
+  "closed_at": "2026-10-26T16:17:31.951Z"
+}

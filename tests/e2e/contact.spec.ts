@@ -54,11 +54,19 @@ test.describe("función de contacto (ADR 0002)", () => {
     expect(await response.json()).toEqual({ ok: false, error: "unavailable" });
   });
 
-  // El uptime externo hace GET: con el binding pero sin secretos (el build de los tests), la ruta responde 503.
+  // Con el binding pero sin secretos (el build de los tests), la comprobación de salud responde 503.
   test("GET responde a la comprobación de salud sin gastar envíos", async ({ request, baseURL }) => {
     const response = await request.get("/api/contact/", { headers: headers(baseURL) });
     expect(response.status()).toBe(503);
     expect(await response.json()).toEqual({ ok: false, error: "unavailable" });
+    expect(response.headers()["cache-control"]).toBe("no-store");
+  });
+
+  // UptimeRobot gratis manda HEAD: Astro lo contesta con el handler del GET, con su estado y sin el cuerpo.
+  test("HEAD, lo que manda el uptime, responde como el GET sin cuerpo", async ({ request, baseURL }) => {
+    const response = await request.head("/api/contact/", { headers: headers(baseURL) });
+    expect(response.status()).toBe(503);
+    expect(await response.body()).toHaveLength(0);
     expect(response.headers()["cache-control"]).toBe("no-store");
   });
 

@@ -457,8 +457,9 @@ describe("handleContact", () => {
   });
 });
 
-// GET /api/contact/: la comprobación del uptime externo (UptimeRobot gratis solo hace GET y da por caído lo
-// que no es 2xx). Mira la configuración sin llamar a terceros ni gastar el límite de envíos.
+// GET /api/contact/: la comprobación del uptime externo (UptimeRobot gratis manda HEAD, que Astro contesta con este
+// GET sin el cuerpo, y da por caído lo que no es 2xx o 3xx). Mira la configuración sin llamar a terceros ni gastar
+// el límite de envíos.
 describe("contactHealth", () => {
   const limiter = () => {
     const keys: string[] = [];
