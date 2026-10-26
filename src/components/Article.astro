@@ -4,6 +4,7 @@ import { type Locale, localizedPath, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
 import type { LocalArticle } from "../lib/articles";
 import { articlePath, feedPath, formatDate, ogImagePath, readingMinutes } from "../lib/blog";
+import { blogAuthor } from "../lib/board";
 import Footer from "./board/Footer.astro";
 
 interface Props {
@@ -22,9 +23,10 @@ const dates = [
 ] as const;
 ---
 
-<!-- DESIGN.md Layout, the article: the title and its lead on the left with the dates beside them, then the body held to
-     measure on the left and the way to the contact on the right, which stays in view while the body scrolls. Unlike the
-     board, an article is read and quoted, so its text stays selectable on touch screens (global.css). -->
+<!-- DESIGN.md Layout, the article: the title and its lead on the left with its author and dates beside them, then the
+     body held to measure on the left and the way to the contact on the right, which stays in view while the body
+     scrolls. Unlike the board, an article is read and quoted, so its text stays selectable on touch screens
+     (global.css). -->
 <Base
   locale={locale}
   title={`${title} · Retama`}
@@ -53,6 +55,10 @@ const dates = [
     <div class="col-span-2 flex flex-col justify-between gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-4">
       <div class="grid gap-md">
         <dl class="grid gap-xs">
+          <div class="grid gap-xs bg-surface p-md">
+            <dt class="type-small text-on-surface-muted">{copy["blog.author"]}</dt>
+            <dd>{blogAuthor}</dd>
+          </div>
           {
             dates.map(([label, date]) => (
               <div class="grid gap-xs bg-surface p-md">

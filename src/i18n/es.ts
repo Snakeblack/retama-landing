@@ -1,7 +1,7 @@
 export const es = {
-  "meta.title": "Retama · Ingeniería de software",
+  "meta.title": "Software a medida y aplicaciones web para empresas · Retama",
   "meta.description":
-    "Retama diseña y construye aplicaciones web, software a medida y automatizaciones para empresas. Arquitectura documentada y trabajo 100 % en remoto.",
+    "Retama diseña y construye software a medida, aplicaciones web y automatizaciones para empresas, con precio cerrado y cada decisión por escrito.",
   "og.imageAlt": "«Software a medida» junto a una retama dibujada sobre fondo grafito, con el logotipo de Retama.",
   "nav.switchLabel": "Read in English",
   "nav.label": "Secciones",
@@ -52,6 +52,10 @@ export const es = {
   "services.seo": "SEO y analítica",
   "services.seoLine": "Que te encuentren, y saber qué funciona sin cookies de seguimiento.",
   "services.seoFrom": "Desde 800 € + IVA · sin cuota mensual",
+  "offers.diagnosis": "Diagnóstico",
+  "offers.cms": "Web con gestor de contenidos",
+  "offers.desktop": "Aplicación de escritorio",
+  "offers.maintenance": "Mantenimiento mensual",
   "services.figure": "1",
   "services.figureCaption": "interlocutor, de la primera llamada a la entrega.",
 
@@ -328,13 +332,14 @@ export const es = {
   "notFound.lead": "La página que buscas no existe o ha cambiado de dirección.",
   "notFound.back": "Volver al inicio",
 
-  "blog.metaTitle": "Blog · Retama",
+  "blog.metaTitle": "Software a medida, explicado · Blog de Retama",
   "blog.metaDescription":
     "Cómo se encarga, se construye y se cuida un software a medida, contado por Retama para quien lo encarga.",
   "blog.title": "Software, explicado",
   "blog.lead":
     "Cómo se encarga, se construye y se cuida un software a medida, contado para quien lo encarga y sin jerga.",
   "blog.listLabel": "Artículos",
+  "blog.author": "Escrito por",
   "blog.published": "Publicado el",
   "blog.updated": "Actualizado el",
   "blog.minutes": "min de lectura",

@@ -7,6 +7,7 @@ import { defineConfig, envField, fontProviders } from "astro/config";
 import { missingOwner } from "./scripts/lib/legal-owner.mjs";
 import { unpinnedPnpm } from "./scripts/lib/pnpm-pin.mjs";
 import { refusedSiteKey, TEST_SITE_KEY } from "./scripts/lib/turnstile-key.mjs";
+import { readArticles, sitemapExtras } from "./src/lib/sitemap.ts";
 
 // The legal notice must name its owner (LSSI art. 10): Workers Builds, which publishes the site, never builds without.
 const missing = missingOwner(process.env);
@@ -24,6 +25,8 @@ if (pnpm) throw new Error(`Workers Builds must build with ${packageManager} (fou
 // Production origin for canonicals, hreflang and the sitemap, the Custom Domain of wrangler.jsonc.
 // SITE_URL overrides it.
 const site = process.env.SITE_URL ?? "https://retama.dev";
+// The blog's dates and each article's translation for the sitemap (src/lib/sitemap.ts).
+const extras = sitemapExtras(new URL(site), readArticles(new URL("./src/content/blog/", import.meta.url)));
 
 export default defineConfig({
   site,
@@ -105,6 +108,7 @@ export default defineConfig({
     sitemap({
       i18n: { defaultLocale: "es", locales: { es: "es", en: "en" } },
       filter: (page) => !/\/404\/?$/.test(new URL(page).pathname),
+      serialize: (item) => ({ ...item, ...extras.get(item.url) }),
     }),
   ],
   security: {

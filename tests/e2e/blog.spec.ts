@@ -12,6 +12,8 @@ const blogs = [
     all: "Todos los artículos",
     talk: "Hablemos",
     contact: "/#contacto",
+    byline: "Escrito por",
+    team: "/#nosotros",
   },
   {
     lang: "en",
@@ -24,13 +26,15 @@ const blogs = [
     all: "All articles",
     talk: "Let's talk",
     contact: "/en/#contact",
+    byline: "Written by",
+    team: "/en/#about-us",
   },
 ];
 
 test.describe("blog sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false });
 
-  for (const { lang, index, title, article, headline, all } of blogs) {
+  for (const { lang, index, title, article, headline, all, byline } of blogs) {
     test(`${index} lista los artículos de su idioma, del más reciente al más antiguo`, async ({ page }) => {
       const response = await page.goto(index);
       expect(response?.status()).toBe(200);
@@ -45,7 +49,7 @@ test.describe("blog sin JavaScript (ADR 0001)", () => {
       await expect(page.getByRole("main").locator("time").first()).toHaveAttribute("datetime", /^\d{4}-\d{2}-\d{2}$/);
     });
 
-    test(`${article} tiene su título, sus fechas y su cuerpo en el HTML`, async ({ page }) => {
+    test(`${article} tiene su título, su firma, sus fechas y su cuerpo en el HTML`, async ({ page }) => {
       const response = await page.goto(article);
       expect(response?.status()).toBe(200);
       await expect(page.locator("html")).toHaveAttribute("lang", lang);
@@ -53,6 +57,9 @@ test.describe("blog sin JavaScript (ADR 0001)", () => {
       await expect(page.getByRole("heading", { level: 1, name: headline })).toBeVisible();
       await expect(page.locator("[data-article] h2").first()).toBeVisible();
       await expect(page.locator("[data-article] li").first()).toBeVisible();
+      // Signed by Manuel M. (owner, 2026-10-26), first of the facts beside the title.
+      await expect(page.locator("dl dt").first()).toHaveText(byline);
+      await expect(page.locator("dl dd").first()).toHaveText("Manuel M.");
       // Published, then updated when its warranty and its floor price followed proposal 1.4.
       await expect(page.locator("dl time")).toHaveCount(2);
       await expect(page.locator("dl time").first()).toHaveAttribute("datetime", "2026-10-23");
@@ -64,7 +71,7 @@ test.describe("blog sin JavaScript (ADR 0001)", () => {
   }
 });
 
-for (const { lang, home, index, article, other, talk, contact } of blogs) {
+for (const { lang, home, index, article, other, talk, contact, team } of blogs) {
   test(`${article} cambia de idioma al mismo artículo traducido`, async ({ page }) => {
     await page.goto(article);
     const switcher = page.locator("a.lang-switch");
@@ -80,8 +87,9 @@ for (const { lang, home, index, article, other, talk, contact } of blogs) {
     await expect(page.getByRole("complementary").getByRole("link", { name: talk })).toHaveAttribute("href", contact);
   });
 
-  test(`${article} se describe como BlogPosting de Retama`, async ({ page }) => {
+  test(`${article} se describe como BlogPosting de Retama, firmado por Manuel M.`, async ({ page }) => {
     await page.goto(article);
+    const canonical = (await page.locator('link[rel="canonical"]').getAttribute("href")) ?? "";
     const graph: Record<string, unknown>[] = JSON.parse(
       (await page.locator('script[type="application/ld+json"]').textContent()) ?? "",
     )["@graph"];
@@ -90,10 +98,9 @@ for (const { lang, home, index, article, other, talk, contact } of blogs) {
       headline: await page.locator("h1").textContent(),
       inLanguage: lang,
       datePublished: "2026-10-23",
-      // Absolute on the production origin, like the canonical.
-      author: {
-        "@id": new URL("/#organization", (await page.locator('link[rel="canonical"]').getAttribute("href")) ?? "").href,
-      },
+      // Absolute on the production origin, like the canonical: the author leads to the team chapter.
+      author: { "@type": "Person", name: "Manuel M.", url: new URL(team, canonical).href },
+      publisher: { "@id": new URL("/#organization", canonical).href },
     });
     await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
   });
