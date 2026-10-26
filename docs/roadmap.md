@@ -131,15 +131,19 @@ ajustes de configuración y defensa en profundidad.
    de los navegadores (estos ya van a HTTPS por el preload de `.dev`), y DMARC con informes `rua` a DMARC Management de
    Cloudflare. Al leer la zona salió que aceptaba TLS 1.0 y 1.1 (la auditoría los dio por rechazados porque OpenSSL 3 no
    los ofrece por defecto): el mínimo pasa a TLS 1.2. Un CAA deja emitir solo a las CAs de Cloudflare.
-5. `worker-quota` (baja, A06): las peticiones que no son una navegación ni coinciden con un asset invocan el Worker y
-   gastan la cuota diaria del plan gratuito, y la regla del WAF solo cubre `/api/report/`. Se decide entre aceptarlo por
-   escrito en un ADR que amplíe el 0011, Workers Paid o ampliar la regla.
+5. `worker-quota` (hecho; baja, A06): las peticiones que no son una navegación ni coinciden con un asset invocan el
+   Worker y gastan el límite diario del plan gratuito, que es de la cuenta y comparte `retama-app`. El ADR 0012, que
+   amplía el 0011, lo acepta: ampliar la regla del WAF no lo protege, porque cuenta por IP, y Workers Paid se decide
+   cuando `retama-app` abra a clientes o la cuenta pase del 25 % del límite. El formulario ya no pide esperar un minuto
+   ante un 429 que no es de la función, y ofrece el correo y WhatsApp.
 6. `dmarc-enforce` (baja, A02): tras dos a cuatro semanas de informes sin fallos legítimos en DMARC Management (desde
    el 2026-10-26), DMARC de `p=none` a `p=quarantine`.
 
 **Riesgos aceptados:**
 - `/api/report/` registra un mensaje corto de quien falsifique el `Origin`: sin datos personales, con el JSON intacto y
   con su límite por IP (ADR 0011).
+- Quien gaste las 100.000 invocaciones diarias de Workers Free deja la landing sin formulario ni informes, y
+  `retama-app` sin servicio, hasta las 00:00 UTC; las páginas siguen y el uptime lo avisa (ADR 0012).
 - Turnstile y el beacon de Web Analytics se cargan sin SRI: Cloudflare exige cargar `api.js` desde su URL, sin copiarlo
   ni fijarlo, porque lo actualiza, y los dos scripts son del mismo proveedor que el hosting.
 
