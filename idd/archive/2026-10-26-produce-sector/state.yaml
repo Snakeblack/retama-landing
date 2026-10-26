@@ -1,0 +1,330 @@
+{
+  "schema": "idd-state/v1",
+  "change": "produce-sector",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "y lo del tema del gaming?",
+    "kind": "feature",
+    "summary": "Replace the gaming sector with fresh-produce distribution, the entry sector of the agreed business model, with its own example fragment of the day's orders",
+    "acceptance": "In es and en, the sectors switcher no longer names gaming anywhere; a fresh-produce tab has its problem, three builds and an example fragment of the day's orders that comes alive like the others; the brief, the functional scope and DESIGN.md name the new sector; all checks pass"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/contact.ts",
+          "line": 5
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/components/board/Sectors.astro",
+          "line": 12
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 41
+        }
+      },
+      {
+        "category": "copy",
+        "question": "What is the tab called and where does it go, which problem and three builds does it name, and which rows does the day's-orders fragment show?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 219
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 232
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "tests/unit/i18n.test.ts",
+          "line": 8
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/product/brief.md",
+      "docs/product/functional-scope.md",
+      "src/components/board/Sectors.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "tests/e2e/sectors.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0008 and quality scenario brand-impact",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The new sector and its fragment, with every next status, are in the HTML; the motion script only swaps them"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "The fragment reuses ExampleTable and its tokens; nothing new in the design system"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "The new keys exist in es.ts and en.ts and the gaming keys leave both"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "Same switcher, same four tabs and fragment shape; only the content of the third changes"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Nombre: Hortofrutícola. Posición: Donde gaming, no quiero que sea evidente, y ponerlo primero, esta bien que ocupe el puesto. Textos (problema, tres builds, pedidos del día): me parece bien.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T07:41:25.865Z",
+      "detail": {
+        "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-26T07:41:25.865Z",
+      "detail": {
+        "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/sectors.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T07:41:25.865Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms"
+        ],
+        "records": [],
+        "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-26T07:41:33.766Z"
+    }
+  ],
+  "base": "93cedbe8810cb0e6359ed2596776e6c6bf8761de",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0a79415acb06d9212cfee0d8b6e59d17da3d463bc7eec177ec54cfcb9e13514a",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:8528202267edb1278fceaa8b25aa95d0a1001e8e38af00936a196c0f92bc99dc",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:1d33803ac9331affbd90137c33ed7417a3be8b0218f3bcdd1ce4929a7ade3c6d",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:1f3abedeb606ff692f36e2ba872379fe496bd68ab8834d290c402eee3cf3613a",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:6a7a1bc153b3166b2b6fa457db71404d95c6bede0569c1b8d5685dee3e9551ca",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:dc505d6fd9b97457417c0c1df86f2d830b4de09770f8e1fcdfd95f9824633cb4",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:ea819a5d03ec54aba8ac1ddd1ec74c6a138f3f94a86d582d11ee11af6ec20440",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:8e4bf60865448e977a5af6b77c3954744d3e82d9e15825973e034a732e764ce2",
+      "tree": "sha256:df3c28d7609ffb0e45d59f6b667a93236c1ec5f9dd9aacf7d18e1d13fcad86cb",
+      "recorded_at": "2026-10-26T07:41:25.865Z"
+    }
+  ],
+  "closed_at": "2026-10-26T07:41:33.766Z"
+}
