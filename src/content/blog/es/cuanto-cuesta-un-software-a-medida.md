@@ -12,7 +12,7 @@ Lo que sí tiene es un suelo. Con nosotros, un software a medida empieza en 8.00
 
 ## Lo que mueve el precio
 
-El coste de un proyecto es, sobre todo, tiempo de trabajo. Y el tiempo lo deciden unas pocas cosas:
+El precio de un proyecto depende, sobre todo, de lo que tiene que hacer y de lo que está en juego si falla. Y eso lo deciden unas pocas cosas:
 
 - **Cuántas cosas distintas tiene que hacer.** No es lo mismo un formulario que guarda pedidos que un sistema que los recibe, los reparte entre almacenes y avisa al cliente.
 - **Con qué otros sistemas habla.** Cada conexión con tu ERP, tu tienda online o un proveedor externo hay que construirla, probarla y prever qué pasa cuando el otro lado falla.
@@ -20,13 +20,15 @@ El coste de un proyecto es, sobre todo, tiempo de trabajo. Y el tiempo lo decide
 - **Los datos que ya tienes.** Pasar diez años de hojas de cálculo a un sistema nuevo, limpiándolos por el camino, puede ser un proyecto en sí mismo.
 - **Lo que no puede fallar.** Una herramienta interna que usan tres personas no necesita lo mismo que un sistema del que depende tu facturación.
 
+Por eso, con nosotros el precio se cierra por proyecto, nunca por horas, y la propuesta te dice cuánto te ahorra.
+
 ## Lo que tarda
 
-Depende de lo mismo. Como orientación, una landing page se cuenta en semanas; una aplicación web o un software a medida, en meses. Lo que sí debería estar claro desde el principio es el plazo, por escrito, y un ritmo de entregas: con nosotros, una cada una o dos semanas, para que veas el avance y puedas corregir el rumbo antes de que sea caro.
+Depende de lo mismo. Como orientación, con nosotros una landing page lleva de una a dos semanas, y el MVP de una aplicación web, de cuatro a ocho. Lo que sí debería estar claro desde el principio es el plazo, por escrito, y un ritmo de entregas: con nosotros, una cada una o dos semanas, para que veas el avance y puedas corregir el rumbo antes de que sea caro.
 
 ## Dos formas de presupuestar
 
-**Por fases.** Empezamos por un primer producto mínimo, lo que en el oficio se llama MVP: la parte más pequeña que ya resuelve tu problema principal. Sobre él ampliamos en ciclos cortos, y en cada ciclo decides qué viene después. Pagas por lo que ya has visto funcionar, no por lo que imaginabas hace seis meses.
+**Por fases.** Empezamos por un primer producto mínimo, lo que en el oficio se llama MVP: la parte más pequeña que ya resuelve tu problema principal. Sobre él ampliamos en ciclos cortos: cada uno se paga al empezarlo, y el siguiente lo decides después de ver funcionar el anterior, no con lo que imaginabas hace seis meses.
 
 **Cerrado.** Fijamos desde el principio todo lo que se va a construir y su precio. Te da certeza en el coste, a cambio de decidir mucho antes de verlo funcionar; un cambio a mitad de camino se presupuesta aparte.
 

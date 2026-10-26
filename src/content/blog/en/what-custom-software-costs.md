@@ -12,7 +12,7 @@ What it does have is a floor. With us, custom software starts at €8,000 exclud
 
 ## What drives the price
 
-The cost of a project is, above all, working time. And a handful of things decide that time:
+The price of a project depends, above all, on what it has to do and on what is at stake if it fails. And a handful of things decide that:
 
 - **How many different things it has to do.** A form that stores orders is not the same as a system that receives them, splits them between warehouses and tells the customer.
 - **Which other systems it talks to.** Every connection to your ERP, your online shop or an outside provider has to be built, tested and planned for the day the other side fails.
@@ -20,13 +20,15 @@ The cost of a project is, above all, working time. And a handful of things decid
 - **The data you already have.** Moving ten years of spreadsheets into a new system, cleaning them on the way, can be a project of its own.
 - **What must not fail.** An internal tool used by three people does not need what a system your invoicing depends on does.
 
+That is why we price each project as a whole, never by the hour, and the proposal tells you how much it saves you.
+
 ## How long it takes
 
-It depends on the same things. As a guide, a landing page takes weeks; a web application or custom software, months. What should be clear from the start is the timeline, in writing, and a rhythm of deliveries: with us, one every one or two weeks, so you see the progress and can change course before it gets expensive.
+It depends on the same things. As a guide, with us a landing page takes one to two weeks, and the MVP of a web application four to eight. What should be clear from the start is the timeline, in writing, and a rhythm of deliveries: with us, one every one or two weeks, so you see the progress and can change course before it gets expensive.
 
 ## Two ways to price it
 
-**In phases.** We start with a first minimum product, what the trade calls an MVP: the smallest part that already solves your main problem. On top of it we grow in short cycles, and in each cycle you decide what comes next. You pay for what you have already seen working, not for what you pictured six months ago.
+**In phases.** We start with a first minimum product, what the trade calls an MVP: the smallest part that already solves your main problem. On top of it we grow in short cycles: each one is paid when it starts, and you decide the next after seeing the last one working, not on what you pictured six months ago.
 
 **Fixed.** We set everything that will be built, and its price, from the start. It gives you certainty about the cost, in exchange for deciding long before you see it working; a change halfway through is quoted separately.
 

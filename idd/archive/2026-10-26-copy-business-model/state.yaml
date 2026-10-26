@@ -1,0 +1,348 @@
+{
+  "schema": "idd-state/v1",
+  "change": "copy-business-model",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "1. \"100% en remoto, pero cerca cuando lo necesites\", algo así podria estar bien. 2. aqui te doy contexto, Paul es realmente un agente logistico de trafico, el que recoge los pedidos de los clientes con una flota, y mantiene contacto con los clientes y soluciona problemas, ademas de que hace labor comercial, lleva más de 10 años de experiencia a nivel nacional, la empresa en la que trabaja generalmente recoge y almacena fruta y verduras y 4gama, con este contexto podrias ayudarme que poner, 3. si, hazlo, firma el blog como Manuel M.  4. no, lo tengo pendiente",
+    "kind": "feature",
+    "summary": "Align the home's copy and the blog with the agreed business model v2.0 (copy review of 2026-10-26, points 1-22 but the lead source): price by value and cycles paid upfront in the cost article, the web card from a landing to a CMS site, lead times on the cards, the free web proposal, one-off SEO, the maintenance minimum, fully remote but close when needed, Paul first with his logistics line, and English privacy texts that no longer say share",
+    "acceptance": "In es and en: the cost article no longer ties the price to working time nor says cycles are paid afterwards, and gives the landing and MVP lead times; every service card shows its starting price and its lead time (SEO: no monthly fee); the FAQ gives the diagnosis lead time, the agents' fee from 150 a month, the maintenance minimum of three months and that a website's proposal is free; the method says fully remote but close when needed; the team shows Paul first with his logistics line; the English form and privacy texts no longer say the data is shared; the JSON-LD and llms.txt repeat the new texts; all checks pass"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "docs/product/functional-scope.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/en.ts",
+          "line": 344
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "idd/config.yaml",
+          "line": 41
+        }
+      },
+      {
+        "category": "copy",
+        "question": "\"Which exact texts replace the ones of points 1-20 and 22 of the review, in es and en, Paul's line included?\""
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/es.ts",
+          "line": 13
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 255
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/es.ts",
+          "line": 345
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/product/brief.md",
+      "docs/product/functional-scope.md",
+      "idd/config.yaml",
+      "src/components/board/Services.astro",
+      "src/content/blog/en/what-custom-software-costs.md",
+      "src/content/blog/en/why-we-write-every-decision-down.md",
+      "src/content/blog/es/cuanto-cuesta-un-software-a-medida.md",
+      "src/content/blog/es/por-que-escribimos-cada-decision.md",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/board.ts",
+      "tests/e2e/questions.spec.ts",
+      "tests/e2e/services.spec.ts",
+      "tests/e2e/team.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0008 and quality scenario brand-impact",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "The note, the lead times and Paul's new line are plain text in the HTML; nothing waits for a script"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "The services note reuses the team lead's tile spacing and measure; no new token, colour or type style"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "services.note exists in es.ts and en.ts and every changed key changes in both languages"
+    },
+    {
+      "kind": "scenario",
+      "id": "brand-impact",
+      "impact": "conforms",
+      "reason": "One short sentence more under the services heading; every chapter keeps its layout and little text"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint passed in ospec check (lint, WCAG contrast and theme sync); the services note uses only token classes (gap-sm, px-tile-sm, pt-tile-sm, pb-lg, md:px-tile, md:pt-tile, max-w-(--spacing-measure)), the same as the team lead, with no loose value; theme.css untouched",
+      "recorded_at": "2026-10-26T18:15:25.231Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "si (a \"¿Apruebas así todos los textos?\": los propuestos para los puntos 1-20 y 22, más una frase bajo los servicios \"Precios de partida, sin IVA, y plazos orientativos: el precio y el plazo finales los fija la propuesta\", \"desde\" en cada precio del FAQ y en la cuota de los agentes, y la línea de Paul \"Más de diez años en logística resolviendo problemas al lado del cliente: un pedido que no llega, una ruta que cambia a última hora. Te acompaña desde la primera llamada hasta la entrega.\"). Antes, el usuario: \"no quiero que especifiques tanto, y menos que des a entender que sigue trabajando ahí\"; \"es importante recalcar para evitar malentendidos que muchos de los precios son desde\"; \"almacen no\"; \"la venta no es cosa de el, hace labor comercial logistico\"; \"haz que en la frase refuerce su capacidad de resolver problemas\"",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T18:15:09.161Z",
+      "detail": {
+        "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-26T18:15:09.161Z",
+      "detail": {
+        "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/questions.spec.ts",
+          "tests/e2e/services.spec.ts",
+          "tests/e2e/team.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-26T18:15:09.161Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms",
+          "scenario:brand-impact conforms"
+        ],
+        "records": [],
+        "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-26T18:16:04.762Z"
+    }
+  ],
+  "base": "06eb7e8fe9f5c8c68623f51ee0e63eb3a7060bd4",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:7db71f569f25791f5a10588112e43d7e679362739e4241fdeb52d9126c5334a6",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:2a3dbb8798db03f39a809badd38cbc5e823fd7364ea4fdcb612c65a4e630e91e",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:748cfb7fbce4c7eeb4825dbea601b6d56c160b80292b4febf07c0547c89b90cb",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:307b151903c774bd21dcbfc85a6abc4d2dd8675dbf9a6f671ade1e0d8bbc17cf",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:4e2d36625bf63ec1234fccc55366111045ba02df653289b1d66510c5769332d7",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:fc4d4e81eb452f2ae1b16d880a6f2ddb1efe56a6b4440512aa533bbe5ee88864",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:9dc541210c0ccafff5b30e9d2f76382fc9f5b841bc704d9cdf95c24a9262cfb2",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:9a6c12dd6d83c24748d7400d8ba37bf95f3d5f001281f9c5878cbe7e26187153",
+      "tree": "sha256:6899443d140a961e78dae3948e0b8d6b1562d510f89ac02af2130b4b39348cb1",
+      "recorded_at": "2026-10-26T18:15:09.161Z"
+    }
+  ],
+  "closed_at": "2026-10-26T18:16:04.762Z"
+}

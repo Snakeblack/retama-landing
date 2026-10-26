@@ -12,11 +12,12 @@ const pages = [
     path: "/en/",
     title: "Who we are",
     after: "How we work",
-    before: "What clients ask us",
+    before: "Common questions",
     roles: ["Product and development", "Clients and sales"],
   },
 ];
-const names = ["Manuel Michael Retamozo García", "Paul Macorny Retamozo García"];
+// The partner the client talks to comes first (owner, 2026-10-26).
+const names = ["Paul Macorny Retamozo García", "Manuel Michael Retamozo García"];
 
 test.describe("el capítulo Quiénes somos (DESIGN.md Layout)", () => {
   test.describe("sin JavaScript (ADR 0001)", () => {
@@ -37,7 +38,7 @@ test.describe("el capítulo Quiénes somos (DESIGN.md Layout)", () => {
 
         // Until the photos exist, each slot holds the initials, a picture with nothing to read.
         const placeholders = chapter.locator("[data-portrait]");
-        await expect(placeholders).toHaveText(["MR", "PR"]);
+        await expect(placeholders).toHaveText(["PR", "MR"]);
         for (const placeholder of await placeholders.all())
           await expect(placeholder).toHaveAttribute("aria-hidden", "true");
 

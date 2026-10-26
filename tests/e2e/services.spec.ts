@@ -6,7 +6,8 @@ const pages = [
     title: "Lo que construimos",
     method: "Cómo trabajamos",
     services: ["Webs y CMS", "Software a medida", "Agentes y automatizaciones", "SEO y analítica"],
-    from: /^Desde \d{1,3}(\.\d{3})? € \+ IVA/,
+    from: /^Desde \d{1,3}(\.\d{3})? € \+ IVA.* · (de \d+ a \d+ semanas|sin cuota mensual)$/,
+    note: /^Precios de partida, sin IVA, y plazos orientativos/,
     contact: "Hablemos",
   },
   {
@@ -14,7 +15,8 @@ const pages = [
     title: "What we build",
     method: "How we work",
     services: ["Websites and CMS", "Custom software", "Agents and automation", "SEO and analytics"],
-    from: /^From €\d{1,3}(,\d{3})? \+ VAT/,
+    from: /^From €\d{1,3}(,\d{3})? \+ VAT.* · (\d+ to \d+ weeks|no monthly fee)$/,
+    note: /^Starting prices, excluding VAT, and indicative timelines/,
     contact: "Let's talk",
   },
 ];
@@ -38,19 +40,22 @@ test.describe("el capítulo Servicios (DESIGN.md Layout e Imagery)", () => {
   test.describe("sin JavaScript (ADR 0001)", () => {
     test.use({ javaScriptEnabled: false });
 
-    for (const { path, title, services, from } of pages) {
-      test(`${path} muestra cuatro tarjetas, cada una con su nombre, su frase, su precio y su trama de la retama`, async ({
+    for (const { path, title, services, from, note } of pages) {
+      test(`${path} muestra cuatro tarjetas, cada una con su nombre, su frase, su precio, su plazo y su trama de la retama`, async ({
         page,
       }) => {
         await page.goto(path);
         const chapter = page.getByRole("region", { name: title });
         await expect(chapter.getByRole("heading", { level: 2, name: title })).toBeVisible();
+        // Before any price, the chapter says they are starting prices and the lead times a guide (owner, 2026-10-26).
+        await expect(chapter.getByText(note)).toBeVisible();
         const cards = chapter.getByRole("listitem");
         await expect(cards).toHaveCount(4);
         await expect(chapter.getByRole("heading", { level: 3 })).toHaveText(services);
         for (const card of await cards.all()) {
           await expect(card.locator("p").first()).not.toBeEmpty();
-          // The starting price, excluding VAT, under the sentence (owner, 2026-10-26).
+          // The starting price, excluding VAT, and its lead time (SEO: no monthly fee), under the sentence (owner,
+          // 2026-10-26).
           await expect(card.locator("p").nth(1)).toHaveText(from);
         }
 

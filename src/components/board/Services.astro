@@ -30,9 +30,11 @@ const shape = retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots);
 ---
 
 <section id={copy["anchor.services"]} class="grid gap-gap" aria-labelledby="services-title">
-  <h2 id="services-title" class="text-balance px-tile-sm pt-tile-sm pb-lg type-headline-sm md:px-tile md:pt-tile md:type-headline">
-    {copy["services.title"]}
-  </h2>
+  <!-- Before any price, one sentence says they are starting prices and the lead times a guide (owner, 2026-10-26). -->
+  <div class="grid gap-sm px-tile-sm pt-tile-sm pb-lg md:px-tile md:pt-tile">
+    <h2 id="services-title" class="text-balance type-headline-sm md:type-headline">{copy["services.title"]}</h2>
+    <p class="max-w-(--spacing-measure)">{copy["services.note"]}</p>
+  </div>
 
   <!-- The plant once, as dots along its strokes; every card shows it through its own viewBox. -->
   <svg class="absolute size-0" aria-hidden="true">
