@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/Snakeblack/retama-landing/compare/v0.10.0...v0.11.0) (2026-10-26)
+
+
+### Features
+
+* **seo:** point the titles, JSON-LD and sitemap at the business model ([9a01902](https://github.com/Snakeblack/retama-landing/commit/9a019022507c2a163f6c5fd01fa84e1ffce5f3e0))
+
 ## [0.10.0](https://github.com/Snakeblack/retama-landing/compare/v0.9.3...v0.10.0) (2026-10-26)
 
 
