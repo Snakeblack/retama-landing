@@ -121,11 +121,12 @@ ajustes de configuración y defensa en profundidad.
    Builds se detiene si no corre el pnpm de `packageManager`, que pnpm ya no impone solo. Un `pnpm audit` programado a
    diario, con el umbral y los avisos ignorados de la puerta de los PR, avisa por email aunque GitHub lo vuelva a leer
    mal. Las tres alertas altas que `pnpm-workspace.yaml` ya acepta se descartan con el mismo motivo.
-3. `worker-headers` (media, A02): el adaptador de Cloudflare añade al Worker rutas propias (`/_image/`,
-   `/_server-islands/`) que no están en la lista de los ADR 0002 y 0011, y sus respuestas no llevan las cabeceras de
-   `public/_headers`, que solo cubren los assets. Lleva cabeceras de seguridad en toda respuesta del Worker, la retirada
-   de las rutas del adaptador que el sitio no usa y la fitness `on-demand-routes` sobre las rutas del build, no solo
-   sobre `src/pages`.
+3. `worker-headers` (hecho; media, A02): Astro y el adaptador de Cloudflare añaden al Worker rutas propias
+   (`/_image/`, `/_server-islands/`) que no están en la lista de los ADR 0002 y 0011, y lo que responde el Worker no
+   llevaba las cabeceras de `public/_headers`, que solo cubren los assets. Un entrypoint propio (`src/worker.ts`) solo
+   entrega a Astro `/api/contact` y `/api/report`, manda lo demás a los assets y añade a todas sus respuestas las
+   cabeceras de seguridad, con una CSP que no carga nada. La fitness `on-demand-routes` lee las rutas del build, no solo
+   `src/pages`, y corre en el CI tras el build.
 4. `zone-hardening` (baja, A04 y A02): en la zona, *Always Use HTTPS*, para que `http://` redirija también fuera de los
    navegadores (estos ya van a HTTPS por el preload de `.dev`), y DMARC con informes `rua` como primer paso; CAA
    opcional.
