@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2](https://github.com/Snakeblack/retama-landing/compare/v0.9.1...v0.9.2) (2026-10-26)
+
+
+### Bug Fixes
+
+* **worker:** secure every response and keep Astro's own routes out of reach ([c41a901](https://github.com/Snakeblack/retama-landing/commit/c41a901c02865e39064046e8ae008ae6fb659aae))
+
 ## [0.9.1](https://github.com/Snakeblack/retama-landing/compare/v0.9.0...v0.9.1) (2026-10-26)
 
 
