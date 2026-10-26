@@ -31,7 +31,6 @@ jobs:
       - run: pnpm test
       - run: pnpm design:lint
       - run: pnpm skills:scan
-      - run: node scripts/fitness.mjs on-demand-routes
       - run: pnpm audit --audit-level high
 
   e2e:
@@ -75,6 +74,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      # The fitness checks that read the build: the on-demand routes of the Worker, its bindings and the start-up JavaScript.
+      - run: node scripts/fitness.mjs on-demand-routes
       - run: node scripts/fitness.mjs no-persistent-bindings
       - run: node scripts/fitness.mjs js-budget
       # perf-mobile: 100 in the four categories on the mobile preset (lighthouserc.json).
