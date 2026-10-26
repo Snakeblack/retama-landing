@@ -2,6 +2,13 @@ allowBuilds:
   esbuild: true
   workerd: true
 
+# By default pnpm 12 puts its own version first in pnpm-lock.yaml, as a YAML document of its own, and GitHub's
+# dependency graph reads only that one (dependabot-core#15904), so Dependabot saw no npm dependency. With ignore the
+# lockfile is one document, but pnpm no longer switches itself to packageManager and the lockfile no longer records the
+# hash of pnpm itself (accepted). packageManager stays the pin: the CI installs it with pnpm/action-setup, and a
+# Workers Builds build stops with any other pnpm (scripts/lib/pnpm-pin.mjs).
+pmOnFail: ignore
+
 overrides:
   # 1.64 needs wrangler ^4.151, newer than pnpm's minimum release age.
   "@cloudflare/vite-plugin": 1.63.2

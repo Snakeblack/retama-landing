@@ -1,9 +1,11 @@
 // @ts-check
+import { readFileSync } from "node:fs";
 import cloudflare from "@astrojs/cloudflare";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField, fontProviders } from "astro/config";
 import { missingOwner } from "./scripts/lib/legal-owner.mjs";
+import { unpinnedPnpm } from "./scripts/lib/pnpm-pin.mjs";
 import { refusedSiteKey, TEST_SITE_KEY } from "./scripts/lib/turnstile-key.mjs";
 
 // The legal notice must name its owner (LSSI art. 10): Workers Builds, which publishes the site, never builds without.
@@ -13,6 +15,11 @@ if (missing.length > 0)
 // The contact widget must not publish a Turnstile test key, which always gives the same answer.
 if (refusedSiteKey(process.env))
   throw new Error("The contact form needs a real Turnstile widget: set PUBLIC_TURNSTILE_SITE_KEY in Workers Builds.");
+// pnpm no longer switches itself to the version package.json pins (pmOnFail in pnpm-workspace.yaml): the published site
+// is built with that one or not at all.
+const { packageManager } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
+const pnpm = unpinnedPnpm(process.env, packageManager);
+if (pnpm) throw new Error(`Workers Builds must build with ${packageManager} (found: ${pnpm}): set PNPM_VERSION there.`);
 
 // Production origin for canonicals, hreflang and the sitemap, the Custom Domain of wrangler.jsonc.
 // SITE_URL overrides it.
