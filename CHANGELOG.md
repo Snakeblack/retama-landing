@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.3](https://github.com/Snakeblack/retama-landing/compare/v0.9.2...v0.9.3) (2026-10-26)
+
+
+### Bug Fixes
+
+* **contact:** ask to wait only on the function's own rate limit ([970ac7f](https://github.com/Snakeblack/retama-landing/commit/970ac7feb1357ae6f94da1849dc981a8dd5ab51b))
+* **deps:** patch the fflate and uuid advisories of the dev tools ([5517dc7](https://github.com/Snakeblack/retama-landing/commit/5517dc70da70eb87ba6d08f92ee82f127cc4b1be))
+
 ## [0.9.2](https://github.com/Snakeblack/retama-landing/compare/v0.9.1...v0.9.2) (2026-10-26)
 
 
