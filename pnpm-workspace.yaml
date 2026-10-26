@@ -16,6 +16,10 @@ overrides:
   "tmp": ">=0.2.6"
   "basic-ftp": ">=6.2.1"
   "body-parser@1": "^1.20.9"
+  # It also asks for uuid ^8.3.1 and only calls require("uuid").v4(), which uuid 11 keeps in its CommonJS build.
+  "uuid@8": "^11.1.1"
+  # satori pins fflate 0.7.3, even in its latest release; 0.7.5 is the patch of the same line.
+  "fflate@0.7": "^0.7.5"
   # miniflare (wrangler, the Astro adapter) pins undici 7.28.0, even in its latest release.
   "undici@7": "^7.30.1"
 
