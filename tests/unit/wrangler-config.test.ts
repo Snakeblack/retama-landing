@@ -47,6 +47,18 @@ describe("límite de envíos en las Previews (ADR 0002)", () => {
   });
 });
 
+// El límite diario de Workers Free solo cuenta lo que invoca el Worker: ni los activos ni las navegaciones lo hacen.
+describe("cuota diaria de Workers (ADR 0012)", () => {
+  it("los activos se sirven sin invocar el Worker", () => {
+    expect(config.assets.run_worker_first).toBeUndefined();
+  });
+
+  it("las navegaciones a una ruta sin activo reciben la 404 sin invocar el Worker", () => {
+    expect(config.compatibility_date >= "2025-04-01").toBe(true);
+    expect(config.compatibility_flags ?? []).not.toContain("assets_navigation_has_no_effect");
+  });
+});
+
 describe("límite de informes de errores (ADR 0011)", () => {
   it("producción admite 20 informes por minuto e IP, con un contador aparte del contacto", () => {
     const report = limiter(config.ratelimits, "REPORT_LIMITER");
