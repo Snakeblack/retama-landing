@@ -1,8 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  // The Astro adapter writes the deploy config (entrypoint and assets directory)
+  // The Astro adapter writes the deploy config (the bundled entry and the assets directory)
   // into dist/; this file only holds what the adapter does not set.
   "name": "retama-landing",
+  // Our own entry around the adapter's handler, which it bundles: it adds the security headers of public/_headers to
+  // what the Worker answers and leaves out of reach the routes Astro injects that the site does not use (src/worker.ts).
+  "main": "./src/worker.ts",
   "compatibility_date": "2026-10-01",
   // Production lives only on retama.dev: the Custom Domain brings its DNS record and certificate, and the
   // workers.dev URL is off. www.retama.dev is a Redirect Rule of the zone (dashboard), not a route of the Worker.

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type APIRequestContext, type APIResponse, expect, test } from "@playwright/test";
 
 const paths = ["/", "/en/", "/no-existe/", "/en/no-existe/"];
 
@@ -52,6 +52,39 @@ test.describe("cabeceras de seguridad (ADR 0006)", () => {
         `frame-src https://challenges.cloudflare.com${booking}`,
       );
       expect(csp).not.toMatch(/unsafe-inline|unsafe-eval/);
+    });
+  }
+});
+
+// public/_headers only reaches the static assets: what the Worker answers itself carries the same headers from
+// src/server/edge.ts, with a CSP that loads nothing, since none of it is a page (M7, worker-headers).
+const WORKER_CSP = "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+
+test.describe("respuestas del Worker (ADR 0002, ADR 0006, ADR 0011)", () => {
+  const answers: [string, (request: APIRequestContext) => Promise<APIResponse>][] = [
+    ["GET /api/contact/", (request) => request.get("/api/contact/")],
+    ["POST /api/report/", (request) => request.post("/api/report/", { data: {} })],
+    ["GET /api/contact, que redirige a la barra final", (request) => request.get("/api/contact", { maxRedirects: 0 })],
+  ];
+  for (const [name, send] of answers) {
+    test(`${name} lleva las cabeceras de seguridad y una CSP que no carga nada`, async ({ request }) => {
+      const headers = (await send(request)).headers();
+      for (const [header, pattern] of Object.entries(expectedHeaders)) {
+        expect(headers[header], header).toMatch(pattern);
+      }
+      expect(headers["content-security-policy"]).toBe(WORKER_CSP);
+    });
+  }
+
+  // Astro and the adapter inject the image endpoint and the server islands into the build; the site uses neither, and
+  // Astro decodes the path before it routes it, so an encoded one must not reach them either.
+  for (const path of ["/_image/?href=/favicon.svg", "/%5Fimage/?href=/favicon.svg", "/_server-islands/Team/"]) {
+    test(`${path} responde como una ruta que no existe`, async ({ request }) => {
+      const missing = await request.get("/no-existe/");
+      const response = await request.get(path);
+      expect(response.status()).toBe(404);
+      expect(await response.text()).toBe(await missing.text());
+      expect(response.headers()["content-security-policy"]).toBe(missing.headers()["content-security-policy"]);
     });
   }
 });
