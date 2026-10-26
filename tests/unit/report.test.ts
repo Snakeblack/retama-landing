@@ -87,31 +87,43 @@ describe("informe de un error de la página (ADR 0011)", () => {
   });
 
   it("lee en tiempo casi lineal un informe adversario de 8 KB", () => {
-    const n = MAX_REPORT_BYTES;
-    const inputs: [RawError, string][] = [
-      [{ message: "a".repeat(n) }, `${origin}/`],
-      [{ message: "a@".repeat(n / 2) }, `${origin}/`],
-      [{ message: `${"a".repeat(n / 2)}@${"b".repeat(n / 2)}` }, `${origin}/`],
-      [{ message: "a:/".repeat(n / 3) }, `${origin}/`],
-      [{ message: "boom", stack: "@".repeat(n) }, `${origin}/`],
-      [{ message: "boom", stack: "@:1:".repeat(n / 4) }, `${origin}/`],
-      [{ message: "boom", stack: `at ${"a".repeat(n)}` }, `${origin}/`],
-      [{ message: "boom", stack: `at ${"a://".repeat(n / 4)}(` }, `${origin}/`],
-      [{ message: "boom", stack: `at ${"a://".repeat(n / 4)})` }, `${origin}/`],
-      [{ message: "boom" }, `${origin}/${"a".repeat(n)}`],
-      [{ message: `${"é".repeat(n / 2)}@${"ü".repeat(n / 2)}` }, `${origin}/`],
-      [{ message: "%40".repeat(n / 3) }, `${origin}/`],
-      [{ message: "boom", stack: `at ${"%40".repeat(n / 3)}` }, `${origin}/`],
-      [{ message: "boom" }, `${origin}/${"%40".repeat(n / 3)}`],
+    const cases: ((n: number) => [RawError, string])[] = [
+      (n) => [{ message: "a".repeat(n) }, `${origin}/`],
+      (n) => [{ message: "a@".repeat(n / 2) }, `${origin}/`],
+      (n) => [{ message: `${"a".repeat(n / 2)}@${"b".repeat(n / 2)}` }, `${origin}/`],
+      (n) => [{ message: "a:/".repeat(n / 3) }, `${origin}/`],
+      (n) => [{ message: "boom", stack: "@".repeat(n) }, `${origin}/`],
+      (n) => [{ message: "boom", stack: "@:1:".repeat(n / 4) }, `${origin}/`],
+      (n) => [{ message: "boom", stack: `at ${"a".repeat(n)}` }, `${origin}/`],
+      (n) => [{ message: "boom", stack: `at ${"a://".repeat(n / 4)}(` }, `${origin}/`],
+      (n) => [{ message: "boom", stack: `at ${"a://".repeat(n / 4)})` }, `${origin}/`],
+      (n) => [{ message: "boom" }, `${origin}/${"a".repeat(n)}`],
+      (n) => [{ message: `${"é".repeat(n / 2)}@${"ü".repeat(n / 2)}` }, `${origin}/`],
+      (n) => [{ message: "%40".repeat(n / 3) }, `${origin}/`],
+      (n) => [{ message: "boom", stack: `at ${"%40".repeat(n / 3)}` }, `${origin}/`],
+      (n) => [{ message: "boom" }, `${origin}/${"%40".repeat(n / 3)}`],
     ];
-    const read = () => {
-      for (const [raw, page] of inputs) errorReport(raw, page, origin);
+    // The median of nine runs of `times` reads in a row, so a pause of the machine in a few of them counts for nothing.
+    const median = ([raw, page]: [RawError, string], times: number) => {
+      const runs = Array.from({ length: 9 }, () => {
+        const start = performance.now();
+        for (let read = 0; read < times; read++) errorReport(raw, page, origin);
+        return performance.now() - start;
+      });
+      return runs.sort((a, b) => a - b)[4] ?? Infinity;
     };
-    read();
-    const start = performance.now();
-    read();
-    // About 1 ms each; with unbounded repetitions one of them alone took about 50 ms.
-    expect(performance.now() - start).toBeLessThan(50);
+    // Eight times the input takes about eight times as long when linear (8.3 at most, measured) and about 64 when
+    // quadratic (52 to 64 with unbounded repetitions), whatever the machine's speed. The small input is read eight
+    // times per run, so both runs last about as long and a scheduler that cuts the longer one short cuts both alike.
+    // A case read in under 1 ms at 8 KB is too short to measure that way and too fast to matter: the quadratic ones
+    // took 26 to 63 ms.
+    const slow = cases
+      .map((input, i) => {
+        const ms = median(input(MAX_REPORT_BYTES), 1);
+        return { i, ms, ratio: (8 * ms) / median(input(MAX_REPORT_BYTES / 8), 8) };
+      })
+      .filter(({ ms, ratio }) => ms >= 1 && ratio >= 24);
+    expect(slow).toEqual([]);
   });
 
   it.each([

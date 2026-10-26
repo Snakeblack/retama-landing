@@ -1,0 +1,217 @@
+{
+  "schema": "idd-state/v1",
+  "change": "report-timing-test",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "El test de tiempo casi lineal de tests/unit/report.test.ts comprueba la complejidad del parser de informes y no la velocidad del runner (issue #73)",
+    "acceptance": "El test falla si una regex de src/lib/report.ts vuelve a ser cuadrática (1 KB frente a 8 KB) y no depende de un límite de reloj absoluto que un runner cargado supera"
+  },
+  "facts": {
+    "open": [
+      "¿Qué enfoque se usa: relación de tiempos 8 KB/1 KB por caso con el mejor de varias ejecuciones, el mejor de varias ejecuciones con un límite absoluto holgado, o ambos?",
+      "¿Qué umbral de relación separa lo lineal de lo cuadrático?",
+      "¿Se descartan los casos que tardan menos que la resolución del reloj?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "tests/unit/report.test.ts"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Enfoque: relación por caso (8 KB frente a 1 KB, el mejor de 7). Umbral: 24. Casos de microsegundos: pasan si 8 KB < 1 ms.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-26T08:20:52.224Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2"
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-26T08:23:38.499Z",
+      "detail": {
+        "tree": "sha256:ae38dddc2f4710065019ef3c3fa966ed7a45e13693372bbb40e2e794fe781d55",
+        "runs": [
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11",
+          "run-12"
+        ]
+      }
+    }
+  ],
+  "base": "f9ab6299a0dfce1f4cb5c2f64da9d1c7b38f89ce",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "sh -c 'for i in 1 2 3; do taskset -c 0 node -e \"for(;;){}\" & done; taskset -c 0 pnpm exec vitest run tests/unit/report.test.ts -t \"casi lineal\"; r=$?; kill $(jobs -p); exit $r'",
+      "exit_code": 1,
+      "output_sha256": "sha256:ae5388f9f17ef692454918b05f2d4429059549966abbb8b634b94c3f6812f10d",
+      "tree": "sha256:0d93a6905994642daf458cf642e3f99bbe99d34b3df395f67baf3ab38abd5471",
+      "recorded_at": "2026-10-26T08:17:49.676Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "sh -c 'for i in 1 2 3; do taskset -c 0 node -e \"for(;;){}\" & done; taskset -c 0 pnpm exec vitest run tests/unit/report.test.ts -t \"casi lineal\"; r=$?; kill $(jobs -p); exit $r'",
+      "exit_code": 0,
+      "output_sha256": "sha256:988622ae299fb6cba2c98e3148f0c1bedb9cccf344c79da0fbcaca7137f0396d",
+      "tree": "sha256:2e3d889335212803acde2487dc37007c2acda77a94cfe25600051c8091ae2319",
+      "recorded_at": "2026-10-26T08:20:52.224Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0a79415acb06d9212cfee0d8b6e59d17da3d463bc7eec177ec54cfcb9e13514a",
+      "tree": "sha256:23786d89587148d21dd344edee9d1488cde62285fd67bea787e37c02d6cce4f4",
+      "recorded_at": "2026-10-26T08:21:51.888Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 1,
+      "output_sha256": "sha256:ada840d007d39dc3fc4412eb559a91fe66335be11d80dc10bfcafa29c4b8de59",
+      "tree": "sha256:23786d89587148d21dd344edee9d1488cde62285fd67bea787e37c02d6cce4f4",
+      "recorded_at": "2026-10-26T08:21:51.888Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:a5b71f14cf88e9cd667c20b404d9c37ec3c45c485fc4465d59a4adc5d7065ebe",
+      "tree": "sha256:23786d89587148d21dd344edee9d1488cde62285fd67bea787e37c02d6cce4f4",
+      "recorded_at": "2026-10-26T08:21:51.888Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:f74503f27c617292388ffe738add605c36566336f89f7a7ab06b2fa87ceedf23",
+      "tree": "sha256:23786d89587148d21dd344edee9d1488cde62285fd67bea787e37c02d6cce4f4",
+      "recorded_at": "2026-10-26T08:21:51.888Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:23786d89587148d21dd344edee9d1488cde62285fd67bea787e37c02d6cce4f4",
+      "recorded_at": "2026-10-26T08:21:51.888Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:ee3f71277304aa28b2d486a963c5d75bafc6fb4fe53ab5372ca2d4f40eda1858",
+      "tree": "sha256:ae38dddc2f4710065019ef3c3fa966ed7a45e13693372bbb40e2e794fe781d55",
+      "recorded_at": "2026-10-26T08:23:38.499Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:5c865c27dae227a4e8ec1442281fe15da8be2785d7b5236f2fc991cd22960526",
+      "tree": "sha256:ae38dddc2f4710065019ef3c3fa966ed7a45e13693372bbb40e2e794fe781d55",
+      "recorded_at": "2026-10-26T08:23:38.499Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:fffde3589e5023ff1169faae2e2c2a8308f78a7578932a1e40c7dc421a54fd4b",
+      "tree": "sha256:ae38dddc2f4710065019ef3c3fa966ed7a45e13693372bbb40e2e794fe781d55",
+      "recorded_at": "2026-10-26T08:23:38.499Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:6cd4f236362701c4698b9433b8e128259e2b758c02a584493ec9682bb935f34e",
+      "tree": "sha256:ae38dddc2f4710065019ef3c3fa966ed7a45e13693372bbb40e2e794fe781d55",
+      "recorded_at": "2026-10-26T08:23:38.499Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:ae38dddc2f4710065019ef3c3fa966ed7a45e13693372bbb40e2e794fe781d55",
+      "recorded_at": "2026-10-26T08:23:38.499Z"
+    }
+  ],
+  "assumptions": [
+    "El test compara la mediana de 9 ejecuciones y no el mejor de 7 que se acordó: con 4 procesos en un núcleo, el mejor de 7 falló en 7 de 8 intentos (relaciones de 25 a 37) porque el mínimo depende de la única ejecución que no interrumpe el planificador; la mediana pasó 8 de 8 y sigue marcando los 9 casos cuadráticos (45 a 67)."
+  ],
+  "closed_at": "2026-10-26T08:23:42.209Z"
+}
