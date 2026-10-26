@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/Snakeblack/retama-landing/compare/v0.9.0...v0.9.1) (2026-10-26)
+
+
+### Bug Fixes
+
+* **deps:** let GitHub's dependency graph read the pnpm lockfile ([3ff3dad](https://github.com/Snakeblack/retama-landing/commit/3ff3dad14c386c464003276c93ad990cf216649a))
+
 ## [0.9.0](https://github.com/Snakeblack/retama-landing/compare/v0.8.0...v0.9.0) (2026-10-26)
 
 
