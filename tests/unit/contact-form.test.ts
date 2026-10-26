@@ -33,6 +33,12 @@ describe("failureOf", () => {
     expect(failureOf(null, undefined).kind).toBe("unavailable");
     expect(failureOf(500, "<html>")).toEqual({ kind: "unavailable", fields: [] });
   });
+
+  it("trata como fallo del servicio un 429 que no es de la función: el límite diario de Workers (ADR 0012)", () => {
+    expect(failureOf(429, undefined)).toEqual({ kind: "unavailable", fields: [] });
+    expect(failureOf(429, "<html>")).toEqual({ kind: "unavailable", fields: [] });
+    expect(failureOf(429, { ok: false, error: "unavailable" })).toEqual({ kind: "unavailable", fields: [] });
+  });
 });
 
 describe("mailtoHref", () => {
