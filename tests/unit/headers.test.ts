@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { SECURITY_HEADERS } from "../../src/server/edge";
 
 // public/_headers: a URL pattern at the line start, its headers indented below it, "#" comments.
 const rules = new Map<string, Record<string, string>>();
@@ -30,5 +31,15 @@ describe("cabeceras de los archivos de texto", () => {
   // The policy's report-to csp (scripts/postbuild.mjs) points here; relative, so each Preview reports to itself.
   it("las violaciones de la CSP van a /api/report/ de la propia web (ADR 0011)", () => {
     expect(rules.get("/*")?.["reporting-endpoints"]).toBe('csp="/api/report/"');
+  });
+
+  // _headers only reaches the static assets: the Worker adds the same ones to what it answers itself, with its own CSP.
+  it("el Worker añade a sus respuestas las mismas cabeceras de seguridad (src/server/edge.ts)", () => {
+    const pageOnly = ["content-security-policy", "reporting-endpoints"];
+    const assets = Object.entries(rules.get("/*") ?? {}).filter(([name]) => !pageOnly.includes(name));
+    const worker = Object.entries(SECURITY_HEADERS)
+      .map(([name, value]) => [name.toLowerCase(), value])
+      .filter(([name]) => name !== "content-security-policy");
+    expect(Object.fromEntries(worker)).toEqual(Object.fromEntries(assets));
   });
 });
