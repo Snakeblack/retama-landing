@@ -1,5 +1,5 @@
 // Architecture fitness checks behind the ADRs' `- Check:` lines.
-//   node scripts/fitness.mjs on-demand-routes        ADR 0002, ADR 0011
+//   node scripts/fitness.mjs on-demand-routes        ADR 0002, ADR 0011 (run after pnpm build)
 //   node scripts/fitness.mjs no-persistent-bindings  ADR 0003 (run after pnpm build)
 //   node scripts/fitness.mjs branch-protection       ADR 0009 (needs gh auth)
 //   node scripts/fitness.mjs js-budget               ADR 0001 (run after pnpm build)
@@ -7,10 +7,12 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
+import { ON_DEMAND_ROUTES } from "../src/server/edge.ts";
+import { onDemandRoutes as builtOnDemandRoutes } from "./lib/build-routes.mjs";
 import { initialScripts } from "./lib/js-budget.mjs";
 
 // ADR 0002 and ADR 0011: the routes rendered on demand, the contact and the client error reports. Adding one needs an ADR.
-const ON_DEMAND_ALLOWED = ["src/pages/api/contact.ts", "src/pages/api/report.ts"];
+const ON_DEMAND_ALLOWED = ["/api/contact", "/api/report"];
 const PERSISTENT_BINDINGS = [
   "kv_namespaces",
   "d1_databases",
@@ -31,21 +33,26 @@ function fail(message) {
   process.exit(1);
 }
 
-function pageFiles(dir) {
-  return readdirSync(dir, { recursive: true })
-    .map((file) => join(dir, file))
-    .filter((file) => /\.(astro|ts|js|mjs)$/.test(file));
-}
-
 function onDemandRoutes() {
-  const config = readFileSync("astro.config.mjs", "utf8");
-  if (/output:\s*["']server["']/.test(config)) fail("astro.config.mjs sets output: 'server' (ADR 0002)");
-  const onDemand = pageFiles("src/pages").filter((file) =>
-    /export\s+const\s+prerender\s*=\s*false/.test(readFileSync(file, "utf8")),
+  const entry = "dist/server/entry.mjs";
+  if (!existsSync(entry)) fail(`no ${entry}: run pnpm build first`);
+  // The Worker hands Astro only its own list (src/worker.ts): every other route of the build is out of reach.
+  if (ON_DEMAND_ROUTES.join() !== ON_DEMAND_ALLOWED.join()) {
+    fail(`src/server/edge.ts renders on demand ${ON_DEMAND_ROUTES.join(", ")}, not the ADR 0002/0011 allowlist`);
+  }
+  const routes = builtOnDemandRoutes(readFileSync(entry, "utf8"));
+  const missing = ON_DEMAND_ALLOWED.filter((allowed) => !routes.some(({ route }) => route === allowed));
+  if (missing.length > 0) fail(`the build does not render on demand ${missing.join(", ")} (ADR 0002/0011)`);
+  // Out of reach is only right for the routes Astro injects on its own: one of the site or of an integration would
+  // never answer, and needs an ADR before it goes on the list.
+  const extra = routes.filter(({ route, origin }) => origin !== "internal" && !ON_DEMAND_ALLOWED.includes(route));
+  if (extra.length > 0) {
+    fail(`on-demand routes outside the ADR 0002/0011 allowlist: ${extra.map(({ route }) => route).join(", ")}`);
+  }
+  const retired = routes.filter(({ route }) => !ON_DEMAND_ALLOWED.includes(route)).map(({ route }) => route);
+  console.log(
+    `on-demand routes: ${ON_DEMAND_ALLOWED.join(", ")}; out of the Worker's reach: ${retired.join(", ") || "none"}`,
   );
-  const extra = onDemand.filter((file) => !ON_DEMAND_ALLOWED.includes(file));
-  if (extra.length > 0) fail(`on-demand routes outside the ADR 0002/0011 allowlist: ${extra.join(", ")}`);
-  console.log(`on-demand routes: ${onDemand.length === 0 ? "none" : onDemand.join(", ")}`);
 }
 
 function stripJsonc(text) {
