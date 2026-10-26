@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/Snakeblack/retama-landing/compare/v0.7.2...v0.8.0) (2026-10-26)
+
+
+### Features
+
+* **home:** introduce the two partners in a team chapter ([e8c7725](https://github.com/Snakeblack/retama-landing/commit/e8c772586e71e1f7ace64a0589babb2b048c8c28))
+* **home:** publish starting prices, the diagnosis and the new warranty ([4e7d3e7](https://github.com/Snakeblack/retama-landing/commit/4e7d3e7ad2124e5a1f6407556728da29574ea9d0))
+
 ## [0.7.2](https://github.com/Snakeblack/retama-landing/compare/v0.7.1...v0.7.2) (2026-10-24)
 
 
