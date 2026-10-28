@@ -391,6 +391,23 @@
         "scripts/widget-create.sh": "sha256-68PvE++Z9Pb5NADOZv/DhIwZE6rAywh2RwxjeM8dn+0=",
         "tests/validation.md": "sha256-bGvhxUCZf9HVaXO9Ed/5KFbEJWCQiGv+mjheUQWPylM="
       }
+    },
+    "blog-writing": {
+      "source": "blader/humanizer",
+      "commit": "0ef9fe5bc3572734fd3ae6c448fe00a30cd5dcf0",
+      "path": "SKILL.md",
+      "license": "MIT",
+      "topic": "blog-writing",
+      "audited": "2026-10-28",
+      "verdict": "Aceptada. Solo SKILL.md y LICENSE, sin cambios; SKILL.md se guarda como humanizer.md para que el SKILL.md local lo envuelva con las reglas del español de España y del blog, que mandan sobre él. Sin red, scripts, hooks ni telemetría; su único enlace cita la fuente (Wikipedia, Signs of AI writing). No se vendorizan los manifiestos de plugin, el workflow ni scripts/validate-package.py.",
+      "added": [
+        "SKILL.md"
+      ],
+      "files": {
+        "LICENSE": "sha256-SsSBAlSrNtRUGRQa645pv1BlLPr+Wy2rlH0G1E5cv5Y=",
+        "SKILL.md": "sha256-/dOoZh6RiGh2zpduh9HsOrs5lHnSzjlncmiHe7AtPVc=",
+        "humanizer.md": "sha256-BhLx37FnKw6puX4Tm/HwbKvpjYsnQk/o/wHh+0zJnK0="
+      }
     }
   },
   "reviewed": [

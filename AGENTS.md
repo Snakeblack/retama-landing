@@ -24,7 +24,8 @@ Si dos fuentes se contradicen, gana la primera:
 Cada tema tiene una sola skill responsable (ADR 0010): dirección de arte → `taste-skill`; revisión de
 interfaz → `web-interface-guidelines`; animación → `gsap-*`; 3D → `threejs-*`; calidad web →
 `core-web-vitals`, `performance`, `seo`, `best-practices`, `web-quality-audit`; hreflang → `seo-hreflang`;
-plataforma → `wrangler`, `workers-best-practices`, `turnstile-spin`. La accesibilidad la cubre la skill global
+plataforma → `wrangler`, `workers-best-practices`, `turnstile-spin`; redacción del blog → `blog-writing`, que envuelve
+blader/humanizer con las reglas del español de España. La accesibilidad la cubre la skill global
 `ospec-workflow:accessibility`. Astro 7, Tailwind 4 y View Transitions se consultan en la documentación oficial
 (`docs.astro.build/llms.txt` o Context7).
 
