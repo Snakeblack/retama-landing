@@ -1,0 +1,292 @@
+{
+  "schema": "idd-state/v1",
+  "change": "blog-web-security",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "añade al blog un articulo relacionado a \"la seguridad web, los ultimos acontecimientos con php, java, node y como retama tiene procesos que mitigan y actualizan dependencias de sus proyectos que mantienen, las aplicacoines siempre estables y seguras, sin cambiar el comportamiento\", busca una skill que sea buena, con muchas estrellas en gh para que el modelo escriba como un humano, humanizar, que no use palabras complicadas, poco usadas, evitar traducciones del ingles al español, frases que se usan en otros paises, que sea español neutral castellano, y guardalo como skill para hacer los articulos de los blogs",
+    "kind": "feature",
+    "summary": "Artículo del blog, en español y en inglés, sobre la seguridad web: lo que ha pasado en 2026 con PHP, Java y Node, y cómo Retama mantiene al día las dependencias de lo que construye y mantiene sin cambiar el comportamiento",
+    "acceptance": "Existen src/content/blog/es/seguridad-web-actualizar-sin-romper.md y src/content/blog/en/web-security-updating-without-breaking.md con la misma key, título de 40 caracteres como máximo, sin código, cada dato con su fuente oficial enlazada y el proceso de Retama contado sin promesas absolutas; pnpm test y pnpm build pasan"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿Se enlazan las fuentes oficiales (CISA, nodejs.org, Apache Tomcat) con el número de CVE, aunque los artículos actuales no llevan enlaces?"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 265
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 23
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Se mantiene «las aplicaciones siempre estables y seguras» o se cuenta el proceso sin promesas absolutas? ¿Puede decir que el mantenimiento mensual incluye este proceso? ¿Retama mantiene aplicaciones en PHP y Java o solo lo que construye?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0008-locale-routing.md",
+          "line": 15
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "request",
+          "text": "que no use palabras complicadas"
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/technical-baseline.md",
+          "line": 25
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "src/content/blog/en/web-security-updating-without-breaking.md",
+      "src/content/blog/es/seguridad-web-actualizar-sin-romper.md",
+      "tests/e2e/blog.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "El e2e del blog cuenta los artículos de la carpeta de cada idioma (src/content/blog/<idioma>/*.md) en vez de fijar 2, para que un artículo nuevo no obligue a tocar el test; sigue comprobando que el índice y el RSS listan todos"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "Promesa: «Sin «siempre» (Recomendado)». Mantenimiento: «Sí, lo incluye». PHP y Java: «Solo lo que construimos». Fuentes: «Enlazar fuentes (Recomendado)».",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-28T21:10:51.322Z",
+      "detail": {
+        "tree": "sha256:b26b304c3aa05d5bd34848c736f2c40cd7bb7b13e06a80d2f10d3b023e26aa06",
+        "runs": [
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-28T21:11:05.449Z"
+    }
+  ],
+  "base": "c9dbc71d091b3db88b919ba4e81d441768499907",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:3e903a40fe0b6a5a106884669603544bff4e815996a96643206dc2a1bca781b1",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:07:41.867Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:4a18de6b2cc16942c488087dbc7aca52bf5c94df5b8dba9cc01e025279a1d500",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:07:41.867Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:9a7e6cb8d65be72cb3429943e281adc925a68e8d320ee2c7f3caa7638db00230",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:07:41.867Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:60a592a8321e123208d4e908d2b6a2ebe430c908093d9ae45b9edd381c6aa870",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:07:41.867Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:07:41.867Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:6e1ebf182627748c0c27ebed77a0b0403459dd2c8995ba2bdbfbd1cc821d9afb",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:08:38.110Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:1ab8cf1bd46df0a746318534d4e7043ef65126575cccb42a4a7645b8fb8fa3f3",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:08:38.110Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:0652ac554f96b15beee52633f293fb077844a950dd4e4d8764a12d9380b7fb70",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:08:38.110Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:9db234250226cf8783fca4125a47d922e2ca95be39841a8d5b1abc716c93ee49",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:08:38.110Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:5e8bd01c62fe4334610f7683257ffb78941eba08b9715ab78179db4f9ba80e9b",
+      "recorded_at": "2026-10-28T21:08:38.110Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:1ec3e0f899d3f09c4b0d7907ad59d334338502d27e9ccb209b3b55d16786bc13",
+      "tree": "sha256:b26b304c3aa05d5bd34848c736f2c40cd7bb7b13e06a80d2f10d3b023e26aa06",
+      "recorded_at": "2026-10-28T21:10:51.322Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:91ba626556608beec6ddc38cbf71bd9b7e52760ea999d4d08bcf79a61afda528",
+      "tree": "sha256:b26b304c3aa05d5bd34848c736f2c40cd7bb7b13e06a80d2f10d3b023e26aa06",
+      "recorded_at": "2026-10-28T21:10:51.322Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:8e75ec642023d03b74d6983819beedcc3dc4a50423a7446976d9eb379bd37926",
+      "tree": "sha256:b26b304c3aa05d5bd34848c736f2c40cd7bb7b13e06a80d2f10d3b023e26aa06",
+      "recorded_at": "2026-10-28T21:10:51.322Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:7e28ab19546cab24dea8549e8dc809c62cf3b8b1024e30c86e8ac15e9a33477c",
+      "tree": "sha256:b26b304c3aa05d5bd34848c736f2c40cd7bb7b13e06a80d2f10d3b023e26aa06",
+      "recorded_at": "2026-10-28T21:10:51.322Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:b26b304c3aa05d5bd34848c736f2c40cd7bb7b13e06a80d2f10d3b023e26aa06",
+      "recorded_at": "2026-10-28T21:10:51.322Z"
+    }
+  ],
+  "closed_at": "2026-10-28T21:11:05.449Z"
+}
