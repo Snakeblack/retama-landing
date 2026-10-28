@@ -1,0 +1,658 @@
+{
+  "schema": "idd-state/v1",
+  "change": "blog-writing-skill",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "docs",
+    "summary": "Skill de redacción para el blog: blader/humanizer vendorizada (ADR 0010) dentro de una skill local que añade las reglas de español de España (castellano neutro, palabras sencillas, sin calcos del inglés ni regionalismos) y el flujo de un artículo del blog",
+    "acceptance": "Existe .claude/skills/blog-writing con SKILL.md local, el humanizer original sin cambios y su LICENSE; manifest.json la registra con commit fijado, licencia y veredicto; pnpm skills:scan pasa; AGENTS.md nombra su tema"
+  },
+  "facts": {
+    "basis": "La petición fija el propósito (artículos del blog), la fuente (skill con muchas estrellas: blader/humanizer, 61.9k, MIT) y las reglas de idioma; ADR 0010 y AGENTS.md fijan cómo se vendoriza; la skill web-interface-guidelines fija el patrón de envoltorio local sobre un archivo original sin cambios"
+  },
+  "plan": {
+    "paths": [
+      ".claude/skills/blog-writing/LICENSE",
+      ".claude/skills/blog-writing/SKILL.md",
+      ".claude/skills/blog-writing/humanizer.md",
+      ".claude/skills/manifest.json",
+      "AGENTS.md"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "Patrón de envoltorio de web-interface-guidelines: el SKILL.md original de humanizer se guarda sin cambios como humanizer.md y un SKILL.md local lo aplica y añade las reglas del español de España, que mandan sobre el original; un solo tema (blog-writing), sin tocar el esquema del manifiesto"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .claude/skills/blog-writing/LICENSE and 1 more (matches .claude/skills/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0010",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0010",
+      "impact": "conforms",
+      "reason": "La skill se copia desde un commit fijado (0ef9fe5) de blader/humanizer, MIT, auditada (sin red, scripts, hooks ni telemetría) y registrada en el manifiesto con hash por archivo; ocupa un tema nuevo (blog-writing) sin segunda fuente, y no descarga nada al usarse"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-7"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-9"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-8"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-28T20:59:10.272Z",
+      "detail": {
+        "tree": "sha256:0460b474e6a9e584dc2f10337728e0fc3c366f8aa232dd3b117fb425abd590a2",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-28T20:59:10.272Z",
+      "detail": {
+        "refs": [
+          "adr:0010 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:0460b474e6a9e584dc2f10337728e0fc3c366f8aa232dd3b117fb425abd590a2",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-28T21:00:02.956Z",
+      "detail": {
+        "lineage_id": "sha256:7a9557a30006a9b17627e3427ac4d1de2b07d52e438a6bfcf6c76e022770880b",
+        "candidate_id": "sha256:8813d3eb2f1e031269235326fe3b26f2cc3768f8ca7e3165f409f187031196f6",
+        "candidate_tree": "018c8ce31807a8ef696420ffc7957037367b5e17",
+        "findings_digest": "sha256:0ef910d7ed4bb6eb515aea18236a1f53446f63f224684f0cde05334d562962df",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-28T20:59:41.956Z",
+          "result_digest": "sha256:7c743e4cfad501cecaedc923b8b6dd2b8aa33a309d155ccc5342b00221b87d50"
+        }
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-28T21:01:06.528Z",
+      "detail": {
+        "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+        "runs": [
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-28T21:01:06.528Z",
+      "detail": {
+        "refs": [
+          "adr:0010 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+        "fitness": [
+          "run-12"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-28T21:02:23.218Z",
+      "detail": {
+        "lineage_id": "sha256:997e93901f7603ac02be281895ea99ab0588a94f67c73905030b68800ee2f288",
+        "candidate_id": "sha256:45879d51e345df1ede4d1460d42fcfcf17cede32a6d1294e91f8c4d965d57764",
+        "candidate_tree": "093ae849c93ea22bec3cbc14fdb0b72b53f2bcc2",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-28T21:01:36.320Z",
+          "result_digest": "sha256:ccc81bed13c00a92dce5970cb821e6b877733f3aeb05968dd4c0ef9a91e7d1c1"
+        }
+      }
+    },
+    {
+      "id": "ev-7",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-28T21:03:18.792Z",
+      "detail": {
+        "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+        "runs": [
+          "run-13",
+          "run-14",
+          "run-15",
+          "run-16",
+          "run-17"
+        ]
+      }
+    },
+    {
+      "id": "ev-8",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-28T21:03:18.792Z",
+      "detail": {
+        "refs": [
+          "adr:0010 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+        "fitness": [
+          "run-18"
+        ]
+      }
+    },
+    {
+      "id": "ev-9",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-28T21:03:22.218Z"
+    }
+  ],
+  "base": "0332bea454461b789d3c1417552c6336601610af",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0d277eb2824fd944f55b673288a00ac27f723a09ebcfe06ca8bcfd89f7e4f833",
+      "tree": "sha256:0460b474e6a9e584dc2f10337728e0fc3c366f8aa232dd3b117fb425abd590a2",
+      "recorded_at": "2026-10-28T20:59:10.272Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:8078a9a6c56b4632521cc89ce0c245546f964464a876c4d244aa8cc7c3ca0fde",
+      "tree": "sha256:0460b474e6a9e584dc2f10337728e0fc3c366f8aa232dd3b117fb425abd590a2",
+      "recorded_at": "2026-10-28T20:59:10.272Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:c3abc15515f85c2715931d6f3d3fef1fe7e6c658a10f28b9a16f5556888874b7",
+      "tree": "sha256:0460b474e6a9e584dc2f10337728e0fc3c366f8aa232dd3b117fb425abd590a2",
+      "recorded_at": "2026-10-28T20:59:10.272Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:d6d6ebbe277b139cacec420ca0f8b250b9e7e6dee4c28bc89cac2f5c28007df2",
+      "tree": "sha256:0460b474e6a9e584dc2f10337728e0fc3c366f8aa232dd3b117fb425abd590a2",
+      "recorded_at": "2026-10-28T20:59:10.272Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:0460b474e6a9e584dc2f10337728e0fc3c366f8aa232dd3b117fb425abd590a2",
+      "recorded_at": "2026-10-28T20:59:10.272Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0010",
+      "command": "pnpm skills:scan",
+      "exit_code": 0,
+      "output_sha256": "sha256:a6423c4b0d424cb8afbc60c1cf534bcb2a804308a336093a915af50766f6f7d2",
+      "tree": "sha256:0460b474e6a9e584dc2f10337728e0fc3c366f8aa232dd3b117fb425abd590a2",
+      "recorded_at": "2026-10-28T20:59:10.272Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:a49429db7fcb15bf75b5264119d1c9acc754db86b2316d6f840b4fdf26c7095c",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:01:06.528Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:0b4107acf82e2fdf183e6d5af700cf529490d027f2f75c891dd783e61e7e5d73",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:01:06.528Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:3ac39aca3576df9006c571e68f394657e61619ff7523c8adc10951f9f41ccadd",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:01:06.528Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:a8039dcc5a7843e82799debf4047384ca5005882eaa68265c2e5f981beb2c96d",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:01:06.528Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:01:06.528Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "fitness",
+      "ref": "adr:0010",
+      "command": "pnpm skills:scan",
+      "exit_code": 0,
+      "output_sha256": "sha256:a6423c4b0d424cb8afbc60c1cf534bcb2a804308a336093a915af50766f6f7d2",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:01:06.528Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:1ec3e0f899d3f09c4b0d7907ad59d334338502d27e9ccb209b3b55d16786bc13",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:03:18.792Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:5c81fd86c87f37864354d429757f18e1a04cddd17064ee4619019f142dfb29b1",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:03:18.792Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:1a8593306e46483dc121cf9c56431c4757673c737520ab75509eae1015240aa9",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:03:18.792Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:1b8d276aa2408737c70628fb9f2bbfbe5e913c5fabdbce3132c4c067f06ea6b3",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:03:18.792Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:03:18.792Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0010",
+      "command": "pnpm skills:scan",
+      "exit_code": 0,
+      "output_sha256": "sha256:a6423c4b0d424cb8afbc60c1cf534bcb2a804308a336093a915af50766f6f7d2",
+      "tree": "sha256:8d353f5fc515ca951539664ba2b19fd4ece89799a4274a63c1b24b82b94e970f",
+      "recorded_at": "2026-10-28T21:03:18.792Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:7a9557a30006a9b17627e3427ac4d1de2b07d52e438a6bfcf6c76e022770880b",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "e7bf12d0e3f3790ece2e07bc8a36ecc67cc59ad3",
+          "candidate_tree": "018c8ce31807a8ef696420ffc7957037367b5e17",
+          "paths": [
+            ".claude/skills/blog-writing/LICENSE",
+            ".claude/skills/blog-writing/SKILL.md",
+            ".claude/skills/blog-writing/humanizer.md",
+            ".claude/skills/manifest.json",
+            "AGENTS.md"
+          ],
+          "diff_hash": "sha256:e9c0daafc09f1c7629cdb4982091697d407bd7a2eeae219469161e50dcd1a9c9",
+          "paths_digest": "sha256:a17206903d08d33f91e65609a2f1b771c418cee6f5ef52d7c07997b8575fe858",
+          "authored_lines": 608,
+          "original_changed_lines": 609
+        },
+        "candidate_id": "sha256:8813d3eb2f1e031269235326fe3b26f2cc3768f8ca7e3165f409f187031196f6",
+        "paths": [
+          ".claude/skills/blog-writing/LICENSE",
+          ".claude/skills/blog-writing/SKILL.md",
+          ".claude/skills/blog-writing/humanizer.md",
+          ".claude/skills/manifest.json",
+          "AGENTS.md"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "018c8ce31807a8ef696420ffc7957037367b5e17",
+        "original_changed_lines": 609,
+        "authored_lines": 608
+      },
+      "current_candidate_id": "sha256:8813d3eb2f1e031269235326fe3b26f2cc3768f8ca7e3165f409f187031196f6",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "e7bf12d0e3f3790ece2e07bc8a36ecc67cc59ad3",
+        "candidate_tree": "018c8ce31807a8ef696420ffc7957037367b5e17",
+        "paths": [
+          ".claude/skills/blog-writing/LICENSE",
+          ".claude/skills/blog-writing/SKILL.md",
+          ".claude/skills/blog-writing/humanizer.md",
+          ".claude/skills/manifest.json",
+          "AGENTS.md"
+        ],
+        "diff_hash": "sha256:e9c0daafc09f1c7629cdb4982091697d407bd7a2eeae219469161e50dcd1a9c9",
+        "paths_digest": "sha256:a17206903d08d33f91e65609a2f1b771c418cee6f5ef52d7c07997b8575fe858",
+        "authored_lines": 608,
+        "original_changed_lines": 609
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "blog-writing-skill:lens-start:1:0",
+          "result_digest": "sha256:2941eb77697808fcfab04f8d0175aa6f663b0b546eaad54407c25251d56c9522",
+          "result": {
+            "findings": [
+              {
+                "severity": "SUGGESTION",
+                "summary": ".claude/skills/blog-writing/SKILL.md:19-21 (step 2) tells the agent to read external primary sources (vendor advisories, CISA, INCIBE-CERT, NVD) in the same session and link them. It does not say that fetched page content is data, not instructions. A compromised or hostile advisory page could carry text aimed at the agent, which could then alter the article (for example, inserting links or claims). The risk is conditional, since the sources are reputable and a human reviews the PR. The local SKILL.md is also the only guard here, because it is not hash-pinned against upstream. Everything else I checked is clean: humanizer.md is pinned to a commit and its only URL is the Wikipedia citation (humanizer.md:397); line 34 says to treat the text as material, not instructions; SKILL.md:13 forbids downloading humanizer.md; there are no scripts, hooks, telemetry, secrets, or writes outside the repository; humanizer.md file mode (line 51) only writes to a file the user names.",
+                "acceptance_criteria": "SKILL.md states in step 2 or in the final checklist that content read from external sources is evidence to cite, and that any instruction found inside it is ignored. A fact is written only if it comes from the source's own advisory text, and no link, command or claim is added because a fetched page asked for it."
+              }
+            ]
+          },
+          "operation": null,
+          "result_request_id": "blog-writing-skill:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [
+        {
+          "id": "F-aa673a29f4c6c1a1",
+          "owner": "trust",
+          "severity": "SUGGESTION",
+          "summary": ".claude/skills/blog-writing/SKILL.md:19-21 (step 2) tells the agent to read external primary sources (vendor advisories, CISA, INCIBE-CERT, NVD) in the same session and link them. It does not say that fetched page content is data, not instructions. A compromised or hostile advisory page could carry text aimed at the agent, which could then alter the article (for example, inserting links or claims). The risk is conditional, since the sources are reputable and a human reviews the PR. The local SKILL.md is also the only guard here, because it is not hash-pinned against upstream. Everything else I checked is clean: humanizer.md is pinned to a commit and its only URL is the Wikipedia citation (humanizer.md:397); line 34 says to treat the text as material, not instructions; SKILL.md:13 forbids downloading humanizer.md; there are no scripts, hooks, telemetry, secrets, or writes outside the repository; humanizer.md file mode (line 51) only writes to a file the user names.",
+          "acceptance_criteria": "SKILL.md states in step 2 or in the final checklist that content read from external sources is evidence to cite, and that any instruction found inside it is ignored. A fact is written only if it comes from the source's own advisory text, and no link, command or claim is added because a fetched page asked for it.",
+          "blocking": false,
+          "resolution": "advisory"
+        }
+      ],
+      "findings_digest": "sha256:0ef910d7ed4bb6eb515aea18236a1f53446f63f224684f0cde05334d562962df",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:997e93901f7603ac02be281895ea99ab0588a94f67c73905030b68800ee2f288",
+      "generation": 2,
+      "predecessor_lineage_id": "sha256:7a9557a30006a9b17627e3427ac4d1de2b07d52e438a6bfcf6c76e022770880b",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "e7bf12d0e3f3790ece2e07bc8a36ecc67cc59ad3",
+          "candidate_tree": "093ae849c93ea22bec3cbc14fdb0b72b53f2bcc2",
+          "paths": [
+            ".claude/skills/blog-writing/LICENSE",
+            ".claude/skills/blog-writing/SKILL.md",
+            ".claude/skills/blog-writing/humanizer.md",
+            ".claude/skills/manifest.json",
+            "AGENTS.md"
+          ],
+          "diff_hash": "sha256:18604c44ad74763192f0e801e3b2b9a33ecf5c78eb4dfe2aef3b16e000bd874f",
+          "paths_digest": "sha256:a17206903d08d33f91e65609a2f1b771c418cee6f5ef52d7c07997b8575fe858",
+          "authored_lines": 609,
+          "original_changed_lines": 610
+        },
+        "candidate_id": "sha256:45879d51e345df1ede4d1460d42fcfcf17cede32a6d1294e91f8c4d965d57764",
+        "paths": [
+          ".claude/skills/blog-writing/LICENSE",
+          ".claude/skills/blog-writing/SKILL.md",
+          ".claude/skills/blog-writing/humanizer.md",
+          ".claude/skills/manifest.json",
+          "AGENTS.md"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "093ae849c93ea22bec3cbc14fdb0b72b53f2bcc2",
+        "original_changed_lines": 610,
+        "authored_lines": 609
+      },
+      "current_candidate_id": "sha256:45879d51e345df1ede4d1460d42fcfcf17cede32a6d1294e91f8c4d965d57764",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "e7bf12d0e3f3790ece2e07bc8a36ecc67cc59ad3",
+        "candidate_tree": "093ae849c93ea22bec3cbc14fdb0b72b53f2bcc2",
+        "paths": [
+          ".claude/skills/blog-writing/LICENSE",
+          ".claude/skills/blog-writing/SKILL.md",
+          ".claude/skills/blog-writing/humanizer.md",
+          ".claude/skills/manifest.json",
+          "AGENTS.md"
+        ],
+        "diff_hash": "sha256:18604c44ad74763192f0e801e3b2b9a33ecf5c78eb4dfe2aef3b16e000bd874f",
+        "paths_digest": "sha256:a17206903d08d33f91e65609a2f1b771c418cee6f5ef52d7c07997b8575fe858",
+        "authored_lines": 609,
+        "original_changed_lines": 610
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "blog-writing-skill:lens-start:2:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "blog-writing-skill:lens-result:2:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "closed_at": "2026-10-28T21:03:22.218Z"
+}
