@@ -1,4 +1,9 @@
+import { readdirSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+
+// The articles of a language, one Markdown file each, so a new article needs no change here.
+const articleCount = (lang: string) =>
+  readdirSync(`src/content/blog/${lang}`).filter((file) => file.endsWith(".md")).length;
 
 const blogs = [
   {
@@ -41,7 +46,7 @@ test.describe("blog sin JavaScript (ADR 0001)", () => {
       await expect(page.locator("html")).toHaveAttribute("lang", lang);
       await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
       const links = page.getByRole("main").getByRole("listitem").getByRole("link");
-      await expect(links).toHaveCount(2);
+      await expect(links).toHaveCount(articleCount(lang));
       for (const href of await links.evaluateAll((all) => all.map((a) => a.getAttribute("href"))))
         expect(href?.startsWith(index)).toBe(true);
       await expect(page.getByRole("link", { name: headline })).toHaveAttribute("href", article);
@@ -143,7 +148,7 @@ for (const { lang, index, article, headline } of blogs) {
     expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
     expect(xml).toContain(`<language>${lang}</language>`);
     expect(xml).toMatch(new RegExp(`<atom:link href="[^"]+${feed}" rel="self"`));
-    expect(xml.match(/<item>/g)).toHaveLength(2);
+    expect(xml.match(/<item>/g)).toHaveLength(articleCount(lang));
     const origin = xml.match(/<link>(https?:\/\/[^/]+)\//)?.[1] ?? baseURL;
     expect(xml).toContain(`<title>${headline}</title>`);
     expect(xml).toContain(`<link>${origin}${article}</link>`);
