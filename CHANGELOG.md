@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.12.0](https://github.com/Snakeblack/retama-landing/compare/v0.11.0...v0.12.0) (2026-10-28)
+
+
+### Features
+
+* **blog:** add the article on web security and updating without breaking ([9ec22a3](https://github.com/Snakeblack/retama-landing/commit/9ec22a34743426fa125871f11fe14f8105c80f4b))
+* **skills:** add blog-writing, humanizer with the rules of Spanish from Spain ([1ac8d29](https://github.com/Snakeblack/retama-landing/commit/1ac8d294bfe6ab16959b0c99d4b02a961f933255))
+
 ## [0.11.0](https://github.com/Snakeblack/retama-landing/compare/v0.10.0...v0.11.0) (2026-10-26)
 
 
