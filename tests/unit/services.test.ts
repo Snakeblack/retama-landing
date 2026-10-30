@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { en } from "../../src/i18n/en";
 import { es } from "../../src/i18n/es";
 import { locales, localizedPath } from "../../src/i18n/index";
+import { PROJECT_TYPES } from "../../src/lib/contact";
 import { serviceImagePath, servicePath, servicePaths, services } from "../../src/lib/services";
 import { frontMatter } from "../../src/lib/sitemap";
 
@@ -28,6 +29,11 @@ describe("services", () => {
           expect(copy[offer.text], offer.text).toContain(amount(offer.once));
           if (offer.monthly !== null) expect(copy[offer.text], offer.text).toContain(amount(offer.monthly));
         }
+  });
+
+  it("marcan cada uno un tipo distinto del formulario de contacto", () => {
+    expect(services.map((service) => service.projectType)).toEqual(["web", "software", "agents", "seo"]);
+    for (const service of services) expect(PROJECT_TYPES, service.id).toContain(service.projectType);
   });
 
   it("empiezan por el precio de su tarjeta", () => {

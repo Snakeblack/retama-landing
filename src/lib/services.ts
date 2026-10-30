@@ -3,7 +3,8 @@ import { type Locale, locales, localizedPath } from "../i18n/index";
 // The four services of the home's cards, each with a page of its own in every language (owner, 2026-10-30): the cards,
 // the pages, the JSON-LD, the sitemap and llms.txt read them from here.
 
-/** The services in the order of their cards. Each has its slug in every language; the offers its page prices, the
+/** The services in the order of their cards. Each has its slug in every language; the project type its page's action
+ * marks in the home's form (src/lib/contact.ts, owner 2026-10-30); the offers its page prices, the
  * card's starting price first, each with the keys of its name and of the text that gives its figures and its minimum in
  * euros excluding VAT, once and, when it has one, a month (business proposal 1.4); the part of the hero's retama its card frames from lg (x, y, width and height in the frame of HERO),
  * which its page shows too; and the keys of its page (DESIGN.md Layout, the service pages): what it includes, when it
@@ -14,6 +15,7 @@ export const services = [
   {
     id: "web",
     slugs: { es: "webs-y-cms", en: "websites-and-cms" },
+    projectType: "web",
     offers: [
       { name: "service.web.landing", text: "service.web.landingFrom", once: 1500, monthly: null },
       { name: "offers.cms", text: "service.web.cmsFrom", once: 3500, monthly: null },
@@ -38,6 +40,7 @@ export const services = [
   {
     id: "custom",
     slugs: { es: "software-a-medida", en: "custom-software" },
+    projectType: "software",
     offers: [
       { name: "service.custom.app", text: "service.custom.appFrom", once: 8000, monthly: null },
       { name: "offers.desktop", text: "service.custom.desktopFrom", once: 10000, monthly: null },
@@ -62,6 +65,7 @@ export const services = [
   {
     id: "agents",
     slugs: { es: "agentes-y-automatizaciones", en: "agents-and-automation" },
+    projectType: "agents",
     offers: [{ name: "services.agents", text: "services.agentsFrom", once: 4000, monthly: 150 }],
     part: "380 560 840 820",
     includes: [
@@ -82,6 +86,7 @@ export const services = [
   {
     id: "seo",
     slugs: { es: "seo-y-analitica", en: "seo-and-analytics" },
+    projectType: "seo",
     offers: [{ name: "services.seo", text: "services.seoFrom", once: 800, monthly: null }],
     part: "100 1100 1400 800",
     includes: [

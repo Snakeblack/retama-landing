@@ -10,27 +10,35 @@ const languages = [
     others: "Otros servicios",
     example: "Ejemplo",
     talk: "Hablemos",
-    contact: "/#contacto",
+    contact: "#contacto",
     footer: "Servicios",
     pages: [
       {
         path: "/servicios/webs-y-cms/",
         other: "/en/services/websites-and-cms/",
         h1: "Diseño web y CMS para empresas",
+        type: "web",
         articles: ["/blog/seguridad-web-actualizar-sin-romper/"],
       },
       {
         path: "/servicios/software-a-medida/",
         other: "/en/services/custom-software/",
         h1: "Desarrollo de software a medida",
+        type: "software",
         articles: ["/blog/cuanto-cuesta-un-software-a-medida/", "/blog/por-que-escribimos-cada-decision/"],
       },
       {
         path: "/servicios/agentes-y-automatizaciones/",
         other: "/en/services/agents-and-automation/",
         h1: "Agentes de IA y automatizaciones",
+        type: "agents",
       },
-      { path: "/servicios/seo-y-analitica/", other: "/en/services/seo-and-analytics/", h1: "SEO técnico y analítica" },
+      {
+        path: "/servicios/seo-y-analitica/",
+        other: "/en/services/seo-and-analytics/",
+        h1: "SEO técnico y analítica",
+        type: "seo",
+      },
     ],
   },
   {
@@ -42,30 +50,34 @@ const languages = [
     others: "Other services",
     example: "Example",
     talk: "Let's talk",
-    contact: "/en/#contact",
+    contact: "#contact",
     footer: "Services",
     pages: [
       {
         path: "/en/services/websites-and-cms/",
         other: "/servicios/webs-y-cms/",
         h1: "Web design and CMS",
+        type: "web",
         articles: ["/en/blog/web-security-updating-without-breaking/"],
       },
       {
         path: "/en/services/custom-software/",
         other: "/servicios/software-a-medida/",
         h1: "Custom software development",
+        type: "software",
         articles: ["/en/blog/what-custom-software-costs/", "/en/blog/why-we-write-every-decision-down/"],
       },
       {
         path: "/en/services/agents-and-automation/",
         other: "/servicios/agentes-y-automatizaciones/",
         h1: "AI agents and automation",
+        type: "agents",
       },
       {
         path: "/en/services/seo-and-analytics/",
         other: "/servicios/seo-y-analitica/",
         h1: "Technical SEO and analytics",
+        type: "seo",
       },
     ],
   },
@@ -78,7 +90,7 @@ test.describe("páginas de servicio sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false });
 
   for (const { lang, home, headings, blog, others, example, talk, contact, pages } of languages)
-    for (const { path, h1, articles = [] } of pages)
+    for (const { path, h1, type, articles = [] } of pages)
       test(`${path} tiene su título, sus precios, sus apartados, sus decisiones y la vuelta al contacto en el HTML`, async ({
         page,
       }) => {
@@ -97,9 +109,10 @@ test.describe("páginas de servicio sin JavaScript (ADR 0001)", () => {
             .getByText(/\d( €)? \+ (IVA|VAT)/)
             .first(),
         ).toBeVisible();
+        // The action leads to the home's form with this service chosen (owner, 2026-10-30).
         await expect(page.locator("main").getByRole("link", { name: talk, exact: true })).toHaveAttribute(
           "href",
-          contact,
+          `${home}?projectType=${type}${contact}`,
         );
         await expect(page.locator("figure[data-ui]").first()).toContainText(example);
         await expect(page.getByRole("navigation", { name: others }).getByRole("link")).toHaveCount(3);
@@ -191,3 +204,34 @@ for (const { blog, pages } of languages)
         await expect(page.locator(`[data-article] a[href="${path}"]`)).toHaveCount(1);
       }
     });
+
+for (const { home, talk, contact, pages } of languages)
+  test(`Hablemos de cada página de servicio en ${home} abre el formulario con su servicio marcado`, async ({
+    page,
+  }) => {
+    for (const { path, type } of pages) {
+      await page.goto(path);
+      await page.locator("main").getByRole("link", { name: talk, exact: true }).click();
+      await expect(page).toHaveURL(`${home}?projectType=${type}${contact}`);
+      await expect(page.locator(`input[name="projectType"][value="${type}"]`), path).toBeChecked();
+      await expect(page.locator('input[name="projectType"]:checked'), path).toHaveCount(1);
+    }
+  });
+
+test("el formulario no marca nada con un tipo desconocido y respeta la elección que el navegador recupera", async ({
+  page,
+}) => {
+  await page.goto("/?projectType=Software#contacto");
+  await expect(page.locator("[data-contact] button[type=submit]")).toBeEnabled();
+  await expect(page.locator('input[name="projectType"]:checked')).toHaveCount(0);
+
+  // Going back, the browser brings back the visitor's choice, and the type in the address does not take its place.
+  await page.goto("/?projectType=seo#contacto");
+  await expect(page.locator('input[name="projectType"][value="seo"]')).toBeChecked();
+  await page.locator('label:has(input[name="projectType"][value="web"])').click();
+  await page.goto("/legal/");
+  await page.goBack();
+  await expect(page.locator("[data-contact] button[type=submit]")).toBeEnabled();
+  await expect(page.locator('input[name="projectType"][value="web"]')).toBeChecked();
+  await expect(page.locator('input[name="projectType"]:checked')).toHaveCount(1);
+});
