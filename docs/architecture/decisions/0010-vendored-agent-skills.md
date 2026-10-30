@@ -1,6 +1,6 @@
 # 0010. Herramientas de agente vendorizadas, fijadas y auditadas, con un solo dueño por tema
 
-- Status: accepted
+- Status: superseded by 0013
 - Date: 2026-10-21
 
 ## Context and drivers
