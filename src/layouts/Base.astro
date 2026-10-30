@@ -115,7 +115,10 @@ if (analytics) {
         <div class="h-bar bg-primary" aria-hidden="true"></div>
         <div class="px-margin py-md">
           <div class="flex items-center gap-md px-tile-sm md:gap-lg md:px-tile">
-            <a class="feedback mr-auto type-wordmark text-on-surface hover:text-primary" href={localizedPath(locale, "/")}>
+            <a
+              class="feedback mr-auto flex min-h-(--spacing-touch) items-center type-wordmark text-on-surface hover:text-primary"
+              href={localizedPath(locale, "/")}
+            >
               <Wordmark class="block" />
               <span class="sr-only">Retama</span>
             </a>
