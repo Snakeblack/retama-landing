@@ -1,0 +1,374 @@
+{
+  "schema": "idd-state/v1",
+  "change": "seo-audit-phase-2",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "Preseleccionar servicio; OnlineBusiness; Enlazar «Manuel M.»; Tabla de precios, Cloudflare a mano, 301 en lugar de 307",
+    "kind": "feature",
+    "summary": "Fase 2 de la auditoría SEO de retama.dev: el CTA de cada servicio abre el formulario con su tipo marcado y ofrece la reserva, Retama pasa a OnlineBusiness en el JSON-LD, la firma del blog enlaza al equipo, el artículo de costes trae una tabla de precios atada a services.ts, las URL sin barra final responden 301 y la zona activa Crawler Hints",
+    "acceptance": "Desde una página de servicio, Hablemos lleva al formulario de la home con el tipo de ese servicio marcado y la página ofrece Reservar una llamada; el JSON-LD tipa a Retama como OnlineBusiness; la firma de cada artículo enlaza al capítulo del equipo y su autor lleva sameAs; el artículo de costes, en es y en, trae una tabla de precios que un test compara con services.ts; /blog y cada página pedida sin barra final responden 301 a su URL con barra; technical-baseline recoge la configuración de la zona"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "Los dos enlaces de la página de servicio. Hablemos a /?projectType=<web|software|agents|seo>#contacto en los dos idiomas, con el nombre y los valores del propio campo como los dejaría un formulario GET (recomendado), o un parámetro traducido (?tipo= / ?type=). Y Reservar una llamada a la página de Cal.com (cal.com/retama/llamada), sin script ni marco y solo con PUBLIC_BOOKING=true, como la home sin JS (recomendado), o a /#contacto con un parámetro que abra allí el calendario"
+      },
+      {
+        "category": "uniqueness",
+        "question": "El nodo de Retama con un solo tipo, OnlineBusiness, que ya es subtipo de Organization como en los ejemplos de Google (recomendado), o con los dos, Organization y OnlineBusiness"
+      },
+      {
+        "category": "persistence",
+        "question": "Si el navegador ya trae un tipo marcado al volver atrás o recargar, se respeta lo que marcó la persona (recomendado) o manda el parámetro"
+      },
+      {
+        "category": "copy",
+        "question": "Filas de la tabla del artículo de costes, las de software a medida (diagnóstico desde 900 €, aplicación web desde 8.000 € en 4 a 8 semanas, escritorio desde 10.000 € en 6 a 10 semanas y mantenimiento desde 120 €/mes), cada una enlazada a su página (recomendado), o los precios de partida de todos los servicios"
+      },
+      {
+        "category": "url-state",
+        "question": "Las redirecciones. El 301 de las URL sin barra final con un _redirects generado en el build, una línea por página (/blog /blog/ 301), versionado y probado con E2E sobre workerd, y las rutas que no existen siguen dando 404 directo (recomendado), o una regla a mano en la zona para toda ruta sin punto fuera de /api/, que añade un salto antes de cada 404. Y http://www en un salto, que exige apagar Always Use HTTPS en toda la zona (compartida con clientes.retama.dev) y sustituirlo por dos reglas a mano; dejarlo en dos saltos (recomendado, HSTS ya lleva a HTTPS al navegador que entró una vez y Google sigue hasta 10 saltos) o hacer el cambio"
+      },
+      {
+        "category": "accessibility",
+        "question": "La firma Manuel M. como enlace en línea subrayado, como los del cuerpo del artículo, dentro de su fila (recomendado; supera los 24 px de WCAG 2.5.8), o la fila entera como enlace de 48 px con su anillo de foco"
+      },
+      {
+        "category": "errors",
+        "question": "Un valor que no es uno de los cinco tipos (?projectType=xyz, o Software con mayúscula) se ignora sin aviso y el formulario queda sin marcar, sin normalizar mayúsculas (recomendado), o se normaliza"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "docs/architecture/technical-baseline.md",
+      "scripts/lib/redirects.mjs",
+      "scripts/postbuild.mjs",
+      "src/components/Article.astro",
+      "src/components/ServicePage.astro",
+      "src/content/blog/en/what-custom-software-costs.md",
+      "src/content/blog/es/cuanto-cuesta-un-software-a-medida.md",
+      "src/lib/board.ts",
+      "src/lib/contact-form.ts",
+      "src/lib/seo.ts",
+      "src/lib/services.ts",
+      "src/scripts/contact.ts",
+      "src/styles/global.css",
+      "tests/e2e/blog.spec.ts",
+      "tests/e2e/booking.spec.ts",
+      "tests/e2e/service-pages.spec.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/contact-form.test.ts",
+      "tests/unit/og-image.test.ts",
+      "tests/unit/redirects.test.ts",
+      "tests/unit/seo.test.ts",
+      "tests/unit/services.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "CTA de servicio (usuario, 2026-10-30): Hablemos lleva a /?projectType=<tipo>#contacto, con el nombre y los valores del campo del formulario, como los dejaría un formulario GET, igual en los dos idiomas; contact.ts marca ese tipo solo si el navegador no trae ya uno marcado, e ignora sin aviso un valor que no sea uno de los cinco, sin normalizar mayúsculas",
+      "Reserva en la página de servicio (usuario, 2026-10-30): Reservar una llamada es un enlace normal a Cal.com, sin script ni marco, solo en un build con PUBLIC_BOOKING",
+      "JSON-LD (usuario, 2026-10-30): Retama pasa de Organization y ProfessionalService, un LocalBusiness desaconsejado por schema.org y sin dirección, a OnlineBusiness solo, el subtipo de Organization de un negocio online",
+      "Firma (usuario, 2026-10-30): Manuel M. es un enlace en línea al capítulo del equipo, y el autor del BlogPosting lleva sameAs al LinkedIn de Michael, el mismo de su ficha",
+      "Tabla de precios (usuario, 2026-10-30): el artículo de costes trae, en es y en, las cifras de software a medida (diagnóstico, aplicación web, escritorio y mantenimiento), cada fila enlazada a su página; un test compara sus cifras con services.ts y con los textos que las dan",
+      "Redirecciones (usuario, 2026-10-30): el 301 de las URL sin barra final sale de un _redirects que genera el postbuild, una línea por página, y las rutas que no existen siguen en el 404 directo; http://www se queda en dos saltos, porque uno exigiría apagar Always Use HTTPS en la zona compartida con clientes.retama.dev; Crawler Hints se activa a mano",
+      "Tabla de precios, enlaces: las tres filas de software a medida comparten la página del servicio, así que la frase sobre la tabla la enlaza una vez, como pide el E2E de la fase 1 (un enlace por artículo), y solo la fila del mantenimiento enlaza, a las preguntas, donde están sus condiciones",
+      "Elección restaurada: Chromium devuelve la elección de la persona al volver atrás después de que corre la isla y por encima del tipo, así que el E2E prueba el resultado (gana la elección) y no la guarda de contact.ts, que cubre a un navegador que la devuelva antes; al recargar, Chromium sin interfaz no restaura el formulario"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0003, 0005, 0006, 0008, 0012 and quality scenario perf-mobile, privacy-security, seo-discovery",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "La preselección del tipo es una mejora de la isla del formulario (contact.ts): sin JS el enlace llega igual al formulario, y la tabla, la firma y la reserva son HTML estático"
+    },
+    {
+      "kind": "adr",
+      "id": "0003",
+      "impact": "conforms",
+      "reason": "El parámetro projectType solo se lee al cargar para marcar un radio; no se guarda nada ni se envía a ningún sitio"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "La tabla del artículo usa los tokens existentes (surface, on-surface-muted, spacing) y DESIGN.md la describe; theme.css no se toca a mano"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin estilos ni manejadores inline; la reserva de la página de servicio es un enlace a Cal.com sin marco, así que su CSP no gana frame-src; _redirects no toca _headers"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Las mismas claves en es y en, el artículo de costes cambia en los dos idiomas y _redirects cubre las páginas de cada idioma; ninguna redirección depende del idioma del navegador"
+    },
+    {
+      "kind": "adr",
+      "id": "0012",
+      "impact": "conforms",
+      "reason": "El 301 va en el _redirects de los activos, que se aplica antes que el Worker y sin run_worker_first ni assets_navigation_has_no_effect; la zona no suma reglas"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "La página de servicio no gana script; contact.ts gana unas líneas en la home, y la tabla es HTML sin imágenes"
+    },
+    {
+      "kind": "scenario",
+      "id": "privacy-security",
+      "impact": "conforms",
+      "reason": "Nada llega a Cal.com antes del clic en el enlace; el parámetro no es un dato personal; la CSP y las cabeceras no cambian"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Mejora el escenario: OnlineBusiness en lugar de un LocalBusiness sin dirección, autor con sameAs, una tabla de precios citable y 301 en lugar de 307"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint limpio en el ospec check del 2026-10-30 (lint, contraste y tema en sincronía); la tabla del artículo usa solo tokens y utilidades del tema (type-small, md:type-body, spacing, surface), y theme.css no cambia",
+      "recorded_at": "2026-10-30T17:41:54.640Z"
+    },
+    {
+      "kind": "adr",
+      "id": "0012",
+      "evidence": "En el ospec check del 2026-10-30 pasan tests/unit/contact-form.test.ts y tests/unit/wrangler-config.test.ts; wrangler.jsonc no cambia (sin run_worker_first ni assets_navigation_has_no_effect); el 301 va en el _redirects de los activos, que en workerd responde sin pasar por el Worker. La revisión de invocaciones diarias toca en la próxima auditoría de seguridad, no en este cambio",
+      "recorded_at": "2026-10-30T17:41:54.763Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "opened_turn": 12,
+      "answer": "lo recomendado",
+      "source": "user",
+      "resolved_turn": 13
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-30T17:41:44.837Z",
+      "detail": {
+        "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-30T17:41:44.837Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0003 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "adr:0012 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:privacy-security conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10",
+          "run-11"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-30T17:42:27.784Z"
+    }
+  ],
+  "base": "4a1bc47b7cc6ceb311e914611d6c74ea58a2e69e",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9e5c2c1950ace1a53104ea84495a758f1c82a0fc69ed8a5805b8fe05ff9fa668",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:328d080e111df6719b803a159a697af2d2ba20d2afd9993c23d7895f8d8b5165",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:4d442e7032f4fcf12533b79b79720c1866112332b605c34fefdc98817e0f6bc8",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3b5d85d49df0562e9fde32c0eb017a06ec70f3aa300c3743d0a4c9f83548be34",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:acf64c31c86ddc535551e1b7b9a1c56e5fe11c6eac5d244e3e4de6a9fddd8785",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:63190052025a30fc584b0a539b4461bb896046e907469d1131b48df2049f6a47",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0003",
+      "command": "pnpm build && node scripts/fitness.mjs no-persistent-bindings",
+      "exit_code": 0,
+      "output_sha256": "sha256:ccb64292a5193846254af941ac65f5f8ebf56ee7f0bcc35a716a2374d0df8485",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:2cad2fd593bb01658dbb517083b6a4c28bf5013ed9ab2108778ffb4e59cdb5d8",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:269fbf65692f675c5975f41f99ec834cde75d80381658efd133f1b973df0220a",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:446f05f8278bce5fb112b7beaf3e386fa00fb0b7dc6fd8bbf15fcfda1d45c264",
+      "tree": "sha256:e5ef92f7b9802cb1cc6d9f053111551e9480178011bf1a1ee53ef846783e7800",
+      "recorded_at": "2026-10-30T17:41:44.837Z"
+    }
+  ],
+  "closed_at": "2026-10-30T17:42:27.784Z"
+}

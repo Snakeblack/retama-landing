@@ -159,6 +159,23 @@ test.describe("sin JavaScript (ADR 0001)", () => {
   }
 });
 
+test("cada página del sitemap pedida sin su barra final se mueve con un 301 a su dirección, con su query", async ({
+  request,
+}) => {
+  const paths = (await sitemapUrls(request)).map((url) => new URL(url).pathname).filter((path) => path !== "/");
+  expect(paths.length).toBeGreaterThan(0);
+  for (const path of paths) {
+    const response = await request.get(`${path.slice(0, -1)}?utm_source=x`, { maxRedirects: 0 });
+    expect(response.status(), path).toBe(301);
+    const location = new URL(response.headers().location ?? "", "http://x");
+    expect(`${location.pathname}${location.search}`, path).toBe(`${path}?utm_source=x`);
+    expect((await request.get(path, { maxRedirects: 0 })).status(), path).toBe(200);
+  }
+  // A path that is no page keeps its direct 404, with no move first.
+  for (const path of ["/servicios", "/en/services", "/nada"])
+    expect((await request.get(path, { maxRedirects: 0 })).status(), path).toBe(404);
+});
+
 test("hreflang recíproco con x-default en todas las páginas del sitemap (ADR 0008)", async ({ page, request }) => {
   const urls = await sitemapUrls(request);
   expect(urls.length).toBeGreaterThanOrEqual(pages.length);

@@ -7,6 +7,9 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+### Added
+- Fase 2 de la auditoría SEO de retama.dev: el CTA de cada servicio abre el formulario con su tipo marcado y ofrece la reserva, Retama pasa a OnlineBusiness en el JSON-LD, la firma del blog enlaza al equipo, el artículo de costes trae una tabla de precios atada a services.ts, las URL sin barra final responden 301 y la zona activa Crawler Hints (seo-audit-phase-2)
+
 ## [0.15.0] - 2026-10-30
 
 ### Added
