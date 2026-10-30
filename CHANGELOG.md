@@ -7,6 +7,8 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-10-30
+
 ### Added
 - Release with ospec and the playbook's retama:delivery instead of release-please and the landing's own merge script (M3, landing change b) (release-by-ospec)
 
