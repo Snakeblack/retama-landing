@@ -1,5 +1,7 @@
 ---
 import { type Locale, t } from "../../i18n/index";
+import { sheets } from "../../lib/board";
+import DecisionSheet from "../DecisionSheet.astro";
 
 interface Props {
   locale: Locale;
@@ -20,27 +22,7 @@ const principles = [
 ] as const;
 // The live piece and the proof of the method (DESIGN.md Overview): a native exclusive accordion laid out as tabs
 // (global.css), so it works without JS. Each project opens the first three decisions Retama would record for it.
-const projects = [
-  ["live.web", ["live.web.d1", "live.web.r1"], ["live.web.d2", "live.web.r2"], ["live.web.d3", "live.web.r3"]],
-  [
-    "live.custom",
-    ["live.custom.d1", "live.custom.r1"],
-    ["live.custom.d2", "live.custom.r2"],
-    ["live.custom.d3", "live.custom.r3"],
-  ],
-  [
-    "live.desktop",
-    ["live.desktop.d1", "live.desktop.r1"],
-    ["live.desktop.d2", "live.desktop.r2"],
-    ["live.desktop.d3", "live.desktop.r3"],
-  ],
-  [
-    "live.agents",
-    ["live.agents.d1", "live.agents.r1"],
-    ["live.agents.d2", "live.agents.r2"],
-    ["live.agents.d3", "live.agents.r3"],
-  ],
-] as const;
+const projects = ["web", "custom", "desktop", "agents"] as const;
 ---
 
 <section id={copy["anchor.method"]} class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="method-title">
@@ -79,31 +61,13 @@ const projects = [
       <p>{copy["live.lead"]}</p>
     </div>
     {
-      projects.map(([name, ...decisions], index) => (
+      projects.map((sheet, index) => (
         <details class="group" name="project" open={index === 0}>
           <summary class="feedback flex min-h-(--spacing-touch) cursor-pointer list-none items-center gap-md bg-surface-raised p-tile-sm type-statement-sm text-on-surface-muted group-open:bg-field group-open:text-on-field hover:bg-field hover:text-on-field md:p-tile [&::-webkit-details-marker]:hidden">
             <span class="size-sm shrink-0 bg-on-surface-muted group-open:bg-primary" aria-hidden="true" />
-            {copy[name]}
+            {copy[sheets[sheet][0]]}
           </summary>
-          <figure class="flex h-full flex-col gap-md bg-surface-raised p-tile-sm md:p-tile" data-ui>
-            <figcaption class="flex items-center justify-between gap-md type-small text-on-surface-muted">
-              {copy["live.sheet"]} · {copy[name]}
-              <span class="bg-field px-sm text-on-field" data-example>
-                {copy["frag.example"]}
-              </span>
-            </figcaption>
-            <ol class="grid gap-xs">
-              {decisions.map(([decision, reason]) => (
-                <li class="grid gap-xs bg-surface p-md">
-                  <span class="flex items-start gap-sm type-body-strong">
-                    <span class="mt-sm size-sm shrink-0 bg-primary" aria-hidden="true" />
-                    {copy[decision]}
-                  </span>
-                  <span class="ps-md">{copy[reason]}</span>
-                </li>
-              ))}
-            </ol>
-          </figure>
+          <DecisionSheet locale={Astro.props.locale} sheet={sheet} class="h-full" />
         </details>
       ))
     }

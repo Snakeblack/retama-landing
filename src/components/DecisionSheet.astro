@@ -1,0 +1,37 @@
+---
+import { type Locale, t } from "../i18n/index";
+import { sheets } from "../lib/board";
+
+interface Props {
+  locale: Locale;
+  sheet: keyof typeof sheets;
+  class?: string;
+}
+
+const { locale, sheet, class: className } = Astro.props;
+const copy = t(locale);
+const [name, ...decisions] = sheets[sheet];
+---
+
+<!-- DESIGN.md Imagery: the decision sheet of a kind of project, an interface fragment with its "Example" label. -->
+<figure class:list={["flex flex-col gap-md bg-surface-raised p-tile-sm md:p-tile", className]} data-ui>
+  <figcaption class="flex items-center justify-between gap-md type-small text-on-surface-muted">
+    {copy["live.sheet"]} · {copy[name]}
+    <span class="bg-field px-sm text-on-field" data-example>
+      {copy["frag.example"]}
+    </span>
+  </figcaption>
+  <ol class="grid gap-xs">
+    {
+      decisions.map(([decision, reason]) => (
+        <li class="grid gap-xs bg-surface p-md">
+          <span class="flex items-start gap-sm type-body-strong">
+            <span class="mt-sm size-sm shrink-0 bg-primary" aria-hidden="true" />
+            {copy[decision]}
+          </span>
+          <span class="ps-md">{copy[reason]}</span>
+        </li>
+      ))
+    }
+  </ol>
+</figure>

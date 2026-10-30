@@ -1,0 +1,17 @@
+---
+import { HERO, retamaShape, strokePath } from "../../lib/retama-shape";
+
+const shape = retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots);
+---
+
+<!-- DESIGN.md Imagery: the hero's retama once, as dots along its strokes (ink on the stems, muted on the roots, primary
+     on the taproot), drawn at build time; every picture of it on the page shows it through its own viewBox. -->
+<svg class="absolute size-0" aria-hidden="true">
+  <defs>
+    <g id="retama-dots" fill="none" stroke-dasharray="0 5" stroke-linecap="round">
+      <path class="stroke-on-surface-muted" d={strokePath(shape, "root")} stroke-width="2.8" />
+      <path class="stroke-current" d={strokePath(shape, "stem")} stroke-width="2.8" />
+      <path class="stroke-primary" d={strokePath(shape, "taproot")} stroke-width="4.5" />
+    </g>
+  </defs>
+</svg>
