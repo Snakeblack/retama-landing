@@ -21,6 +21,8 @@ const dates = [
   ["blog.published", published],
   ...(updated ? [["blog.updated", updated] as const] : []),
 ] as const;
+// The signature leads to the team chapter, where the author's card is (owner, 2026-10-30).
+const team = `${localizedPath(locale, "/")}#${copy["anchor.team"]}`;
 ---
 
 <!-- DESIGN.md Layout, the article: the title and its lead on the left with its author and dates beside them, then the
@@ -57,7 +59,7 @@ const dates = [
         <dl class="grid gap-xs">
           <div class="grid gap-xs bg-surface p-md">
             <dt class="type-small text-on-surface-muted">{copy["blog.author"]}</dt>
-            <dd>{blogAuthor}</dd>
+            <dd><a class="feedback underline hover:decoration-primary" href={team}>{blogAuthor}</a></dd>
           </div>
           {
             dates.map(([label, date]) => (

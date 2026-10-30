@@ -39,7 +39,7 @@ const blogs = [
 test.describe("blog sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false });
 
-  for (const { lang, index, title, article, headline, all, byline } of blogs) {
+  for (const { lang, index, title, article, headline, all, byline, team } of blogs) {
     test(`${index} lista los artículos de su idioma, del más reciente al más antiguo`, async ({ page }) => {
       const response = await page.goto(index);
       expect(response?.status()).toBe(200);
@@ -65,6 +65,11 @@ test.describe("blog sin JavaScript (ADR 0001)", () => {
       // Signed by Manuel M. (owner, 2026-10-26), first of the facts beside the title.
       await expect(page.locator("dl dt").first()).toHaveText(byline);
       await expect(page.locator("dl dd").first()).toHaveText("Manuel M.");
+      // The signature leads to the team chapter, where his card is (owner, 2026-10-30).
+      await expect(page.locator("dl dd").first().getByRole("link", { name: "Manuel M." })).toHaveAttribute(
+        "href",
+        team,
+      );
       // Published, then updated when its warranty and its floor price followed proposal 1.4 and, last, when it linked
       // its service's page (2026-10-30).
       await expect(page.locator("dl time")).toHaveCount(2);
@@ -105,7 +110,13 @@ for (const { lang, home, index, article, other, talk, contact, team } of blogs) 
       inLanguage: lang,
       datePublished: "2026-10-23",
       // Absolute on the production origin, like the canonical: the author leads to the team chapter.
-      author: { "@type": "Person", name: "Manuel M.", url: new URL(team, canonical).href },
+      // and his public profile names him (owner, 2026-10-30).
+      author: {
+        "@type": "Person",
+        name: "Manuel M.",
+        url: new URL(team, canonical).href,
+        sameAs: ["https://www.linkedin.com/in/mmretamozo/"],
+      },
       publisher: { "@id": new URL("/#organization", canonical).href },
     });
     await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
@@ -223,3 +234,20 @@ test.describe("artículos en pantallas táctiles", () => {
     });
   }
 });
+
+for (const { article } of blogs)
+  test(`la tabla de precios de ${article} cabe en su tesela a ancho de móvil (DESIGN.md)`, async ({ page }) => {
+    for (const width of [320, 360, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(article);
+      await page.evaluate(() => document.fonts.ready);
+      const table = page.locator("[data-article] table");
+      await expect(table.locator("tbody tr")).toHaveCount(4);
+      const { right, tile } = await table.evaluate((node) => ({
+        right: node.getBoundingClientRect().right,
+        tile: (node.parentElement as HTMLElement).getBoundingClientRect().right,
+      }));
+      expect(right, `${article} a ${width}px`).toBeLessThanOrEqual(tile);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `${article} a ${width}px`).toBe(width);
+    }
+  });

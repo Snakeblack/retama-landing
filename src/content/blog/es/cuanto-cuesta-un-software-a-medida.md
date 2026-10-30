@@ -8,7 +8,14 @@ updated: 2026-10-30
 
 Es la primera pregunta de casi cualquier cliente, y la respuesta honesta empieza por otra: ¿qué tiene que hacer exactamente? Un software a medida no tiene precio de catálogo, porque no hay dos iguales. Lo que sí se puede es explicar de qué depende, para que sepas qué estás pagando y puedas comparar propuestas.
 
-Lo que sí tiene es un suelo. Con nosotros, [un software a medida](/servicios/software-a-medida/) empieza en 8.000 € sin IVA, y su precio cerrado sale de un diagnóstico de precio fijo, desde 900 €, que se descuenta si seguimos.
+Lo que sí tiene es un suelo. Con nosotros, [un software a medida](/servicios/software-a-medida/) parte de estos precios, sin IVA, y su precio cerrado sale del diagnóstico, que se descuenta si seguimos:
+
+| Qué | Desde, sin IVA | Plazo |
+| --- | --- | --- |
+| Diagnóstico de precio fijo | 900 € | de 1 a 2 semanas |
+| Aplicación web | 8.000 € | de 4 a 8 semanas |
+| Aplicación de escritorio | 10.000 € | de 6 a 10 semanas |
+| [Mantenimiento mensual](/#preguntas) | 250 € al mes | opcional, tres meses como mínimo |
 
 ## Lo que mueve el precio
 

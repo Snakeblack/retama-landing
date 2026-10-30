@@ -8,7 +8,14 @@ updated: 2026-10-30
 
 It is the first question almost every client asks, and the honest answer starts with another one: what exactly does it have to do? Custom software has no catalogue price, because no two projects are the same. What can be explained is what the price depends on, so you know what you are paying for and can compare proposals.
 
-What it does have is a floor. With us, [custom software](/en/services/custom-software/) starts at €8,000 excluding VAT, and its fixed price comes out of a fixed-price diagnosis, from €900, deducted if we carry on.
+What it does have is a floor. With us, [custom software](/en/services/custom-software/) starts from these prices, excluding VAT, and its fixed price comes out of the diagnosis, deducted if we carry on:
+
+| What | From, excluding VAT | Time |
+| --- | --- | --- |
+| Fixed-price diagnosis | €900 | 1 to 2 weeks |
+| Web application | €8,000 | 4 to 8 weeks |
+| Desktop application | €10,000 | 6 to 10 weeks |
+| [Monthly maintenance](/en/#questions) | €250 a month | optional, three months at least |
 
 ## What drives the price
 
