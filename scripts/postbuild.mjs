@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { en } from "../src/i18n/en.ts";
 import { es } from "../src/i18n/es.ts";
 import { extractMetaCsp, mergePolicies, serializePolicy } from "./lib/csp.mjs";
+import { icons } from "./lib/icons.mjs";
 import { ogImage, ogPageImage, ownImages, themeTokens } from "./lib/og-image.mjs";
 
 const root = new URL("../dist/client/", import.meta.url).pathname;
@@ -65,6 +66,13 @@ async function ogImages() {
     }
 }
 
+// favicon.ico and apple-touch-icon.png from the SVG icon, which Base.astro links and the JSON-LD names as the logo.
+async function iconFiles() {
+  const svg = await readFile(join(root, "favicon.svg"), "utf8");
+  for (const [name, data] of Object.entries(await icons(svg))) await writeFile(join(root, name), data);
+}
+
 await flattenLocale404();
 await cspHeader();
 await ogImages();
+await iconFiles();

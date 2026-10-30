@@ -51,6 +51,27 @@ for (const { path } of pages) {
   });
 }
 
+test("el icono existe en ICO y en PNG de 180 px, la cabecera los enlaza y el PNG es el logo de Retama", async ({
+  page,
+  request,
+}) => {
+  for (const [path, type] of [
+    ["/favicon.ico", /image\/(x-icon|vnd\.microsoft\.icon)/],
+    ["/apple-touch-icon.png", /image\/png/],
+  ] as const) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+    expect(response.headers()["content-type"], path).toMatch(type);
+  }
+  await page.goto("/servicios/software-a-medida/");
+  await expect(page.locator('link[rel="icon"][href="/favicon.ico"]')).toHaveAttribute("sizes", "32x32");
+  await expect(page.locator('link[rel="icon"][href="/favicon.svg"]')).toHaveAttribute("type", "image/svg+xml");
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/apple-touch-icon.png");
+  const graph = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? "{}");
+  const retama = graph["@graph"].find((node: { "@id"?: string }) => node["@id"]?.endsWith("#organization"));
+  expect(retama.logo).toBe("https://retama.dev/apple-touch-icon.png");
+});
+
 test.describe("sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false });
 
