@@ -26,12 +26,12 @@ const copy = t(locale);
     {caption}
     <span class="bg-field px-sm text-on-field" data-example>{copy["frag.example"]}</span>
   </figcaption>
-  <table class="w-full border-separate border-spacing-y-(--spacing-xs) text-left type-small tabular-nums md:type-body">
+  <table class="w-full border-separate border-spacing-y-(--spacing-xs) text-left type-small tabular-nums lg:type-body">
     <thead class="type-small text-on-surface-muted">
       <tr>
         {
           columns.map((column) => (
-            <th class="px-sm type-small md:px-md" scope="col">
+            <th class="px-sm type-small lg:px-md" scope="col">
               {column}
             </th>
           ))
@@ -43,9 +43,9 @@ const copy = t(locale);
         rows.map(({ cells, alert, next }) => (
           <tr class="bg-surface" data-live={next?.text} data-live-alert={next ? String(next.alert) : undefined}>
             {cells.slice(0, -1).map((cell) => (
-              <td class="px-sm py-md md:p-md">{cell}</td>
+              <td class="px-sm py-md lg:p-md">{cell}</td>
             ))}
-            <td class="px-sm py-md md:p-md">
+            <td class="px-sm py-md lg:p-md">
               <span class="flex items-center gap-sm">
                 <span
                   class="size-sm shrink-0 bg-on-surface-muted data-alert:bg-primary"

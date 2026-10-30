@@ -39,3 +39,31 @@ test.describe("el capítulo Sectores (DESIGN.md Imagery y Motion)", () => {
     });
   }
 });
+
+test.describe("el capítulo Sectores a ancho de tableta (DESIGN.md Layout)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  for (const width of [768, 1024]) {
+    for (const path of ["/", "/en/"]) {
+      test(`${path} a ${width} px no se sale de la pantalla ni de sus teselas, con cualquier sector abierto`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 1024 });
+        await page.goto(path);
+        const sectors = page.locator("#sectors-title").locator("xpath=ancestor::section");
+        const overflowing = () =>
+          sectors.evaluate((section) =>
+            [...section.querySelectorAll<HTMLElement>(":scope > p, [data-sectors] summary")]
+              .filter((tile) => tile.scrollWidth > tile.clientWidth)
+              .map((tile) => tile.textContent?.trim()),
+          );
+        const summaries = sectors.locator("[data-sectors] summary");
+        for (let index = 0; index < (await summaries.count()); index++) {
+          await summaries.nth(index).click();
+          expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+          expect(await overflowing()).toEqual([]);
+        }
+      });
+    }
+  }
+});
