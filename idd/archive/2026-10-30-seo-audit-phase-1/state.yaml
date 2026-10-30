@@ -1,0 +1,390 @@
+{
+  "schema": "idd-state/v1",
+  "change": "seo-audit-phase-1",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "empieza con la fase 1 (del plan de acción de la auditoría SEO con claude-seo)",
+    "kind": "feature",
+    "summary": "Fase 1 de la auditoría SEO de retama.dev (2026-10-30): enlaces entre artículos y servicios, el grano fuera del LCP de las páginas interiores, la home sin desbordes a ancho de tableta, la escena que se rinde antes con una GPU lenta, favicon.ico y apple-touch-icon, lastmod y x-default en el sitemap, logo de la Organization en PNG de al menos 112 px, la marca en hero.lead y el área táctil del enlace del logotipo",
+    "acceptance": "Cada artículo enlaza en su cuerpo a su servicio y cada servicio con artículo lo enlaza, en es y en; en las páginas interiores el último LCP no es una imagen data: y coincide con el primer pintado; en / y /en/ a 768 y 1024 px no hay scroll horizontal ni texto que se salga de su tesela; la escena decide si se rinde en torno a 1 s y no a los 60 frames; /favicon.ico y /apple-touch-icon.png responden 200; el sitemap da lastmod a toda URL y x-default en su hreflang, y su índice lleva la fecha más reciente; el JSON-LD de la Organization usa un logo PNG de al menos 112×112; hero.lead nombra a Retama en los dos idiomas; el enlace del logotipo mide al menos 48 px de alto; pasan las cinco comprobaciones"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "Dos límites de la primera pantalla. (1) Grano en las páginas interiores, donde la tesela SVG de 240×240 px llega en load y lleva el LCP de 0,79 a 1,56 s. ¿Grano desde el HTML en las páginas sin escena (cambia DESIGN.md, que lo trae tras la carga y sin script ninguno), mapa de bits rasterizado en el build y activo desde el principio, o dejarlo como está? (2) Escena con GPU lenta. ¿Decidir con 1 s de frames ya calientes (mínimo 10 frames) o con los 60 frames, lo que llegue antes, manteniendo el umbral de 30 fps?"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "src/lib/sitemap.ts",
+          "line": 46
+        }
+      },
+      {
+        "category": "persistence",
+        "question": "lastmod del sitemap. ¿Fecha updated mantenida a mano en los datos, en formato AAAA-MM-DD, para servicios (2026-10-30), home (2026-10-30) y legal (la fecha de su texto), con un test que la exija?"
+      },
+      {
+        "category": "copy",
+        "question": "Texto de hero.lead con la marca, como mucho una línea más que hoy. ¿«Retama hace aplicaciones web, herramientas internas y agentes para empresas, en remoto desde España.» y «Retama builds web apps, internal tools and agents for companies, remotely from Spain.», u otro?"
+      },
+      {
+        "category": "url-state",
+        "question": "Enlaces entre blog y servicios, donde 2 de 4 servicios tienen artículo. ¿Los artículos de coste y de decisiones enlazan /servicios/software-a-medida/ y el de seguridad /servicios/webs-y-cms/ (y sus versiones en inglés); y en la página de servicio una fila nueva «Del blog» con la tesela de cada artículo antes de «Otros servicios», con su cambio en DESIGN.md?"
+      },
+      {
+        "category": "accessibility",
+        "question": "Home a 768 y 1024 px. ¿Nombres de las pestañas de sectores a statement-sm (22 px) hasta lg o pestañas 2×2 hasta lg; y para «Hispanoamérica» en la tesela de tres columnas a 1024 px, partición con guion (hyphens auto y overflow-wrap break-word) u otra solución?"
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "scripts/postbuild.mjs",
+          "line": 36
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "astro.config.mjs",
+      "scripts/lib/icons.mjs",
+      "scripts/postbuild.mjs",
+      "src/components/Home.astro",
+      "src/components/ServicePage.astro",
+      "src/components/board/ExampleTable.astro",
+      "src/components/board/Hero.astro",
+      "src/components/board/Sectors.astro",
+      "src/content/blog/en/web-security-updating-without-breaking.md",
+      "src/content/blog/en/what-custom-software-costs.md",
+      "src/content/blog/en/why-we-write-every-decision-down.md",
+      "src/content/blog/es/cuanto-cuesta-un-software-a-medida.md",
+      "src/content/blog/es/por-que-escribimos-cada-decision.md",
+      "src/content/blog/es/seguridad-web-actualizar-sin-romper.md",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/lib/scene-tier.ts",
+      "src/lib/seo.ts",
+      "src/lib/services.ts",
+      "src/lib/sitemap.ts",
+      "src/scripts/header.ts",
+      "src/scripts/scene-worker.ts",
+      "src/styles/global.css",
+      "tests/e2e/blog.spec.ts",
+      "tests/e2e/grain.spec.ts",
+      "tests/e2e/header.spec.ts",
+      "tests/e2e/sectors.spec.ts",
+      "tests/e2e/service-pages.spec.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/icons.test.ts",
+      "tests/unit/scene-tier.test.ts",
+      "tests/unit/seo.test.ts",
+      "tests/unit/services.test.ts",
+      "tests/unit/sitemap.test.ts"
+    ],
+    "work_units": 6,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "Grano: las páginas sin escena traen data-grain desde el HTML (Base.astro), así que su grano entra en el primer pintado y no crea un LCP nuevo en load; la home, con escena, lo sigue poniendo header.ts en load (usuario, 2026-10-30)",
+      "Escena: tooSlow decide con 1 s de frames ya calientes (mínimo 10) o con los 60 frames, lo que llegue antes, con el mismo umbral de 30 fps (usuario, 2026-10-30)",
+      "Home en tableta: los nombres de las pestañas de sectores quedan en statement-sm hasta lg; las teselas de frase de los sectores parten con guion (hyphens auto) y, de respaldo, overflow-wrap break-word; la tabla de ejemplo va en letra pequeña hasta lg, como pide DESIGN.md Imagery (usuario, 2026-10-30)",
+      "Sitemap: cada página sin artículo lleva su fecha updated (AAAA-MM-DD) a mano en los datos y un test la exige; el lastmod nunca es la fecha del build; el hreflang del sitemap añade x-default a la versión es, como el HTML (usuario, 2026-10-30)",
+      "hero.lead nombra a Retama: «Retama hace aplicaciones web, herramientas internas y agentes para empresas, en remoto desde España.» / «Retama builds web apps, internal tools and agents for companies, remotely from Spain.» (usuario, 2026-10-30)",
+      "Blog y servicios: coste y decisiones enlazan software a medida y seguridad enlaza webs y CMS desde su texto; la página de servicio con artículos añade la fila «Del blog» antes de «Otros servicios», con la tesela de cada artículo como en el índice del blog (usuario, 2026-10-30)",
+      "favicon.ico (PNG de 32 px dentro de un ICO) y apple-touch-icon.png (180 px) se generan en el postbuild desde public/favicon.svg con sharp; el logo de la Organization pasa a ser ese PNG de 180 px, por encima de los 112 que pide Google",
+      "hero.lead nombra a Retama aunque DESIGN.md decía que en el primer capítulo «Retama» era solo el logotipo: DESIGN.md pasa a decir que el título nunca la nombra y la entradilla sí, como quien hace lo que dice, y el E2E de la portada lo comprueba (usuario, 2026-10-30)",
+      "El grano y las palabras partidas: hyphens auto partía casi todo en la tesela de tres columnas, así que la utilidad hyphenate-long de global.css limita la partición a palabras de 10 letras o más (hyphenate-limit-chars 10 4 4), con overflow-wrap break-word de respaldo",
+      "La relación entre servicios y artículos vive en src/lib/services.ts (articles, por clave del artículo); un test unitario exige que cada artículo asignado enlace la página de su servicio en su texto, en cada idioma"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 6 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs and 2 more (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0008 and quality scenario perf-mobile, seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Todo el texto nuevo (fila «Del blog», enlaces de los artículos) está en el HTML; el grano de las páginas sin escena ya no depende del script"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "La escena sigue rindiéndose al póster por debajo de 30 fps; solo decide antes, con 1 s de frames calientes, y nunca toca el LCP"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "Los cambios visibles (grano, pestañas, fila del blog) se escriben primero en DESIGN.md y usan solo sus tokens; pnpm design:lint pasa"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Las claves nuevas van en es y en; el sitemap añade el mismo x-default a la versión es que ya da el HTML"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "En las páginas interiores el LCP pasa a coincidir con el primer pintado (antes llegaba en load); el primer pintado no cambia con CPU 4x y red lenta"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Sitemap con lastmod en toda URL y x-default; enlaces internos entre artículos y servicios; favicon.ico y logo raster"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "todas las recomendadas",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-30T15:49:52.770Z",
+      "detail": {
+        "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-30T15:49:52.770Z",
+      "detail": {
+        "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+        "check": "ev-1",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/blog.spec.ts",
+          "tests/e2e/grain.spec.ts",
+          "tests/e2e/header.spec.ts",
+          "tests/e2e/sectors.spec.ts",
+          "tests/e2e/service-pages.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/icons.test.ts",
+          "tests/unit/scene-tier.test.ts",
+          "tests/unit/seo.test.ts",
+          "tests/unit/services.test.ts",
+          "tests/unit/sitemap.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-30T15:49:52.770Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-30T15:50:10.635Z"
+    }
+  ],
+  "base": "e58b4fd112b6b55b4987f1a384e12a543d6a8949",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:96cd4de4c79e776b88fbf3200f59d140e7ed422d18090dce89a44d9d4b41dbc6",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:2a38b26bb5577d524fbb7c8846088c1c317932149d381080ed7a5189e64fc65d",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:c19cf68e82e520dc865f7964f5a60958fca6e12799ed1f4b27094e6e06c6a5d5",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:fa16b68ef321f335754afe5bc240d30c4e622dea82976defc705ccfb31ea782d",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:fc6aca1b1c40893ac09183c1ff507b927544f8331222418b57d99d8024c56c78",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:d68b0945948195ba64e8d58fdb255e4a0a4f4c88da289d881adb3085211fa9d1",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:bd1ecdd1edb57b330ca20ee747dbb20a470067aa426a5f99e9e985695a310420",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:941d2590f58b277dd3ad1da31050312d659f229b6b479e4c71b87c8b65554fb3",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:eb5de611842353f3225aefbb9a818a8cf535c3e5fdfb0642497b20988c816b1a",
+      "tree": "sha256:73b145fd0d72db3439f78aae6a9c398be93968c8427862fd5c2015f3dfa8df7a",
+      "recorded_at": "2026-10-30T15:49:52.770Z"
+    }
+  ],
+  "closed_at": "2026-10-30T15:50:10.635Z"
+}
