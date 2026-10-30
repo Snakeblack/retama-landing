@@ -7,6 +7,8 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-30
+
 ### Added
 - Fase 1 de la auditoría SEO de retama.dev (2026-10-30): enlaces entre artículos y servicios, el grano fuera del LCP de las páginas interiores, la home sin desbordes a ancho de tableta, la escena que se rinde antes con una GPU lenta, favicon.ico y apple-touch-icon, lastmod y x-default en el sitemap, logo de la Organization en PNG de al menos 112 px, la marca en hero.lead y el área táctil del enlace del logotipo (seo-audit-phase-1)
 
