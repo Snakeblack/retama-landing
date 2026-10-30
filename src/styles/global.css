@@ -44,6 +44,17 @@
   outline-offset: var(--spacing-focus);
 }
 
+/* DESIGN.md Layout, the services: a card's name links its page and takes the click on the whole card, so the card
+   carries the focus ring rather than the name. */
+[data-card]:has(:focus-visible) {
+  outline: var(--spacing-focus) solid var(--color-primary);
+  outline-offset: var(--spacing-focus);
+
+  & :focus-visible {
+    outline: none;
+  }
+}
+
 /* DESIGN.md Layout: board rows are 96px and grow when a tile's content needs more. */
 @utility board-rows {
   grid-auto-rows: minmax(var(--spacing-row), auto);

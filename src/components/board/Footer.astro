@@ -1,5 +1,6 @@
 ---
 import { type Locale, localizedPath, t } from "../../i18n/index";
+import { servicePath, services } from "../../lib/services";
 import Wordmark from "../Wordmark.astro";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 const { locale } = Astro.props;
 const copy = t(locale);
 const legal = localizedPath(locale, "/legal/");
+const quiet = "feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface-muted underline hover:text-on-surface";
 const links = [
   ["anchor.legalNotice", "legal.notice.title"],
   ["anchor.privacy", "legal.privacy.title"],
@@ -16,13 +18,28 @@ const links = [
 ] as const;
 ---
 
-<!-- DESIGN.md: the board's last row is the footer, with the blog and the legal links in quiet type under the wordmark. -->
+<!-- DESIGN.md: the board's last row is the footer, with the services, the blog and the legal links in quiet type under
+     the wordmark. -->
 <footer class="grid grid-cols-2 gap-gap px-margin pt-section pb-margin lg:grid-cols-12">
   <div class="col-span-2 grid gap-md bg-surface-raised p-tile-sm md:p-tile lg:col-span-9">
     <Wordmark class="block type-wordmark" />
+    <!-- The service pages, from every page (owner, 2026-10-30). -->
+    <nav aria-label={copy["nav.services"]}>
+      <ul class="flex flex-wrap gap-x-lg">
+        {
+          services.map(({ id }) => (
+            <li>
+              <a class={quiet} href={servicePath(locale, id)}>
+                {copy[`services.${id}`]}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
     <!-- The blog leads the row of quiet links; the legal ones keep their own navigation. -->
     <div class="flex flex-wrap gap-x-lg">
-      <a class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface-muted underline hover:text-on-surface" href={localizedPath(locale, "/blog/")}>
+      <a class={quiet} href={localizedPath(locale, "/blog/")}>
         {copy["nav.blog"]}
       </a>
       <nav aria-label={copy["footer.legalLabel"]}>
@@ -30,7 +47,7 @@ const links = [
           {
             links.map(([anchor, title]) => (
               <li>
-                <a class="feedback flex min-h-(--spacing-touch) items-center type-small text-on-surface-muted underline hover:text-on-surface" href={`${legal}#${copy[anchor]}`}>
+                <a class={quiet} href={`${legal}#${copy[anchor]}`}>
                   {copy[title]}
                 </a>
               </li>

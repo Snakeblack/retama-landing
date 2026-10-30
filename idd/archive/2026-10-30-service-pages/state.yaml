@@ -1,0 +1,529 @@
+{
+  "schema": "idd-state/v1",
+  "change": "service-pages",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "continua (relevo: páginas por servicio; respuesta del usuario del 2026-10-30 a la propuesta: «las recomendadas y el manifiesto lo dejamos»)",
+    "kind": "feature",
+    "summary": "Una página por servicio (webs y CMS, software a medida con el escritorio dentro, agentes y automatización, SEO y analítica) en es y en, enlazada desde las tarjetas de la portada, con canónica, hreflang recíproco, sitemap, JSON-LD Service y BreadcrumbList, imagen Open Graph propia y llms.txt",
+    "acceptance": "El build publica 8 páginas de servicio (4 en es, 4 en en) con HTML completo sin JS, h1 propio, title y description distintos de la portada, canónica, hreflang recíproco con x-default, entrada en el sitemap con su traducción, JSON-LD Service y BreadcrumbList, og:image propia y línea en llms.txt; cada tarjeta de Servicios de la portada enlaza a su página; lint, typecheck, test, e2e y design:lint pasan"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 362
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0008-locale-routing.md",
+          "line": 15
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "copy",
+        "question": "¿Cómo se diferencia el title de la portada (Software a medida y aplicaciones web para empresas) del de la página de Software a medida para que no compitan por la misma búsqueda?"
+      },
+      {
+        "category": "url-state",
+        "question": "¿Qué rutas llevan las páginas: /servicios/<slug en español>/ y /en/services/<slug en inglés>/ con el slug traducido, como los artículos del blog, o el mismo slug en los dos idiomas?"
+      },
+      {
+        "category": "accessibility",
+        "question": "¿Cómo enlaza cada tarjeta de Servicios a su página: el nombre del servicio como enlace que cubre toda la tarjeta, o un enlace visible aparte dentro de ella?"
+      },
+      {
+        "category": "errors",
+        "question": "/servicios/ y /en/services/ a secas no son ninguna página: ¿dan el 404 de su idioma o redirigen al capítulo Servicios de la portada?"
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "astro.config.mjs",
+      "docs/architecture/technical-baseline.md",
+      "docs/roadmap.md",
+      "lighthouserc.json",
+      "scripts/lib/og-image.mjs",
+      "scripts/postbuild.mjs",
+      "src/components/DecisionSheet.astro",
+      "src/components/ServicePage.astro",
+      "src/components/board/Footer.astro",
+      "src/components/board/Method.astro",
+      "src/components/board/RetamaDots.astro",
+      "src/components/board/Services.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/layouts/Base.astro",
+      "src/lib/board.ts",
+      "src/lib/seo.ts",
+      "src/lib/services.ts",
+      "src/lib/sitemap.ts",
+      "src/pages/en/services/[slug].astro",
+      "src/pages/servicios/[slug].astro",
+      "src/styles/global.css",
+      "tests/e2e/legal.spec.ts",
+      "tests/e2e/service-pages.spec.ts",
+      "tests/e2e/services.spec.ts",
+      "tests/e2e/site.spec.ts",
+      "tests/unit/og-image.test.ts",
+      "tests/unit/seo.test.ts",
+      "tests/unit/services.test.ts",
+      "tests/unit/sitemap.test.ts"
+    ],
+    "work_units": 3,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "Rutas con slug traducido (usuario, 2026-10-30): /servicios/webs-y-cms/, /servicios/software-a-medida/, /servicios/agentes-y-automatizaciones/, /servicios/seo-y-analitica/ y /en/services/websites-and-cms/, /en/services/custom-software/, /en/services/agents-and-automation/, /en/services/seo-and-analytics/",
+      "/servicios/ y /en/services/ a secas dan el 404 de su idioma; la miga de pan es Inicio > Servicio (usuario, 2026-10-30)",
+      "La portada conserva su title; la página de software a medida va a la búsqueda más larga: «Desarrollo de software a medida: web y escritorio · Retama» (usuario, 2026-10-30)",
+      "Cada tarjeta de Servicios enlaza con su nombre, un enlace que cubre toda la tarjeta, sin «Ver más» (usuario, 2026-10-30)",
+      "Cada página: cabecera (h1, entradilla, precio desde y plazo, Hablemos), Qué incluye (3-4 piezas), Cuándo encaja (3 situaciones), Cómo empieza (propuesta o diagnóstico, entregas, garantía), la hoja de decisiones de ejemplo y enlaces a los otros tres servicios; textos con retama:humanizer, revisados en el PR (usuario, 2026-10-30)",
+      "SEO y analítica empieza con propuesta gratis, como una web (usuario, 2026-10-30)",
+      "La cabecera de cada página lleva la parte de la retama en trama de puntos de su tarjeta; DESIGN.md Imagery suma las páginas de servicio; SEO estrena su hoja de decisiones (usuario, 2026-10-30)",
+      "Imagen Open Graph propia por página, como la de un artículo: «Servicios» en gris sobre el nombre del servicio (usuario, 2026-10-30)",
+      "El pie de todas las páginas suma una fila con los cuatro servicios (usuario, 2026-10-30)",
+      "Hablemos de una página de servicio lleva a /#contacto sin marcar el servicio en el formulario (usuario, 2026-10-30)",
+      "Entrega: un PR si cabe en unas 400 líneas; si no, dos encadenados (base: estructura, plantilla, DESIGN.md, SEO y la página de webs; encima: las otras tres, enlaces de tarjetas y pie), con la release en el padre (usuario, 2026-10-30)",
+      "Tras este change, revisión SEO con una skill que instalará el usuario (usuario, 2026-10-30)",
+      "Los cuatro servicios (slugs, precios y su parte de la retama) viven en src/lib/services.ts, que usan las tarjetas, las páginas, el JSON-LD, el sitemap y llms.txt",
+      "La hoja de decisiones del método y la trama de puntos de la retama pasan a componentes compartidos (DecisionSheet.astro, RetamaDots.astro); las listas de claves de las hojas, a src/lib/board.ts como las preguntas",
+      "La imagen Open Graph de una página de servicio está en og/ con la ruta de la página (/og/servicios/<slug>.png, /og/en/services/<slug>.png); postbuild la dibuja desde el nodo Service del JSON-LD, como la de un artículo desde su BlogPosting",
+      "La miga de pan sube un paso por carpeta que es página: /servicios/ no lo es, así que una página de servicio cuelga del inicio (el test de site.spec.ts pasa de «una por carpeta» a «una por carpeta del sitemap»)",
+      "Lighthouse CI mide también /servicios/software-a-medida/, la plantilla nueva con las dos hojas y la trama (perf-mobile)",
+      "Prior decision (memory): seo-business-model, el title de la portada «Software a medida y aplicaciones web para empresas · Retama» -> src/i18n/es.ts: current",
+      "Prior decision (memory): seo-business-model, zona de servicio España, Portugal e Hispanoamérica -> src/lib/board.ts (areaServed): current; el nodo Service de cada página la repite",
+      "El h1 inglés de webs es «Web design and CMS»: «Web design and CMS for businesses» ocupaba tres líneas a 360 px (DESIGN.md: nunca más de dos); el title conserva «for businesses»"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared 3 work units",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches astro.config.mjs and 2 more (matches astro.config.*)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0005, 0006, 0008 and quality scenario perf-mobile, seo-discovery",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Las páginas de servicio son HTML estático prerenderizado sin isla propia: todo el texto está sin JS (e2e «páginas de servicio sin JavaScript»), y el enlace de cada tarjeta es un <a> nativo"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md describe la página de servicio, el enlace de las tarjetas, el pie, Imagery y la imagen OG; los componentes solo usan tokens y pnpm design:lint pasa"
+    },
+    {
+      "kind": "adr",
+      "id": "0006",
+      "impact": "conforms",
+      "reason": "Sin style ni manejadores inline ni scripts nuevos: el foco de la tarjeta va en global.css y la imagen OG se dibuja en el build; la CSP con hashes no cambia"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Cada página de servicio existe en es y en con slug traducido (como el blog), declara canónica y alternativas recíprocas con x-default, el sitemap la empareja con su traducción y las claves i18n tienen paridad"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "La página nueva no carga JS propio ni la escena; Lighthouse CI la mide ahora (/servicios/software-a-medida/): 100 x4 en local, LCP 1,43 s, CLS 0"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Una URL indexable por servicio con HTML completo sin JS, canónica, hreflang recíproco, sitemap emparejado, JSON-LD Service y BreadcrumbList, og:image propia y línea en llms.txt"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint en este árbol: «DESIGN.md: lint clean, theme in sync, components use only tokens»; theme.css no se ha tocado a mano y los componentes nuevos solo usan utilidades de los tokens",
+      "recorded_at": "2026-10-30T11:51:18.618Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "todas las recomendadas, al terminar esto haremos una review con una skill que te voy a instalar que es para SEO",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-30T11:49:50.973Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-30T11:52:28.096Z",
+      "detail": {
+        "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+        "runs": [
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-30T11:52:28.096Z",
+      "detail": {
+        "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+        "check": "ev-2",
+        "documents": [
+          "DESIGN.md",
+          "docs/architecture/technical-baseline.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/legal.spec.ts",
+          "tests/e2e/service-pages.spec.ts",
+          "tests/e2e/site.spec.ts",
+          "tests/unit/og-image.test.ts",
+          "tests/unit/seo.test.ts",
+          "tests/unit/services.test.ts",
+          "tests/unit/sitemap.test.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-30T11:52:28.096Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0005 conforms",
+          "adr:0006 conforms",
+          "adr:0008 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+        "fitness": [
+          "run-16",
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-30T11:52:33.019Z"
+    }
+  ],
+  "base": "7aaee4426f938e8a0cb1c8ccb2d8efb007525ca6",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:7db71f569f25791f5a10588112e43d7e679362739e4241fdeb52d9126c5334a6",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:e858c529334b9afbaeaf602afb52ac96fbf6d3ac8e2e92d931ef6e942df2aedc",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:5ce16ffe6ce0c85c67c767ff19a474d8b090a7186486a3567cc517c33653d468",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:d2d22fcd23909e15b9b2c8f0e53214ec15319a808c5da8b91587a69c7b461d93",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:1006021322179483058311ebdcbfb77307f7d0fc7b943bbe5a68f979befeba5a",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:76a60f318affe8ef31437e17ff511cbd1fdd446e96af8230f677216cf3b55753",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:54e77db5e8cc50987b40d0b097e0836c23fe411a38dcaa79bd772f53405a156a",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:caad94abda54589c7af38b39f5a3fef51473030cf1f02b64e5cf4674f4811161",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a69d9b927daa6fa317acde793ce7510ae21022d1b7d1c428cadf9a6f38837c53",
+      "tree": "sha256:6663a17e0b96108cadee38e625076724378793699705c5c470b3d73a4572b712",
+      "recorded_at": "2026-10-30T11:49:50.973Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:06013442081c3c560f8e4b5cbc0cbebfef2c5e307ff9fc5a43803991306cb841",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:b5f1a0cf07c8e3a64331430660ba5ea794330d094243b273f437843564d6f860",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:f069e6b4b8e7135bc4925ec6dfc482c81aecf05633ba6c01f7f0622d5a7a3fe0",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:8a5217774884f349ea02cc2953fd45fced884641d5e6bda1df8e52cd2f8e615d",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:67d39862203728fdfdce1bad4e8daa87db59eecf5cadfdf894c7be5d5ba3a7bc",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:6a76e2e726d419f50113c639113fc9b76d5137969725f7f6348268adea547aa1",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0006",
+      "command": "pnpm test:e2e --grep \"ADR 0006\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:7b9bdce3ead38dfb4d4eefb3caf32e40b4f19ad5d96c89dbd8e0749923552488",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:31524766d88dcdaa1bc0374c358076bb89e7964a030fdc19a8e6f0fdd40c7916",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:03531b32b05299f052350295ddf03ee31a41c403443566f202cffff3f31a57f7",
+      "tree": "sha256:f5c472516afc1a072bc88e206ae4cdc24ba8e3c867d9ff6b189d034e235595e8",
+      "recorded_at": "2026-10-30T11:52:28.096Z"
+    }
+  ],
+  "closed_at": "2026-10-30T11:52:33.019Z"
+}

@@ -1,22 +1,17 @@
 ---
 import { type Locale, t } from "../../i18n/index";
+import { servicePath, services } from "../../lib/services";
 import RetamaDots from "./RetamaDots.astro";
 
 interface Props {
   locale: Locale;
 }
 
-const copy = t(Astro.props.locale);
-const services = [
-  ["services.web", "services.webLine", "services.webFrom"],
-  ["services.custom", "services.customLine", "services.customFrom"],
-  ["services.agents", "services.agentsLine", "services.agentsFrom"],
-  ["services.seo", "services.seoLine", "services.seoFrom"],
-] as const;
+const { locale } = Astro.props;
+const copy = t(locale);
 // DESIGN.md Imagery: the cards read the hero's retama from the top down, as a dot screen drawn at build time. From lg
-// each card frames its own part of the plant (x, y, width and height in the frame of HERO): the crown, its base with
-// the taproot, the roots and their tips.
-const PARTS = ["560 60 480 470", "600 330 400 390", "380 560 840 820", "100 1100 1400 800"];
+// each card frames its own part of the plant (src/lib/services.ts): the crown, its base with the taproot, the roots and
+// their tips.
 // Below lg the cards stack and one plant runs down through them: a column as wide as the crown, cut into slices in
 // the 5:2 of their windows, one after the other.
 const COLUMN = { x: 500, y: 60, width: 600 };
@@ -37,25 +32,24 @@ const FIELD = 2;
 
   <RetamaDots />
 
+  <!-- Each card's name links its page and takes the click on the whole card (owner, 2026-10-30). -->
   <ul class="grid gap-gap lg:grid-cols-4">
     {
-      services.map(([name, line, from], index) => (
-        <li class:list={["flex flex-col", index === FIELD ? "bg-field text-on-field" : "bg-surface-raised"]}>
+      services.map(({ id, part }, index) => (
+        <li class:list={["group relative flex flex-col", index === FIELD ? "bg-field text-on-field" : "bg-surface-raised"]} data-card>
           <div class="grid gap-sm p-tile-sm md:p-tile">
-            <h3 class="text-balance type-statement-sm md:type-statement">{copy[name]}</h3>
-            <p class="max-w-(--spacing-measure)">{copy[line]}</p>
-            <p class="type-body-strong">{copy[from]}</p>
+            <h3 class="text-balance type-statement-sm md:type-statement">
+              <a class="feedback decoration-primary group-hover:underline after:absolute after:inset-0" href={servicePath(locale, id)}>
+                {copy[`services.${id}`]}
+              </a>
+            </h3>
+            <p class="max-w-(--spacing-measure)">{copy[`services.${id}Line`]}</p>
+            <p class="type-body-strong">{copy[`services.${id}From`]}</p>
           </div>
           <svg class="mt-auto aspect-5/2 w-full lg:hidden" viewBox={slice(index)} aria-hidden="true" data-dots>
             <use href="#retama-dots" />
           </svg>
-          <svg
-            class="mt-auto hidden aspect-square w-full lg:block"
-            viewBox={PARTS[index]}
-            preserveAspectRatio="xMidYMid slice"
-            aria-hidden="true"
-            data-dots
-          >
+          <svg class="mt-auto hidden aspect-square w-full lg:block" viewBox={part} preserveAspectRatio="xMidYMid slice" aria-hidden="true" data-dots>
             <use href="#retama-dots" />
           </svg>
         </li>
