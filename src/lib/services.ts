@@ -7,8 +7,9 @@ import { type Locale, locales, localizedPath } from "../i18n/index";
  * card's starting price first, each with the keys of its name and of the text that gives its figures and its minimum in
  * euros excluding VAT, once and, when it has one, a month (business proposal 1.4); the part of the hero's retama its card frames from lg (x, y, width and height in the frame of HERO),
  * which its page shows too; and the keys of its page (DESIGN.md Layout, the service pages): what it includes, when it
- * fits, how it starts and the decision sheets of the method it shows (src/lib/board.ts, sheets); and the articles of
- * the blog about it, by key, which its page lists and which link it in their text (owner, 2026-10-30). */
+ * fits, how it starts and the decision sheets of the method it shows (src/lib/board.ts, sheets); the articles of the
+ * blog about it, by key, which its page lists and which link it in their text (owner, 2026-10-30); and the date of its
+ * page's last change that matters, kept by hand for the sitemap's lastmod (src/lib/sitemap.ts). */
 export const services = [
   {
     id: "web",
@@ -32,6 +33,7 @@ export const services = [
     ],
     sheets: ["web"],
     articles: ["web-security-updates"],
+    updated: "2026-10-30",
   },
   {
     id: "custom",
@@ -55,6 +57,7 @@ export const services = [
     ],
     sheets: ["custom", "desktop"],
     articles: ["software-cost", "written-decisions"],
+    updated: "2026-10-30",
   },
   {
     id: "agents",
@@ -74,6 +77,7 @@ export const services = [
     ],
     sheets: ["agents"],
     articles: [],
+    updated: "2026-10-30",
   },
   {
     id: "seo",
@@ -94,6 +98,7 @@ export const services = [
     ],
     sheets: ["seo"],
     articles: [],
+    updated: "2026-10-30",
   },
 ] as const;
 

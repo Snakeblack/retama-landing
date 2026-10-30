@@ -259,7 +259,7 @@ test("los títulos de la portada y del blog nombran el software a medida y a Ret
   }
 });
 
-test("el sitemap fecha y empareja los artículos, empareja los servicios y fecha los índices del blog, no las páginas sin fecha", async ({
+test("el sitemap fecha cada página, empareja artículos y servicios con su x-default y fecha el índice con lo último", async ({
   request,
 }) => {
   const index = await (await request.get("/sitemap-index.xml")).text();
@@ -283,17 +283,29 @@ test("el sitemap fecha y empareja los artículos, empareja los servicios y fecha
     for (const link of pair) expect(entry(path), path).toContain(link);
   }
   for (const path of ["/blog/", "/en/blog/"]) expect(entry(path), path).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}/);
-  // A service page too, with no date of its own (owner, 2026-10-30).
+  // A service page too, with the date kept by hand in its data (owner, 2026-10-30).
   const service = [
     '<xhtml:link rel="alternate" hreflang="es" href="https://retama.dev/servicios/software-a-medida/"/>',
     '<xhtml:link rel="alternate" hreflang="en" href="https://retama.dev/en/services/custom-software/"/>',
   ];
   for (const path of ["/servicios/software-a-medida/", "/en/services/custom-software/"]) {
-    expect(entry(path), path).not.toContain("<lastmod>");
+    '<xhtml:link rel="alternate" hreflang="x-default" href="https://retama.dev/servicios/software-a-medida/"/>',
+    expect(entry(path), path).toMatch(/<lastmod>2026-10-30/);
     for (const link of service) expect(entry(path), path).toContain(link);
   }
-  // A build date would change on every deploy: a page with no date of its own gets none.
-  for (const path of ["/", "/en/", "/legal/", "/en/legal/"]) expect(entry(path), path).not.toContain("<lastmod>");
+  // Every page has its date, never the build's, and every translated page its x-default, as in the HTML (ADR 0008).
+  const dates: string[] = [];
+  for (const [url, item] of entries) {
+    const date = item.match(/<lastmod>(\d{4}-\d{2}-\d{2})/)?.[1];
+    expect(date, url).toBeDefined();
+    dates.push(date ?? "");
+    if (item.includes("hreflang=")) expect(item, url).toContain('hreflang="x-default"');
+  }
+  expect(entry("/en/legal/"), "/en/legal/").toContain(
+    '<xhtml:link rel="alternate" hreflang="x-default" href="https://retama.dev/legal/"/>',
+  );
+  // The index dates its file with the newest page in it.
+  expect(index).toContain(`<lastmod>${dates.sort().at(-1)}`);
 });
 
 // The other tests tie the canonicals, hreflang, robots.txt and llms.txt to the sitemap's URLs.
