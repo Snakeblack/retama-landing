@@ -7,6 +7,8 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-30
+
 ### Added
 - Una página por servicio (webs y CMS, software a medida con el escritorio dentro, agentes y automatización, SEO y analítica) en es y en, enlazada desde las tarjetas de la portada, con canónica, hreflang recíproco, sitemap, JSON-LD Service y BreadcrumbList, imagen Open Graph propia y llms.txt (service-pages)
 
