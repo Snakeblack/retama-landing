@@ -57,10 +57,10 @@ describe("structuredData", () => {
   const node = (nodes: Record<string, unknown>[], type: string) =>
     nodes.find((item) => [item["@type"]].flat().includes(type));
 
-  it("describe Retama como organización y servicio profesional, solo con datos que existen", () => {
-    const retama = node(graph(), "ProfessionalService");
+  it("describe Retama como negocio online, sin local ni dirección, solo con datos que existen", () => {
+    const retama = node(graph(), "OnlineBusiness");
     expect(retama).toMatchObject({
-      "@type": ["Organization", "ProfessionalService"],
+      "@type": "OnlineBusiness",
       "@id": "https://retama.example/#organization",
       name: "Retama",
       url: "https://retama.example/",
@@ -77,8 +77,10 @@ describe("structuredData", () => {
 
   it("sirve a España, Portugal e Hispanoamérica, cada país con su nombre en el idioma de la página", () => {
     const area = (locale: "es" | "en") =>
-      node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "ProfessionalService")
-        ?.areaServed as Record<string, unknown>[];
+      node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "OnlineBusiness")?.areaServed as Record<
+        string,
+        unknown
+      >[];
     expect(area("es")).toHaveLength(21);
     for (const country of area("es")) expect(country["@type"]).toBe("Country");
     const names = (locale: "es" | "en") => area(locale).map((country) => country.name);
@@ -91,8 +93,10 @@ describe("structuredData", () => {
 
   it("presenta a los dos socios como miembros de Retama, con su cargo y, si lo hay, su perfil", () => {
     const members = (locale: "es" | "en") =>
-      node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "ProfessionalService")
-        ?.member as Record<string, unknown>[];
+      node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "OnlineBusiness")?.member as Record<
+        string,
+        unknown
+      >[];
     expect(members("es")).toEqual([
       {
         "@type": "Person",
@@ -112,7 +116,7 @@ describe("structuredData", () => {
   });
 
   it("lista las cuatro tarjetas y lo que solo precian las preguntas, en el idioma de la página", () => {
-    const retama = node(structuredData(site, "es")["@graph"] as Record<string, unknown>[], "ProfessionalService");
+    const retama = node(structuredData(site, "es")["@graph"] as Record<string, unknown>[], "OnlineBusiness");
     const catalog = retama?.hasOfferCatalog as { itemListElement: { itemOffered: Record<string, unknown> }[] };
     expect(catalog.itemListElement.map((offer) => offer.itemOffered.name)).toEqual([
       es["services.web"],
@@ -142,7 +146,7 @@ describe("structuredData", () => {
       ["es", es, (value: number) => `${value.toLocaleString("de-DE")} €`],
       ["en", en, (value: number) => `€${value.toLocaleString("en-GB")}`],
     ] as const) {
-      const retama = node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "ProfessionalService");
+      const retama = node(structuredData(site, locale)["@graph"] as Record<string, unknown>[], "OnlineBusiness");
       const catalog = retama?.hasOfferCatalog as { itemListElement: { priceSpecification: unknown }[] };
       const prices = catalog.itemListElement.map(
         (offer) => [offer.priceSpecification].flat() as Record<string, unknown>[],
@@ -233,11 +237,12 @@ describe("structuredData de un artículo", () => {
   const nodes = (item?: Article) => structuredData(site, "en", [], false, item)["@graph"] as Record<string, unknown>[];
   const posting = (item?: Article) => nodes(item).find((node) => node["@type"] === "BlogPosting");
 
-  it("lo firma Manuel M., con su enlace al capítulo del equipo, en el idioma de la página", () => {
+  it("lo firma Manuel M., con su enlace al capítulo del equipo, en el idioma de la página, y su perfil", () => {
     expect(posting(article)?.author).toEqual({
       "@type": "Person",
       name: "Manuel M.",
       url: "https://retama.example/en/#about-us",
+      sameAs: ["https://www.linkedin.com/in/mmretamozo/"],
     });
     const spanish = structuredData(site, "es", [], false, { ...article, path: "/blog/cuanto-cuesta/" })[
       "@graph"
@@ -260,7 +265,12 @@ describe("structuredData de un artículo", () => {
       datePublished: "2026-10-23",
       dateModified: "2026-10-23",
       image: "https://retama.example/og/en/what-it-costs.png",
-      author: { "@type": "Person", name: "Manuel M.", url: "https://retama.example/en/#about-us" },
+      author: {
+        "@type": "Person",
+        name: "Manuel M.",
+        url: "https://retama.example/en/#about-us",
+        sameAs: ["https://www.linkedin.com/in/mmretamozo/"],
+      },
       publisher: { "@id": "https://retama.example/#organization" },
       isPartOf: { "@id": "https://retama.example/#website" },
     });
@@ -298,7 +308,7 @@ describe("structuredData de una página de servicio", () => {
   });
 
   it("sirve a la misma zona que Retama", () => {
-    const retama = nodes("es", "custom").find((node) => [node["@type"]].flat().includes("ProfessionalService"));
+    const retama = nodes("es", "custom").find((node) => [node["@type"]].flat().includes("OnlineBusiness"));
     expect(described("es", "custom")?.areaServed).toEqual(retama?.areaServed);
   });
 

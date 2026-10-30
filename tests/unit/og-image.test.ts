@@ -82,7 +82,7 @@ describe("ownImages", () => {
   it("lee de una página de servicio el nombre y la imagen de su Service, con el idioma de la página", () => {
     const html = page(
       [
-        { "@type": ["Organization", "ProfessionalService"], name: "Retama" },
+        { "@type": "OnlineBusiness", name: "Retama" },
         {
           "@type": "Service",
           name: "Custom software",
