@@ -150,6 +150,19 @@ ajustes de configuración y defensa en profundidad.
 **Hecho cuando:** los seis changes están en `main` y una nueva pasada de la auditoría no da hallazgos de severidad
 media.
 
+## M8 — Páginas de servicio
+
+**Objetivo:** cada servicio con su propia URL en los dos idiomas, porque Google no indexa partes de una página
+(investigación SEO del 2026-10-30, cuyas recomendaciones eligió el usuario ese día).
+
+**Entra:**
+1. `service-pages`: las cuatro páginas (webs y CMS, software a medida con el escritorio dentro, agentes y
+   automatizaciones, SEO y analítica), enlazadas desde sus tarjetas y desde el pie, con canónica, hreflang recíproco,
+   sitemap con su traducción, JSON-LD `Service` y miga de pan, imagen Open Graph propia y llms.txt.
+2. `seo-review`: una revisión SEO de la web con la skill que instale el usuario, y los cambios que salgan de ella.
+
+**Hecho cuando:** las ocho páginas están en `main` y la revisión no deja hallazgos sin decidir.
+
 ## v2 (aplazado)
 
 - Heatmaps, grabaciones y funnels con **PostHog EU** tras consentimiento, con CMP ligero (ADR 0007).

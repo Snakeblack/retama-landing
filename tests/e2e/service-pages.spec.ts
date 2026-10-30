@@ -125,6 +125,35 @@ test("el título de una página de servicio nunca pasa de dos líneas (DESIGN.md
   }
 });
 
+for (const { home, chapter, pages } of languages)
+  test(`cada tarjeta de Servicios de ${home} lleva a su página, se pulse donde se pulse`, async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const [index, { path }] of pages.entries()) {
+      await page.goto(home);
+      const card = page.getByRole("region", { name: chapter }).getByRole("listitem").nth(index);
+      await expect(card.getByRole("link")).toHaveAttribute("href", path);
+      // The foot of the card, on its plant, far from the name.
+      const box = await card.boundingBox();
+      await card.click({ position: { x: 24, y: (box?.height ?? 0) - 24 } });
+      await expect(page).toHaveURL(path);
+    }
+  });
+
+for (const { home, footer, pages } of languages)
+  test(`el pie de ${home}, de la legal, del blog y de una página de servicio enlaza los cuatro servicios`, async ({
+    page,
+  }) => {
+    const legal = `${home}legal/`;
+    for (const path of [home, legal, `${home}blog/`, pages[0]?.path ?? home]) {
+      await page.goto(path);
+      const links = page.locator("footer").getByRole("navigation", { name: footer }).getByRole("link");
+      await expect(links, path).toHaveCount(4);
+      expect(await links.evaluateAll((items) => items.map((item) => item.getAttribute("href"))), path).toEqual(
+        pages.map(({ path: service }) => service),
+      );
+    }
+  });
+
 test("la carpeta de los servicios sola no es una página: da la 404 de su idioma", async ({ page }) => {
   for (const [path, lang] of [
     ["/servicios/", "es"],

@@ -64,18 +64,20 @@ for (const { path, owner } of pages) {
   });
 }
 
-for (const { path, home, missing, anchors } of pages) {
+for (const { path, home, missing, title, anchors } of pages) {
   test(`el pie de ${home} y de su 404 lleva a las tres secciones de ${path}`, async ({ page }) => {
+    // The footer's legal navigation, named like the page; the services have their own (owner, 2026-10-30).
+    const legal = () => page.locator("footer").getByRole("navigation", { name: title });
     for (const from of [home, missing, path]) {
       await page.goto(from);
-      const links = page.locator("footer nav a");
+      const links = legal().getByRole("link");
       await expect(links).toHaveCount(3);
       expect(await links.evaluateAll((all) => all.map((a) => a.getAttribute("href")))).toEqual(
         anchors.map((anchor) => `${path}#${anchor}`),
       );
     }
     await page.goto(home);
-    await page.locator("footer nav a").nth(1).click();
+    await legal().getByRole("link").nth(1).click();
     await expect(page).toHaveURL(new RegExp(`${path}#${anchors[1]}$`));
     await expect(page.locator(`section#${anchors[1]}`)).toBeInViewport();
   });
