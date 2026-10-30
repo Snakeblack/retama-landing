@@ -89,11 +89,11 @@ const sectors = [
     <h2 id="sectors-title" class="text-balance type-headline-sm md:type-headline">{copy["sectors.title"]}</h2>
   </div>
 
-  <p class="col-span-2 bg-surface-raised p-tile-sm type-statement-sm md:p-tile md:type-statement lg:col-span-3">
+  <p class="col-span-2 bg-surface-raised p-tile-sm type-statement-sm hyphenate-long md:p-tile md:type-statement lg:col-span-3">
     {copy["sectors.statement"]}
   </p>
 
-  <p class="col-span-2 bg-field p-tile-sm text-on-field type-statement-sm md:p-tile md:type-statement lg:col-span-3">
+  <p class="col-span-2 bg-field p-tile-sm text-on-field type-statement-sm hyphenate-long md:p-tile md:type-statement lg:col-span-3">
     {copy["sectors.field"]}
   </p>
 
@@ -103,7 +103,7 @@ const sectors = [
     {
       sectors.map(([name, problem, builds, table], index) => (
         <details class="group" name="sector" open={index === 0}>
-          <summary class="feedback flex min-h-(--spacing-touch) cursor-pointer list-none flex-col justify-between gap-md bg-surface-raised p-tile-sm text-on-surface-muted type-statement-sm group-open:text-on-surface hover:bg-field hover:text-on-field md:p-tile md:type-statement [&::-webkit-details-marker]:hidden">
+          <summary class="feedback flex min-h-(--spacing-touch) cursor-pointer list-none flex-col justify-between gap-md bg-surface-raised p-tile-sm text-on-surface-muted type-statement-sm group-open:text-on-surface hover:bg-field hover:text-on-field md:p-tile lg:type-statement [&::-webkit-details-marker]:hidden">
             {copy[name]}
             <span class="block h-(--spacing-focus) bg-primary" aria-hidden="true" data-sectors-progress />
           </summary>

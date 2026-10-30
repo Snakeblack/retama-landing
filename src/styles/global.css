@@ -60,6 +60,15 @@
   grid-auto-rows: minmax(var(--spacing-row), auto);
 }
 
+/* DESIGN.md Layout, the sectors: a statement in a tile too narrow for one of its words, like «Hispanoamérica» in three
+   columns at 1024px, breaks that word with a hyphen. Only a long word breaks, so the rest of the statement wraps as it
+   does elsewhere, and a browser without hyphenation breaks it anyway rather than let it leave the tile. */
+@utility hyphenate-long {
+  hyphens: auto;
+  hyphenate-limit-chars: 10 4 4;
+  overflow-wrap: break-word;
+}
+
 /* DESIGN.md Components: feedback on every control. Colour eases on hover; a press sinks by the focus width. */
 @utility feedback {
   transition:
