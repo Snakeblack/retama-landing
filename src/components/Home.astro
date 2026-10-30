@@ -36,7 +36,7 @@ if (PUBLIC_BOOKING) Astro.csp?.insertDirective(bookingFrameDirective(bookingUrl)
 ---
 
 <!-- DESIGN.md Layout: the home is a sequence of chapters, 128px apart, more than any gap inside one. -->
-<Base locale={locale} title={copy["meta.title"]} description={copy["meta.description"]} questions>
+<Base locale={locale} title={copy["meta.title"]} description={copy["meta.description"]} questions scene>
   <!-- From md the chapters lead the header's links; on phones the chapter index holds them. -->
   <Fragment slot="nav">
     {

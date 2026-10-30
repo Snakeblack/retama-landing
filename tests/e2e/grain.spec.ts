@@ -34,6 +34,59 @@ test.describe("el grano de los fondos (DESIGN.md Elevation & Depth)", () => {
     expect((await ground(page, "[data-grounds]")).image).toBe("none");
   });
 
+  for (const path of [
+    "/servicios/software-a-medida/",
+    "/en/blog/",
+    "/blog/cuanto-cuesta-un-software-a-medida/",
+    "/legal/",
+  ]) {
+    test(`${path} no tiene escena y trae el grano desde el HTML, así que no retrasa el LCP hasta la carga`, async ({
+      page,
+    }) => {
+      // The phone of Lighthouse's mobile run, where the title paints smaller than a 240×240 tile of the grain, on a slow
+      // network, where the page loads after its first paint, as it does for a visitor.
+      await page.setViewportSize({ width: 412, height: 823 });
+      const cdp = await page.context().newCDPSession(page);
+      await cdp.send("Network.enable");
+      await cdp.send("Network.emulateNetworkConditions", {
+        offline: false,
+        latency: 150,
+        downloadThroughput: (1.6 * 1024 * 1024) / 8,
+        uploadThroughput: (750 * 1024) / 8,
+      });
+      await page.goto(path);
+      // Two frames after the load, where the grain used to come on and paint a new largest candidate.
+      await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+      const paints = await page.evaluate(
+        () =>
+          new Promise<{ first: number; largest: number; load: number }>((resolve) => {
+            new PerformanceObserver((list) => {
+              const [navigation] = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+              resolve({
+                first: performance.getEntriesByName("first-contentful-paint")[0]?.startTime ?? 0,
+                largest: list.getEntries().at(-1)?.startTime ?? 0,
+                load: navigation?.loadEventStart ?? 0,
+              });
+            }).observe({ type: "largest-contentful-paint", buffered: true });
+          }),
+      );
+      expect(paints.load, "the page loads after its first paint").toBeGreaterThan(paints.first);
+      expect(paints.largest - paints.first).toBeLessThan(50);
+    });
+  }
+
+  test.describe("sin JavaScript", () => {
+    test.use({ javaScriptEnabled: false });
+
+    test("una página sin escena lleva su grano igual, y la home espera a la carga", async ({ page }) => {
+      await page.goto("/servicios/software-a-medida/");
+      await expect(page.locator("html")).toHaveAttribute("data-grain", "");
+      expect((await ground(page, "[data-grounds]")).image).toContain("data:image/svg+xml");
+      await page.goto("/");
+      await expect(page.locator("html")).not.toHaveAttribute("data-grain");
+    });
+  });
+
   test("una capa ligera del mismo grano cubre los capítulos sin tomar el puntero ni pedir nada a la red", async ({
     page,
   }) => {
