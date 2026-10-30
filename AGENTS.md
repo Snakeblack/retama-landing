@@ -34,18 +34,10 @@ consultan en la documentación oficial (`docs.astro.build/llms.txt` o Context7).
 ## Entrega
 
 Los cambios de código siguen IDD (`idd/config.yaml`). Ramas, commits, PRs, fusión y releases siguen la skill
-`retama:delivery` del playbook de Retama (ADR 0014), salvo en un punto: `main` está protegida (PR, checks obligatorios y
-`enforce_admins`), así que la release no se sube directa a `main`. Con el OK del usuario a la versión, el último commit
-del PR es `chore(release): x.y.z`: pasa `[Unreleased]` de `CHANGELOG.md` a `## [x.y.z] - AAAA-MM-DD` y sube
-`package.json`. Tras la fusión, y antes de etiquetar nada:
+`retama:delivery` del playbook de Retama (ADR 0014), que da los pasos. De este proyecto, la skill necesita saber:
 
-1. `git fetch origin`, `git switch main` y `git pull --ff-only`: el HEAD local debe ser igual a `origin/main`.
-2. El asunto de ese HEAD es `chore(release): x.y.z`, su `package.json` está en x.y.z y su `CHANGELOG.md` tiene la
-   sección `## [x.y.z] - AAAA-MM-DD`. Si no, para: otro PR se ha fusionado en medio o la fusión no ha llegado.
-3. `gh api repos/Snakeblack/retama-landing/commits/<sha>/check-runs --jq '.check_runs[] | "\(.name) \(.conclusion)"'`
-   da `success` en `quality`, `e2e` y `lighthouse`. Si alguno falta, sigue en curso, se ha cancelado o ha fallado,
-   para y no etiquetes.
-4. `git tag -a vX.Y.Z <sha> -m "vX.Y.Z"` sobre ese SHA explícito y `git push origin vX.Y.Z`.
-5. `gh release create vX.Y.Z --verify-tag --title "vX.Y.Z" --notes-file <fichero>`, con las notas de esa sección.
+- `main` está protegida: exige PR, también a los administradores, con los checks `quality`, `e2e` y `lighthouse`. La
+  release es el último commit del PR, y el tag se pone tras la fusión.
+- La landing publica un GitHub Release por versión.
 
 Un PR encadenado se fusiona en su padre y después el padre en `main`, que lleva la release.

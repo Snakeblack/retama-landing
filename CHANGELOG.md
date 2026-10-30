@@ -7,6 +7,9 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+### Changed
+- La sección Entrega de AGENTS.md remite a retama:delivery 0.8.0, que ya trae la release con main protegida, en vez de repetir sus pasos (agents-delivery)
+
 ## [0.13.1] - 2026-10-30
 
 ### Added
