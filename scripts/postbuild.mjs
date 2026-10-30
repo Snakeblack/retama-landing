@@ -6,6 +6,7 @@ import { es } from "../src/i18n/es.ts";
 import { extractMetaCsp, mergePolicies, serializePolicy } from "./lib/csp.mjs";
 import { icons } from "./lib/icons.mjs";
 import { ogImage, ogPageImage, ownImages, themeTokens } from "./lib/og-image.mjs";
+import { pagePaths, redirectsFile } from "./lib/redirects.mjs";
 
 const root = new URL("../dist/client/", import.meta.url).pathname;
 
@@ -72,7 +73,16 @@ async function iconFiles() {
   for (const [name, data] of Object.entries(await icons(svg))) await writeFile(join(root, name), data);
 }
 
+// The 301 of every page asked for without its final slash (scripts/lib/redirects.mjs), once the 404 pages are flat
+// files and no longer count as pages. Nothing else writes the file, so finding one means something changed.
+async function slashRedirects() {
+  const files = await readdir(root, { recursive: true });
+  if (files.includes("_redirects")) throw new Error("dist/client already has a _redirects file");
+  await writeFile(join(root, "_redirects"), redirectsFile(pagePaths(files)));
+}
+
 await flattenLocale404();
 await cspHeader();
 await ogImages();
 await iconFiles();
+await slashRedirects();
