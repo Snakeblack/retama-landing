@@ -1,0 +1,291 @@
+{
+  "schema": "idd-state/v1",
+  "change": "copy-humanizer",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "revisa los literales para humanizarlos como en el blog; las recomendadas y el manifiesto lo dejamos; lo recomendado",
+    "kind": "feature",
+    "summary": "Humanize the home's copy with the blog's rules (retama:humanizer and its Spanish rules), from the review of 2026-10-30: the 'from X to Y' formula only in Paul's line, no empty contrast nor absolute promise in the decisions sheet, no jargon in Michael's line, plain words in the method, a whole SEO card line, the service area of 2026-10-26 in the sectors, a label of its own for what each sector gets, and 'Preguntas frecuentes' as the questions' heading",
+    "acceptance": "In es and en, services.figureCaption, team.lead, team.michaelLine, sectors.item4Build3, live.desktop.r3, live.desktop.r2, live.custom.r3, services.seoLine, sectors.field and sectors.builds read the texts the owner approved on 2026-10-30, and in es also method.d2Reason and faq.title ('Preguntas frecuentes'); the manifesto and Paul's line stay; the JSON-LD and llms.txt repeat the new card line and service area; lint, typecheck, test, e2e and design pass"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0008-locale-routing.md",
+          "line": 15
+        }
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0008-locale-routing.md",
+          "line": 23
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "copy",
+        "question": "The exact es and en wording of each changed key (services.figureCaption, team.lead, team.michaelLine, sectors.item4Build3, live.desktop.r3, live.desktop.r2, live.custom.r3, method.d2Reason, services.seoLine, sectors.field, sectors.builds, faq.title), whether the English faq.title and method.d2Reason change too, and whether the manifesto is rewritten"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/es.ts",
+          "line": 17
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "tests/e2e/questions.spec.ts",
+          "line": 67
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "src/i18n/es.ts",
+          "line": 243
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "tests/e2e/questions.spec.ts",
+      "tests/e2e/team.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "Prior decision (memory): seo-business-model answers (service area) -> src/lib/board.ts areaServed: current. sectors.field now names the same area: Spain, Portugal and the Spanish-speaking countries of America.",
+      "Spanish-speaking America, not Latin America, in English: Latin America takes in Brazil, which areaServed leaves out.",
+      "services.title keeps 'Lo que construimos' / 'What we build': it heads the services chapter, names the chapter in the index and the OfferCatalog in the JSON-LD. sectors.builds, the small label over what each sector gets, takes 'Qué podemos hacer' / 'What we can do' so the two no longer repeat.",
+      "The English faq.title ('Common questions') and method.d2Reason ('in plain words') stay: they already say what the Spanish now says.",
+      "The manifesto stays (owner, 2026-10-30), a brand choice of DESIGN.md, although retama:humanizer's pattern 3 flags aphorisms; Paul's line keeps the one 'from the first call to delivery'."
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0008",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Only values change: every changed key keeps its twin in the other language, no key is added or removed, and the anchors and routes stay"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "To the review: 'las recomendadas y el manifiesto lo dejamos'. To the table of exact es and en texts (English faq.title and method.d2Reason unchanged) and the worktree from main: 'lo recomendado'",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-30T00:38:36.895Z",
+      "detail": {
+        "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-30T00:38:36.895Z",
+      "detail": {
+        "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+        "check": "ev-1",
+        "documents": [
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/questions.spec.ts",
+          "tests/e2e/team.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-30T00:38:36.895Z",
+      "detail": {
+        "refs": [
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+        "fitness": [
+          "run-6",
+          "run-7"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-30T00:38:48.919Z"
+    }
+  ],
+  "base": "d6b2240750b4bbbd4cfced7aed954a3bf8723a93",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:a49429db7fcb15bf75b5264119d1c9acc754db86b2316d6f840b4fdf26c7095c",
+      "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+      "recorded_at": "2026-10-30T00:38:36.895Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:d7c015d02d35fd4948f6743d1c0eaa4103dd533de1205db43e9e6638e111310c",
+      "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+      "recorded_at": "2026-10-30T00:38:36.895Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:3181a898a9b41ea2c447122a0de23b076fcd7fbbb642c86f06e0ba4389c166ce",
+      "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+      "recorded_at": "2026-10-30T00:38:36.895Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:ae23421b01a41f07c6827e9bf4d733623a85e76fd89e12763f0858a00b60bf73",
+      "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+      "recorded_at": "2026-10-30T00:38:36.895Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+      "recorded_at": "2026-10-30T00:38:36.895Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:d90400213b3ebcf564f58ac63f61fa064d987e20fbdcd605a575fe346847dcf0",
+      "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+      "recorded_at": "2026-10-30T00:38:36.895Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:89b84cee0433aba4946f1d25be30f6173a8abb5b96da5daf98ddd9b03ca48042",
+      "tree": "sha256:2bed7c4bca08fb2704cc83c40afa1c1a1451254d73a53f440347ff602bbe2037",
+      "recorded_at": "2026-10-30T00:38:36.895Z"
+    }
+  ],
+  "closed_at": "2026-10-30T00:38:48.919Z"
+}

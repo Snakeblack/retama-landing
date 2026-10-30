@@ -6,7 +6,7 @@ const pages = [
     anchor: "preguntas",
     before: "nosotros",
     after: "contacto",
-    title: "Lo que nos preguntan",
+    title: "Preguntas frecuentes",
     first: "¿Cuánto tarda un proyecto?",
     second: "¿Cómo se presupuesta?",
     owner: "¿De quién es el código?",

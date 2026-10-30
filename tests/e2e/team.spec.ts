@@ -5,7 +5,7 @@ const pages = [
     path: "/",
     title: "Quiénes somos",
     after: "Cómo trabajamos",
-    before: "Lo que nos preguntan",
+    before: "Preguntas frecuentes",
     roles: ["Producto y desarrollo", "Clientes y ventas"],
   },
   {
