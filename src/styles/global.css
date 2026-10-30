@@ -625,4 +625,31 @@ footer,
     color: var(--color-on-field);
     padding: var(--spacing-tile-sm);
   }
+
+  /* A table is rows on the field's graphite under a header in small muted type, like the legal facts; a long word
+     breaks with a hyphen rather than push the table past a phone's tile. Below md it is in small type, like the
+     example table of the sectors, so three columns fit 320px. */
+  & table {
+    @apply type-small tabular-nums md:type-body;
+    border-collapse: separate;
+    border-spacing: 0 var(--spacing-xs);
+    width: 100%;
+  }
+
+  & th,
+  & td {
+    @apply hyphenate-long;
+    padding: var(--spacing-sm);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  & th {
+    @apply type-small text-on-surface-muted;
+    padding-block: 0;
+  }
+
+  & td {
+    background-color: var(--color-surface);
+  }
 }
