@@ -18,8 +18,7 @@
     "test:e2e": "playwright test",
     "serve:dist": "wrangler dev -c dist/server/wrangler.json",
     "design:theme": "node scripts/design-check.mjs --write",
-    "design:lint": "node scripts/design-check.mjs",
-    "pr:merge": "node scripts/merge-pr.mjs"
+    "design:lint": "node scripts/design-check.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.4.1",

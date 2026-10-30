@@ -1,0 +1,700 @@
+{
+  "schema": "idd-state/v1",
+  "change": "release-by-ospec",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "continua",
+    "kind": "feature",
+    "summary": "Release with ospec and the playbook's retama:delivery instead of release-please and the landing's own merge script (M3, landing change b)",
+    "acceptance": "release-please (workflow, config, manifest and its test), scripts/merge-pr.mjs, scripts/lib/merge-pr.mjs, its test and pnpm pr:merge are gone; idd/config.yaml declares delivery (serial, CHANGELOG.md, per-change); AGENTS.md sends branches, PRs, merge and releases to retama:delivery, except that the release commit is the PR's last commit and, after the merge, the tag goes on the verified release commit of main with a GitHub Release from its CHANGELOG section; ADR 0014 amends ADR 0009 with the per-change versioning and the technical baseline describes it; the branch-protection fitness check also fails when main stops requiring a pull request or stops applying to admins; CHANGELOG.md has the Keep a Changelog header and an [Unreleased] that ospec close fills, above the old entries, which stay unchanged; lint, typecheck, test, e2e and design pass"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "This change's PR carries its own release commit: which version is it, 0.14.0 (minor, the delivery procedure changes) or 0.13.1 (patch, nothing visible on retama.dev changes), and does it break compatibility?"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "AGENTS.md",
+          "line": 46
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "CHANGELOG.md",
+          "line": 8
+        }
+      },
+      {
+        "category": "copy",
+        "cite": {
+          "kind": "path",
+          "path": "CHANGELOG.md",
+          "line": 5
+        }
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0014-per-change-versioning.md",
+          "line": 16
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "scripts/lib/branch-protection.mjs",
+          "line": 11
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "AGENTS.md",
+          "line": 43
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      ".github/workflows/release-please.yml",
+      ".release-please-manifest.json",
+      "AGENTS.md",
+      "CHANGELOG.md",
+      "docs/architecture/decisions/0009-delivery-gates.md",
+      "docs/architecture/decisions/0014-per-change-versioning.md",
+      "docs/architecture/technical-baseline.md",
+      "idd/config.yaml",
+      "package.json",
+      "release-please-config.json",
+      "scripts/fitness.mjs",
+      "scripts/lib/branch-protection.mjs",
+      "scripts/lib/merge-pr.mjs",
+      "scripts/merge-pr.mjs",
+      "tests/unit/branch-protection.test.ts",
+      "tests/unit/merge-pr.test.ts",
+      "tests/unit/release-config.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "ADR 0014 amends ADR 0009 with the per-change versioning only; 0009 keeps its text and gains an 'Amended by' line, as 0010 only changed its status when 0013 superseded it (user, 2026-10-30)",
+      "main is protected (PR, required checks quality/e2e/lighthouse, linear history, enforce_admins), so the release commit chore(release): x.y.z is the PR's last commit instead of a direct push to main; after the rebase merge the annotated tag goes on that commit's SHA in main, checked first (user, 2026-10-30)",
+      "The landing keeps publishing a GitHub Release for every tag, with the notes of its CHANGELOG section: the repository is public and its Latest badge would freeze at v0.13.0 (user, 2026-10-30)",
+      "The RELEASE_PLEASE_TOKEN secret is deleted after the merge and the user revokes the PAT (user, 2026-10-30)",
+      "The CHANGELOG keeps its release-please entries as they are, under the Keep a Changelog header and an [Unreleased] section; v0.13.0 already lists playbook-skills and copy-humanizer, so no entry is written by hand",
+      "The branch-protection fitness check also fails when main stops requiring a pull request or stops applying to admins, since the release commit inside the PR relies on nobody pushing to main; its verdict lives in scripts/lib/branch-protection.mjs with a unit test (trust review, 2026-10-30)",
+      "docs/roadmap.md keeps 'release-please' under S1: it records what S1 delivered"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "security-boundary",
+      "reason": "security boundary: touches .github/workflows/release-please.yml (matches .github/workflows/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0009",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0009",
+      "impact": "amends",
+      "reason": "ADR 0014 replaces only its versioning sentence: versions no longer come from a release-please PR computed from Conventional Commits, but per merged change from ospec close and retama:delivery, with the user's OK; the release commit is the PR's last commit and the tag goes on main after the merge. The rest of 0009 stands: main is production, changes only by PR with every gate green, no direct push",
+      "record": "docs/architecture/decisions/0014-per-change-versioning.md"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-6"
+      ]
+    },
+    {
+      "id": "trust-review",
+      "signal": "security-boundary",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "answer": "0.13.1, no rompe (Recomendado)",
+      "source": "user"
+    },
+    {
+      "id": "adr-amend-or-contradict",
+      "status": "resolved",
+      "reason": "ADR 0009 amends: ADR 0014 replaces only its versioning sentence: versions no longer come from a release-please PR computed from Conventional Commits, but per merged change from ospec close and retama:delivery, with the user's OK; the release commit is the PR's last commit and the tag goes on main after the merge. The rest of 0009 stands: main is production, changes only by PR with every gate green, no direct push",
+      "answer": "ADR 0014 que enmienda (Recomendado): un ADR 0014 con solo el versionado (una versión por cambio, la release dentro del PR por la protección de main, el tag, la GitHub Release y el fitness reforzado); el 0009 recupera su texto original salvo una línea que remite al 0014.",
+      "source": "user"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-30T08:07:55.031Z",
+      "detail": {
+        "lineage_id": "sha256:e5386c479eb6e3513c8b5861455eae8987c7ba828b53536b88de86813b7c0131",
+        "candidate_id": "sha256:eab10941784d1d7a7f6fb3f8ddaeb418df5b26f1304348b0cf43219873f5a0a3",
+        "candidate_tree": "043365c39771aa751ec9bfced44eee370efc470b",
+        "findings_digest": "sha256:eb689e6de82a21927e6215022c5d185f0a99e50a95b5ba4e9b2bd7976ff2799c",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-30T08:07:32.955Z",
+          "result_digest": "sha256:b3286b48938884edf12b71095ee8829e4394fd0554190c214074e347e8259d83"
+        }
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-30T08:09:49.328Z",
+      "detail": {
+        "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-30T08:09:49.328Z",
+      "detail": {
+        "refs": [
+          "adr:0009 amends"
+        ],
+        "records": [
+          "docs/architecture/decisions/0014-per-change-versioning.md"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "frozen-review",
+      "obligation": "trust-review",
+      "recorded_at": "2026-10-30T08:11:16.130Z",
+      "detail": {
+        "lineage_id": "sha256:7863bd075fd643f275d101b5564398cc39dc90cf3089aa1b4fced9927913398b",
+        "candidate_id": "sha256:9689f0eea0643454e5fff49623dced3c52c300a2017c2fd5f04e28f14cc2c75a",
+        "candidate_tree": "cb474fa19809c654f089014af0d396c719b58de4",
+        "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+        "attestation": "subagent-stop",
+        "receipt": {
+          "agent": "review-trust",
+          "recorded_at": "2026-10-30T08:11:03.724Z",
+          "result_digest": "sha256:c045d1e4ab343246c648b386c024354cac91b5bf8323efb1f422b5e702a5af11"
+        }
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-30T08:12:05.899Z",
+      "detail": {
+        "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+        "runs": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-6",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-30T08:12:05.979Z"
+    }
+  ],
+  "base": "731d01957d79ad6fe31c2bb78acab53dc18b18a4",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:e11444c695e20cf6097c406622dca5c3926797f742d4f85a8b1a024b2dbfe3a9",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:09:49.328Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:02c0e3547044ed08f9583e69161af5e66cc76369b15f869bb1f47e1657c792a5",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:09:49.328Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:d6eedb11700b1f52f4b8175f39e266546e64652c72514ea2ea6c678d9279a827",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:09:49.328Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:6396d7e0090a0b26181687ffc520d9c48dbc38a30c2a6cba513dd5cc657c6a18",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:09:49.328Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:09:49.328Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:fb2bbb23ef9e29753bc054a4d31ed90311b0d7ff54ad77822f476aa3adc1fec3",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:12:05.899Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:28840562f8b20240e4539fd66bcd465e04aa2e9e0cd9ffc5ad3094f24c563e8b",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:12:05.899Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:3ff131a6442794e47fdd4ff2f274b1b5e1c38cd880668ad0c36d0c0aa5e7bf00",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:12:05.899Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:dc63384a50cfd1ee7b27991d561aad5bc1dc9f135dcdb7057a145edf7413ad66",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:12:05.899Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:bedc0356fba23d145ac8661f1bc970683c879c756447e08e5dbc77558000bd39",
+      "recorded_at": "2026-10-30T08:12:05.899Z"
+    }
+  ],
+  "reviews": [
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:e5386c479eb6e3513c8b5861455eae8987c7ba828b53536b88de86813b7c0131",
+      "generation": 1,
+      "predecessor_lineage_id": null,
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "b7b690b16e829e308eceba1e14ca1abb23e4a237",
+          "candidate_tree": "043365c39771aa751ec9bfced44eee370efc470b",
+          "paths": [
+            ".github/workflows/release-please.yml",
+            ".release-please-manifest.json",
+            "AGENTS.md",
+            "CHANGELOG.md",
+            "docs/architecture/decisions/0009-delivery-gates.md",
+            "docs/architecture/decisions/0014-per-change-versioning.md",
+            "docs/architecture/technical-baseline.md",
+            "package.json",
+            "release-please-config.json",
+            "scripts/fitness.mjs",
+            "scripts/lib/branch-protection.mjs",
+            "scripts/lib/merge-pr.mjs",
+            "scripts/merge-pr.mjs",
+            "tests/unit/branch-protection.test.ts",
+            "tests/unit/merge-pr.test.ts",
+            "tests/unit/release-config.test.ts"
+          ],
+          "diff_hash": "sha256:0e8329a12f81d4ff7581fc4352dadb126d0ae13fcb1f7b707f08143de2dad079",
+          "paths_digest": "sha256:1e9d6ac7734021fbaa7bc0354460127563093a736c5e2b6d64b3b65df42413fd",
+          "authored_lines": 116,
+          "original_changed_lines": 406
+        },
+        "candidate_id": "sha256:eab10941784d1d7a7f6fb3f8ddaeb418df5b26f1304348b0cf43219873f5a0a3",
+        "paths": [
+          ".github/workflows/release-please.yml",
+          ".release-please-manifest.json",
+          "AGENTS.md",
+          "CHANGELOG.md",
+          "docs/architecture/decisions/0009-delivery-gates.md",
+          "docs/architecture/decisions/0014-per-change-versioning.md",
+          "docs/architecture/technical-baseline.md",
+          "package.json",
+          "release-please-config.json",
+          "scripts/fitness.mjs",
+          "scripts/lib/branch-protection.mjs",
+          "scripts/lib/merge-pr.mjs",
+          "scripts/merge-pr.mjs",
+          "tests/unit/branch-protection.test.ts",
+          "tests/unit/merge-pr.test.ts",
+          "tests/unit/release-config.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "043365c39771aa751ec9bfced44eee370efc470b",
+        "original_changed_lines": 406,
+        "authored_lines": 116
+      },
+      "current_candidate_id": "sha256:eab10941784d1d7a7f6fb3f8ddaeb418df5b26f1304348b0cf43219873f5a0a3",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "b7b690b16e829e308eceba1e14ca1abb23e4a237",
+        "candidate_tree": "043365c39771aa751ec9bfced44eee370efc470b",
+        "paths": [
+          ".github/workflows/release-please.yml",
+          ".release-please-manifest.json",
+          "AGENTS.md",
+          "CHANGELOG.md",
+          "docs/architecture/decisions/0009-delivery-gates.md",
+          "docs/architecture/decisions/0014-per-change-versioning.md",
+          "docs/architecture/technical-baseline.md",
+          "package.json",
+          "release-please-config.json",
+          "scripts/fitness.mjs",
+          "scripts/lib/branch-protection.mjs",
+          "scripts/lib/merge-pr.mjs",
+          "scripts/merge-pr.mjs",
+          "tests/unit/branch-protection.test.ts",
+          "tests/unit/merge-pr.test.ts",
+          "tests/unit/release-config.test.ts"
+        ],
+        "diff_hash": "sha256:0e8329a12f81d4ff7581fc4352dadb126d0ae13fcb1f7b707f08143de2dad079",
+        "paths_digest": "sha256:1e9d6ac7734021fbaa7bc0354460127563093a736c5e2b6d64b3b65df42413fd",
+        "authored_lines": 116,
+        "original_changed_lines": 406
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "release-by-ospec:lens-start:1:0",
+          "result_digest": "sha256:6c1dec2edb725a79317f2a95e65c2344aedc761f6a7acf8a79c13f75f88cb2b4",
+          "result": {
+            "findings": [
+              {
+                "severity": "WARNING",
+                "summary": "scripts/lib/branch-protection.mjs:8-16 declares main safe whenever required_pull_request_reviews exists and enforce_admins.enabled is true, and scripts/fitness.mjs:96 then prints 'requires a pull request, also from admins'. The check does not read required_pull_request_reviews.bypass_pull_request_allowances or allow_force_pushes.enabled. If either is turned on (for example the owner is added as a bypass actor, or force pushes are allowed), the owner can push the release commit straight to main, which deploys to production without the gates, and the check still passes. The unit-test fixture (tests/unit/branch-protection.test.ts:6-13) has neither field. I did not run it against GitHub, and I assume the bypass list overrides enforce_admins. The risk is conditional on a later configuration drift.",
+                "acceptance_criteria": "protectionProblems returns a problem for a main whose required_pull_request_reviews.bypass_pull_request_allowances names any user, team or app, and for allow_force_pushes.enabled true. Unit tests cover each case and the fully protected fixture still returns []. The message printed by fitness.mjs no longer claims 'also from admins' when either gap exists. No documentation may state an enforcement the check does not verify."
+              },
+              {
+                "severity": "SUGGESTION",
+                "summary": "AGENTS.md:42-47 (Entrega, steps 2-3) leaves the post-merge check open. Step 3, 'El CI de ese commit en main está en verde', names no command and no rule for pending, cancelled or absent runs. ci.yml:5-15 runs on push to main with cancel-in-progress on group ci-refs/heads/main, so a cancelled or still-running run is plausible. The wrong-SHA risk is already covered: step 4 tags an explicit SHA, and step 2 stops if the HEAD is not the release commit. But the tag and Release can go out on a main commit whose gates never finished, because the 'green' reading is left to the operator. Step 2 also does not check that CHANGELOG.md has the '## [x.y.z]' heading from which step 5 takes the notes.",
+                "acceptance_criteria": "The Entrega section states how to read the quality, e2e and lighthouse results for the exact SHA to tag (for example gh api on the commit's check-runs). It requires conclusion success on all three and tells the operator to stop and not tag if any is pending, cancelled, failed or absent. Step 2 also requires the '## [x.y.z]' section in CHANGELOG.md at that SHA before the notes file is made."
+              }
+            ]
+          },
+          "operation": null,
+          "result_request_id": "release-by-ospec:lens-result:1:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [
+        {
+          "id": "F-2c1d10a47dcd7cab",
+          "owner": "trust",
+          "severity": "WARNING",
+          "summary": "scripts/lib/branch-protection.mjs:8-16 declares main safe whenever required_pull_request_reviews exists and enforce_admins.enabled is true, and scripts/fitness.mjs:96 then prints 'requires a pull request, also from admins'. The check does not read required_pull_request_reviews.bypass_pull_request_allowances or allow_force_pushes.enabled. If either is turned on (for example the owner is added as a bypass actor, or force pushes are allowed), the owner can push the release commit straight to main, which deploys to production without the gates, and the check still passes. The unit-test fixture (tests/unit/branch-protection.test.ts:6-13) has neither field. I did not run it against GitHub, and I assume the bypass list overrides enforce_admins. The risk is conditional on a later configuration drift.",
+          "acceptance_criteria": "protectionProblems returns a problem for a main whose required_pull_request_reviews.bypass_pull_request_allowances names any user, team or app, and for allow_force_pushes.enabled true. Unit tests cover each case and the fully protected fixture still returns []. The message printed by fitness.mjs no longer claims 'also from admins' when either gap exists. No documentation may state an enforcement the check does not verify.",
+          "blocking": false,
+          "resolution": "advisory"
+        },
+        {
+          "id": "F-45f213c2d77aab4f",
+          "owner": "trust",
+          "severity": "SUGGESTION",
+          "summary": "AGENTS.md:42-47 (Entrega, steps 2-3) leaves the post-merge check open. Step 3, 'El CI de ese commit en main está en verde', names no command and no rule for pending, cancelled or absent runs. ci.yml:5-15 runs on push to main with cancel-in-progress on group ci-refs/heads/main, so a cancelled or still-running run is plausible. The wrong-SHA risk is already covered: step 4 tags an explicit SHA, and step 2 stops if the HEAD is not the release commit. But the tag and Release can go out on a main commit whose gates never finished, because the 'green' reading is left to the operator. Step 2 also does not check that CHANGELOG.md has the '## [x.y.z]' heading from which step 5 takes the notes.",
+          "acceptance_criteria": "The Entrega section states how to read the quality, e2e and lighthouse results for the exact SHA to tag (for example gh api on the commit's check-runs). It requires conclusion success on all three and tells the operator to stop and not tag if any is pending, cancelled, failed or absent. Step 2 also requires the '## [x.y.z]' section in CHANGELOG.md at that SHA before the notes file is made.",
+          "blocking": false,
+          "resolution": "advisory"
+        }
+      ],
+      "findings_digest": "sha256:eb689e6de82a21927e6215022c5d185f0a99e50a95b5ba4e9b2bd7976ff2799c",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    },
+    {
+      "schema_version": 2,
+      "lineage_id": "sha256:7863bd075fd643f275d101b5564398cc39dc90cf3089aa1b4fced9927913398b",
+      "generation": 2,
+      "predecessor_lineage_id": "sha256:e5386c479eb6e3513c8b5861455eae8987c7ba828b53536b88de86813b7c0131",
+      "migration": null,
+      "recovery": null,
+      "revision": 3,
+      "status": "approved",
+      "genesis": {
+        "candidate": {
+          "projection": "idd-tree-diff/v1",
+          "base_tree": "b7b690b16e829e308eceba1e14ca1abb23e4a237",
+          "candidate_tree": "cb474fa19809c654f089014af0d396c719b58de4",
+          "paths": [
+            ".github/workflows/release-please.yml",
+            ".release-please-manifest.json",
+            "AGENTS.md",
+            "CHANGELOG.md",
+            "docs/architecture/decisions/0009-delivery-gates.md",
+            "docs/architecture/decisions/0014-per-change-versioning.md",
+            "docs/architecture/technical-baseline.md",
+            "package.json",
+            "release-please-config.json",
+            "scripts/fitness.mjs",
+            "scripts/lib/branch-protection.mjs",
+            "scripts/lib/merge-pr.mjs",
+            "scripts/merge-pr.mjs",
+            "tests/unit/branch-protection.test.ts",
+            "tests/unit/merge-pr.test.ts",
+            "tests/unit/release-config.test.ts"
+          ],
+          "diff_hash": "sha256:3cb770b1060fd4a7f6de44cfd1610f729ae2f0e1e7020bd8db01e6614e45d773",
+          "paths_digest": "sha256:1e9d6ac7734021fbaa7bc0354460127563093a736c5e2b6d64b3b65df42413fd",
+          "authored_lines": 143,
+          "original_changed_lines": 433
+        },
+        "candidate_id": "sha256:9689f0eea0643454e5fff49623dced3c52c300a2017c2fd5f04e28f14cc2c75a",
+        "paths": [
+          ".github/workflows/release-please.yml",
+          ".release-please-manifest.json",
+          "AGENTS.md",
+          "CHANGELOG.md",
+          "docs/architecture/decisions/0009-delivery-gates.md",
+          "docs/architecture/decisions/0014-per-change-versioning.md",
+          "docs/architecture/technical-baseline.md",
+          "package.json",
+          "release-please-config.json",
+          "scripts/fitness.mjs",
+          "scripts/lib/branch-protection.mjs",
+          "scripts/lib/merge-pr.mjs",
+          "scripts/merge-pr.mjs",
+          "tests/unit/branch-protection.test.ts",
+          "tests/unit/merge-pr.test.ts",
+          "tests/unit/release-config.test.ts"
+        ],
+        "classification": "high-risk",
+        "selected_domains": [
+          "trust"
+        ],
+        "evidence_fingerprint": "cb474fa19809c654f089014af0d396c719b58de4",
+        "original_changed_lines": 433,
+        "authored_lines": 143
+      },
+      "current_candidate_id": "sha256:9689f0eea0643454e5fff49623dced3c52c300a2017c2fd5f04e28f14cc2c75a",
+      "current_candidate": {
+        "projection": "idd-tree-diff/v1",
+        "base_tree": "b7b690b16e829e308eceba1e14ca1abb23e4a237",
+        "candidate_tree": "cb474fa19809c654f089014af0d396c719b58de4",
+        "paths": [
+          ".github/workflows/release-please.yml",
+          ".release-please-manifest.json",
+          "AGENTS.md",
+          "CHANGELOG.md",
+          "docs/architecture/decisions/0009-delivery-gates.md",
+          "docs/architecture/decisions/0014-per-change-versioning.md",
+          "docs/architecture/technical-baseline.md",
+          "package.json",
+          "release-please-config.json",
+          "scripts/fitness.mjs",
+          "scripts/lib/branch-protection.mjs",
+          "scripts/lib/merge-pr.mjs",
+          "scripts/merge-pr.mjs",
+          "tests/unit/branch-protection.test.ts",
+          "tests/unit/merge-pr.test.ts",
+          "tests/unit/release-config.test.ts"
+        ],
+        "diff_hash": "sha256:3cb770b1060fd4a7f6de44cfd1610f729ae2f0e1e7020bd8db01e6614e45d773",
+        "paths_digest": "sha256:1e9d6ac7734021fbaa7bc0354460127563093a736c5e2b6d64b3b65df42413fd",
+        "authored_lines": 143,
+        "original_changed_lines": 433
+      },
+      "lenses": {
+        "trust": {
+          "selected": true,
+          "status": "completed",
+          "request_id": "release-by-ospec:lens-start:2:0",
+          "result_digest": "sha256:0fa38eeaca8882e0d194fd5ba5d8378917d98e795204f8f7a9dfdb78f111f3cc",
+          "result": {
+            "findings": []
+          },
+          "operation": null,
+          "result_request_id": "release-by-ospec:lens-result:2:1"
+        },
+        "runtime": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "evolution": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        },
+        "efficiency": {
+          "selected": false,
+          "status": "skipped",
+          "request_id": null,
+          "result_digest": null,
+          "result": null,
+          "operation": null
+        }
+      },
+      "findings": [],
+      "findings_digest": "sha256:4d59fd4aa8eefff6dbf7cd085cc100ee928217573658f8bbc301aa4a3f1adc0f",
+      "correction_budget": {
+        "limit_lines": 200,
+        "used_lines": 0,
+        "failed_attempts": 0,
+        "max_failed_attempts": 3
+      },
+      "correction_history": [],
+      "validation_history": [],
+      "follow_ups": [],
+      "pending_operation": null,
+      "pending_correction": null,
+      "terminal_reason": "no-unresolved-blocking-findings"
+    }
+  ],
+  "assumptions": [
+    "url-state and accessibility do not apply: the change touches no UI file. ospec requires every category because the project has .astro files, so their cites (ADR 0014:16, scripts/lib/branch-protection.mjs:11) only show the change has no URL or UI behavior",
+    "Replaces the change playbook-delivery, opened by the playbook session and never committed: its ADR record named ADR 0009 itself and ospec allows no correction, so the user approved (2026-10-30) a new change and the deletion of idd/playbook-delivery/; the user's answers there are reused here as they gave them",
+    "The cites uniqueness=AGENTS.md:48 and errors=AGENTS.md:47 point at lines that the fix for the second trust review shifted, and ospec allows no change to them (intent-conflict). The tag on an explicit SHA is at AGENTS.md:48 and the stop rules at AGENTS.md:43-47. The first record cited AGENTS.md:46 and :43, and this record was refused"
+  ],
+  "closed_at": "2026-10-30T08:12:05.979Z"
+}

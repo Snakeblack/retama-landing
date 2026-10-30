@@ -1,13 +1,14 @@
 // Architecture fitness checks behind the ADRs' `- Check:` lines.
 //   node scripts/fitness.mjs on-demand-routes        ADR 0002, ADR 0011 (run after pnpm build)
 //   node scripts/fitness.mjs no-persistent-bindings  ADR 0003 (run after pnpm build)
-//   node scripts/fitness.mjs branch-protection       ADR 0009 (needs gh auth)
+//   node scripts/fitness.mjs branch-protection       ADR 0009 and 0014 (needs gh auth)
 //   node scripts/fitness.mjs js-budget               ADR 0001 (run after pnpm build)
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { ON_DEMAND_ROUTES } from "../src/server/edge.ts";
+import { protectionProblems } from "./lib/branch-protection.mjs";
 import { onDemandRoutes as builtOnDemandRoutes } from "./lib/build-routes.mjs";
 import { initialScripts } from "./lib/js-budget.mjs";
 
@@ -79,21 +80,22 @@ function branchProtection() {
   const remote = execFileSync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"], {
     encoding: "utf8",
   }).trim();
-  let contexts;
+  let protection;
   try {
-    contexts = JSON.parse(
-      execFileSync(
-        "gh",
-        ["api", `repos/${remote}/branches/main/protection/required_status_checks`, "--jq", "[.checks[].context]"],
-        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
-      ),
+    protection = JSON.parse(
+      execFileSync("gh", ["api", `repos/${remote}/branches/main/protection`], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      }),
     );
   } catch (error) {
-    fail(`main has no required status checks on ${remote} (ADR 0009): ${String(error.stderr).trim()}`);
+    fail(`main is not protected on ${remote} (ADR 0009): ${String(error.stderr).trim()}`);
   }
-  const missing = REQUIRED_CHECKS.filter((check) => !contexts.includes(check));
-  if (missing.length > 0) fail(`main does not require: ${missing.join(", ")} (ADR 0009)`);
-  console.log(`main requires ${contexts.join(", ")}`);
+  const problems = protectionProblems(protection, REQUIRED_CHECKS);
+  if (problems.length > 0) fail(`${problems.join("; ")} (ADR 0009, 0014)`);
+  console.log(
+    `main requires a pull request nobody bypasses, also from admins, no force pushes, ${REQUIRED_CHECKS.join(", ")}`,
+  );
 }
 
 function jsBudget() {
