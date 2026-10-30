@@ -30,6 +30,8 @@ interface Props {
   blog?: boolean;
   /** The RSS of the page's blog, which the head announces (the blog's index and its articles). */
   feed?: string;
+  /** The page opens with the scene of the first chapter (the home), so its grain waits for the load (header.ts). */
+  scene?: boolean;
 }
 
 const {
@@ -44,6 +46,7 @@ const {
   service,
   blog = false,
   feed,
+  scene = false,
 } = Astro.props;
 const copy = t(locale);
 const image = service && {
@@ -66,7 +69,9 @@ if (analytics) {
 ---
 
 <!doctype html>
-<html lang={locale}>
+<!-- DESIGN.md Elevation & Depth: a page without the scene has grain on its first screen, so it paints with it from the
+     start; were it to come on at the load, the grain would paint a new largest picture there and push the LCP back. -->
+<html lang={locale} data-grain={scene ? undefined : ""}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
