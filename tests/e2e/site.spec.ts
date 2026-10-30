@@ -194,7 +194,7 @@ test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga 
     expect(blocks, url).toHaveLength(1);
     const graph: Record<string, unknown>[] = JSON.parse(blocks[0] ?? "")["@graph"];
     const types = graph.flatMap((node) => [node["@type"]].flat());
-    expect(types, url).toEqual(expect.arrayContaining(["Organization", "ProfessionalService", "WebSite"]));
+    expect(types, url).toEqual(expect.arrayContaining(["OnlineBusiness", "WebSite"]));
     const retama = graph.find((node) => node["@id"] === new URL("/#organization", url).href);
     expect(retama, url).not.toHaveProperty("address");
 

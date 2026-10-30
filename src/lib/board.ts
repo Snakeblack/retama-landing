@@ -25,8 +25,10 @@ export const partners = [
   },
 ] as const;
 
-/** The name the blog's articles are signed with (owner, 2026-10-26): Michael's, as the blog gives it. */
+/** The name the blog's articles are signed with (owner, 2026-10-26): Michael's, as the blog gives it, and his public
+ * profile, which the article's JSON-LD names as the author's (owner, 2026-10-30). */
 export const blogAuthor = "Manuel M.";
+export const blogAuthorProfile = partners[1].linkedin;
 
 /** Where Retama works (owner, 2026-10-26): Spain, Portugal and the Spanish-speaking countries of the Americas, Puerto
  * Rico included, as ISO 3166-1 codes. The JSON-LD names each one in the page's language (src/lib/seo.ts). */

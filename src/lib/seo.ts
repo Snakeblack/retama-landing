@@ -1,5 +1,5 @@
 import { defaultLocale, type Locale, locales, localizedPath, pathWithoutLocale, t } from "../i18n/index";
-import { areaServed, blogAuthor, contactEmail, partners, questions } from "./board";
+import { areaServed, blogAuthor, blogAuthorProfile, contactEmail, partners, questions } from "./board";
 import { type ServiceId, serviceById, serviceImagePath, servicePath, services } from "./services";
 
 export interface Alternate {
@@ -125,9 +125,9 @@ function offer(name: string, description: string | null, once: number | null, mo
 }
 
 /** The JSON-LD of a page: Retama, the site, when the page gives a trail its breadcrumb, when it holds the questions
- * chapter its FAQPage, when it is an article its BlogPosting, signed by Manuel M., and when it is a service page its
- * Service. Only data that exists: no company yet, so no address, tax ID or founder; the partners are its members, and
- * only Michael has a profile. */
+ * chapter its FAQPage, when it is an article its BlogPosting, signed by Manuel M. with his profile, and when it is a
+ * service page its Service. Only data that exists: no company yet, so no address, tax ID or founder; the partners are
+ * its members, and only Michael has a profile. */
 export function structuredData(
   site: URL,
   locale: Locale,
@@ -145,7 +145,8 @@ export function structuredData(
   const page = (id: ServiceId) => new URL(servicePath(locale, id), site).href;
   const graph: Record<string, unknown>[] = [
     {
-      "@type": ["Organization", "ProfessionalService"],
+      // An online business: Retama works remotely, with no premises a LocalBusiness would need (owner, 2026-10-30).
+      "@type": "OnlineBusiness",
       "@id": organization,
       name: "Retama",
       url: home,
@@ -222,7 +223,7 @@ export function structuredData(
       datePublished: isoDate(article.published),
       dateModified: isoDate(article.updated ?? article.published),
       image: new URL(article.image, site).href,
-      author: { "@type": "Person", name: blogAuthor, url: team },
+      author: { "@type": "Person", name: blogAuthor, url: team, sameAs: [blogAuthorProfile] },
       publisher: { "@id": organization },
       isPartOf: { "@id": `${home}#website` },
     });
