@@ -79,9 +79,11 @@ test.describe("sin JavaScript (ADR 0001)", () => {
     test(`${path} tiene encabezado y texto en el HTML`, async ({ page }) => {
       await page.goto(path);
       await expect(page.locator("h1")).toHaveCount(1);
-      // DESIGN.md Layout: the first chapter says what Retama makes; "Retama" is only the wordmark.
+      // DESIGN.md Layout: the first chapter says what Retama makes. The title never names it; the lead does, as the
+      // one that makes it (owner, 2026-10-30).
       await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
-      await expect(page.locator('[data-chapter="hero"]')).not.toContainText("Retama");
+      await expect(page.locator('[data-chapter="hero"] h1')).not.toContainText("Retama");
+      await expect(page.locator('[data-chapter="hero"] p').first()).toHaveText(/^Retama /);
       await expect(page.locator("main p").first()).not.toBeEmpty();
     });
 
@@ -287,9 +289,9 @@ test("el sitemap fecha cada página, empareja artículos y servicios con su x-de
   const service = [
     '<xhtml:link rel="alternate" hreflang="es" href="https://retama.dev/servicios/software-a-medida/"/>',
     '<xhtml:link rel="alternate" hreflang="en" href="https://retama.dev/en/services/custom-software/"/>',
+    '<xhtml:link rel="alternate" hreflang="x-default" href="https://retama.dev/servicios/software-a-medida/"/>',
   ];
   for (const path of ["/servicios/software-a-medida/", "/en/services/custom-software/"]) {
-    '<xhtml:link rel="alternate" hreflang="x-default" href="https://retama.dev/servicios/software-a-medida/"/>',
     expect(entry(path), path).toMatch(/<lastmod>2026-10-30/);
     for (const link of service) expect(entry(path), path).toContain(link);
   }

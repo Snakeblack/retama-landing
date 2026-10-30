@@ -27,7 +27,7 @@ export const en = {
 
   "hero.word": "Software",
   "hero.rest": "made to measure",
-  "hero.lead": "Web apps, internal tools and agents for companies, built remotely from Spain.",
+  "hero.lead": "Retama builds web apps, internal tools and agents for companies, remotely from Spain.",
   "hero.poster": "Drawing of a retama: thin stems above the ground and a root that goes far deeper.",
   "hero.scenePauseLabel": "Pause the retama animation",
   "hero.scenePlayLabel": "Play the retama animation",

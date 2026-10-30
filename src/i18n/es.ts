@@ -25,7 +25,7 @@ export const es = {
 
   "hero.word": "Software",
   "hero.rest": "a medida",
-  "hero.lead": "Aplicaciones web, herramientas internas y agentes para empresas, en remoto desde España.",
+  "hero.lead": "Retama hace aplicaciones web, herramientas internas y agentes para empresas, en remoto desde España.",
   "hero.poster": "Dibujo de una retama: tallos finos sobre el suelo y una raíz que baja mucho más hondo.",
   "hero.scenePauseLabel": "Pausar la animación de la retama",
   "hero.scenePlayLabel": "Reanudar la animación de la retama",
