@@ -30,18 +30,22 @@ consultan en la documentación oficial (`docs.astro.build/llms.txt` o Context7).
 | `pnpm preview` | Build servido por workerd con `_headers` |
 | `pnpm lint` / `pnpm typecheck` / `pnpm test` / `pnpm test:e2e` | Puertas de calidad |
 | `pnpm design:lint` / `pnpm design:theme` | Lint de DESIGN.md con contraste y sincronía del tema / regenerarlo |
-| `pnpm pr:merge <n>` | Fusiona un PR por el procedimiento (abajo); `--dry-run` solo comprueba |
 
-## Fusionar PRs
+## Entrega
 
-Cada PR se fusiona con `pnpm pr:merge <n>` (`scripts/merge-pr.mjs`), uno a uno, nunca con `gh pr merge` a mano. El
-script se niega si el PR no está abierto, tiene conflictos, está por detrás de su base (da la orden
-`gh pr update-branch <n> --rebase`) o tiene algún check pendiente o en rojo sobre su último commit. Un check en rojo que
-no es obligatorio, como el Workers Builds de la rama de release-please, solo pasa si se nombra con
-`--allow-failing "<check>"`. Fusiona con rebase atado a ese commit, comprueba que GitHub lo da por fusionado y solo
-entonces borra la rama remota y la local, si `git cherry` encuentra todos sus commits en la base. Con varios PRs
-pendientes, primero los de funcionalidad y al final el de release-please; un PR encadenado se fusiona en su padre y
-después el padre en `main`.
+Los cambios de código siguen IDD (`idd/config.yaml`). Ramas, commits, PRs, fusión y releases siguen la skill
+`retama:delivery` del playbook de Retama (ADR 0014), salvo en un punto: `main` está protegida (PR, checks obligatorios y
+`enforce_admins`), así que la release no se sube directa a `main`. Con el OK del usuario a la versión, el último commit
+del PR es `chore(release): x.y.z`: pasa `[Unreleased]` de `CHANGELOG.md` a `## [x.y.z] - AAAA-MM-DD` y sube
+`package.json`. Tras la fusión, y antes de etiquetar nada:
 
-Los cambios de código siguen IDD (`idd/config.yaml`). Commits en Conventional Commits, sin atribución a
-herramientas.
+1. `git fetch origin`, `git switch main` y `git pull --ff-only`: el HEAD local debe ser igual a `origin/main`.
+2. El asunto de ese HEAD es `chore(release): x.y.z`, su `package.json` está en x.y.z y su `CHANGELOG.md` tiene la
+   sección `## [x.y.z] - AAAA-MM-DD`. Si no, para: otro PR se ha fusionado en medio o la fusión no ha llegado.
+3. `gh api repos/Snakeblack/retama-landing/commits/<sha>/check-runs --jq '.check_runs[] | "\(.name) \(.conclusion)"'`
+   da `success` en `quality`, `e2e` y `lighthouse`. Si alguno falta, sigue en curso, se ha cancelado o ha fallado,
+   para y no etiquetes.
+4. `git tag -a vX.Y.Z <sha> -m "vX.Y.Z"` sobre ese SHA explícito y `git push origin vX.Y.Z`.
+5. `gh release create vX.Y.Z --verify-tag --title "vX.Y.Z" --notes-file <fichero>`, con las notas de esa sección.
+
+Un PR encadenado se fusiona en su padre y después el padre en `main`, que lleva la release.

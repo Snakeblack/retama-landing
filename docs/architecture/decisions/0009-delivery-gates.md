@@ -2,6 +2,7 @@
 
 - Status: accepted
 - Date: 2026-10-21
+- Amended by: [0014](0014-per-change-versioning.md), que sustituye el versionado de release-please
 
 ## Context and drivers
 Hay presupuestos estrictos (`scenario:perf-mobile`), un solo responsable (`constraint:solo-team`) y el usuario pidió un preview por rama y versión SemVer automática (ronda 5).

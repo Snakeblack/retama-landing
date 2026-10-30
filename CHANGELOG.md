@@ -1,5 +1,15 @@
 # Changelog
 
+Todos los cambios notables de este proyecto se documentan en este fichero.
+
+El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y el proyecto sigue
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html). Hasta la 0.13.0, las entradas las escribía release-please.
+
+## [Unreleased]
+
+### Added
+- Release with ospec and the playbook's retama:delivery instead of release-please and the landing's own merge script (M3, landing change b) (release-by-ospec)
+
 ## [0.13.0](https://github.com/Snakeblack/retama-landing/compare/v0.12.0...v0.13.0) (2026-10-30)
 
 
