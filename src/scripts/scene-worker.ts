@@ -2,7 +2,7 @@
 // shaders and drawing every frame never block the page (TBT and INP of scenario:perf-mobile). The page only sends
 // the stage's size with the samples of the words, the scroll, the pointer and whether to run; the worker answers when
 // the first frame is drawn or when it gives up.
-import { SAMPLE_FRAMES, type Tier, tooSlow } from "../lib/scene-tier";
+import { type Tier, tooSlow } from "../lib/scene-tier";
 import { type Colors, createScene, type GlyphScene, type Stage, type Word } from "./scene-three";
 
 export type ToScene =
@@ -35,6 +35,7 @@ let run = false;
 let started = false;
 let over = false;
 const samples: number[] = [];
+let slow: boolean | undefined;
 
 function giveUp() {
   if (over) return;
@@ -47,8 +48,12 @@ function giveUp() {
 function tick(now: number) {
   const dt = last === undefined ? 0 : Math.min(0.1, (now - last) / 1000);
   last = now;
-  if (dt > 0 && samples.length < SAMPLE_FRAMES) samples.push(dt * 1000);
-  if (tooSlow(samples)) return giveUp();
+  // The sample can end before 60 frames; once it has, the verdict stands and the frames after it are not measured.
+  if (dt > 0 && slow === undefined) {
+    samples.push(dt * 1000);
+    slow = tooSlow(samples);
+  }
+  if (slow) return giveUp();
   scene?.frame(dt);
   if (!started) {
     started = true;
