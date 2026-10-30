@@ -13,35 +13,13 @@ Landing de Retama (es en `/`, en en `/en/`): Astro 7 estático sobre Cloudflare 
   Las transiciones entre páginas son `@view-transition` nativas.
 - Cada texto visible va en `src/i18n/es.ts` y `src/i18n/en.ts` con las mismas claves (ADR 0008).
 
-## Precedencia de skills
+## Skills de agente
 
-Si dos fuentes se contradicen, gana la primera:
-
-1. `DESIGN.md`
-2. `taste-skill` (dirección de arte)
-3. La skill global `ospec-workflow:design-system`, solo para auditar
-
-Cada tema tiene una sola skill responsable (ADR 0010): dirección de arte → `taste-skill`; revisión de
-interfaz → `web-interface-guidelines`; animación → `gsap-*`; 3D → `threejs-*`; calidad web →
-`core-web-vitals`, `performance`, `seo`, `best-practices`, `web-quality-audit`; hreflang → `seo-hreflang`;
-plataforma → `wrangler`, `workers-best-practices`, `turnstile-spin`; redacción del blog → `blog-writing`, que envuelve
-blader/humanizer con las reglas del español de España. La accesibilidad la cubre la skill global
-`ospec-workflow:accessibility`. Astro 7, Tailwind 4 y View Transitions se consultan en la documentación oficial
-(`docs.astro.build/llms.txt` o Context7).
-
-## Skills vendorizadas (`.claude/skills/`)
-
-- Son copias fijadas a un commit y auditadas; `manifest.json` registra origen, commit, licencia, veredicto y el
-  hash de cada archivo. `pnpm skills:scan` lo comprueba en CI junto con los patrones de riesgo.
-- Nunca descargues, clones ni "actualices" una skill en el momento de usarla, ni la copies a `~/.claude`.
-- `turnstile-spin` es solo de consulta: no ejecutes sus scripts ni su asistente (usan un token de la API de
-  Cloudflare), no pidas ni guardes tokens (tampoco en `~/.cf-turnstile-token`), y no hagas su paso 11: ni
-  persistirla ni instalar o sincronizar su prompt alojado (`developers.cloudflare.com/turnstile/spin/prompt.md`),
-  que sustituiría el `SKILL.md` auditado. El widget de Turnstile se crea a mano en el dashboard.
-- `taste-skill` guarda su historial en `.taste-skill/` (`TASTE_SKILL_HISTORY`, ignorado por git).
-- Para actualizar una skill: descárgala en un directorio aparte fijando el commit, revisa el diff, actualiza
-  `manifest.json` (commit, veredicto y `reviewed`), ejecuta `node scripts/skills-scan.mjs --rehash` y
-  `node scripts/skills-scan.mjs`, y entrégalo en un PR propio.
+Las skills de terceros, su tema, su precedencia y sus restricciones de uso vienen del playbook de Retama (ADR 0013):
+sus paquetes `retama` y `retama-motion`, activados en `.claude/settings.json`, y el bloque que su hook pone al empezar
+cada sesión. Si no ves ese bloque en tu contexto, díselo al usuario. En `.claude/skills/` solo vive `blog-writing`,
+propia, para los artículos del blog, que remite a `retama:humanizer`. Astro 7, Tailwind 4 y View Transitions se
+consultan en la documentación oficial (`docs.astro.build/llms.txt` o Context7).
 
 ## Comandos
 

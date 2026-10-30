@@ -28,7 +28,7 @@
 | Función de informes | Recibir los errores de JavaScript de las páginas y las violaciones de la CSP, limpiarlos y registrarlos en Workers Logs (ADR 0011) | Ninguno; una línea de log sin datos personales (ADR 0003) | — |
 | Función de contacto | Validar, verificar el anti-bot, limitar, entregar por email; con GET o HEAD, responder la comprobación de salud del uptime (200 con los secretos y el binding, 503 si falta alguno; el HEAD, sin cuerpo; sin terceros ni envíos) | Ninguno; tránsito (ADR 0003) | — |
 | DESIGN.md | Tokens y justificación visual (ADR 0005) | Sistema de diseño | Editor y agentes, mediante PR |
-| Skills vendorizadas | Guía para los agentes (ADR 0010) | `.claude/skills/` + manifiesto | Editor, mediante PR |
+| Skills de agente | Guía para los agentes (ADR 0013) | Paquetes `retama` y `retama-motion` del playbook de Retama, activados en `.claude/settings.json`; `blog-writing`, propia, en `.claude/skills/` | Editor, mediante PR |
 
 ## Integrations
 
@@ -106,23 +106,8 @@ No se fija ningún porcentaje de cobertura. TDD estricto en la función de conta
 | Cloudflare Web Analytics | 0001, 0006, 0007 | Umami, Plausible (de pago), la configuración automática del borde | Sin cookies ni almacenamiento en el navegador, gratis, Web Vitals de campo. A mano y no automática, para que el repositorio decida cuándo carga y el E2E lo pruebe: la CSP admite `https://static.cloudflareinsights.com` en `script-src` y `https://cloudflareinsights.com` en `connect-src`, solo con token (lo añade `Base.astro`). Pesa 10,0 KB gzip: tras el evento `load` queda fuera del presupuesto de JS de inicio (la portada carga 49,7 de 60 KB) | 2026-10-24: developers.cloudflare.com/web-analytics (FAQ: CSP y hostnames por sufijo; recogida: `/cdn-cgi/rum` en cloudflareinsights.com); cloudflare.com/web-analytics («does not use any client-side state, such as cookies or localStorage»); beacon medido; E2E con el beacon como doble |
 | release-please | 0009 | Tags manuales | SemVer desde Conventional Commits (ronda 5) | Pendiente de verificar la versión en el slice 1 |
 
-## Agent skills (ADR 0010)
+## Agent skills (ADR 0013)
 
-Vendorizadas en `.claude/skills/` en el slice 1 y auditadas el 2026-10-21. Ninguna tiene inyección, telemetría ni ejecución remota de scripts en las carpetas elegidas.
-
-| Tema | Skill (carpeta) | Repo @ commit | Licencia | Notas |
-| --- | --- | --- | --- | --- |
-| Dirección de arte | `skills/taste-skill` | Leonxlnx/taste-skill @ `6010f91a9935f1c167dfc500fb1a475681892e6b` | MIT | Sus scripts contactan APIs públicas de imágenes y Google Fonts y lanzan Chrome por CDP. El historial se redirige al repo con `TASTE_SKILL_HISTORY`. Sustituye a frontend-design (ronda 8) |
-| Revisión de interfaz | `command.md` de web-interface-guidelines, con un SKILL.md que lo lee en local | vercel-labs/web-interface-guidelines @ `434b7f91364665f2f733b310ec54809bf8f37937` | MIT | Se elimina la descarga remota de reglas y se adaptan las reglas de React a Astro |
-| Animación | `gsap-core`, `gsap-timeline`, `gsap-scrolltrigger`, `gsap-plugins`, `gsap-performance` | greensock/gsap-skills @ `aed9cfd3277740755f6bfc1155c7aa645403b760` | MIT | Motor único |
-| 3D | `threejs-fundamentals`, `-shaders`, `-postprocessing`, `-performance` | CloudAI-X/threejs-skills @ `0e181866f095b5f06d005133876e926515390d95` | MIT | Comunidad, un solo autor; cubre r186, WebGPU y TSL |
-| Calidad web | `core-web-vitals`, `performance`, `seo`, `best-practices`, `web-quality-audit` | addyosmani/web-quality-skills @ `afa8da942115f2961fdbfa80807ea0b232ff6c00` | MIT | La accesibilidad la cubre la skill global `ospec-workflow:accessibility` para no duplicar |
-| hreflang | `skills/seo-hreflang` | AgriciDaniel/claude-seo @ `4b99de2f7de7e7d5247042e5fb5b4ea9368ef734` | MIT | Solo la carpeta; el plugin no (tiene hooks y un instalador remoto) |
-| Plataforma | `wrangler`, `workers-best-practices`, `turnstile-spin` | cloudflare/skills @ `86505e44f87d801aa1864a3c4109e9a8ae5c409f` | Apache-2.0 | Los scripts de `turnstile-spin` usan un token de la API de Cloudflare: no se ejecutan; el widget se crea a mano en el dashboard |
-
-**Precedencia para evitar conflictos:**
-1. DESIGN.md
-2. taste-skill
-3. La skill global `ospec-workflow:design-system`, solo para auditar
+Vienen del playbook de Retama, que copia, fija y audita cada skill de terceros una vez para todos sus proyectos: el paquete `retama` (dirección de arte, revisión de interfaz, calidad web, hreflang, Cloudflare y redacción) y `retama-motion` (GSAP y Three.js), activados en `.claude/settings.json`. Su bloque de inicio de sesión fija la skill de cada tema y la precedencia: `DESIGN.md`, después `retama:taste-skill`, y `ospec-workflow:design-system` solo para auditar. En el repositorio solo queda `blog-writing`, propia, que remite a `retama:humanizer`. Hasta el 2026-10-30 eran copias vendorizadas en `.claude/skills/` (ADR 0010).
 
 **Huecos:** Astro 7, Tailwind 4 y View Transitions se consultan en la documentación oficial (Context7 o `docs.astro.build/llms.txt`).

@@ -30,7 +30,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm design:lint
-      - run: pnpm skills:scan
       - run: pnpm audit --audit-level high
 
   e2e:

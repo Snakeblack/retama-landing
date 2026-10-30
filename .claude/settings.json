@@ -1,5 +1,6 @@
 {
-  "env": {
-    "TASTE_SKILL_HISTORY": ".taste-skill/history.json"
+  "enabledPlugins": {
+    "retama@retama": true,
+    "retama-motion@retama": true
   }
 }

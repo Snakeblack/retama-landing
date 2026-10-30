@@ -10,5 +10,5 @@
 | Presupuesto de rendimiento | Umbrales de `scenario:perf-mobile` que el CI verifica |
 | Preview | Despliegue efímero de una rama que no es `main` |
 | ADR | Architecture Decision Record, en `docs/architecture/decisions/` |
-| Skill vendorizada | Skill de agente copiada en `.claude/skills/`, fijada a un commit y auditada |
+| Playbook de Retama | Catálogo privado de Retama con sus reglas de trabajo y las skills de agente de terceros, copiadas, fijadas y auditadas una vez para todos sus proyectos (ADR 0013) |
 | Bandeja de respaldo | Segunda dirección de email que recibe una copia de cada lead |
