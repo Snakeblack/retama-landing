@@ -149,7 +149,7 @@ export function structuredData(
       "@id": organization,
       name: "Retama",
       url: home,
-      logo: new URL("/favicon.svg", site).href,
+      logo: new URL("/apple-touch-icon.png", site).href,
       email: contactEmail,
       description: copy["meta.description"],
       knowsLanguage: [...locales],

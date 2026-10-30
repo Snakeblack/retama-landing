@@ -64,7 +64,7 @@ describe("structuredData", () => {
       "@id": "https://retama.example/#organization",
       name: "Retama",
       url: "https://retama.example/",
-      logo: "https://retama.example/favicon.svg",
+      logo: "https://retama.example/apple-touch-icon.png",
       email: "hola@retama.dev",
       description: en["meta.description"],
       knowsLanguage: ["es", "en"],
