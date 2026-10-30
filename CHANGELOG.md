@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.13.0](https://github.com/Snakeblack/retama-landing/compare/v0.12.0...v0.13.0) (2026-10-30)
+
+
+### Features
+
+* **agents:** take the agent skills from the Retama playbook ([2efb2a0](https://github.com/Snakeblack/retama-landing/commit/2efb2a079251224595daf1bc31c9847c1e911eac))
+* **copy:** humanize the home's copy with the blog's rules ([2b6f60d](https://github.com/Snakeblack/retama-landing/commit/2b6f60d73a77c049c827ee989439aa9e831566db))
+
 ## [0.12.0](https://github.com/Snakeblack/retama-landing/compare/v0.11.0...v0.12.0) (2026-10-28)
 
 
