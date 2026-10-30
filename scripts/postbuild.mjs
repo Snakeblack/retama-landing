@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { en } from "../src/i18n/en.ts";
 import { es } from "../src/i18n/es.ts";
 import { extractMetaCsp, mergePolicies, serializePolicy } from "./lib/csp.mjs";
-import { blogPostings, ogArticleImage, ogImage, themeTokens } from "./lib/og-image.mjs";
+import { ogImage, ogPageImage, ownImages, themeTokens } from "./lib/og-image.mjs";
 
 const root = new URL("../dist/client/", import.meta.url).pathname;
 
@@ -43,8 +43,9 @@ async function cspHeader() {
   await writeFile(path, rules.replace(PLACEHOLDER, header));
 }
 
-// The Open Graph image of each language, og/<locale>.png, and of each article, og/<locale>/<slug>.png, which Base.astro
-// declares (src/lib/seo.ts, openGraph). A failure fails the build: no page links an image that is not there.
+// The Open Graph image of each language, og/<locale>.png, of each article, og/<locale>/<slug>.png, and of each service
+// page, og/ at the page's path, which Base.astro declares (src/lib/seo.ts, openGraph). A failure fails the build: no
+// page links an image that is not there.
 async function ogImages() {
   const theme = themeTokens(await readFile(new URL("../src/styles/theme.css", import.meta.url), "utf8"));
   const copies = { es, en };
@@ -52,13 +53,15 @@ async function ogImages() {
   for (const [locale, copy] of Object.entries(copies))
     await writeFile(join(root, "og", `${locale}.png`), await ogImage(copy, theme));
 
-  // Each article's own image, where its BlogPosting says it is (src/lib/seo.ts), with its headline.
+  // Each article's and service page's own image, where its BlogPosting or its Service says it is (src/lib/seo.ts):
+  // "Blog" over the article's headline, "Servicios" over the service's name.
+  const labels = { BlogPosting: "nav.blog", Service: "nav.services" };
   const pages = (await readdir(root, { recursive: true })).filter((file) => file.endsWith(".html"));
   for (const page of pages)
-    for (const { headline, inLanguage, image } of blogPostings(await readFile(join(root, page), "utf8"))) {
+    for (const { type, title, locale, image } of ownImages(await readFile(join(root, page), "utf8"))) {
       const file = join(root, new URL(image).pathname);
       await mkdir(dirname(file), { recursive: true });
-      await writeFile(file, await ogArticleImage(headline, copies[inLanguage], theme));
+      await writeFile(file, await ogPageImage(copies[locale][labels[type]], title, theme));
     }
 }
 

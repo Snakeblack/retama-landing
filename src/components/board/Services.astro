@@ -1,6 +1,6 @@
 ---
 import { type Locale, t } from "../../i18n/index";
-import { HERO, retamaShape, strokePath } from "../../lib/retama-shape";
+import RetamaDots from "./RetamaDots.astro";
 
 interface Props {
   locale: Locale;
@@ -26,7 +26,6 @@ const slice = (index: number) => {
 };
 // The one field card, so the row is not four of the same tile.
 const FIELD = 2;
-const shape = retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots);
 ---
 
 <section id={copy["anchor.services"]} class="grid gap-gap" aria-labelledby="services-title">
@@ -36,16 +35,7 @@ const shape = retamaShape(HERO.seed, HERO.frame, HERO.stems, HERO.roots);
     <p class="max-w-(--spacing-measure)">{copy["services.note"]}</p>
   </div>
 
-  <!-- The plant once, as dots along its strokes; every card shows it through its own viewBox. -->
-  <svg class="absolute size-0" aria-hidden="true">
-    <defs>
-      <g id="retama-dots" fill="none" stroke-dasharray="0 5" stroke-linecap="round">
-        <path class="stroke-on-surface-muted" d={strokePath(shape, "root")} stroke-width="2.8" />
-        <path class="stroke-current" d={strokePath(shape, "stem")} stroke-width="2.8" />
-        <path class="stroke-primary" d={strokePath(shape, "taproot")} stroke-width="4.5" />
-      </g>
-    </defs>
-  </svg>
+  <RetamaDots />
 
   <ul class="grid gap-gap lg:grid-cols-4">
     {

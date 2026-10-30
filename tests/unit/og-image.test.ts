@@ -1,14 +1,7 @@
 import { readFileSync } from "node:fs";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
-import {
-  blogPostings,
-  ogArticleCard,
-  ogArticleImage,
-  ogCard,
-  ogImage,
-  themeTokens,
-} from "../../scripts/lib/og-image.mjs";
+import { ogCard, ogImage, ogPageCard, ogPageImage, ownImages, themeTokens } from "../../scripts/lib/og-image.mjs";
 import { en } from "../../src/i18n/en";
 import { es } from "../../src/i18n/es";
 
@@ -52,38 +45,64 @@ describe("ogImage", () => {
   });
 });
 
-describe("ogArticleCard", () => {
-  it("lleva «Blog» y el título del artículo, sin la frase del hero", () => {
-    expect(texts(ogArticleCard("Cuánto cuesta un software a medida", es, theme))).toEqual([
+describe("ogPageCard", () => {
+  it("lleva en gris qué es la página sobre su título, sin la frase del hero", () => {
+    expect(texts(ogPageCard(es["nav.blog"], "Cuánto cuesta un software a medida", theme))).toEqual([
       es["nav.blog"],
       "Cuánto cuesta un software a medida",
+    ]);
+    expect(texts(ogPageCard(es["nav.services"], es["services.custom"], theme))).toEqual([
+      es["nav.services"],
+      es["services.custom"],
     ]);
   });
 });
 
-describe("ogArticleImage", () => {
+describe("ogPageImage", () => {
   it("dibuja un PNG de 1200×630", async () => {
-    const meta = await sharp(await ogArticleImage("What custom software costs", en, theme)).metadata();
+    const meta = await sharp(await ogPageImage(en["nav.blog"], "What custom software costs", theme)).metadata();
     expect([meta.format, meta.width, meta.height]).toEqual(["png", 1200, 630]);
   });
 });
 
-describe("blogPostings", () => {
-  const page = (graph: unknown[]) =>
-    `<html><head><script type="application/ld+json">${JSON.stringify({ "@graph": graph }).replace(/</g, "\\u003c")}</script></head></html>`;
+describe("ownImages", () => {
+  const page = (graph: unknown[], lang = "es") =>
+    `<html lang="${lang}"><head><script type="application/ld+json">${JSON.stringify({ "@graph": graph }).replace(/</g, "\\u003c")}</script></head></html>`;
 
   it("lee de una página el titular, el idioma y la imagen de su BlogPosting", () => {
     const html = page([
       { "@type": "WebSite" },
       { "@type": "BlogPosting", headline: "A <b>", inLanguage: "es", image: "https://retama.example/og/es/a.png" },
     ]);
-    expect(blogPostings(html)).toEqual([
-      { headline: "A <b>", inLanguage: "es", image: "https://retama.example/og/es/a.png" },
+    expect(ownImages(html)).toEqual([
+      { type: "BlogPosting", title: "A <b>", locale: "es", image: "https://retama.example/og/es/a.png" },
     ]);
   });
 
-  it("no encuentra nada en una página sin artículo ni JSON-LD", () => {
-    expect(blogPostings(page([{ "@type": "WebSite" }]))).toEqual([]);
-    expect(blogPostings("<html></html>")).toEqual([]);
+  it("lee de una página de servicio el nombre y la imagen de su Service, con el idioma de la página", () => {
+    const html = page(
+      [
+        { "@type": ["Organization", "ProfessionalService"], name: "Retama" },
+        {
+          "@type": "Service",
+          name: "Custom software",
+          image: "https://retama.example/og/en/services/custom-software.png",
+        },
+      ],
+      "en",
+    );
+    expect(ownImages(html)).toEqual([
+      {
+        type: "Service",
+        title: "Custom software",
+        locale: "en",
+        image: "https://retama.example/og/en/services/custom-software.png",
+      },
+    ]);
+  });
+
+  it("no encuentra nada en una página sin artículo, sin servicio o sin JSON-LD", () => {
+    expect(ownImages(page([{ "@type": "WebSite" }]))).toEqual([]);
+    expect(ownImages("<html></html>")).toEqual([]);
   });
 });

@@ -132,9 +132,10 @@ export function ogCard(copy, theme) {
   ]);
 }
 
-/** The card of an article (owner, 2026-10-23): "Blog" in muted ink over its title at headline size, which holds two
- * lines at most (src/lib/blog.ts, TITLE_MAX), clear of the retama. */
-export function ogArticleCard(title, copy, theme) {
+/** The card of a page with an image of its own, in muted ink what it is over its title at headline size, which holds
+ * two lines at most, clear of the retama: an article, "Blog" over its title (owner, 2026-10-23; src/lib/blog.ts,
+ * TITLE_MAX), and a service page, "Servicios" over the service's name (owner, 2026-10-30). */
+export function ogPageCard(label, title, theme) {
   return frame(theme, [
     el(
       "div",
@@ -143,7 +144,7 @@ export function ogArticleCard(title, copy, theme) {
         color: theme["color-on-surface-muted"],
         marginBottom: px(theme["spacing-md"]),
       },
-      copy["nav.blog"],
+      label,
     ),
     el(
       "div",
@@ -167,17 +168,19 @@ export function ogImage(copy, theme) {
   return png(ogCard(copy, theme));
 }
 
-/** The PNG of an article's card. */
-export function ogArticleImage(title, copy, theme) {
-  return png(ogArticleCard(title, copy, theme));
+/** The PNG of a page's own card. */
+export function ogPageImage(label, title, theme) {
+  return png(ogPageCard(label, title, theme));
 }
 
-/** The BlogPosting of a built page, from its JSON-LD (src/lib/seo.ts, structuredData): its headline, language and
- * image, which postbuild draws. */
-export function blogPostings(html) {
+/** The images of their own a built page declares in its JSON-LD (src/lib/seo.ts, structuredData), which postbuild
+ * draws: an article's BlogPosting, with its headline, and a service page's Service, with its name, each with the
+ * page's language. */
+export function ownImages(html) {
+  const locale = html.match(/<html lang="([^"]+)"/)?.[1];
   return [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].flatMap(([, json]) =>
     (JSON.parse(json)["@graph"] ?? [])
-      .filter((node) => node["@type"] === "BlogPosting")
-      .map(({ headline, inLanguage, image }) => ({ headline, inLanguage, image })),
+      .filter((node) => node["@type"] === "BlogPosting" || node["@type"] === "Service")
+      .map((node) => ({ type: node["@type"], title: node.headline ?? node.name, locale, image: node.image })),
   );
 }
