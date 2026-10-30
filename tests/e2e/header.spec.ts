@@ -14,6 +14,16 @@ const barTop = (page: Page) => bar(page).evaluate((node) => Math.round(node.getB
 test.describe("cabecera flotante e índice de capítulos en el móvil (DESIGN.md Layout)", () => {
   test.use({ viewport: phone, hasTouch: true });
 
+  for (const path of ["/", "/servicios/software-a-medida/", "/en/blog/"])
+    test(`${path} da al logotipo un objetivo táctil de 48 px de alto sin agrandar la cabecera`, async ({ page }) => {
+      await page.goto(path);
+      const home = bar(page).getByRole("link", { name: "Retama" });
+      expect(await home.evaluate((node) => node.getBoundingClientRect().height)).toBeGreaterThanOrEqual(48);
+      const height = await bar(page).evaluate((node) => node.getBoundingClientRect().height);
+      // The primary bar (6), the row's padding (2 × 16) and a touch-tall row (48).
+      expect(height).toBe(6 + 32 + 48);
+    });
+
   for (const { path, index, close, method, sectors, here } of pages) {
     test(`${path} cambia la fila de enlaces por el índice, un diálogo modal que se cierra con Escape`, async ({
       page,
