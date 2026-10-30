@@ -1,10 +1,10 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { locales } from "../i18n/index";
+import { defaultLocale, locales } from "../i18n/index";
 import { articlePath, entryLocale, entrySlug } from "./blog";
 import { servicePaths, services } from "./services";
 
-// What the sitemap says of a page beyond its URL, which @astrojs/sitemap (astro.config.mjs) knows nothing of: the dates
-// of the blog, and the translation of each article and service page, which it cannot pair because every language has
+// What the sitemap says of a page beyond its URL, which @astrojs/sitemap (astro.config.mjs) knows nothing of: the date
+// of every page, and the translation of each article and service page, which it cannot pair because every language has
 // its own slug.
 
 /** An article as the sitemap reads it: its id, `<locale>/<slug>`, and the key and dates of its front matter. */
@@ -21,6 +21,16 @@ export interface SitemapExtra {
   lastmod?: string;
   links?: { url: string; lang: string }[];
 }
+
+/** The last change that matters of each page with no article or service behind it, by path, kept by hand like a
+ * service's (owner, 2026-10-30): a build date would change on every deploy. The legal page's is the date its text
+ * shows in each language (legal.updated). */
+export const pageUpdates: Record<string, string> = {
+  "/": "2026-10-30",
+  "/en/": "2026-10-30",
+  "/legal/": "2026-10-24",
+  "/en/legal/": "2026-10-26",
+};
 
 /** The key and dates of an article's front matter. The config reads them before the content collection exists; the
  * collection's schema (src/content.config.ts) checks the rest when the site builds. */
@@ -47,8 +57,8 @@ const day = (date: Date) => date.toISOString().slice(0, 10);
 const changed = (article: SitemapArticle) => article.updated ?? article.published;
 
 /** By absolute URL: each article with its last change and its translations, each language's blog index with the last
- * change of its newest article, and each service page with its translations. A page with no date of its own, like the
- * home or a service page, gets no lastmod: a build date would change on every deploy. */
+ * change of its newest article, each service page with its date and its translations, and the other pages with their
+ * date (pageUpdates). */
 export function sitemapExtras(site: URL, articles: SitemapArticle[]): Map<string, SitemapExtra> {
   const url = (article: SitemapArticle) =>
     new URL(articlePath(entryLocale(article.id), entrySlug(article.id)), site).href;
@@ -68,10 +78,23 @@ export function sitemapExtras(site: URL, articles: SitemapArticle[]): Map<string
         lastmod: day(new Date(Math.max(...dates.map(Number)))),
       });
   }
-  for (const { id } of services) {
+  for (const { id, updated } of services) {
     const paths = servicePaths(id);
     const links = locales.map((locale) => ({ url: new URL(paths[locale], site).href, lang: locale }));
-    for (const { url } of links) extras.set(url, { links });
+    for (const { url } of links) extras.set(url, { lastmod: updated, links });
   }
+  for (const [path, lastmod] of Object.entries(pageUpdates)) extras.set(new URL(path, site).href, { lastmod });
   return extras;
+}
+
+/** An entry of @astrojs/sitemap with its extras and, when it has translations, the x-default the HTML gives them too:
+ * the page in the default language (ADR 0008). */
+export function sitemapEntry<Entry extends { url: string; links?: SitemapExtra["links"] }>(
+  item: Entry,
+  extras: Map<string, SitemapExtra>,
+): Entry & SitemapExtra {
+  const entry: Entry & SitemapExtra = { ...item, ...extras.get(item.url) };
+  const fallback = entry.links?.find((link) => link.lang === defaultLocale);
+  if (!entry.links || !fallback || entry.links.some((link) => link.lang === "x-default")) return entry;
+  return { ...entry, links: [...entry.links, { url: fallback.url, lang: "x-default" }] };
 }

@@ -7,7 +7,7 @@ import { defineConfig, envField, fontProviders } from "astro/config";
 import { missingOwner } from "./scripts/lib/legal-owner.mjs";
 import { unpinnedPnpm } from "./scripts/lib/pnpm-pin.mjs";
 import { refusedSiteKey, TEST_SITE_KEY } from "./scripts/lib/turnstile-key.mjs";
-import { readArticles, sitemapExtras } from "./src/lib/sitemap.ts";
+import { readArticles, sitemapEntry, sitemapExtras } from "./src/lib/sitemap.ts";
 
 // The legal notice must name its owner (LSSI art. 10): Workers Builds, which publishes the site, never builds without.
 const missing = missingOwner(process.env);
@@ -108,7 +108,7 @@ export default defineConfig({
     sitemap({
       i18n: { defaultLocale: "es", locales: { es: "es", en: "en" } },
       filter: (page) => !/\/404\/?$/.test(new URL(page).pathname),
-      serialize: (item) => ({ ...item, ...extras.get(item.url) }),
+      serialize: (item) => sitemapEntry(item, extras),
     }),
   ],
   security: {
