@@ -1,0 +1,159 @@
+{
+  "schema": "idd-state/v1",
+  "change": "agents-delivery",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "docs",
+    "summary": "La sección Entrega de AGENTS.md remite a retama:delivery 0.8.0, que ya trae la release con main protegida, en vez de repetir sus pasos",
+    "acceptance": "AGENTS.md › Entrega dice que main está protegida (exige PR, también a los administradores) y que la landing publica un GitHub Release por versión, remite a retama:delivery para la release y sus pasos, ya no copia los pasos 1-5, y mantiene la regla de los PRs encadenados, que la skill no trae"
+  },
+  "facts": {
+    "basis": "retama:delivery 0.8.0 (sección Release de su SKILL.md) aplica la release dentro del PR y el GitHub Release cuando el AGENTS.md del proyecto dice esos dos datos; el texto se propuso al usuario el 2026-10-30 y lo aceptó al recargar los plugins para hacerlo en esta sesión"
+  },
+  "plan": {
+    "paths": [
+      "AGENTS.md"
+    ],
+    "work_units": 1,
+    "decision": false,
+    "operations": []
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0014",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0014",
+      "impact": "conforms",
+      "reason": "ADR 0014 decide entregar con retama:delivery y la release dentro del PR porque main está protegida; AGENTS.md sigue diciendo eso y remite a la skill, que ya trae esos pasos"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    }
+  ],
+  "gates": [],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-30T10:28:51.205Z",
+      "detail": {
+        "tree": "sha256:327fd97584141173ee1cc33e416f34449e4eab882685393c50ce058f141be87f",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-30T10:28:51.205Z",
+      "detail": {
+        "refs": [
+          "adr:0014 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:327fd97584141173ee1cc33e416f34449e4eab882685393c50ce058f141be87f",
+        "fitness": [
+          "run-6"
+        ]
+      }
+    }
+  ],
+  "base": "3219b671b7f02df252cf585f882337c41cceaa37",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9bcef5d853569be3e8ef78b0e65d28fb75c94b37a7df5f2bedc0750d22521fd6",
+      "tree": "sha256:327fd97584141173ee1cc33e416f34449e4eab882685393c50ce058f141be87f",
+      "recorded_at": "2026-10-30T10:28:51.205Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:35fbd8c993467d3ad8fb25a49a0c06c6ab424ec7f13fd791eff6a4b26a716a99",
+      "tree": "sha256:327fd97584141173ee1cc33e416f34449e4eab882685393c50ce058f141be87f",
+      "recorded_at": "2026-10-30T10:28:51.205Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:50d3c9d5f32390a54028dba47bdf3195484c5c0ff594c519397c7583298a92e9",
+      "tree": "sha256:327fd97584141173ee1cc33e416f34449e4eab882685393c50ce058f141be87f",
+      "recorded_at": "2026-10-30T10:28:51.205Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:de2e138cdcbbc0b3b71e8e003d21e2e49fed4d6ba4ceb3b6c63a2bd88097d31d",
+      "tree": "sha256:327fd97584141173ee1cc33e416f34449e4eab882685393c50ce058f141be87f",
+      "recorded_at": "2026-10-30T10:28:51.205Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:327fd97584141173ee1cc33e416f34449e4eab882685393c50ce058f141be87f",
+      "recorded_at": "2026-10-30T10:28:51.205Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0014",
+      "command": "node scripts/fitness.mjs branch-protection",
+      "exit_code": 0,
+      "output_sha256": "sha256:ad066e035f32d013194acde59f8c3c2deab20c06cd37e2005db423b0d50d0b77",
+      "tree": "sha256:327fd97584141173ee1cc33e416f34449e4eab882685393c50ce058f141be87f",
+      "recorded_at": "2026-10-30T10:28:51.205Z"
+    }
+  ],
+  "closed_at": "2026-10-30T10:28:53.921Z"
+}
