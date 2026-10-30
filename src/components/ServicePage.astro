@@ -1,8 +1,11 @@
 ---
+import { PUBLIC_BOOKING } from "astro:env/client";
 import { type Locale, localizedPath, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
 import { articles } from "../lib/articles";
 import { articlePath, formatDate, readingMinutes } from "../lib/blog";
+import { bookingUrl } from "../lib/board";
+import { presetSearch } from "../lib/contact-form";
 import { type Service, servicePath, servicePaths, services } from "../lib/services";
 import DecisionSheet from "./DecisionSheet.astro";
 import Footer from "./board/Footer.astro";
@@ -24,6 +27,9 @@ const others = services.filter((other) => other !== service);
 const keys: readonly string[] = service.articles;
 const posts = (await articles(locale)).filter(({ entry }) => keys.includes(entry.data.key));
 const link = "feedback grid content-start gap-sm bg-surface-raised p-tile-sm hover:bg-field hover:text-on-field md:p-tile";
+// The action leads to the home's form with this service already chosen (owner, 2026-10-30); the booking, while it is
+// on, is a plain link to Cal.com, with no frame on this page.
+const contact = `${localizedPath(locale, "/")}${presetSearch(service.projectType)}#${copy["anchor.contact"]}`;
 ---
 
 <!-- DESIGN.md Layout, the service pages (owner, 2026-10-30): one page per service and language. The title with the
@@ -57,9 +63,18 @@ const link = "feedback grid content-start gap-sm bg-surface-raised p-tile-sm hov
             </dl>
           )
         }
-        <a class="feedback flex min-h-(--spacing-touch) w-fit items-center bg-primary px-lg type-label text-on-primary hover:bg-field hover:text-on-field" href={`${localizedPath(locale, "/")}#${copy["anchor.contact"]}`}>
-          {copy["nav.talk"]}
-        </a>
+        <div class="flex flex-wrap items-center gap-x-lg gap-y-sm">
+          <a class="feedback flex min-h-(--spacing-touch) w-fit items-center bg-primary px-lg type-label text-on-primary hover:bg-field hover:text-on-field" href={contact}>
+            {copy["nav.talk"]}
+          </a>
+          {
+            PUBLIC_BOOKING && (
+              <a class="feedback flex min-h-(--spacing-touch) items-center underline hover:decoration-primary" href={bookingUrl}>
+                {copy["booking.open"]}
+              </a>
+            )
+          }
+        </div>
       </div>
       <div class:list={["relative col-span-2 aspect-5/2 lg:col-span-5 lg:aspect-auto", field ? "bg-field text-on-field" : "bg-surface-raised"]}>
         <RetamaDots />

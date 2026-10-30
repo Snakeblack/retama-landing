@@ -1,9 +1,9 @@
 // The contact form's island (ADR 0001, Contact.astro). It enables the button, loads Turnstile on the first focus in
 // the form (invisible unless Cloudflare asks for a click), checks the fields with the rules the function uses, sends
 // to /api/contact/ and shows what came of it. A failure keeps what was written and offers the mail, prefilled with
-// it, and WhatsApp. Nothing is kept once the page goes (ADR 0003).
+// it, and WhatsApp. Nothing is kept once the page goes (ADR 0003). A service page's action marks its project type.
 import { type ContactField, parseContact } from "../lib/contact";
-import { type FailureKind, failureOf, mailtoHref } from "../lib/contact-form";
+import { type FailureKind, failureOf, mailtoHref, presetType } from "../lib/contact-form";
 
 interface Turnstile {
   render(container: HTMLElement, options: Record<string, unknown>): string;
@@ -157,6 +157,14 @@ if (root && form && submit) {
     submit.textContent = value ? sending : label;
     form.toggleAttribute("aria-busy", value);
   };
+
+  // The type a service page's action carries, unless the browser already brought back the visitor's own choice on the
+  // way back (owner, 2026-10-30). Chromium brings it back after this module runs, over the type, to the same end.
+  const preset = presetType(location.search);
+  if (preset && !form.querySelector('[name="projectType"]:checked')) {
+    const choice = form.querySelector<HTMLInputElement>(`[name="projectType"][value="${preset}"]`);
+    if (choice) choice.checked = true;
+  }
 
   form.addEventListener("focusin", turnstile.load, { once: true });
 

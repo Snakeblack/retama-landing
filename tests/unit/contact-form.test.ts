@@ -1,5 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { failureOf, MAILTO_BODY_MAX, mailtoHref } from "../../src/lib/contact-form";
+import { PROJECT_TYPES } from "../../src/lib/contact";
+import { failureOf, MAILTO_BODY_MAX, mailtoHref, presetSearch, presetType } from "../../src/lib/contact-form";
+
+describe("presetSearch y presetType", () => {
+  it("escriben y leen el tipo de proyecto como lo enviaría un formulario GET con ese campo", () => {
+    expect(presetSearch("software")).toBe("?projectType=software");
+    for (const type of PROJECT_TYPES) expect(presetType(presetSearch(type))).toBe(type);
+  });
+
+  it("leen el tipo entre otros parámetros", () => {
+    expect(presetType("?utm_source=x&projectType=seo")).toBe("seo");
+  });
+
+  it("no marcan nada con un valor que no es uno de los cinco, sin normalizarlo", () => {
+    for (const search of [
+      "",
+      "?projectType=",
+      "?projectType=xyz",
+      "?projectType=Software",
+      "?projectType=%20web",
+      "?tipo=web",
+    ])
+      expect(presetType(search), search).toBeUndefined();
+  });
+});
 
 describe("failureOf", () => {
   it("devuelve los campos que el visitante puede corregir cuando la función los rechaza", () => {

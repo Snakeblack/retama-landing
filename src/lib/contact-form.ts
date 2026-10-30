@@ -1,5 +1,20 @@
-// What the contact form does with an answer of /api/contact it did not want, and the mail it offers instead.
-import type { ContactField } from "./contact";
+// What the contact form does with an answer of /api/contact it did not want, the mail it offers instead and the project
+// type a link marks in it on arrival.
+import { type ContactField, PROJECT_TYPES, type ProjectType } from "./contact";
+
+/** The field a link marks in the form, named as a GET form with it would send it (owner, 2026-10-30). */
+const PRESET: ContactField = "projectType";
+
+/** The query a service page's action carries to mark its project type in the home's form (ServicePage.astro). */
+export function presetSearch(type: ProjectType): string {
+  return `?${new URLSearchParams({ [PRESET]: type })}`;
+}
+
+/** The project type a query marks, exactly as the form writes it; any other value marks nothing, without a word. */
+export function presetType(search: string): ProjectType | undefined {
+  const value = new URLSearchParams(search).get(PRESET);
+  return PROJECT_TYPES.find((type) => type === value);
+}
 
 /** The fields a visitor can see and fix; the rest of a 400 is the page's fault, not theirs. */
 const VISIBLE: readonly ContactField[] = ["name", "email", "projectType", "message"];

@@ -11,6 +11,12 @@ const pages = [
   { path: "/en/", open: "Book a call", close: "Close", frame: "Calendar to book a call" },
 ] as const;
 
+// A service page offers the booking beside its action as a plain link, with no frame (owner, 2026-10-30).
+const services = [
+  { path: "/servicios/software-a-medida/", open: "Reservar una llamada" },
+  { path: "/en/services/custom-software/", open: "Book a call" },
+] as const;
+
 test.describe("reserva de llamada desactivada", () => {
   test.skip(booking, "the build has the booking on");
 
@@ -20,6 +26,13 @@ test.describe("reserva de llamada desactivada", () => {
       await expect(page.getByRole("link", { name: open })).toHaveCount(0);
       await expect(page.locator("[data-booking]")).toHaveCount(0);
       expect(response?.headers()["content-security-policy"]).not.toContain("cal.com");
+    });
+  }
+
+  for (const { path, open } of services) {
+    test(`${path} no ofrece la reserva`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.getByRole("link", { name: open })).toHaveCount(0);
     });
   }
 });
@@ -36,6 +49,14 @@ test.describe("reserva de llamada sin JavaScript (ADR 0001)", () => {
         BOOKING_PAGE,
       );
       await expect(page.locator("[data-booking]")).toBeHidden();
+    });
+  }
+
+  for (const { path, open } of services) {
+    test(`${path} ofrece la reserva junto a Hablemos como un enlace a Cal.com, sin marco`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator("main").getByRole("link", { name: open })).toHaveAttribute("href", BOOKING_PAGE);
+      await expect(page.locator("[data-booking]")).toHaveCount(0);
     });
   }
 });
