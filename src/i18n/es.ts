@@ -64,6 +64,7 @@ export const es = {
   "service.start": "Cómo empieza",
   "service.sheetTitle": "Lo primero que decidiríamos",
   "service.sheetLead": "Un ejemplo de las primeras decisiones que dejaríamos por escrito en un proyecto así.",
+  "service.blog": "Del blog",
   "service.others": "Otros servicios",
   "service.imageAlt": "servicio de Retama",
   "service.proposal": "Una propuesta gratis, por escrito,",

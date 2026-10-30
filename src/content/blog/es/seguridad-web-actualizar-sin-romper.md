@@ -3,6 +3,7 @@ key: web-security-updates
 title: "Seguridad web: actualizar sin romper"
 description: Lo que ha pasado este año con PHP, Java y Node, por qué una aplicación que nadie toca no está a salvo y cómo actualizamos las nuestras sin cambiar lo que hacen.
 published: 2026-10-28
+updated: 2026-10-30
 ---
 
 El 21 de octubre de 2026, PHP y Node.js publicaron arreglos para fallos graves. En agosto, la CISA, la agencia de ciberseguridad de Estados Unidos, ya había avisado de que se estaba atacando un fallo de Apache Tomcat, el servidor sobre el que funcionan muchas aplicaciones hechas en Java. Si tu empresa usa una aplicación web, lo más probable es que funcione con alguna de las tres.
@@ -38,7 +39,7 @@ Los dos se evitan con el mismo método: actualizar a menudo, con pasos fijos y s
 
 ## Cómo lo hacemos en Retama
 
-Es lo que hacemos en todo lo que construimos y mantenemos, empezando por esta web. También es lo que incluye nuestro mantenimiento mensual, desde 120 € para una web y 250 € para un software a medida, sin IVA.
+Es lo que hacemos en todo lo que construimos y mantenemos, empezando por esta web. También es lo que incluye nuestro mantenimiento mensual, desde 120 € para [una web](/servicios/webs-y-cms/) y 250 € para un software a medida, sin IVA.
 
 - **Guardamos la lista exacta de lo que lleva cada aplicación.** Cada proyecto anota la versión de cada paquete, así que lo que probamos es justo lo que se publica.
 - **La comparamos cada día con los fallos conocidos.** Una revisión automática la cruza con las bases públicas de fallos de seguridad cada día y en cada cambio, y nos avisa en cuanto aparece uno.

@@ -3,7 +3,7 @@ key: written-decisions
 title: Why we write every decision down
 description: What a written decision is, what it saves you when the project grows or changes hands, and why it is yours, just like the code.
 published: 2026-10-23
-updated: 2026-10-26
+updated: 2026-10-30
 ---
 
 Every software project takes hundreds of decisions. Almost all of them are small, but a few shape everything else: what it is built with, where the data lives, how it connects to your other systems, what is left for later. In many projects those decisions live only in the head of whoever took them. We write them down.
@@ -32,6 +32,6 @@ Once it is paid in full, your project's code is yours, and so are the documentat
 
 ## What it looks like in practice
 
-Before building anything important, we walk you through the options and their cost, and we decide together. That conversation ends in a written decision, which comes with the delivery and you can read whenever you like. If something changes later, it is not erased: a new one explains what changed and why, and the old one stays as history.
+Before building anything important, we walk you through the options and their cost, and we decide together. That conversation ends in a written decision, which comes with the delivery and you can read whenever you like. If something changes later, it is not erased: a new one explains what changed and why, and the old one stays as history. On the [custom software](/en/services/custom-software/) page you can see an example of the first decisions we would put in writing on a project like that.
 
 It is a small habit that cannot be seen from outside, like the roots of the retama, the broom shrub that holds on in poor soil thanks to a root far deeper than the plant is tall.

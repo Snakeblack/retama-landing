@@ -6,17 +6,24 @@ const languages = [
     home: "/",
     chapter: "Lo que construimos",
     headings: ["Qué incluye", "Cuándo encaja", "Cómo empieza", "Lo primero que decidiríamos", "Otros servicios"],
+    blog: "Del blog",
     others: "Otros servicios",
     example: "Ejemplo",
     talk: "Hablemos",
     contact: "/#contacto",
     footer: "Servicios",
     pages: [
-      { path: "/servicios/webs-y-cms/", other: "/en/services/websites-and-cms/", h1: "Diseño web y CMS para empresas" },
+      {
+        path: "/servicios/webs-y-cms/",
+        other: "/en/services/websites-and-cms/",
+        h1: "Diseño web y CMS para empresas",
+        articles: ["/blog/seguridad-web-actualizar-sin-romper/"],
+      },
       {
         path: "/servicios/software-a-medida/",
         other: "/en/services/custom-software/",
         h1: "Desarrollo de software a medida",
+        articles: ["/blog/cuanto-cuesta-un-software-a-medida/", "/blog/por-que-escribimos-cada-decision/"],
       },
       {
         path: "/servicios/agentes-y-automatizaciones/",
@@ -31,6 +38,7 @@ const languages = [
     home: "/en/",
     chapter: "What we build",
     headings: ["What it includes", "When it fits", "How it starts", "What we would decide first", "Other services"],
+    blog: "From the blog",
     others: "Other services",
     example: "Example",
     talk: "Let's talk",
@@ -41,11 +49,13 @@ const languages = [
         path: "/en/services/websites-and-cms/",
         other: "/servicios/webs-y-cms/",
         h1: "Web design and CMS",
+        articles: ["/en/blog/web-security-updating-without-breaking/"],
       },
       {
         path: "/en/services/custom-software/",
         other: "/servicios/software-a-medida/",
         h1: "Custom software development",
+        articles: ["/en/blog/what-custom-software-costs/", "/en/blog/why-we-write-every-decision-down/"],
       },
       {
         path: "/en/services/agents-and-automation/",
@@ -67,8 +77,8 @@ const description = (page: Page) => page.locator('meta[name="description"]').get
 test.describe("páginas de servicio sin JavaScript (ADR 0001)", () => {
   test.use({ javaScriptEnabled: false });
 
-  for (const { lang, home, headings, others, example, talk, contact, pages } of languages)
-    for (const { path, h1 } of pages)
+  for (const { lang, home, headings, blog, others, example, talk, contact, pages } of languages)
+    for (const { path, h1, articles = [] } of pages)
       test(`${path} tiene su título, sus precios, sus apartados, sus decisiones y la vuelta al contacto en el HTML`, async ({
         page,
       }) => {
@@ -76,7 +86,10 @@ test.describe("páginas de servicio sin JavaScript (ADR 0001)", () => {
         expect(response?.status()).toBe(200);
         await expect(page.locator("html")).toHaveAttribute("lang", lang);
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(h1);
-        await expect(page.getByRole("heading", { level: 2 })).toHaveText(headings);
+        // A service the blog writes about lists its articles before the other services (owner, 2026-10-30).
+        await expect(page.getByRole("heading", { level: 2 })).toHaveText(
+          articles.length > 0 ? [...headings.slice(0, -1), blog, others] : headings,
+        );
         // The starting price excluding VAT, with its lead time or its monthly fee.
         await expect(
           page
@@ -164,3 +177,17 @@ test("la carpeta de los servicios sola no es una página: da la 404 de su idioma
     await expect(page.locator("html")).toHaveAttribute("lang", lang);
   }
 });
+
+for (const { blog, pages } of languages)
+  for (const { path, articles = [] } of pages.filter((item) => item.articles))
+    test(`${path} enlaza sus artículos del blog, y cada uno la enlaza a ella en su texto`, async ({ page }) => {
+      await page.goto(path);
+      const row = page.getByRole("region", { name: blog });
+      const links = await row.getByRole("link").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href")));
+      expect(links.toSorted()).toEqual(articles.toSorted());
+      await expect(row.getByRole("heading", { level: 3 })).toHaveCount(articles.length);
+      for (const article of articles) {
+        await page.goto(article);
+        await expect(page.locator(`[data-article] a[href="${path}"]`)).toHaveCount(1);
+      }
+    });

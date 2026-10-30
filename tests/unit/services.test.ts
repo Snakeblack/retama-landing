@@ -1,8 +1,10 @@
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { en } from "../../src/i18n/en";
 import { es } from "../../src/i18n/es";
 import { locales } from "../../src/i18n/index";
 import { serviceImagePath, servicePath, servicePaths, services } from "../../src/lib/services";
+import { frontMatter } from "../../src/lib/sitemap";
 
 describe("services", () => {
   it("son las cuatro tarjetas de la portada, en su orden", () => {
@@ -56,5 +58,29 @@ describe("serviceImagePath", () => {
   it("pone la imagen Open Graph en og/ con la ruta de su página", () => {
     expect(serviceImagePath("es", "web")).toBe("/og/servicios/webs-y-cms.png");
     expect(serviceImagePath("en", "seo")).toBe("/og/en/services/seo-and-analytics.png");
+  });
+});
+
+describe("los artículos de cada servicio", () => {
+  const blog = locales.flatMap((locale) =>
+    readdirSync(`src/content/blog/${locale}`).map((file) => {
+      const source = readFileSync(`src/content/blog/${locale}/${file}`, "utf8");
+      return { locale, key: frontMatter(file, source).key, body: source.replace(/^---[\s\S]*?---/, "") };
+    }),
+  );
+
+  it("existen en el blog, y cada uno enlaza en su texto a la página de su servicio, en cada idioma", () => {
+    for (const service of services)
+      for (const key of service.articles)
+        for (const locale of locales) {
+          const article = blog.find((item) => item.key === key && item.locale === locale);
+          expect(article, `${key} (${locale})`).toBeDefined();
+          expect(article?.body, `${key} (${locale})`).toContain(`](${servicePath(locale, service.id)})`);
+        }
+  });
+
+  it("dan a cada artículo un único servicio", () => {
+    const keys = services.flatMap((service) => service.articles);
+    expect(new Set(keys).size).toBe(keys.length);
   });
 });

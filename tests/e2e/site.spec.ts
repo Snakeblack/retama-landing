@@ -279,7 +279,7 @@ test("el sitemap fecha y empareja los artículos, empareja los servicios y fecha
     '<xhtml:link rel="alternate" hreflang="en" href="https://retama.dev/en/blog/what-custom-software-costs/"/>',
   ];
   for (const path of ["/blog/cuanto-cuesta-un-software-a-medida/", "/en/blog/what-custom-software-costs/"]) {
-    expect(entry(path), path).toMatch(/<lastmod>2026-10-26/);
+    expect(entry(path), path).toMatch(/<lastmod>2026-10-30/);
     for (const link of pair) expect(entry(path), path).toContain(link);
   }
   for (const path of ["/blog/", "/en/blog/"]) expect(entry(path), path).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}/);

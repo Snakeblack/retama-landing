@@ -65,10 +65,11 @@ test.describe("blog sin JavaScript (ADR 0001)", () => {
       // Signed by Manuel M. (owner, 2026-10-26), first of the facts beside the title.
       await expect(page.locator("dl dt").first()).toHaveText(byline);
       await expect(page.locator("dl dd").first()).toHaveText("Manuel M.");
-      // Published, then updated when its warranty and its floor price followed proposal 1.4.
+      // Published, then updated when its warranty and its floor price followed proposal 1.4 and, last, when it linked
+      // its service's page (2026-10-30).
       await expect(page.locator("dl time")).toHaveCount(2);
       await expect(page.locator("dl time").first()).toHaveAttribute("datetime", "2026-10-23");
-      await expect(page.locator("dl time").last()).toHaveAttribute("datetime", "2026-10-26");
+      await expect(page.locator("dl time").last()).toHaveAttribute("datetime", "2026-10-30");
       await expect(page.getByRole("link", { name: all })).toHaveAttribute("href", index);
       // No code in an article (DESIGN.md: no monospace outside the first chapter).
       await expect(page.locator("[data-article] code, [data-article] pre")).toHaveCount(0);

@@ -1,6 +1,8 @@
 ---
 import { type Locale, localizedPath, t } from "../i18n/index";
 import Base from "../layouts/Base.astro";
+import { articles } from "../lib/articles";
+import { articlePath, formatDate, readingMinutes } from "../lib/blog";
 import { type Service, servicePath, servicePaths, services } from "../lib/services";
 import DecisionSheet from "./DecisionSheet.astro";
 import Footer from "./board/Footer.astro";
@@ -18,12 +20,16 @@ const name = copy[`services.${id}`];
 // The plant's tile takes its card's ground: the third card is the field (src/components/board/Services.astro).
 const field = services.indexOf(service) === 2;
 const others = services.filter((other) => other !== service);
+// The articles of the blog about this service, newest first; a service with none has no row for them.
+const keys: readonly string[] = service.articles;
+const posts = (await articles(locale)).filter(({ entry }) => keys.includes(entry.data.key));
 const link = "feedback grid content-start gap-sm bg-surface-raised p-tile-sm hover:bg-field hover:text-on-field md:p-tile";
 ---
 
 <!-- DESIGN.md Layout, the service pages (owner, 2026-10-30): one page per service and language. The title with the
      prices and the action beside its card's part of the retama, then what it includes, when it fits and how it starts,
-     the decisions Retama would write first and the other services, 128px apart like the home's chapters. -->
+     the decisions Retama would write first, the articles of the blog about it and the other services, 128px apart like
+     the home's chapters. -->
 <Base
   locale={locale}
   title={copy[`service.${id}.metaTitle`]}
@@ -117,6 +123,30 @@ const link = "feedback grid content-start gap-sm bg-surface-raised p-tile-sm hov
         {service.sheets.map((sheet) => <DecisionSheet locale={locale} sheet={sheet} />)}
       </div>
     </section>
+
+    {
+      posts.length > 0 && (
+        <section class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="blog-title">
+          <h2 id="blog-title" class="col-span-2 bg-surface-raised p-tile-sm text-balance type-headline-sm md:p-tile md:type-headline lg:col-span-5">
+            {copy["service.blog"]}
+          </h2>
+          <ul class="col-span-2 grid content-start gap-gap lg:col-span-7">
+            {posts.map(({ entry, slug }) => (
+              <li>
+                <a class="group feedback grid gap-md bg-surface-raised p-tile-sm hover:bg-field hover:text-on-field md:p-tile" href={articlePath(locale, slug)}>
+                  <h3 class="text-balance type-statement-sm md:type-statement">{entry.data.title}</h3>
+                  <p class="max-w-(--spacing-measure)">{entry.data.description}</p>
+                  <p class="type-small text-on-surface-muted group-hover:text-on-field">
+                    <time datetime={entry.data.published.toISOString().slice(0, 10)}>{formatDate(locale, entry.data.published)}</time>
+                    {` · ${readingMinutes(entry.body ?? "")} ${copy["blog.minutes"]}`}
+                  </p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
 
     <nav class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="others-title">
       <h2 id="others-title" class="col-span-2 bg-surface-raised p-tile-sm text-balance type-headline-sm md:p-tile md:type-headline lg:col-span-3">
