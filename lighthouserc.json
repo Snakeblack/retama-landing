@@ -3,7 +3,12 @@
     "collect": {
       "startServerCommand": "pnpm serve:dist --port 4398",
       "startServerReadyPattern": "Ready on",
-      "url": ["http://localhost:4398/", "http://localhost:4398/en/", "http://localhost:4398/legal/"],
+      "url": [
+        "http://localhost:4398/",
+        "http://localhost:4398/en/",
+        "http://localhost:4398/legal/",
+        "http://localhost:4398/servicios/software-a-medida/"
+      ],
       "numberOfRuns": 3,
       "settings": {
         "chromeFlags": "--headless=new --no-sandbox"

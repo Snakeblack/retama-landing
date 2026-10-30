@@ -127,6 +127,14 @@ describe("structuredData", () => {
     // A card's offer carries its line; the others have no text of their own on the page.
     expect(catalog.itemListElement[0]?.itemOffered.description).toBe(es["services.webLine"]);
     expect(catalog.itemListElement[4]?.itemOffered).not.toHaveProperty("description");
+    // A card's service links its page in the page's language (owner, 2026-10-30); the others have none.
+    expect(catalog.itemListElement.slice(0, 4).map((offer) => offer.itemOffered.url)).toEqual([
+      "https://retama.example/servicios/webs-y-cms/",
+      "https://retama.example/servicios/software-a-medida/",
+      "https://retama.example/servicios/agentes-y-automatizaciones/",
+      "https://retama.example/servicios/seo-y-analitica/",
+    ]);
+    expect(catalog.itemListElement[4]?.itemOffered).not.toHaveProperty("url");
   });
 
   it("da el precio mínimo de cada oferta sin IVA, el mismo que su tarjeta o sus preguntas, y al mes lo mensual", () => {
@@ -266,6 +274,66 @@ describe("structuredData de un artículo", () => {
   });
 });
 
+describe("structuredData de una página de servicio", () => {
+  const nodes = (locale: "es" | "en", service?: "custom" | "agents") =>
+    structuredData(site, locale, [], false, undefined, service)["@graph"] as Record<string, unknown>[];
+  const described = (locale: "es" | "en", service?: "custom" | "agents") =>
+    nodes(locale, service).find((node) => node["@type"] === "Service");
+
+  it("describe el servicio que presta Retama, en el idioma de la página y con su propia imagen", () => {
+    expect(described("en")).toBeUndefined();
+    expect(described("en", "custom")).toMatchObject({
+      "@type": "Service",
+      "@id": "https://retama.example/en/services/custom-software/#service",
+      name: en["services.custom"],
+      description: en["service.custom.metaDescription"],
+      url: "https://retama.example/en/services/custom-software/",
+      image: "https://retama.example/og/en/services/custom-software.png",
+      provider: { "@id": "https://retama.example/#organization" },
+    });
+    expect(described("es", "custom")).toMatchObject({
+      name: es["services.custom"],
+      url: "https://retama.example/servicios/software-a-medida/",
+    });
+  });
+
+  it("sirve a la misma zona que Retama", () => {
+    const retama = nodes("es", "custom").find((node) => [node["@type"]].flat().includes("ProfessionalService"));
+    expect(described("es", "custom")?.areaServed).toEqual(retama?.areaServed);
+  });
+
+  it("da cada oferta de la página con su nombre y su precio mínimo sin IVA", () => {
+    expect(described("es", "custom")?.offers).toEqual([
+      {
+        "@type": "Offer",
+        name: es["service.custom.app"],
+        priceSpecification: {
+          "@type": "PriceSpecification",
+          minPrice: 8000,
+          priceCurrency: "EUR",
+          valueAddedTaxIncluded: false,
+        },
+      },
+      {
+        "@type": "Offer",
+        name: es["offers.desktop"],
+        priceSpecification: {
+          "@type": "PriceSpecification",
+          minPrice: 10000,
+          priceCurrency: "EUR",
+          valueAddedTaxIncluded: false,
+        },
+      },
+    ]);
+    const agents = described("en", "agents")?.offers as { priceSpecification: unknown }[];
+    expect(agents).toHaveLength(1);
+    expect(agents[0]?.priceSpecification).toMatchObject([
+      { "@type": "PriceSpecification", minPrice: 4000 },
+      { "@type": "UnitPriceSpecification", minPrice: 150, unitCode: "MON" },
+    ]);
+  });
+});
+
 describe("jsonLd", () => {
   it("no deja cerrar el script desde un texto", () => {
     const html = jsonLd({ name: "</script><script>alert(1)</script>" });
@@ -308,10 +376,19 @@ describe("llmsTxt", () => {
       expect(text).toContain(`](${new URL(path, site).href})`);
   });
 
-  it("da el correo de contacto y los servicios", () => {
+  it("da el correo de contacto y los servicios, cada uno enlazado a su página en inglés", () => {
     expect(text).toContain("hola@retama.dev");
+    expect(text).toContain(
+      `- [${en["services.custom"]}](https://retama.example/en/services/custom-software/): ${en["services.customLine"]} ${en["services.customFrom"]}.`,
+    );
     for (const key of ["services.web", "services.custom", "services.agents", "services.seo"] as const)
-      expect(text).toContain(`- ${en[key]}: ${en[`${key}Line`]} ${en[`${key}From`]}.`);
+      expect(text).toContain(`- [${en[key]}](`);
+  });
+
+  it("enlaza también las páginas de servicio en español", () => {
+    expect(text).toContain(
+      `- [${es["services.seo"]}](https://retama.example/servicios/seo-y-analitica/): ${en["services.seo"]}, in Spanish.`,
+    );
   });
 
   it("responde las preguntas de la portada, cada una enlazada a su capítulo", () => {
@@ -355,6 +432,14 @@ describe("openGraph", () => {
     expect(tags).toContainEqual(["article:published_time", "2026-10-23"]);
     expect(tags).toContainEqual(["article:modified_time", "2026-11-02"]);
     expect(tags.filter(([property]) => property === "og:type")).toHaveLength(1);
+  });
+
+  it("usa la imagen propia de la página cuando la tiene, como una página de servicio", () => {
+    const image = { path: "/og/servicios/webs-y-cms.png", alt: `${es["services.web"]}, ${es["service.imageAlt"]}` };
+    const tags = new Map(openGraph(site, "es", "/servicios/webs-y-cms/", "Webs", "Qué hace.", undefined, image));
+    expect(tags.get("og:type")).toBe("website");
+    expect(tags.get("og:image")).toBe("https://retama.example/og/servicios/webs-y-cms.png");
+    expect(tags.get("og:image:alt")).toBe("Webs y CMS, servicio de Retama");
   });
 
   it("usa la imagen y el territorio del español en las páginas en español", () => {

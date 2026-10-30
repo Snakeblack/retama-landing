@@ -1,9 +1,11 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { locales } from "../i18n/index";
 import { articlePath, entryLocale, entrySlug } from "./blog";
+import { servicePaths, services } from "./services";
 
 // What the sitemap says of a page beyond its URL, which @astrojs/sitemap (astro.config.mjs) knows nothing of: the dates
-// of the blog, and the translation of each article, which it cannot pair because every language has its own slug.
+// of the blog, and the translation of each article and service page, which it cannot pair because every language has
+// its own slug.
 
 /** An article as the sitemap reads it: its id, `<locale>/<slug>`, and the key and dates of its front matter. */
 export interface SitemapArticle {
@@ -13,9 +15,10 @@ export interface SitemapArticle {
   updated?: Date | undefined;
 }
 
-/** A page's lastmod and, for an article, its translations, as @astrojs/sitemap's serialize takes them. */
+/** A page's lastmod and, for an article or a service page, its translations, as @astrojs/sitemap's serialize takes
+ * them. */
 export interface SitemapExtra {
-  lastmod: string;
+  lastmod?: string;
   links?: { url: string; lang: string }[];
 }
 
@@ -43,9 +46,9 @@ export function readArticles(dir: URL): SitemapArticle[] {
 const day = (date: Date) => date.toISOString().slice(0, 10);
 const changed = (article: SitemapArticle) => article.updated ?? article.published;
 
-/** By absolute URL: each article with its last change and its translations, and each language's blog index with the
- * last change of its newest article. Pages with no date of their own, like the home, get nothing: a build date would
- * change on every deploy. */
+/** By absolute URL: each article with its last change and its translations, each language's blog index with the last
+ * change of its newest article, and each service page with its translations. A page with no date of its own, like the
+ * home or a service page, gets no lastmod: a build date would change on every deploy. */
 export function sitemapExtras(site: URL, articles: SitemapArticle[]): Map<string, SitemapExtra> {
   const url = (article: SitemapArticle) =>
     new URL(articlePath(entryLocale(article.id), entrySlug(article.id)), site).href;
@@ -64,6 +67,11 @@ export function sitemapExtras(site: URL, articles: SitemapArticle[]): Map<string
       extras.set(new URL(articlePath(locale), site).href, {
         lastmod: day(new Date(Math.max(...dates.map(Number)))),
       });
+  }
+  for (const { id } of services) {
+    const paths = servicePaths(id);
+    const links = locales.map((locale) => ({ url: new URL(paths[locale], site).href, lang: locale }));
+    for (const { url } of links) extras.set(url, { links });
   }
   return extras;
 }

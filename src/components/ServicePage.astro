@@ -1,0 +1,136 @@
+---
+import { type Locale, localizedPath, t } from "../i18n/index";
+import Base from "../layouts/Base.astro";
+import { type Service, servicePath, servicePaths, services } from "../lib/services";
+import DecisionSheet from "./DecisionSheet.astro";
+import Footer from "./board/Footer.astro";
+import RetamaDots from "./board/RetamaDots.astro";
+
+interface Props {
+  locale: Locale;
+  service: Service;
+}
+
+const { locale, service } = Astro.props;
+const { id, offers, part, includes, fits, steps } = service;
+const copy = t(locale);
+const name = copy[`services.${id}`];
+// The plant's tile takes its card's ground: the third card is the field (src/components/board/Services.astro).
+const field = services.indexOf(service) === 2;
+const others = services.filter((other) => other !== service);
+const link = "feedback grid content-start gap-sm bg-surface-raised p-tile-sm hover:bg-field hover:text-on-field md:p-tile";
+---
+
+<!-- DESIGN.md Layout, the service pages (owner, 2026-10-30): one page per service and language. The title with the
+     prices and the action beside its card's part of the retama, then what it includes, when it fits and how it starts,
+     the decisions Retama would write first and the other services, 128px apart like the home's chapters. -->
+<Base
+  locale={locale}
+  title={copy[`service.${id}.metaTitle`]}
+  description={copy[`service.${id}.metaDescription`]}
+  trail={[{ name, path: servicePath(locale, id) }]}
+  paths={servicePaths(id)}
+  service={id}
+>
+  <div class="mt-(--header-height) grid gap-section px-margin pt-xl" data-grounds>
+    <div class="grid grid-cols-2 gap-gap lg:grid-cols-12">
+      <div class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-7">
+        <h1 class="text-balance type-headline-sm md:type-headline">{copy[`service.${id}.title`]}</h1>
+        <p class="max-w-(--spacing-measure) type-statement-sm md:type-statement">{copy[`service.${id}.lead`]}</p>
+        {
+          offers.length === 1 ? (
+            <p class="type-body-strong">{copy[offers[0].text]}</p>
+          ) : (
+            <dl class="grid max-w-(--spacing-measure) gap-xs">
+              {offers.map((offer) => (
+                <div class="grid gap-xs bg-surface p-md md:grid-cols-3">
+                  <dt class="type-small text-on-surface-muted">{copy[offer.name]}</dt>
+                  <dd class="type-body-strong md:col-span-2">{copy[offer.text]}</dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+        <a class="feedback flex min-h-(--spacing-touch) w-fit items-center bg-primary px-lg type-label text-on-primary hover:bg-field hover:text-on-field" href={`${localizedPath(locale, "/")}#${copy["anchor.contact"]}`}>
+          {copy["nav.talk"]}
+        </a>
+      </div>
+      <div class:list={["relative col-span-2 aspect-5/2 lg:col-span-5 lg:aspect-auto", field ? "bg-field text-on-field" : "bg-surface-raised"]}>
+        <RetamaDots />
+        <svg class="absolute inset-0 size-full" viewBox={part} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <use href="#retama-dots" />
+        </svg>
+      </div>
+    </div>
+
+    <section class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="includes-title">
+      <h2 id="includes-title" class="col-span-2 bg-surface-raised p-tile-sm text-balance type-headline-sm md:p-tile md:type-headline lg:col-span-4">
+        {copy["service.includes"]}
+      </h2>
+      <!-- Two by two when they pair up; three go in one column, so the tile holds no hole. -->
+      <ul class:list={["col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-8", { "md:grid-cols-2": includes.length % 2 === 0 }]}>
+        {
+          includes.map(([lead, text]) => (
+            <li class="max-w-(--spacing-measure)">
+              <strong class="type-body-strong">{copy[lead]}</strong> {copy[text]}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <div class="grid grid-cols-2 gap-gap lg:grid-cols-12">
+      <section class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-6" aria-labelledby="fits-title">
+        <h2 id="fits-title" class="text-balance type-headline-sm md:type-headline">{copy["service.fits"]}</h2>
+        <ul class="grid gap-xs">
+          {
+            fits.map((fit) => (
+              <li class="flex items-start gap-sm bg-surface p-md">
+                <span class="mt-sm size-sm shrink-0 bg-primary" aria-hidden="true" />
+                {copy[fit]}
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+      <section class="col-span-2 grid content-start gap-lg bg-surface-raised p-tile-sm md:p-tile lg:col-span-6" aria-labelledby="start-title">
+        <h2 id="start-title" class="text-balance type-headline-sm md:type-headline">{copy["service.start"]}</h2>
+        <ol class="grid gap-md">
+          {
+            steps.map(([lead, rest]) => (
+              <li class="max-w-(--spacing-measure)">
+                <strong class="type-body-strong">{copy[lead]}</strong> {copy[rest]}
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+    </div>
+
+    <section class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="sheet-title">
+      <!-- As tall as its text and in view while the sheets scroll, so it never holds a hole beside two of them. -->
+      <div class="col-span-2 grid content-start gap-lg self-start bg-surface-raised p-tile-sm md:p-tile lg:sticky lg:top-(--header-clearance) lg:col-span-5">
+        <h2 id="sheet-title" class="text-balance type-headline-sm md:type-headline">{copy["service.sheetTitle"]}</h2>
+        <p class="max-w-(--spacing-measure)">{copy["service.sheetLead"]}</p>
+      </div>
+      <div class="col-span-2 grid gap-gap lg:col-span-7">
+        {service.sheets.map((sheet) => <DecisionSheet locale={locale} sheet={sheet} />)}
+      </div>
+    </section>
+
+    <nav class="grid grid-cols-2 gap-gap lg:grid-cols-12" aria-labelledby="others-title">
+      <h2 id="others-title" class="col-span-2 bg-surface-raised p-tile-sm text-balance type-headline-sm md:p-tile md:type-headline lg:col-span-3">
+        {copy["service.others"]}
+      </h2>
+      {
+        others.map((other) => (
+          <a class={`${link} col-span-2 lg:col-span-3`} href={servicePath(locale, other.id)}>
+            <span class="text-balance type-statement-sm md:type-statement">{copy[`services.${other.id}`]}</span>
+            <span class="max-w-(--spacing-measure)">{copy[`services.${other.id}Line`]}</span>
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+  <Footer slot="footer" locale={locale} />
+</Base>

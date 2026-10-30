@@ -60,12 +60,23 @@ describe("sitemapExtras", () => {
   });
 
   it("no fecha las páginas sin una fecha propia, como la portada y la legal", () => {
-    expect([...extras.keys()]).toHaveLength(6);
     for (const path of ["/", "/en/", "/legal/", "/en/legal/"]) expect(extras.has(new URL(path, site).href)).toBe(false);
   });
 
+  it("empareja cada página de servicio con su traducción, sin fecha", () => {
+    const pair = [
+      { url: "https://retama.example/servicios/software-a-medida/", lang: "es" },
+      { url: "https://retama.example/en/services/custom-software/", lang: "en" },
+    ];
+    expect(extras.get("https://retama.example/servicios/software-a-medida/")).toEqual({ links: pair });
+    expect(extras.get("https://retama.example/en/services/custom-software/")).toEqual({ links: pair });
+    // The four articles, the two blog indexes and the eight service pages.
+    expect([...extras.keys()]).toHaveLength(14);
+  });
+
   it("no fecha el índice de un blog sin artículos", () => {
-    expect(sitemapExtras(site, []).size).toBe(0);
+    const empty = sitemapExtras(site, []);
+    expect([...empty.keys()].some((url) => url.includes("/blog/"))).toBe(false);
   });
 });
 

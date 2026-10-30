@@ -61,6 +61,108 @@ export const en = {
   "services.figure": "1",
   "services.figureCaption": "person to talk to for the whole project.",
 
+  "service.includes": "What it includes",
+  "service.fits": "When it fits",
+  "service.start": "How it starts",
+  "service.sheetTitle": "What we would decide first",
+  "service.sheetLead": "An example of the first decisions we would put in writing on a project like this.",
+  "service.others": "Other services",
+  "service.imageAlt": "a Retama service",
+  "service.proposal": "A free written proposal,",
+  "service.proposalRest": "with the options, what each one costs and what we would rule out.",
+  "service.diagnosis": "A fixed-price diagnosis, from €900 + VAT,",
+  "service.diagnosisRest":
+    "with the decision document, the fixed quote and a prototype of the key screen. It is deducted if we carry on.",
+  "service.deliveries": "A delivery every one or two weeks,",
+  "service.deliveriesRest": "which you open in your browser, with what we have decided and what comes next.",
+  "service.warranty": "Three months of warranty, once the project is paid,",
+  "service.warrantyRest":
+    "from the day you start using it: we fix at no cost the faults against what the proposal agreed.",
+
+  "service.web.metaTitle": "Web design and CMS for businesses · Retama",
+  "service.web.metaDescription":
+    "Landing pages and websites with a CMS for businesses, fast on mobile. From €1,500 + VAT, 1 to 4 weeks, with a free proposal.",
+  "service.web.title": "Web design and CMS",
+  "service.web.lead":
+    "A landing page to present what you sell, or a website with a content management system so your team publishes without calling us.",
+  "service.web.landing": "Landing page",
+  "service.web.landingFrom": "From €1,500 + VAT · 1 to 2 weeks",
+  "service.web.cmsFrom": "From €3,500 + VAT · 2 to 4 weeks",
+  "service.web.i1": "Ready for search engines.",
+  "service.web.i1Text":
+    "Every page with its title, its description and its structured data, and a sitemap that lists them all.",
+  "service.web.i2": "In one language or several.",
+  "service.web.i2Text": "Each language at its own address, so Google shows every visitor theirs.",
+  "service.web.i3": "Visits counted without tracking cookies.",
+  "service.web.i3Text": "As on this website: you know which pages are read without following anyone from site to site.",
+  "service.web.i4": "Yours outright.",
+  "service.web.i4Text":
+    "Once it is paid in full, the code and the documentation are yours, and you can carry on with us or with anyone you like.",
+  "service.web.fit1":
+    "You are launching a product or a service and need a page that explains it and collects the enquiries.",
+  "service.web.fit2": "Your website is slow to load, or changing a line of text depends on someone else.",
+  "service.web.fit3": "Your team often publishes news, offers or product pages and wants to do it without help.",
+
+  "service.custom.metaTitle": "Custom software development: web and desktop · Retama",
+  "service.custom.metaDescription":
+    "Custom web and desktop applications for businesses, for when Excel gives out. A fixed price after a diagnosis, from €8,000 + VAT.",
+  "service.custom.title": "Custom software development",
+  "service.custom.lead":
+    "A web or desktop application built around how your company works, for when spreadsheets and email give out.",
+  "service.custom.app": "Web application",
+  "service.custom.appFrom": "From €8,000 + VAT · 4 to 8 weeks",
+  "service.custom.desktopFrom": "From €10,000 + VAT · 6 to 10 weeks",
+  "service.custom.i1": "Linked to what you already use.",
+  "service.custom.i1Text": "Your ERP, your warehouse or your spreadsheets, without changing systems.",
+  "service.custom.i2": "In the browser or on the computer.",
+  "service.custom.i2Text": "On the web, to use from anywhere, or on the desktop, installed on each computer.",
+  "service.custom.i3": "The code and the decisions, yours.",
+  "service.custom.i3Text":
+    "Once it is paid in full, you take the code, the documentation and the written decisions of the project.",
+  "service.custom.i4": "In phases, if you prefer.",
+  "service.custom.i4Text": "A first MVP that grows in short cycles, or the whole scope fixed from the start.",
+  "service.custom.fit1": "Your team spends hours copying data from one spreadsheet to another.",
+  "service.custom.fit2": "Orders or approvals live in email and in someone's memory.",
+  "service.custom.fit3": "No software on the market fits the way you work.",
+
+  "service.agents.metaTitle": "AI agents and automation for businesses · Retama",
+  "service.agents.metaDescription":
+    "Agents and automation that take the repetitive work and leave the decisions to your team. From €4,000 + VAT and €150 a month.",
+  "service.agents.title": "AI agents and automation",
+  "service.agents.lead":
+    "An agent or an automation does the repetitive work, such as moving the orders from email into your system, and your team confirms what matters.",
+  "service.agents.i1": "Linked to what you already use.",
+  "service.agents.i1Text": "It works with your email, your ERP or your spreadsheets, without changing systems.",
+  "service.agents.i2": "A fixed price.",
+  "service.agents.i2Text": "Setting it up has the fixed price of the proposal, never by the hour.",
+  "service.agents.i3": "Running and supervision.",
+  "service.agents.i3Text": "A fee from €150 a month so it keeps running and someone keeps an eye on it.",
+  "service.agents.fit1": "Someone on your team moves data from emails or PDFs into another system every day.",
+  "service.agents.fit2": "Preparing the same report every week takes hours of copy and paste.",
+  "service.agents.fit3": "You hear about an incident when the customer calls.",
+
+  "service.seo.metaTitle": "Technical SEO and cookie-free analytics · Retama",
+  "service.seo.metaDescription":
+    "A technical SEO audit, an improvement plan and cookie-free analytics installed on your website. From €800 + VAT, no monthly fee, with a free proposal.",
+  "service.seo.title": "Technical SEO and analytics",
+  "service.seo.lead":
+    "We review what stops Google from finding and understanding your website, and leave you analytics that show what works, without tracking cookies.",
+  "service.seo.i1": "A technical audit.",
+  "service.seo.i1Text": "The speed, titles, links, sitemap, structured data and languages of your website.",
+  "service.seo.i2": "An improvement plan, in order.",
+  "service.seo.i2Text": "What to fix first and why, for your team to do or for us to quote.",
+  "service.seo.i3": "Cookie-free analytics, installed.",
+  "service.seo.i3Text":
+    "You know which pages are read, where the visits come from and how long each page takes to load.",
+  "service.seo.i4": "No monthly fee.",
+  "service.seo.i4Text": "It is a one-off job: we do not sell monthly content SEO.",
+  "service.seo.fit1": "Your website exists, but hardly anyone reaches it from Google.",
+  "service.seo.fit2": "You do not know which pages are read or where your customers come from.",
+  "service.seo.fit3": "You have moved to a new website and do not know whether you lost visits on the way.",
+  "service.seo.step2": "The audit and the plan, in writing,",
+  "service.seo.step2Rest":
+    "with what we found and what to fix first, and the analytics already running on your website.",
+
   "sectors.title": "Who we work with",
   "sectors.builds": "What we can do",
   "frag.example": "Example",
@@ -179,6 +281,13 @@ export const en = {
   "live.agents.r2": "If something goes wrong, you know why and since when.",
   "live.agents.d3": "We measure the savings before we scale.",
   "live.agents.r3": "We only automate more of what has already given you hours back.",
+  "live.seo": "SEO",
+  "live.seo.d1": "First, what holds Google back.",
+  "live.seo.r1": "Slow pages, broken links and what does not get indexed come before keywords.",
+  "live.seo.d2": "Measuring without following anyone.",
+  "live.seo.r2": "Visits are counted in aggregate, without cookies and without a profile of each visitor.",
+  "live.seo.d3": "Every improvement, with its reason.",
+  "live.seo.r3": "Why each thing changed is written down, for your team or for whoever comes next.",
 
   "team.title": "Who we are",
   "team.lead": "Two brothers: one looks after you, the other builds.",

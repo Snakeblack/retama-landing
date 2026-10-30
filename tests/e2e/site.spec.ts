@@ -164,7 +164,8 @@ test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga 
   page,
   request,
 }) => {
-  for (const url of await sitemapUrls(request)) {
+  const urls = await sitemapUrls(request);
+  for (const url of urls) {
     await page.goto(new URL(url).pathname);
     const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
     expect(blocks, url).toHaveLength(1);
@@ -174,12 +175,14 @@ test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga 
     const retama = graph.find((node) => node["@id"] === new URL("/#organization", url).href);
     expect(retama, url).not.toHaveProperty("address");
 
-    // The breadcrumb climbs from the page to the home of its language, one step per folder: legal, blog, article.
+    // The breadcrumb climbs from the page to the home of its language, one step per folder that is a page: legal,
+    // blog, article; a service page hangs from the home, since its folder is none (owner, 2026-10-30).
     const trail = graph.find((node) => node["@type"] === "BreadcrumbList");
     const home = new URL(new URL(url).pathname.startsWith("/en/") ? "/en/" : "/", url).href;
     if (url !== home) {
-      const expected = [url];
-      while (expected[0] !== home) expected.unshift(new URL("..", expected[0]).href);
+      const folders = [url];
+      while (folders[0] !== home) folders.unshift(new URL("..", folders[0]).href);
+      const expected = folders.filter((folder) => folder === home || urls.includes(folder));
       const steps = trail?.itemListElement as { item: string }[];
       expect(
         steps.map((step) => step.item),
@@ -189,7 +192,7 @@ test("JSON-LD de Retama y del sitio en todas las páginas del sitemap, con miga 
   }
 });
 
-test("Open Graph con la imagen de su idioma, o la suya en los artículos, en todas las páginas del sitemap", async ({
+test("Open Graph con la imagen de su idioma, o la suya en los artículos y los servicios, en todas las páginas del sitemap", async ({
   page,
   request,
 }) => {
@@ -203,10 +206,14 @@ test("Open Graph con la imagen de su idioma, o la suya en los artículos, en tod
     expect(await og("og:image:alt"), url).toBeTruthy();
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
 
-    // An article has its own, named after its slug under its language's folder (src/lib/blog.ts, ogImagePath).
+    // An article has its own, named after its slug under its language's folder (src/lib/blog.ts, ogImagePath), and a
+    // service page its own under og/ at the page's path (src/lib/services.ts, serviceImagePath).
     const image = await og("og:image");
-    const slug = new URL(url).pathname.match(/\/blog\/([^/]+)\/$/)?.[1];
-    expect(image, url).toBe(new URL(slug ? `/og/${lang}/${slug}.png` : `/og/${lang}.png`, url).href);
+    const { pathname } = new URL(url);
+    const slug = pathname.match(/\/blog\/([^/]+)\/$/)?.[1];
+    const service = /^(\/en)?\/(servicios|services)\/[^/]+\/$/.test(pathname);
+    const own = service ? `/og${pathname.slice(0, -1)}.png` : slug ? `/og/${lang}/${slug}.png` : `/og/${lang}.png`;
+    expect(image, url).toBe(new URL(own, url).href);
     const response = await request.get(new URL(image ?? "").pathname);
     expect(response.status(), image ?? "").toBe(200);
     expect(response.headers()["content-type"]).toBe("image/png");
@@ -231,7 +238,7 @@ test("los títulos de la portada y del blog nombran el software a medida y a Ret
   }
 });
 
-test("el sitemap fecha y empareja los artículos y fecha los índices del blog, no las páginas sin fecha", async ({
+test("el sitemap fecha y empareja los artículos, empareja los servicios y fecha los índices del blog, no las páginas sin fecha", async ({
   request,
 }) => {
   const index = await (await request.get("/sitemap-index.xml")).text();
@@ -255,6 +262,15 @@ test("el sitemap fecha y empareja los artículos y fecha los índices del blog, 
     for (const link of pair) expect(entry(path), path).toContain(link);
   }
   for (const path of ["/blog/", "/en/blog/"]) expect(entry(path), path).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}/);
+  // A service page too, with no date of its own (owner, 2026-10-30).
+  const service = [
+    '<xhtml:link rel="alternate" hreflang="es" href="https://retama.dev/servicios/software-a-medida/"/>',
+    '<xhtml:link rel="alternate" hreflang="en" href="https://retama.dev/en/services/custom-software/"/>',
+  ];
+  for (const path of ["/servicios/software-a-medida/", "/en/services/custom-software/"]) {
+    expect(entry(path), path).not.toContain("<lastmod>");
+    for (const link of service) expect(entry(path), path).toContain(link);
+  }
   // A build date would change on every deploy: a page with no date of its own gets none.
   for (const path of ["/", "/en/", "/legal/", "/en/legal/"]) expect(entry(path), path).not.toContain("<lastmod>");
 });
