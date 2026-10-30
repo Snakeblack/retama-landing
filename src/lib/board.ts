@@ -102,8 +102,8 @@ export const questions = [
 ] as const;
 
 /** The decision sheets, as i18n keys: each kind of project with the first three decisions Retama would record for it,
- * each decision with its reason. The method shows the first four as its projects (DESIGN.md Overview); the service
- * pages show them too. */
+ * each decision with its reason. The method shows the first four as its projects (DESIGN.md Overview); each service
+ * page shows its own (src/lib/services.ts), SEO's included. */
 export const sheets = {
   web: ["live.web", ["live.web.d1", "live.web.r1"], ["live.web.d2", "live.web.r2"], ["live.web.d3", "live.web.r3"]],
   custom: [
@@ -124,4 +124,5 @@ export const sheets = {
     ["live.agents.d2", "live.agents.r2"],
     ["live.agents.d3", "live.agents.r3"],
   ],
+  seo: ["live.seo", ["live.seo.d1", "live.seo.r1"], ["live.seo.d2", "live.seo.r2"], ["live.seo.d3", "live.seo.r3"]],
 } as const;

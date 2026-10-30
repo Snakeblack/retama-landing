@@ -59,6 +59,107 @@ export const es = {
   "services.figure": "1",
   "services.figureCaption": "interlocutor durante todo el proyecto.",
 
+  "service.includes": "Qué incluye",
+  "service.fits": "Cuándo encaja",
+  "service.start": "Cómo empieza",
+  "service.sheetTitle": "Lo primero que decidiríamos",
+  "service.sheetLead": "Un ejemplo de las primeras decisiones que dejaríamos por escrito en un proyecto así.",
+  "service.others": "Otros servicios",
+  "service.imageAlt": "servicio de Retama",
+  "service.proposal": "Una propuesta gratis, por escrito,",
+  "service.proposalRest": "con las opciones, lo que cuesta cada una y lo que descartaríamos.",
+  "service.diagnosis": "Un diagnóstico de precio fijo, desde 900 € + IVA,",
+  "service.diagnosisRest":
+    "con el documento de decisiones, el presupuesto cerrado y un prototipo de la pantalla clave. Se descuenta si seguimos.",
+  "service.deliveries": "Una entrega cada una o dos semanas,",
+  "service.deliveriesRest": "que abres en tu navegador, con lo que hemos decidido y lo que viene.",
+  "service.warranty": "Tres meses de garantía, con el proyecto pagado,",
+  "service.warrantyRest":
+    "desde que empiezas a usarlo: corregimos sin coste los fallos frente a lo acordado en la propuesta.",
+
+  "service.web.metaTitle": "Diseño web y CMS para empresas · Retama",
+  "service.web.metaDescription":
+    "Landing pages y webs con gestor de contenidos para empresas, rápidas en el móvil. Desde 1.500 € + IVA, de 1 a 4 semanas, con propuesta gratis.",
+  "service.web.title": "Diseño web y CMS para empresas",
+  "service.web.lead":
+    "Una landing para presentar lo que vendes, o una web con gestor de contenidos para que tu equipo publique sin llamarnos.",
+  "service.web.landing": "Landing page",
+  "service.web.landingFrom": "Desde 1.500 € + IVA · de 1 a 2 semanas",
+  "service.web.cmsFrom": "Desde 3.500 € + IVA · de 2 a 4 semanas",
+  "service.web.i1": "Preparada para buscadores.",
+  "service.web.i1Text":
+    "Cada página con su título, su descripción y sus datos estructurados, y un sitemap que la lista entera.",
+  "service.web.i2": "En uno o varios idiomas.",
+  "service.web.i2Text": "Cada idioma con su propia dirección, para que Google muestre a cada visitante la suya.",
+  "service.web.i3": "Visitas contadas sin cookies de seguimiento.",
+  "service.web.i3Text": "Como en esta web: sabes qué páginas se leen sin seguir a nadie de una web a otra.",
+  "service.web.i4": "Tuya del todo.",
+  "service.web.i4Text":
+    "Cuando la pagas entera, el código y la documentación son tuyos, y puedes seguir con nosotros o con quien quieras.",
+  "service.web.fit1": "Lanzas un producto o un servicio y necesitas una página que lo explique y recoja los contactos.",
+  "service.web.fit2": "Tu web tarda en cargar, o cambiar un texto depende de otra persona.",
+  "service.web.fit3": "Tu equipo publica noticias, ofertas o fichas a menudo y quiere hacerlo sin ayuda.",
+
+  "service.custom.metaTitle": "Desarrollo de software a medida: web y escritorio · Retama",
+  "service.custom.metaDescription":
+    "Aplicaciones web y de escritorio a medida para empresas, cuando Excel ya no da más. Precio cerrado tras un diagnóstico, desde 8.000 € + IVA.",
+  "service.custom.title": "Desarrollo de software a medida",
+  "service.custom.lead":
+    "Una aplicación web o de escritorio hecha para cómo trabaja tu empresa, cuando las hojas de cálculo y el correo ya no dan más.",
+  "service.custom.app": "Aplicación web",
+  "service.custom.appFrom": "Desde 8.000 € + IVA · de 4 a 8 semanas",
+  "service.custom.desktopFrom": "Desde 10.000 € + IVA · de 6 a 10 semanas",
+  "service.custom.i1": "Conectada a lo que ya usas.",
+  "service.custom.i1Text": "Tu ERP, tu almacén o tus hojas de cálculo, sin cambiar de sistema.",
+  "service.custom.i2": "En el navegador o en el ordenador.",
+  "service.custom.i2Text": "Web, para usarla desde cualquier sitio, o de escritorio, instalada en cada equipo.",
+  "service.custom.i3": "El código y las decisiones, tuyos.",
+  "service.custom.i3Text":
+    "Cuando lo pagas entero, te llevas el código, la documentación y las decisiones escritas del proyecto.",
+  "service.custom.i4": "Por fases, si lo prefieres.",
+  "service.custom.i4Text":
+    "Un primer MVP que se amplía en ciclos cortos, o todo el alcance cerrado desde el principio.",
+  "service.custom.fit1": "Tu equipo pasa horas copiando datos de una hoja de cálculo a otra.",
+  "service.custom.fit2": "Los pedidos o las aprobaciones viven en el correo y en la memoria de alguien.",
+  "service.custom.fit3": "Ningún programa del mercado encaja con tu forma de trabajar.",
+
+  "service.agents.metaTitle": "Agentes de IA y automatizaciones para empresas · Retama",
+  "service.agents.metaDescription":
+    "Agentes y automatizaciones que se quedan el trabajo repetitivo y dejan las decisiones a tu equipo. Desde 4.000 € + IVA y 150 €/mes.",
+  "service.agents.title": "Agentes de IA y automatizaciones",
+  "service.agents.lead":
+    "Un agente o una automatización hace el trabajo repetitivo, como pasar los pedidos del correo a tu sistema, y tu equipo confirma lo que importa.",
+  "service.agents.i1": "Conectado a lo que ya usas.",
+  "service.agents.i1Text": "Trabaja con tu correo, tu ERP o tus hojas de cálculo, sin cambiar de sistema.",
+  "service.agents.i2": "Precio cerrado.",
+  "service.agents.i2Text": "La puesta en marcha tiene el precio fijo de la propuesta, nunca por horas.",
+  "service.agents.i3": "Funcionamiento y supervisión.",
+  "service.agents.i3Text": "Una cuota desde 150 € al mes para que siga funcionando y alguien lo vigile.",
+  "service.agents.fit1": "Alguien de tu equipo pasa cada día datos de correos o de PDF a otro sistema.",
+  "service.agents.fit2": "Preparar el mismo informe cada semana se lleva horas de copiar y pegar.",
+  "service.agents.fit3": "Te enteras de una incidencia cuando llama el cliente.",
+
+  "service.seo.metaTitle": "SEO técnico y analítica sin cookies · Retama",
+  "service.seo.metaDescription":
+    "Auditoría técnica de SEO, plan de mejoras y analítica sin cookies instalada en tu web. Desde 800 € + IVA, sin cuota mensual y con propuesta gratis.",
+  "service.seo.title": "SEO técnico y analítica",
+  "service.seo.lead":
+    "Revisamos lo que impide que Google encuentre y entienda tu web, y te dejamos instalada una analítica que dice qué funciona, sin cookies de seguimiento.",
+  "service.seo.i1": "Una auditoría técnica.",
+  "service.seo.i1Text":
+    "La velocidad, los títulos, los enlaces, el sitemap, los datos estructurados y los idiomas de tu web.",
+  "service.seo.i2": "Un plan de mejoras por orden.",
+  "service.seo.i2Text": "Qué arreglar primero y por qué, para que lo haga tu equipo o te lo presupuestemos.",
+  "service.seo.i3": "Analítica sin cookies, instalada.",
+  "service.seo.i3Text": "Sabes qué páginas se leen, de dónde llegan las visitas y cuánto tarda en cargar cada una.",
+  "service.seo.i4": "Sin cuota mensual.",
+  "service.seo.i4Text": "Es un trabajo puntual: no hacemos SEO de contenidos cada mes.",
+  "service.seo.fit1": "Tu web existe, pero casi nadie llega a ella desde Google.",
+  "service.seo.fit2": "No sabes qué páginas se leen ni de dónde vienen tus clientes.",
+  "service.seo.fit3": "Has cambiado de web y no sabes si has perdido visitas por el camino.",
+  "service.seo.step2": "La auditoría y el plan, por escrito,",
+  "service.seo.step2Rest": "con lo que hemos encontrado y qué arreglar primero, y la analítica ya instalada en tu web.",
+
   "sectors.title": "Para quién trabajamos",
   "sectors.builds": "Qué podemos hacer",
   "frag.example": "Ejemplo",
@@ -178,6 +279,13 @@ export const es = {
   "live.agents.r2": "Si algo sale mal, se sabe por qué y desde cuándo.",
   "live.agents.d3": "Medimos el ahorro antes de ampliar.",
   "live.agents.r3": "Solo automatizamos más lo que ya te ha devuelto horas.",
+  "live.seo": "SEO",
+  "live.seo.d1": "Primero, lo que frena a Google.",
+  "live.seo.r1": "Las páginas lentas, los enlaces rotos y lo que no se indexa van antes que las palabras clave.",
+  "live.seo.d2": "Medir sin seguir a nadie.",
+  "live.seo.r2": "Las visitas se cuentan en conjunto, sin cookies y sin perfiles de cada visitante.",
+  "live.seo.d3": "Cada mejora, con su motivo.",
+  "live.seo.r3": "Queda por escrito por qué se cambió cada cosa, para tu equipo o para quien venga después.",
 
   "team.title": "Quiénes somos",
   "team.lead": "Dos hermanos: uno lleva el trato contigo y el otro construye.",
