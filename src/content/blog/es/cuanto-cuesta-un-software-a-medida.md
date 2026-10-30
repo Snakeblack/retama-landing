@@ -3,12 +3,12 @@ key: software-cost
 title: Cuánto cuesta un software a medida
 description: Por qué nadie serio te da un precio sin preguntar antes, qué hace que un proyecto cueste más o menos y cómo pedir un presupuesto que se pueda comparar.
 published: 2026-10-23
-updated: 2026-10-26
+updated: 2026-10-30
 ---
 
 Es la primera pregunta de casi cualquier cliente, y la respuesta honesta empieza por otra: ¿qué tiene que hacer exactamente? Un software a medida no tiene precio de catálogo, porque no hay dos iguales. Lo que sí se puede es explicar de qué depende, para que sepas qué estás pagando y puedas comparar propuestas.
 
-Lo que sí tiene es un suelo. Con nosotros, un software a medida empieza en 8.000 € sin IVA, y su precio cerrado sale de un diagnóstico de precio fijo, desde 900 €, que se descuenta si seguimos.
+Lo que sí tiene es un suelo. Con nosotros, [un software a medida](/servicios/software-a-medida/) empieza en 8.000 € sin IVA, y su precio cerrado sale de un diagnóstico de precio fijo, desde 900 €, que se descuenta si seguimos.
 
 ## Lo que mueve el precio
 

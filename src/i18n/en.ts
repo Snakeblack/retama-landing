@@ -66,6 +66,7 @@ export const en = {
   "service.start": "How it starts",
   "service.sheetTitle": "What we would decide first",
   "service.sheetLead": "An example of the first decisions we would put in writing on a project like this.",
+  "service.blog": "From the blog",
   "service.others": "Other services",
   "service.imageAlt": "a Retama service",
   "service.proposal": "A free written proposal,",

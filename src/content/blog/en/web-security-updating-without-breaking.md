@@ -3,6 +3,7 @@ key: web-security-updates
 title: "Web security: updating without breaking"
 description: What happened this year with PHP, Java and Node, why an application nobody touches is not safe, and how we update ours without changing what they do.
 published: 2026-10-28
+updated: 2026-10-30
 ---
 
 On 21 October 2026, PHP and Node.js both released fixes for serious flaws. Back in August, CISA, the United States cybersecurity agency, had warned that attackers were exploiting a flaw in Apache Tomcat, the server that runs many applications written in Java. If your business uses a web application, it most likely runs on one of the three.
@@ -38,7 +39,7 @@ The same method avoids both: update often, in fixed steps, and in no hurry for w
 
 ## How we do it at Retama
 
-This is what we do in everything we build and maintain, starting with this website. It is also what our monthly maintenance includes, from €120 for a website and €250 for custom software, excluding VAT.
+This is what we do in everything we build and maintain, starting with this website. It is also what our monthly maintenance includes, from €120 for [a website](/en/services/websites-and-cms/) and €250 for custom software, excluding VAT.
 
 - **We keep the exact list of what each application contains.** Every project records the version of each package, so what we test is exactly what goes live.
 - **We check it every day against known flaws.** An automatic review compares it with the public databases of security flaws every day and on every change, and tells us as soon as one appears.
