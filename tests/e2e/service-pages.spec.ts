@@ -158,6 +158,17 @@ for (const { home, chapter, pages } of languages)
       await page.goto(home);
       const card = page.getByRole("region", { name: chapter }).getByRole("listitem").nth(index);
       await expect(card.getByRole("link")).toHaveAttribute("href", path);
+      // Coming on screen the cards rise into place (DESIGN.md Motion), and the click checks for a still card before it
+      // scrolls: the card goes there first and the click waits for it to settle, so it never lands where it was.
+      await card.scrollIntoViewIfNeeded();
+      await expect
+        .poll(() =>
+          card.evaluate((item) => {
+            const style = getComputedStyle(item);
+            return style.opacity === "1" && new DOMMatrix(style.transform).isIdentity;
+          }),
+        )
+        .toBe(true);
       // The foot of the card, on its plant, far from the name.
       const box = await card.boundingBox();
       await card.click({ position: { x: 24, y: (box?.height ?? 0) - 24 } });
