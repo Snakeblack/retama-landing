@@ -6,8 +6,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { readMotion } from "../lib/motion";
 
-gsap.registerPlugin(ScrollTrigger);
-
 const root = getComputedStyle(document.documentElement);
 const motion = readMotion((name) => root.getPropertyValue(name));
 // DESIGN.md: entrances rise 16–32px; the spacing token lg sits in that range.
@@ -22,30 +20,36 @@ const QUERIES = {
   still: "(prefers-reduced-motion: reduce)",
 };
 
-/** Inside each group the tiles enter in order, once, as the group arrives; lists arrive row by row. */
-function entrances(move: boolean) {
-  for (const group of document.querySelectorAll<HTMLElement>("main section[id]")) {
-    const timeline = gsap.timeline({
-      paused: true,
-      defaults: { duration: motion.duration.reveal, ease: motion.ease.out },
-    });
-    // A tile hidden at load (the booking) shows when it is asked for, not with its group: tweening it while hidden
-    // would make GSAP lift it out of the page to measure it, and a framed page reloads when it moves.
-    const tiles = [...group.children].filter((tile) => !(tile as HTMLElement).hidden);
-    tiles.forEach((tile, index) => {
-      const at = index * motion.stagger.item;
-      if (!move) {
-        timeline.from(tile, { opacity: 0 }, at);
-      } else if (tile.querySelector(":scope > picture, :scope > [data-ui]")) {
-        timeline.from(tile, { clipPath: "inset(0 0 100% 0)", ease: motion.ease.expo }, at);
-      } else if (tile.matches("ul, ol, [data-rows]")) {
-        timeline.from(tile.children, { opacity: 0, y: RISE, stagger: motion.stagger.line }, at);
-      } else {
-        timeline.from(tile, { opacity: 0, y: RISE }, at);
-      }
-    });
-    ScrollTrigger.create({ trigger: group, start: "top 85%", once: true, onEnter: () => void timeline.play() });
-  }
+/**
+ * Whether the visitor may have seen this already: it is on screen or above it. The layer comes after the first paint
+ * (Home.astro), so a link to a chapter, a restored scroll or a quick one can get there first; what is there stays as
+ * the HTML has it, with no entrance and no count, so nothing already read goes away (owner, 2026-10-31).
+ */
+const seen = (node: Element) => node.getBoundingClientRect().top < innerHeight;
+
+/** Inside a group the tiles enter in order, once, as the group arrives; lists arrive row by row. */
+function entrance(group: HTMLElement, move: boolean) {
+  if (seen(group)) return;
+  const timeline = gsap.timeline({
+    paused: true,
+    defaults: { duration: motion.duration.reveal, ease: motion.ease.out },
+  });
+  // A tile hidden at load (the booking) shows when it is asked for, not with its group: tweening it while hidden
+  // would make GSAP lift it out of the page to measure it, and a framed page reloads when it moves.
+  const tiles = [...group.children].filter((tile) => !(tile as HTMLElement).hidden);
+  tiles.forEach((tile, index) => {
+    const at = index * motion.stagger.item;
+    if (!move) {
+      timeline.from(tile, { opacity: 0 }, at);
+    } else if (tile.querySelector(":scope > picture, :scope > [data-ui]")) {
+      timeline.from(tile, { clipPath: "inset(0 0 100% 0)", ease: motion.ease.expo }, at);
+    } else if (tile.matches("ul, ol, [data-rows]")) {
+      timeline.from(tile.children, { opacity: 0, y: RISE, stagger: motion.stagger.line }, at);
+    } else {
+      timeline.from(tile, { opacity: 0, y: RISE }, at);
+    }
+  });
+  ScrollTrigger.create({ trigger: group, start: "top 85%", once: true, onEnter: () => void timeline.play() });
 }
 
 /** Tiles stacked in one place: showing one wipes it in from the left over the rest, never left half cut. */
@@ -294,7 +298,7 @@ function countUp() {
   }));
   for (const { figure, text } of figures) {
     const target = Number(text.trim());
-    if (!Number.isInteger(target) || target <= 0) continue;
+    if (!Number.isInteger(target) || target <= 0 || seen(figure)) continue;
     const value = { n: 0 };
     const tween = gsap.to(value, {
       n: target,
@@ -313,13 +317,42 @@ function countUp() {
   };
 }
 
-const media = gsap.matchMedia();
-media.add(QUERIES, (context) => {
+/**
+ * Sets the board up for the media of the context, one step a task: each group's entrance, the switcher, the manifesto
+ * and the count. Each step runs inside the context, which reverts what it made when the media change.
+ */
+function board(context: gsap.Context) {
   const { move = false, still = false } = context.conditions ?? {};
   if (!move && !still) return;
-  entrances(move);
-  const cleanups = [sectorsSwitcher(move), manifesto(), move ? countUp() : undefined];
-  return () => {
-    for (const cleanup of cleanups) cleanup?.();
+  const groups = [...document.querySelectorAll<HTMLElement>("main section[id]")];
+  const steps: (() => (() => void) | undefined)[] = [
+    ...groups.map((group) => () => {
+      entrance(group, move);
+      return undefined;
+    }),
+    () => sectorsSwitcher(move),
+    manifesto,
+    ...(move ? [countUp] : []),
+  ];
+  const cleanups: (() => void)[] = [];
+  let timer = 0;
+  const run = (index: number) => {
+    const step = steps[index];
+    if (!step) return;
+    const cleanup = context.add(step);
+    if (cleanup) cleanups.push(cleanup);
+    timer = window.setTimeout(() => run(index + 1));
   };
+  timer = window.setTimeout(() => run(0));
+  return () => {
+    clearTimeout(timer);
+    for (const cleanup of cleanups) cleanup();
+  };
+}
+
+// scenario:perf-mobile: evaluating GSAP, registering ScrollTrigger and each step of the board take a task each, so none
+// holds the main thread long enough to count as blocking time.
+setTimeout(() => {
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.matchMedia().add(QUERIES, board);
 });

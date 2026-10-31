@@ -69,10 +69,25 @@ if (PUBLIC_BOOKING) Astro.csp?.insertDirective(bookingFrameDirective(bookingUrl)
 </Base>
 
 <!-- One bundle for the page: a second module script in the head costs Lighthouse a round trip before the first
-     paint (scenario:perf-mobile). -->
+     paint (scenario:perf-mobile). The motion layer comes after the first paint, below. -->
 <script>
   import "../scripts/booking";
   import "../scripts/contact";
-  import "../scripts/motion";
   import "../scripts/scene";
+
+  // scenario:perf-mobile: GSAP is most of the page's JavaScript, and a script asked for at high priority that is in
+  // before the first contentful paint counts in the first and largest paints Lighthouse simulates; a frame or an idle
+  // moment after the load can still come before that paint. So the motion layer is asked for once the page has loaded
+  // and painted, while what it moves is below the first screen (motion.ts). A browser without paint timing never
+  // asks for it and keeps the board as the HTML has it.
+  addEventListener(
+    "load",
+    () =>
+      new PerformanceObserver((entries, observer) => {
+        if (entries.getEntriesByName("first-contentful-paint").length === 0) return;
+        observer.disconnect();
+        void import("../scripts/motion");
+      }).observe({ type: "paint", buffered: true }),
+    { once: true },
+  );
 </script>

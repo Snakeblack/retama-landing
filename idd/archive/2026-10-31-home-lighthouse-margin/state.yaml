@@ -1,0 +1,491 @@
+{
+  "schema": "idd-state/v1",
+  "change": "home-lighthouse-margin",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "La portada (/ y /en/) va al filo del 100 de rendimiento de Lighthouse y el check lighthouse del CI falla de vez en cuando, también en main: GSAP viaja en el script de arranque y entra en el FCP y el LCP simulados, y montar el movimiento es una sola tarea larga que suma TBT",
+    "acceptance": "La capa de movimiento (GSAP) se pide después del primer pintado con contenido y fuera del script de arranque, y su montaje se reparte en tareas cortas; en 10 pasadas locales de lhci sobre / y /en/ las cinco métricas de rendimiento puntúan 1,00 en todas, así que el TBT puede subir hasta ~90 ms sin bajar del 100; un E2E comprueba que el script del movimiento llega después del FCP; el check lighthouse del CI pasa"
+  },
+  "facts": {
+    "open": [
+      "Cuando la capa de movimiento llega tarde (enlace directo a /#contacto, volver atrás con el scroll restaurado o un scroll rápido nada más cargar), un capítulo que ya está en pantalla o por encima ¿se queda como viene en el HTML, sin entrada ni cuenta (recomendado: no desaparece texto ya leído), o hace su entrada igualmente (se oculta un instante y vuelve a entrar, como pasa hoy en un enlace directo pero durante más tiempo)?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/Home.astro",
+      "src/scripts/motion.ts",
+      "tests/e2e/motion.spec.ts",
+      "tests/e2e/service-pages.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "GSAP y la capa de movimiento salen del script de arranque de la portada a un import() dinámico que espera al load y a la entrada first-contentful-paint de PerformanceObserver: un script de prioridad alta que termina antes del primer pintado entra en el grafo del FCP y del LCP de Lighthouse (lantern), y con rAF o requestIdleCallback tras el load el trozo aún podía terminar antes del FCP",
+      "El montaje del movimiento se reparte en una tarea por paso (cada grupo de entradas, el selector de sectores, el manifiesto y la cuenta), dentro del contexto de gsap.matchMedia con context.add, porque crear los from() de todas las entradas en una sola tarea costaba ~45 ms con la CPU a 4× y era la tarea larga que sumaba TBT",
+      "Capítulos ya vistos (usuario, 2026-10-31): cuando la capa de movimiento llega, un grupo cuyo borde superior ya ha pasado su punto de entrada (85 % de la pantalla) se queda como viene en el HTML, sin entrada, y una cifra que ya ha pasado el suyo (90 %) no cuenta; los de más abajo entran como siempre",
+      "Capítulos ya vistos, precisión de la decisión anterior: «ya vistos» es en pantalla o por encima (su borde superior por encima del borde inferior de la pantalla), no el punto de entrada del 85 % ni el del 90 % de la cifra, porque un capítulo que asoma por abajo también se ve; el resto de los capítulos conserva su entrada en el 85 %",
+      "El selector de sectores y el manifiesto no son entradas y quedan igual: la vuelta arranca cuando el selector está en pantalla y el manifiesto va atado al scroll, solo con opacidad, así que ninguno esconde texto",
+      "El registro de ScrollTrigger también va en una tarea propia, después de la que evalúa GSAP, y el primer paso del tablero en la siguiente: con la CPU a 4× y a 6× (Playwright, Emulation.setCPUThrottlingRate) no queda ninguna tarea larga tras el primer pintado, donde antes la de GSAP duraba 92-100 ms a 4×; la pasada con un núcleo (systemd-run CPUQuota=100%) se descarta como medida porque la domina el ruido, incluidas tareas largas del propio Lighthouse"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004 and quality scenario perf-mobile",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Todo el texto sigue en el HTML y la capa de movimiento solo pone estados de partida que anima; el JS de arranque de la portada baja de ~52 KB a ~7 KB gzip y GSAP pasa a un import() diferido, que el ADR deja fuera del presupuesto"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "La escena no cambia: sigue tras el load, visible y con la sonda de GPU; el LCP sigue siendo el HTML y el cambio da margen al presupuesto de perf-mobile que el ADR mide con lhci"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "Mismo objetivo (Lighthouse 100 x4 en móvil, LCP <= 1,8 s); el cambio lo cumple con margen: FCP ~920 ms, LCP 1,35-1,51 s y TBT bajo en las portadas"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "opened_turn": 25,
+      "answer": "la 1 (un capítulo que ya está en pantalla o por encima cuando llega el movimiento se queda como viene en el HTML, sin entrada ni cuenta; los de más abajo entran como siempre)",
+      "source": "user",
+      "resolved_turn": 26
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-31T13:49:34.656Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-2",
+        "counterproof": [
+          "run-3",
+          "run-4",
+          "run-5",
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-31T14:07:53.591Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+        "fitness": [
+          "run-15",
+          "run-16",
+          "run-17"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-31T14:18:03.063Z",
+      "detail": {
+        "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+        "runs": [
+          "run-18",
+          "run-19",
+          "run-20",
+          "run-21",
+          "run-22"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-31T14:18:03.063Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "scenario:perf-mobile conforms"
+        ],
+        "records": [],
+        "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+        "fitness": [
+          "run-23",
+          "run-24",
+          "run-25"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-31T14:18:21.362Z"
+    }
+  ],
+  "base": "7b085a9359c59cfb4d1e88a21f14fa6fda17568d",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts -g 'pide GSAP'",
+      "exit_code": 1,
+      "output_sha256": "sha256:f41bac07d6dc83a9560c4a25aa7b7aee417f748db54f7a016914c80b4a5b1dd1",
+      "tree": "sha256:d725d712ce38ecd696efd81a315bafc4211b22c5e8c3798903e89e0d99704cf4",
+      "recorded_at": "2026-10-31T13:45:51.690Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts -g 'pide GSAP'",
+      "exit_code": 0,
+      "output_sha256": "sha256:a9055ae82d4afa60d41edcd15a2629bd61daf1f80d8830c5901af009211c94e9",
+      "tree": "sha256:83abd7afa66ad02ab95f6de6ab189899b7ad8ceabab1322d40ea88a75ba20ca8",
+      "recorded_at": "2026-10-31T13:49:34.656Z",
+      "counterproof": [
+        "run-3",
+        "run-4",
+        "run-5",
+        "run-6",
+        "run-7",
+        "run-8",
+        "run-9"
+      ]
+    },
+    {
+      "id": "run-3",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "base": "7b085a9359c59cfb4d1e88a21f14fa6fda17568d",
+      "mount": "sha256:23039c0605c1a788179069fed42db8b1b80170daddd99f898d79dab16f22a8ca",
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts -g 'pide GSAP'",
+      "exit_code": 1,
+      "output_sha256": "sha256:7665077eacd0ced07779ccba915e4f56ff4b42aebe45f7b4d40ce8807e234cd8",
+      "tree": "sha256:83abd7afa66ad02ab95f6de6ab189899b7ad8ceabab1322d40ea88a75ba20ca8",
+      "recorded_at": "2026-10-31T13:49:34.656Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "base": "7b085a9359c59cfb4d1e88a21f14fa6fda17568d",
+      "mount": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control": true,
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts -g 'pide GSAP'",
+      "exit_code": 1,
+      "output_sha256": "sha256:db462f416fe75db0b5ff497dc00df23f0818e2ab582de4fdad6ba4354e38137e",
+      "tree": "sha256:83abd7afa66ad02ab95f6de6ab189899b7ad8ceabab1322d40ea88a75ba20ca8",
+      "recorded_at": "2026-10-31T13:49:34.656Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "name": "lint",
+      "base": "7b085a9359c59cfb4d1e88a21f14fa6fda17568d",
+      "mount": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control": true,
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9e5c2c1950ace1a53104ea84495a758f1c82a0fc69ed8a5805b8fe05ff9fa668",
+      "tree": "sha256:83abd7afa66ad02ab95f6de6ab189899b7ad8ceabab1322d40ea88a75ba20ca8",
+      "recorded_at": "2026-10-31T13:49:34.656Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "name": "typecheck",
+      "base": "7b085a9359c59cfb4d1e88a21f14fa6fda17568d",
+      "mount": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control": true,
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:8a4d6f4bb101f49537cb517935f1c91f045459b5dc6415c1717bb0305893bb3d",
+      "tree": "sha256:83abd7afa66ad02ab95f6de6ab189899b7ad8ceabab1322d40ea88a75ba20ca8",
+      "recorded_at": "2026-10-31T13:49:34.656Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "name": "test",
+      "base": "7b085a9359c59cfb4d1e88a21f14fa6fda17568d",
+      "mount": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control": true,
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:96d2f4ef2dd5c6f356b221b4865734140fddb0feb657602a94b61f7e3f92c344",
+      "tree": "sha256:83abd7afa66ad02ab95f6de6ab189899b7ad8ceabab1322d40ea88a75ba20ca8",
+      "recorded_at": "2026-10-31T13:49:34.656Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "name": "e2e",
+      "base": "7b085a9359c59cfb4d1e88a21f14fa6fda17568d",
+      "mount": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control": true,
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3e590162db536a82bd33aca49a9436da32b2038ff5b2c0dc561bd998d8709c82",
+      "tree": "sha256:83abd7afa66ad02ab95f6de6ab189899b7ad8ceabab1322d40ea88a75ba20ca8",
+      "recorded_at": "2026-10-31T13:49:34.656Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "name": "design",
+      "base": "7b085a9359c59cfb4d1e88a21f14fa6fda17568d",
+      "mount": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control": true,
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:83abd7afa66ad02ab95f6de6ab189899b7ad8ceabab1322d40ea88a75ba20ca8",
+      "recorded_at": "2026-10-31T13:49:34.656Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9e5c2c1950ace1a53104ea84495a758f1c82a0fc69ed8a5805b8fe05ff9fa668",
+      "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+      "recorded_at": "2026-10-31T14:07:53.591Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:647b81be5a56752e55433cfb4c385b91f909cbd524a417d9e32c2a0ee74d451a",
+      "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+      "recorded_at": "2026-10-31T14:07:53.591Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:b48911ef8ff86c33c7523b9e99a41790c3f3bb9cb16185fba2539a352fde508e",
+      "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+      "recorded_at": "2026-10-31T14:07:53.591Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:745461f20845e6e0db9ed6425f117fc5327933e2b8bff15c89338b6fc758a554",
+      "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+      "recorded_at": "2026-10-31T14:07:53.591Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+      "recorded_at": "2026-10-31T14:07:53.591Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:7acbcc3c2f7f6c7425e2d471737695797fd4c12a9f979f6094f1d3f21b42b79d",
+      "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+      "recorded_at": "2026-10-31T14:07:53.591Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:311cc02efbdbaabf43deabe17a0c9fa20addc52570c678a4fdc89fdab539ca9b",
+      "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+      "recorded_at": "2026-10-31T14:07:53.591Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:6ed7e9791ea4edb259e8d2eb3433150112e77ccc27c5de3aec4c07b40c1d8515",
+      "tree": "sha256:23cf78849bdac91586b8949992de0999c34d314ddc45b0414e32b0c260e5b290",
+      "recorded_at": "2026-10-31T14:07:53.591Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:b374abca63f7f6b65e4e042ca640e2bfad690356fa7afb920d5ddf59e93c64d1",
+      "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+      "recorded_at": "2026-10-31T14:18:03.063Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:3613e253f0cb59acc2abdea6f9a05852f9ace1523ee4f3fe9b8042a55daf7e37",
+      "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+      "recorded_at": "2026-10-31T14:18:03.063Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:33974ed7a8248e99cc462a52b41a3580d1fb505917982d96caca351ef9ffe7e9",
+      "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+      "recorded_at": "2026-10-31T14:18:03.063Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3f278c3add57631cc2c9068c0fb48e5e356905e0ac1833b85baadf4698aba6ba",
+      "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+      "recorded_at": "2026-10-31T14:18:03.063Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+      "recorded_at": "2026-10-31T14:18:03.063Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:808d1d8e90cebe89b1a9fe7575ad5df0dafc11b10c6bb03d03bc47cc1e25e424",
+      "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+      "recorded_at": "2026-10-31T14:18:03.063Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:58deff7f8457e8fad6cc31b1b0ac59be4f4a330b78977179d19cf29b21314772",
+      "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+      "recorded_at": "2026-10-31T14:18:03.063Z"
+    },
+    {
+      "id": "run-25",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:827ea01384f84ba6e19c3f4a7a2c724b4932e2d96902b785074bd74a091c3ebc",
+      "tree": "sha256:f37c89120ce10bab662c96adb3fa31956f8b7045ed9ac10ab3035e7ce281df5f",
+      "recorded_at": "2026-10-31T14:18:03.063Z"
+    }
+  ],
+  "closed_at": "2026-10-31T14:18:21.362Z"
+}

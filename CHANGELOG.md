@@ -7,6 +7,9 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+### Fixed
+- La portada (/ y /en/) iba al filo del 100 de rendimiento de Lighthouse y el check del CI fallaba de vez en cuando, también en main. Ahora pide GSAP después del primer pintado, fuera del script de arranque (de ~52 KB a 7 KB gzip), y monta el movimiento en tareas cortas: en local las cinco métricas dan 1,00 (FCP ~920 ms, LCP ≤ 1,51 s, TBT 0). Un capítulo que ya está en pantalla cuando llega el movimiento se queda como viene, y el E2E de las tarjetas de Servicios espera a que la tarjeta esté quieta antes de pulsarla (home-lighthouse-margin)
+
 ## [0.16.0] - 2026-10-30
 
 ### Added
