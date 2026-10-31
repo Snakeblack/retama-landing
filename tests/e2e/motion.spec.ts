@@ -44,8 +44,34 @@ async function scrollThrough(page: Page) {
   await page.keyboard.press("End");
 }
 
+/** The scripts of the build the page has fetched that carry GSAP (its ScrollTrigger), with when each was asked for. */
+async function gsapScripts(page: Page) {
+  const scripts = await page.evaluate(() =>
+    performance
+      .getEntriesByType("resource")
+      .filter((entry) => new URL(entry.name).pathname.match(/^\/_astro\/.*\.js$/))
+      .map((entry) => ({ url: entry.name, start: entry.startTime })),
+  );
+  const bodies = await Promise.all(scripts.map(async ({ url }) => (await page.request.get(url)).text()));
+  return scripts.filter((_, index) => bodies[index]?.includes("ScrollTrigger"));
+}
+
+const firstContentfulPaint = (page: Page) =>
+  page.evaluate(() => performance.getEntriesByName("first-contentful-paint")[0]?.startTime ?? Number.NaN);
+
 test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
   test.use({ viewport: desktop });
+
+  // scenario:perf-mobile: a script asked for at high priority that is in before the first paint counts in the first and
+  // largest paints Lighthouse simulates, and GSAP is most of the page's JavaScript.
+  for (const path of ["/", "/en/"]) {
+    test(`${path} pide GSAP después del primer pintado, fuera del script de arranque`, async ({ page }) => {
+      await page.goto(path);
+      await expect.poll(async () => (await gsapScripts(page)).length).toBeGreaterThan(0);
+      const paint = await firstContentfulPaint(page);
+      for (const { url, start } of await gsapScripts(page)) expect(start, url).toBeGreaterThan(paint);
+    });
+  }
 
   test("la cifra cuenta y el texto se puede seleccionar, salvo el título", async ({ page }) => {
     await page.goto("/");
@@ -70,7 +96,8 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
     await page.goto("/");
     const words = page.locator("[data-manifesto] [data-word]");
     const opacities = () => words.evaluateAll((nodes) => nodes.map((node) => Number(getComputedStyle(node).opacity)));
-    expect(Math.max(...(await opacities()))).toBeLessThan(1);
+    // The motion layer comes after the first paint.
+    await expect.poll(async () => Math.max(...(await opacities()))).toBeLessThan(1);
     await page.locator("[data-manifesto]").last().scrollIntoViewIfNeeded();
     await page.mouse.wheel(0, 600);
     await expect.poll(async () => Math.min(...(await opacities()))).toBe(1);
@@ -132,10 +159,49 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
 
   test("cada grupo entra una vez al llegar y al final todo queda visible", async ({ page }) => {
     await page.goto("/");
-    expect((await tileOpacities(page)).some((opacity) => opacity < 1)).toBe(true);
+    await expect.poll(async () => (await tileOpacities(page)).some((opacity) => opacity < 1)).toBe(true);
 
     await scrollThrough(page);
     await expect.poll(async () => (await tileOpacities(page)).every((opacity) => opacity === 1)).toBe(true);
+  });
+
+  test("lo que ya está en pantalla cuando llega el movimiento se queda como viene, sin entrada ni cuenta", async ({
+    page,
+  }) => {
+    // Every text the figure takes, the one the parser writes included.
+    await page.addInitScript(() => {
+      const texts: string[] = [];
+      Object.assign(window, { counted: texts });
+      new MutationObserver((records) => {
+        for (const { target } of records) {
+          const figure = (target instanceof Element ? target : target.parentElement)?.closest("[data-count]");
+          if (figure) texts.push(figure.textContent ?? "");
+        }
+      }).observe(document, { subtree: true, childList: true, characterData: true });
+    });
+    await page.goto("/#metodo");
+    // The layer has come: the contact, below the screen, waits hidden for its entrance; the rest are steps of a task.
+    const contact = page.locator("#contacto > *");
+    await expect
+      .poll(() => contact.evaluateAll((tiles) => tiles.some((tile) => getComputedStyle(tile).opacity !== "1")))
+      .toBe(true);
+    await page.waitForTimeout(500);
+
+    // The chapters on screen and above it: no tile or row of theirs got a starting state.
+    const started = await page
+      .locator("#servicios, #sectores, #metodo")
+      .evaluateAll(
+        (groups) =>
+          groups.flatMap((group) =>
+            [...group.querySelectorAll<HTMLElement>("*")].filter(
+              ({ style }) => style.opacity !== "" || style.transform !== "" || style.clipPath !== "",
+            ),
+          ).length,
+      );
+    expect(started).toBe(0);
+    await expect(page.locator("[data-count]")).toHaveText("100");
+    const counted = await page.evaluate(() => (window as unknown as { counted: string[] }).counted);
+    expect(new Set(counted.map((text) => text.trim()))).toEqual(new Set(["100"]));
   });
 });
 
