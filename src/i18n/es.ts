@@ -24,7 +24,7 @@ export const es = {
   "nav.here": "Estás aquí",
 
   "hero.word": "Software",
-  "hero.rest": "a medida",
+  "hero.rest": "hecho a medida",
   "hero.lead": "Retama hace aplicaciones web, herramientas internas y agentes para empresas, en remoto desde España.",
   "hero.poster": "Dibujo de una retama: tallos finos sobre el suelo y una raíz que baja mucho más hondo.",
   "hero.scenePauseLabel": "Pausar la animación de la retama",
@@ -363,15 +363,15 @@ export const es = {
     "con las opciones, lo que cuesta cada una, lo que te ahorra y lo que descartaríamos. Para una web, es gratis; en software a medida y automatizaciones, sale de un diagnóstico de precio fijo, desde 900 € + IVA, que se descuenta si seguimos.",
 
   "footer.top": "Volver arriba",
-  "footer.legalLabel": "Información legal",
+  "footer.legalLabel": "Aviso legal y privacidad",
 
   "anchor.legalNotice": "aviso-legal",
   "anchor.privacy": "privacidad",
   "anchor.cookies": "cookies",
-  "legal.metaTitle": "Información legal · Retama",
+  "legal.metaTitle": "Aviso legal y privacidad · Retama",
   "legal.metaDescription":
     "Aviso legal, política de privacidad y política de cookies de Retama: quién está detrás, qué pasa con tus datos y qué guarda la web en tu navegador.",
-  "legal.title": "Información legal",
+  "legal.title": "Aviso legal y privacidad",
   "legal.lead": "Quién está detrás de Retama, qué hacemos con tus datos y qué guarda esta web en tu navegador.",
   "legal.updated": "Actualizado el 24 de octubre de 2026.",
 
@@ -444,7 +444,7 @@ export const es = {
   "blog.metaTitle": "Software a medida, explicado · Blog de Retama",
   "blog.metaDescription":
     "Cómo se encarga, se construye y se cuida un software a medida, contado por Retama para quien lo encarga.",
-  "blog.title": "Software, explicado",
+  "blog.title": "El software, explicado",
   "blog.lead":
     "Cómo se encarga, se construye y se cuida un software a medida, contado para quien lo encarga y sin jerga.",
   "blog.listLabel": "Artículos",

@@ -116,7 +116,7 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
     await expect(page.locator("[data-talk]")).toBeHidden();
   });
 
-  test("la S de «Software» empieza en la columna de la «a» de «a medida»", async ({ page }) => {
+  test("la S de «Software» empieza en la columna de la «h» de «hecho a medida»", async ({ page }) => {
     await page.goto("/");
     const ink = (selector: string) =>
       page.locator(selector).evaluate((node) => {
@@ -212,6 +212,22 @@ test.describe("movimiento en el móvil (DESIGN.md Motion)", () => {
     await page.goto("/");
     const word = await page.locator("[data-glyph-word]").first().boundingBox();
     expect((word?.x ?? 0) + (word?.width ?? 0)).toBeLessThanOrEqual(phone.width);
+  });
+
+  // The scene samples each line of the title as one line of text (scene.ts, sampleWord).
+  test("cada renglón del título cabe en una línea, también a 320 px", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    for (const path of ["/", "/en/"]) {
+      await page.goto(path);
+      const lines = await page
+        .locator("[data-glyph-word]")
+        .evaluateAll((words) =>
+          words.map((word) =>
+            Math.round(word.getBoundingClientRect().height / Number.parseFloat(getComputedStyle(word).lineHeight)),
+          ),
+        );
+      expect(lines, path).toEqual([1, 1]);
+    }
   });
 
   test("el manifiesto se lee a tamaño de titular y cada frase cabe en tres líneas", async ({ page }) => {

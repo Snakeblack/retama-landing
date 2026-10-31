@@ -7,6 +7,9 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+### Fixed
+- Seis páginas tenían un H1 de menos de 20 caracteres, el mínimo que piden los verificadores SEO (Google no fija ninguno). Ahora la portada dice «Software hecho a medida», el blog «El software, explicado» y «Software, in plain English», la página legal «Aviso legal y privacidad» y «Legal notice and privacy» (y así se llaman también su título, su miga de pan, el pie y llms.txt) y la página de webs en inglés «Web design with a CMS». Todos caben en las líneas que permite DESIGN.md, «hecho a medida» en una sola porque la escena la dibuja así, y un E2E exige de 20 a 70 caracteres en el H1 de cada página del sitemap (short-h1)
+
 ## [0.16.1] - 2026-10-31
 
 ### Fixed

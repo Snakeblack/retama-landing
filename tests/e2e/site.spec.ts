@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 const pages = [
-  { path: "/", lang: "es", other: "/en/", title: "Software a medida" },
+  { path: "/", lang: "es", other: "/en/", title: "Software hecho a medida" },
   { path: "/en/", lang: "en", other: "/", title: "Software made to measure" },
 ];
 
@@ -275,6 +275,18 @@ test("los títulos de la portada y del blog nombran el software a medida y a Ret
   ] as const) {
     await page.goto(path);
     await expect(page, path).toHaveTitle(title);
+  }
+});
+
+// DESIGN.md Layout: SEO checkers ask for an h1 of 20 to 70 characters (owner, 2026-10-31).
+test("cada página del sitemap tiene un h1 de entre 20 y 70 caracteres", async ({ page, request }) => {
+  const urls = await sitemapUrls(request);
+  expect(urls.length).toBeGreaterThan(0);
+  for (const url of urls) {
+    await page.goto(new URL(url).pathname);
+    const title = ((await page.locator("h1").textContent()) ?? "").replace(/\s+/g, " ").trim();
+    expect(title.length, `${url}: ${title}`).toBeGreaterThanOrEqual(20);
+    expect(title.length, `${url}: ${title}`).toBeLessThanOrEqual(70);
   }
 });
 

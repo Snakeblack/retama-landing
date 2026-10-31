@@ -83,7 +83,7 @@ export const en = {
   "service.web.metaTitle": "Web design and CMS for businesses · Retama",
   "service.web.metaDescription":
     "Landing pages and websites with a CMS for businesses, fast on mobile. From €1,500 + VAT, 1 to 4 weeks, with a free proposal.",
-  "service.web.title": "Web design and CMS",
+  "service.web.title": "Web design with a CMS",
   "service.web.lead":
     "A landing page to present what you sell, or a website with a content management system so your team publishes without calling us.",
   "service.web.landing": "Landing page",
@@ -365,15 +365,15 @@ export const en = {
     "with the options, what each one costs, what it saves you and what we would rule out. For a website it is free; for custom software and automation, it comes out of a fixed-price diagnosis, from €900 + VAT, deducted if we carry on.",
 
   "footer.top": "Back to top",
-  "footer.legalLabel": "Legal information",
+  "footer.legalLabel": "Legal notice and privacy",
 
   "anchor.legalNotice": "legal-notice",
   "anchor.privacy": "privacy",
   "anchor.cookies": "cookies",
-  "legal.metaTitle": "Legal information · Retama",
+  "legal.metaTitle": "Legal notice and privacy · Retama",
   "legal.metaDescription":
     "Retama's legal notice, privacy policy and cookie policy: who is behind it, what happens to your data and what the website keeps in your browser.",
-  "legal.title": "Legal information",
+  "legal.title": "Legal notice and privacy",
   "legal.lead": "Who is behind Retama, what we do with your data and what this website keeps in your browser.",
   "legal.updated": "Updated on 26 October 2026.",
 
@@ -446,7 +446,7 @@ export const en = {
   "blog.metaTitle": "Custom software, explained · Retama blog",
   "blog.metaDescription":
     "How custom software is commissioned, built and looked after, told by Retama for the people who commission it.",
-  "blog.title": "Software, explained",
+  "blog.title": "Software, in plain English",
   "blog.lead":
     "How custom software is commissioned, built and looked after, told for the people who commission it, without jargon.",
   "blog.listLabel": "Articles",
