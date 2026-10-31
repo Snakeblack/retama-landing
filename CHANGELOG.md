@@ -7,6 +7,8 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-10-31
+
 ### Added
 - Dos artículos nuevos en el blog, en español y en inglés: «Cuánto cuesta un agente de IA» y «Cuánto cuesta el SEO de una web», la primera parte de la fase 3 de la auditoría SEO. Cada uno trae una tabla con los precios de partida de su servicio, que un test compara con src/lib/services.ts y con los textos de la web, y enlaza la página de su servicio, que ahora lo lista en «Del blog». El de agentes cuenta que el uso del modelo de IA lo paga el cliente desde su propia cuenta y cita el aviso que exige el artículo 50 del Reglamento europeo de IA; el de SEO cita la guía de Google para contratar a un especialista (pricing-articles)
 
