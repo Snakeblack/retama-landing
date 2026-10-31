@@ -1,0 +1,300 @@
+{
+  "schema": "idd-state/v1",
+  "change": "sector-choice-before-motion",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "kind": "bug",
+    "summary": "Sectors switcher: a choice, pointer or focus that comes before the motion layer is ignored; the tour starts and overrides the visitor's sector (flaky E2E 'elegir un sector detiene la vuelta')",
+    "acceptance": "A sector chosen before the motion layer arrives stays open and the tour never runs; with the pointer or the focus already on the switcher when the layer arrives, the tour starts paused; the E2E for choosing before and after the layer pass deterministically"
+  },
+  "facts": {
+    "open": [
+      "How should the layer tell that the visitor chose before it arrived: from the state at set-up (the open tab is not the first, or none is open) or from a click listener in the boot script of Home.astro?",
+      "If the visitor closed the open sector before the layer (none open), does the layer leave it closed or reopen one?",
+      "Does the layer start the tour paused when the pointer is over the switcher or the focus is inside it when it arrives, without a choice?"
+    ]
+  },
+  "plan": {
+    "paths": [
+      "src/scripts/motion.ts",
+      "tests/e2e/motion.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "A choice before the layer is read from the switcher's state at set-up: an open tab other than the first, or none open, is a choice and the tour never runs; the tabs stay as the visitor left them, none open included (user, 2026-10-31)",
+      "A choice before the layer counts as one made with it: the click's effect (tour stopped, full bar under the chosen tab, its fragment alive) moves to a choose() both use",
+      "The pointer over the switcher or the focus inside it when the layer arrives holds the tour (user, 2026-10-31); the pointer counts only where it can hover, since a touch screen keeps :hover after a tap",
+      "E2E: page.route holds the build scripts that carry ScrollTrigger to use the switcher before the layer; the inline --progress on the bars tells the layer has set the switcher up"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "bug-fix",
+      "reason": "the intent is a bug fix",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "repro-test",
+      "signal": "bug-fix",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "opened_turn": 40,
+      "answer": "lo recomendado (1a: por el estado al montarse; 2a: lo deja cerrado y no arranca la vuelta; 3a: la vuelta empieza en pausa con el puntero o el foco ya en el selector)",
+      "source": "user",
+      "resolved_turn": 41
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "repro-run-pair",
+      "obligation": "repro-test",
+      "recorded_at": "2026-10-31T17:16:15.245Z",
+      "detail": {
+        "red": "run-1",
+        "green": "run-3",
+        "counterproof": [
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-31T17:21:38.541Z",
+      "detail": {
+        "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+        "runs": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9",
+          "run-10"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-31T17:23:25.184Z",
+      "detail": {
+        "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+        "runs": [
+          "run-11",
+          "run-12",
+          "run-13",
+          "run-14",
+          "run-15"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-31T17:23:25.202Z"
+    }
+  ],
+  "base": "264d9b93c2b58643f17cb7ca8022842445569f83",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:c035210c51793906cf7d860f57e8608d31f2108b51fa1846a07f850d181a8e3b",
+      "tree": "sha256:4950b3cf7e60a4d93d5bda826937c01f2eea7ad9bcda1057c62b1c854ab91a2e",
+      "recorded_at": "2026-10-31T17:13:11.889Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:6385cf704ca8bd8312743b6da4e94c161b36400754a74f42438a3868050bcab4",
+      "tree": "sha256:c4204e13701bb356f06e50df7bba64f26cc24c2e3ea1e038515204720a9b27fd",
+      "recorded_at": "2026-10-31T17:14:45.164Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "repro-test",
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:a9446be0d3d0e1ee78b6b91c6222a23d9a14ad8ae65dacd86acc6c3f06ac3d32",
+      "tree": "sha256:c4204e13701bb356f06e50df7bba64f26cc24c2e3ea1e038515204720a9b27fd",
+      "recorded_at": "2026-10-31T17:16:15.245Z",
+      "counterproof": [
+        "run-4",
+        "run-5"
+      ]
+    },
+    {
+      "id": "run-4",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "base": "264d9b93c2b58643f17cb7ca8022842445569f83",
+      "mount": "sha256:aaba78861a7d9426b62cd926d42ba2ddbad4ef9d93e1db3aaf60d9675e58ed5d",
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts",
+      "exit_code": 1,
+      "output_sha256": "sha256:5f12f4dadbbcc9e8f0515279e3efd11505e5197e62fca244c2c61c6d9cbae350",
+      "tree": "sha256:c4204e13701bb356f06e50df7bba64f26cc24c2e3ea1e038515204720a9b27fd",
+      "recorded_at": "2026-10-31T17:16:15.245Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "counterproof",
+      "obligation": "repro-test",
+      "base": "264d9b93c2b58643f17cb7ca8022842445569f83",
+      "mount": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "control": true,
+      "command": "pnpm exec playwright test tests/e2e/motion.spec.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:f3e82358855036cb2b4e74d4ca4569db20229f028141dc9b62831eec23f32e01",
+      "tree": "sha256:c4204e13701bb356f06e50df7bba64f26cc24c2e3ea1e038515204720a9b27fd",
+      "recorded_at": "2026-10-31T17:16:15.245Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:0d608eb24fb2fff395a65d258652a9fbf994de3257e999cfa72588223ac8aa48",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:21:38.541Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:91a1c402290f63990a81b915dd3efcf7aac5eb5d25b2fa74bfb4686bb993d7d4",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:21:38.541Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:48bd469054712d98e5dfcf02ef504292a78d740ad68a53de1bb41fcb0af3d577",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:21:38.541Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:29179a2b3d474c603a65128bc9eb005923b0c646cb45fe00f23725bce41a8cfc",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:21:38.541Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:21:38.541Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9e5c2c1950ace1a53104ea84495a758f1c82a0fc69ed8a5805b8fe05ff9fa668",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:23:25.184Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:54244c1d198d5c602f368e36587f4de7269141c6126fdc5f6a579fc6225ec27d",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:23:25.184Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:31315a3c6b9586f8ea66b1097f55f561486e4f64b1fd20efe57ff2be69d3fb17",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:23:25.184Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:38f3d81e8c85db696aec7edf60eccdfe86a1376687fd21e720a083987497be1c",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:23:25.184Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:f8718c8da72ed31f9551526a7c6610b0a8248339f960f3d79fb39f044e8c246a",
+      "recorded_at": "2026-10-31T17:23:25.184Z"
+    }
+  ],
+  "closed_at": "2026-10-31T17:23:25.202Z"
+}
