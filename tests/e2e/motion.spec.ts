@@ -39,6 +39,31 @@ async function showSectors(page: Page) {
     .evaluate((group) => group.scrollIntoView());
 }
 
+/** Waits until the motion layer has set the switcher up: it puts the progress of the tour on the bars. */
+const sectorsReady = (page: Page) =>
+  expect(page.locator("[data-sectors-progress]").first()).toHaveAttribute("style", /--progress/);
+
+/**
+ * Holds back the scripts of the build that carry GSAP (its ScrollTrigger), so the page can be used before the motion
+ * layer arrives; the function it returns lets them in and waits until the layer has set the switcher up.
+ */
+async function holdMotion(page: Page) {
+  let release = () => {};
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(/\/_astro\/.*\.js$/, async (route) => {
+    const response = await route.fetch();
+    const body = await response.text();
+    if (body.includes("ScrollTrigger")) await held;
+    await route.fulfill({ response, body });
+  });
+  return async () => {
+    release();
+    await sectorsReady(page);
+  };
+}
+
 async function scrollThrough(page: Page) {
   for (const group of await page.locator("main section[id]").all()) await group.scrollIntoViewIfNeeded();
   await page.keyboard.press("End");
@@ -148,6 +173,7 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
 
   test("elegir un sector detiene la vuelta y la pestaña abierta no se cierra", async ({ page }) => {
     await page.goto("/");
+    await sectorsReady(page);
     await showSectors(page);
     const summaries = page.locator(`${TABS} > summary`);
     await summaries.nth(2).click();
@@ -155,6 +181,41 @@ test.describe("movimiento en escritorio (DESIGN.md Motion)", () => {
     await summaries.nth(2).click();
     await page.waitForTimeout(7000);
     expect(await openSector(page)).toBe(2);
+  });
+
+  // The motion layer comes after the first paint (Home.astro), so the visitor can use the switcher before it. Pointer
+  // and focus leave the switcher, so only the choice can keep the tour from running.
+  for (const [state, pressed, open] of [
+    ["elegido", 2, 2],
+    ["cerrado", 0, -1],
+  ] as const) {
+    test(`un sector ${state} antes de que llegue el movimiento se queda así, sin vuelta`, async ({ page }) => {
+      const letMotionIn = await holdMotion(page);
+      await page.goto("/");
+      await showSectors(page);
+      const summary = page.locator(`${TABS} > summary`).nth(pressed);
+      await summary.click();
+      await summary.blur();
+      await page.mouse.move(0, 0);
+      expect(await openSector(page)).toBe(open);
+      await letMotionIn();
+      await page.waitForTimeout(7000);
+      expect(await openSector(page)).toBe(open);
+    });
+  }
+
+  test("con el puntero sobre el selector cuando llega el movimiento, la vuelta espera a que se vaya", async ({
+    page,
+  }) => {
+    const letMotionIn = await holdMotion(page);
+    await page.goto("/");
+    await showSectors(page);
+    await page.locator(`${TABS} > summary`).nth(2).hover();
+    await letMotionIn();
+    await page.waitForTimeout(7000);
+    expect(await openSector(page)).toBe(0);
+    await page.mouse.move(0, 0);
+    await expect.poll(() => openSector(page), { timeout: 9000 }).toBe(1);
   });
 
   test("cada grupo entra una vez al llegar y al final todo queda visible", async ({ page }) => {

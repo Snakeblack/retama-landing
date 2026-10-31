@@ -7,6 +7,9 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
 
 ## [Unreleased]
 
+### Fixed
+- Si el visitante elegía un sector antes de que llegara la capa de movimiento, que se pide tras el primer pintado, la vuelta arrancaba igual y le cambiaba el sector; el puntero o el foco sobre el selector tampoco la paraban. Ahora la capa mira cómo encuentra el selector: un sector abierto que no es el primero, o ninguno, cuenta como elección y la vuelta no arranca, y con el puntero o el foco ya encima empieza en pausa. Era la causa del E2E intermitente «elegir un sector detiene la vuelta…», que fallaba también en main; ahora tres tests retienen GSAP para usar el selector antes de que llegue la capa (sector-choice-before-motion)
+
 ## [0.16.2] - 2026-10-31
 
 ### Fixed

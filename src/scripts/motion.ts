@@ -196,17 +196,21 @@ function sectorsSwitcher(move: boolean) {
   const run = () => {
     if (!stopped && visible && !held) tour.resume();
   };
+  /** Choosing a tab ends the tour: the bar under it full and its fragment alive. */
+  const choose = ({ bar, live }: (typeof parts)[number]) => {
+    stopped = true;
+    tour.pause();
+    gsap.set(bars, { "--progress": 0 });
+    gsap.set(bar, { "--progress": 1 });
+    showing?.kill();
+    showing = live.play();
+  };
 
-  for (const { tab, summary, panel, bar, live } of parts) {
+  for (const part of parts) {
+    const { tab, summary, panel } = part;
     on(summary, "click", (event) => {
       if (tab.open) event.preventDefault();
-      if (!move) return;
-      stopped = true;
-      tour.pause();
-      gsap.set(bars, { "--progress": 0 });
-      gsap.set(bar, { "--progress": 1 });
-      showing?.kill();
-      showing = live.play();
+      if (move) choose(part);
     });
     if (!move) continue;
     on(tab, "toggle", () => {
@@ -237,6 +241,15 @@ function sectorsSwitcher(move: boolean) {
     if (!switcher.contains((event as FocusEvent).relatedTarget as Node | null)) hold(false)();
   });
   gsap.set(bars, { "--progress": 0 });
+  // The visitor may have used the switcher before the layer came (Home.astro): an open tab other than the first, or
+  // none, is a choice, left as it is, and the pointer or the focus already on the switcher holds the tour. A touch
+  // screen keeps :hover after a tap, so the pointer counts only where it can hover.
+  const open = parts.find(({ tab }) => tab.open);
+  if (open !== parts[0]) {
+    if (open) choose(open);
+    else stopped = true;
+  }
+  held = switcher.matches(":focus-within") || (matchMedia("(hover: hover)").matches && switcher.matches(":hover"));
   const enter = () => {
     visible = true;
     if (stopped) return;
