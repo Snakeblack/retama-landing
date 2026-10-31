@@ -235,14 +235,24 @@ test.describe("artículos en pantallas táctiles", () => {
   }
 });
 
-for (const { article } of blogs)
+// The blog's price tables (owner, 2026-10-30 and 2026-10-31), each with its rows.
+const tables = [
+  { article: "/blog/cuanto-cuesta-un-software-a-medida/", rows: 4 },
+  { article: "/en/blog/what-custom-software-costs/", rows: 4 },
+  { article: "/blog/cuanto-cuesta-un-agente-de-ia/", rows: 3 },
+  { article: "/en/blog/what-an-ai-agent-costs/", rows: 3 },
+  { article: "/blog/cuanto-cuesta-el-seo-de-una-web/", rows: 4 },
+  { article: "/en/blog/what-website-seo-costs/", rows: 4 },
+];
+
+for (const { article, rows } of tables)
   test(`la tabla de precios de ${article} cabe en su tesela a ancho de móvil (DESIGN.md)`, async ({ page }) => {
     for (const width of [320, 360, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(article);
       await page.evaluate(() => document.fonts.ready);
       const table = page.locator("[data-article] table");
-      await expect(table.locator("tbody tr")).toHaveCount(4);
+      await expect(table.locator("tbody tr")).toHaveCount(rows);
       const { right, tile } = await table.evaluate((node) => ({
         right: node.getBoundingClientRect().right,
         tile: (node.parentElement as HTMLElement).getBoundingClientRect().right,

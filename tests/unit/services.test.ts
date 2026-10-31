@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { en } from "../../src/i18n/en";
 import { es } from "../../src/i18n/es";
-import { locales, localizedPath } from "../../src/i18n/index";
+import { type Locale, locales, localizedPath } from "../../src/i18n/index";
 import { PROJECT_TYPES } from "../../src/lib/contact";
 import { serviceImagePath, servicePath, servicePaths, services } from "../../src/lib/services";
 import { frontMatter } from "../../src/lib/sitemap";
@@ -75,6 +75,20 @@ describe("los artículos de cada servicio", () => {
     }),
   );
 
+  /** The rows of an article's table after its header and its separator, each as its cells. */
+  const table = (key: string, locale: Locale) =>
+    (blog.find((item) => item.key === key && item.locale === locale)?.body ?? "")
+      .split("\n")
+      .filter((line) => line.startsWith("| "))
+      .slice(2)
+      .map((line) =>
+        line
+          .split("|")
+          .slice(1, -1)
+          // A no-break space keeps a figure with its sign on a phone.
+          .map((cell) => cell.trim().replaceAll("\u00a0", " ")),
+      );
+
   it("existen en el blog, y cada uno enlaza en su texto a la página de su servicio, en cada idioma", () => {
     for (const service of services)
       for (const key of service.articles)
@@ -95,19 +109,7 @@ describe("los artículos de cada servicio", () => {
       ["es", es, (value: number) => `${value.toLocaleString("de-DE")} €`, "para un software a medida"],
       ["en", en, (value: number) => `€${value.toLocaleString("en-GB")}`, "for custom software"],
     ] as const) {
-      const body = blog.find((item) => item.key === "software-cost" && item.locale === locale)?.body ?? "";
-      // The table's lines after its header and its separator.
-      const rows = body
-        .split("\n")
-        .filter((line) => line.startsWith("| "))
-        .slice(2)
-        .map((line) =>
-          line
-            .split("|")
-            .slice(1, -1)
-            // A no-break space keeps a figure with its sign on a phone.
-            .map((cell) => cell.trim().replaceAll("\u00a0", " ")),
-        );
+      const rows = table("software-cost", locale);
       const questions = `${localizedPath(locale, "/")}#${copy["anchor.questions"]}`;
       expect(
         rows.map(([name]) => name?.match(/\]\((.+)\)$/)?.[1]),
@@ -126,6 +128,56 @@ describe("los artículos de cada servicio", () => {
       // The maintenance of custom software, as the questions give it.
       const monthly = rest[2]?.[1]?.replace(/ (al mes|a month)$/, "");
       expect(copy["faq.a6"], locale).toContain(`${monthly} ${software}`);
+    }
+  });
+
+  // The agents article's table (owner, 2026-10-31): the diagnosis, the set-up and the monthly fee, in that order, each
+  // with the figure and the time or the minimum the page gives. No row links anything: the sentence above it links the
+  // service's page once.
+  it("dan en la tabla del artículo de agentes las cifras de su servicio, en cada idioma", () => {
+    // Agents and automation is the third card (the first test).
+    const [offer] = services[2].offers;
+    for (const [locale, copy, amount, month] of [
+      ["es", es, (value: number) => `${value.toLocaleString("de-DE")} €`, "al mes"],
+      ["en", en, (value: number) => `€${value.toLocaleString("en-GB")}`, "a month"],
+    ] as const) {
+      const rows = table("agents-cost", locale);
+      expect(rows, locale).toHaveLength(3);
+      expect(
+        rows.filter(([name]) => name?.includes("](")),
+        locale,
+      ).toEqual([]);
+
+      const [diagnosis, setUp, fee] = rows;
+      expect(copy["service.diagnosis"], locale).toContain(diagnosis?.[1]);
+      expect(setUp?.[1], locale).toBe(amount(offer.once));
+      expect(setUp?.[2], locale).toBe(copy[offer.text].split(" · ")[1]);
+      expect(fee?.[1], locale).toBe(`${amount(offer.monthly)} ${month}`);
+    }
+  });
+
+  // The SEO article's table (owner, 2026-10-31): the free proposal, the job from its price, no monthly fee and who makes
+  // the plan's improvements, in that order, as the page gives them.
+  it("dan en la tabla del artículo de SEO el precio de su servicio y ninguna cuota, en cada idioma", () => {
+    // SEO and analytics is the fourth card (the first test).
+    const [offer] = services[3].offers;
+    expect(offer.monthly).toBeNull();
+    for (const [locale, copy, price, free, none] of [
+      ["es", es, (value: number) => `desde ${value.toLocaleString("de-DE")} €`, "gratis", "no hay"],
+      ["en", en, (value: number) => `from €${value.toLocaleString("en-GB")}`, "free", "none"],
+    ] as const) {
+      const rows = table("seo-cost", locale);
+      expect(rows, locale).toHaveLength(4);
+      expect(
+        rows.filter(([name]) => name?.includes("](")),
+        locale,
+      ).toEqual([]);
+
+      const [proposal, job, fee] = rows;
+      expect(proposal?.[1], locale).toBe(free);
+      expect(copy["service.proposal"], locale).toContain(free);
+      expect(job?.[1], locale).toBe(price(offer.once));
+      expect(fee?.[1], locale).toBe(none);
     }
   });
 

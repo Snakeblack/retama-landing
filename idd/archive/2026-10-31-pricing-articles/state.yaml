@@ -1,0 +1,305 @@
+{
+  "schema": "idd-state/v1",
+  "change": "pricing-articles",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "continua",
+    "kind": "feature",
+    "summary": "Fase 3 de la auditoría SEO, primera parte: dos artículos de precios en es y en, cuánto cuesta un agente o automatización y cuánto cuesta el SEO de una web, con las cifras de src/lib/services.ts en una tabla que un test ata a services.ts, enlazados desde y hacia la página de su servicio",
+    "acceptance": "El blog publica en es y en un artículo sobre el precio de un agente o automatización y otro sobre el precio del SEO, cada uno con una tabla cuyas cifras compara un test con services.ts y con los textos de la web; la página de agentes y la de SEO listan su artículo en Del blog y cada artículo enlaza una vez a su página; pnpm test, el build y los E2E pasan"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "Dos datos del artículo de agentes. (1) El coste de uso del modelo de IA (lo que cobra el proveedor por cada consulta) lo paga el cliente desde su propia cuenta y la propuesta lo estima (recomendado), va dentro de la cuota hasta un volumen fijado en la propuesta, se factura aparte a coste, o el artículo no lo menciona. (2) Se cuenta que, si el agente habla con tus clientes, la ley obliga a avisar de que es una IA (artículo 50 del Reglamento europeo de IA, enlazado a EUR-Lex) sin prometer dónde se guardan los datos porque depende del proveedor (recomendado), o se afirma además que los datos se quedan en la UE"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "tests/unit/services.test.ts",
+          "line": 132
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "copy",
+        "question": "Tres datos de las cifras. (1) Solo los mínimos que ya da la web (diagnóstico 900 €, puesta en marcha 4.000 €, cuota 150 €/mes; SEO 800 € sin cuota), sin rangos habituales ni cifras de mercado (recomendado), o también lo habitual del modelo de negocio (agente 4.000-15.000 € + 150-400 €/mes; SEO 800-2.000 €). (2) La cuota del agente con tres meses de permanencia, como el mantenimiento (recomendado), o sin mencionarla. (3) El plazo del SEO, que la web no publica, se omite (recomendado mientras no lo fijes) o se da el que digas, por ejemplo de una a dos semanas"
+      },
+      {
+        "category": "url-state",
+        "question": "Títulos y slugs: es «Cuánto cuesta un agente de IA» en /blog/cuanto-cuesta-un-agente-de-ia/ y «Cuánto cuesta el SEO de una web» en /blog/cuanto-cuesta-el-seo-de-una-web/; en «What an AI agent costs» en /en/blog/what-an-ai-agent-costs/ y «What website SEO costs» en /en/blog/what-website-seo-costs/ (recomendado), u otros"
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 265
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "tests/unit/services.test.ts",
+          "line": 91
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "src/content/blog/en/what-an-ai-agent-costs.md",
+      "src/content/blog/en/what-website-seo-costs.md",
+      "src/content/blog/es/cuanto-cuesta-el-seo-de-una-web.md",
+      "src/content/blog/es/cuanto-cuesta-un-agente-de-ia.md",
+      "src/lib/services.ts",
+      "tests/e2e/blog.spec.ts",
+      "tests/e2e/service-pages.spec.ts",
+      "tests/unit/services.test.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "Coste del modelo de IA: lo paga el cliente desde su propia cuenta del proveedor y la propuesta lo estima (usuario, 2026-10-31)",
+      "El artículo de agentes cuenta el aviso de IA del artículo 50 del Reglamento europeo de IA, enlazado a EUR-Lex, y no promete dónde se guardan los datos (usuario, 2026-10-31)",
+      "Los artículos publican solo los mínimos de la web, sin rangos habituales ni cifras de mercado; la cuota del agente lleva tres meses de permanencia y el SEO no da plazo (usuario, 2026-10-31)",
+      "Cada tabla de precios se ata con un test a services.ts y a los textos de la web, como la del artículo de costes"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0008 and quality scenario perf-mobile, seo-discovery",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Los artículos son Markdown que el build convierte en HTML estático, y la fila Del blog de la página de servicio también; no ganan script"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Cada artículo existe en es y en con la misma key y su slug en cada idioma; checkArticles hace fallar el build si falta una traducción"
+    },
+    {
+      "kind": "scenario",
+      "id": "perf-mobile",
+      "impact": "conforms",
+      "reason": "Páginas de artículo como las que ya hay, sin imágenes ni script nuevos; la página de servicio solo gana una fila de HTML"
+    },
+    {
+      "kind": "scenario",
+      "id": "seo-discovery",
+      "impact": "conforms",
+      "reason": "Mejora el escenario: dos URL nuevas con HTML completo sin JS, en el sitemap, con canónica, hreflang y JSON-LD BlogPosting como el resto del blog, y enlaces internos con su servicio"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-1"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "opened_turn": 43,
+      "answer": "todas las recomendadas",
+      "source": "user",
+      "resolved_turn": 44
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-31T18:06:41.458Z",
+      "detail": {
+        "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+        "runs": [
+          "run-1",
+          "run-2",
+          "run-3",
+          "run-4",
+          "run-5"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-31T18:06:41.458Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0008 conforms",
+          "scenario:perf-mobile conforms",
+          "scenario:seo-discovery conforms"
+        ],
+        "records": [],
+        "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+        "fitness": [
+          "run-6",
+          "run-7",
+          "run-8",
+          "run-9"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-31T18:07:00.830Z"
+    }
+  ],
+  "base": "7cd6c5c2637794489f4861bdf1abb2aec4a8fea5",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:611403e2a785a53db53ec57a85ec505336b444e5e11d27abe3558711732a4daf",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:b7d64d25d2355403db539214a4bce71e33d3b769a2e2eb3dea8c4ef0243a715b",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:c425f70f170b0a433b9ad3c38414df7ddb053bf1ae924eeb478cd04d51e74cb9",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:f5620954de4807dbc0b0d9b859b700510361634a751260df86cea59f8e4204d0",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:da09028d22e767119ccafff6827f1fe5617b592b96529694dbaf38a5b4ef29c5",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:f322fac2f2ee7e6aab9d4f88cf45554cce49a018135b2510c58ad8c0961fcab5",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:1eefbda595f36348bfa2b7abe82f51489288b5d97b9d441c1c76477c8170bc82",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:1d543802005925c06ce3add8972b552a41a1eebdad2dd80d31f925c515339111",
+      "tree": "sha256:a95d2eae356479663fe787a02c1b1ecb71a33a14ab49bcdb4c8061594c53a9a1",
+      "recorded_at": "2026-10-31T18:06:41.458Z"
+    }
+  ],
+  "assumptions": [
+    "Los dos artículos de precios van en este change y en un solo PR",
+    "Los artículos se publican con fecha 2026-10-31",
+    "El updated de agents y seo en services.ts pasa a 2026-10-31, porque sus páginas ganan la fila Del blog"
+  ],
+  "closed_at": "2026-10-31T18:07:00.830Z"
+}

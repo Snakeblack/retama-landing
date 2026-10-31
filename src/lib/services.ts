@@ -80,8 +80,8 @@ export const services = [
       ["service.warranty", "service.warrantyRest"],
     ],
     sheets: ["agents"],
-    articles: [],
-    updated: "2026-10-30",
+    articles: ["agents-cost"],
+    updated: "2026-10-31",
   },
   {
     id: "seo",
@@ -102,8 +102,8 @@ export const services = [
       ["service.warranty", "service.warrantyRest"],
     ],
     sheets: ["seo"],
-    articles: [],
-    updated: "2026-10-30",
+    articles: ["seo-cost"],
+    updated: "2026-10-31",
   },
 ] as const;
 
