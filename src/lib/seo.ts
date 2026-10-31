@@ -296,8 +296,8 @@ export function llmsTxt(site: URL, articles: ArticleLink[] = []): string {
     "",
     `- [Home](${url("en", "/")}): what Retama builds, for whom and how it works, with the contact form.`,
     `- [Inicio](${url("es", "/")}): the home page in Spanish.`,
-    `- [Legal information](${url("en", "/legal/")}): ${copy["legal.metaDescription"]}`,
-    `- [Información legal](${url("es", "/legal/")}): the legal information in Spanish, which prevails.`,
+    `- [Legal notice and privacy](${url("en", "/legal/")}): ${copy["legal.metaDescription"]}`,
+    `- [Aviso legal y privacidad](${url("es", "/legal/")}): the legal information in Spanish, which prevails.`,
     `- [Blog](${url("en", "/blog/")}): ${copy["blog.metaDescription"]}`,
     `- [Blog en español](${url("es", "/blog/")}): the blog in Spanish.`,
     ...services.map(

@@ -56,7 +56,7 @@ const languages = [
       {
         path: "/en/services/websites-and-cms/",
         other: "/servicios/webs-y-cms/",
-        h1: "Web design and CMS",
+        h1: "Web design with a CMS",
         type: "web",
         articles: ["/en/blog/web-security-updating-without-breaking/"],
       },

@@ -1,0 +1,581 @@
+{
+  "schema": "idd-state/v1",
+  "change": "short-h1",
+  "mode": "idd",
+  "status": "closed",
+  "intent": {
+    "request": "antes de estos veremos esto: H1 debe tener entre 20 y 70 caracteres(17 caracteres) sopesaremos esto en la siguiente sesion antes de ponerme con todo lo demas, me gusta el orden / ¿Qué hacemos con el aviso del H1 corto?: Todo, portada incluida",
+    "kind": "feature",
+    "summary": "Alargar a 20-70 caracteres el H1 de las seis páginas que bajan de 20 (portada, blog y legal en es y en, webs y CMS en inglés) sin pasar de las líneas que permite DESIGN.md",
+    "acceptance": "Cada página del sitemap tiene un H1 visible de entre 20 y 70 caracteres; el segundo renglón del título de la portada cabe en una línea de 320 a 1920 px y los demás H1 en dos; DESIGN.md, el i18n y los tests recogen los textos nuevos y un test falla si una página del sitemap baja de 20 o pasa de 70"
+  },
+  "facts": {
+    "coverage": [
+      {
+        "category": "inputs",
+        "question": "¿La regla de 20 a 70 caracteres se aplica solo a las páginas del sitemap? La 404 en inglés, «Page not found» (14), no está en él y lleva noindex: ¿se queda fuera?"
+      },
+      {
+        "category": "uniqueness",
+        "cite": {
+          "kind": "path",
+          "path": "AGENTS.md",
+          "line": 14
+        }
+      },
+      {
+        "category": "persistence",
+        "cite": {
+          "kind": "path",
+          "path": "docs/architecture/decisions/0003-no-persistent-store.md",
+          "line": 1
+        }
+      },
+      {
+        "category": "copy",
+        "question": "1) Portada en español: ¿«Software hecho a medida» (23), «Software a tu medida» (20) o «Software a la medida» (20)? El inglés «Software made to measure» (24) se queda. 2) Blog: en español «El software, explicado» (22); en inglés, ¿«Software, in plain words» (24) o «Software, in plain English» (26)? 3) Legal: ¿«Aviso legal y privacidad» / «Legal notice and privacy» (24) o «Información legal de Retama» / «Retama's legal information» (27/26)? ¿Siguen al H1 el metaTitle, la miga de pan y el enlace de llms.txt? 4) Webs y CMS en inglés: ¿«Web design with a CMS» (21) o «Websites and CMS for business» (29, tres líneas a 320 px, como ya le pasa al español)?"
+      },
+      {
+        "category": "url-state",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 263
+        }
+      },
+      {
+        "category": "accessibility",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 247
+        }
+      },
+      {
+        "category": "errors",
+        "cite": {
+          "kind": "path",
+          "path": "DESIGN.md",
+          "line": 351
+        }
+      }
+    ]
+  },
+  "plan": {
+    "paths": [
+      "DESIGN.md",
+      "src/components/board/Hero.astro",
+      "src/i18n/en.ts",
+      "src/i18n/es.ts",
+      "src/lib/seo.ts",
+      "tests/e2e/blog.spec.ts",
+      "tests/e2e/legal.spec.ts",
+      "tests/e2e/motion.spec.ts",
+      "tests/e2e/service-pages.spec.ts",
+      "tests/e2e/site.spec.ts"
+    ],
+    "work_units": 1,
+    "decision": true,
+    "operations": [],
+    "decisions": [
+      "Un E2E recorre el sitemap y exige un H1 de 20 a 70 caracteres en cada página, para que un artículo o una página nueva no vuelva a dar el aviso",
+      "El segundo renglón del título de la portada debe caber en una línea: la escena de glifos lo dibuja con un solo fillText (src/scripts/scene.ts sampleWord)"
+    ]
+  },
+  "signals": [
+    {
+      "id": "always",
+      "reason": "every change with a resolved intent",
+      "source": "declaration"
+    },
+    {
+      "id": "multi-unit-or-decision",
+      "reason": "declared a non-obvious decision",
+      "source": "declaration"
+    },
+    {
+      "id": "public-contract",
+      "reason": "public contract: touches src/i18n/en.ts and 1 more (matches src/i18n/**)",
+      "source": "declaration"
+    },
+    {
+      "id": "adr-or-quality-attribute",
+      "reason": "declared ADR 0001, 0004, 0005, 0008",
+      "source": "declaration"
+    }
+  ],
+  "impacts": [
+    {
+      "kind": "adr",
+      "id": "0001",
+      "impact": "conforms",
+      "reason": "Los H1 nuevos son texto del HTML desde el i18n; ningún texto depende de JS"
+    },
+    {
+      "kind": "adr",
+      "id": "0004",
+      "impact": "conforms",
+      "reason": "La escena sigue muestreando el título de la portada en dos renglones de una línea cada uno (E2E a 320 px); el mayor pintado sigue siendo el título HTML"
+    },
+    {
+      "kind": "adr",
+      "id": "0005",
+      "impact": "conforms",
+      "reason": "DESIGN.md recoge los textos y la regla de 20 a 70 caracteres; no cambia ningún token y design:lint pasa"
+    },
+    {
+      "kind": "adr",
+      "id": "0008",
+      "impact": "conforms",
+      "reason": "Las claves cambian a la vez en es.ts y en.ts; las rutas no cambian"
+    }
+  ],
+  "attestations": [
+    {
+      "kind": "adr",
+      "id": "0005",
+      "evidence": "pnpm design:lint: DESIGN.md: lint clean, theme in sync, components use only tokens (2026-10-31, rama fix/short-h1)",
+      "recorded_at": "2026-10-31T15:03:45.036Z"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "checks-pass",
+      "signal": "always",
+      "status": "satisfied",
+      "evidence": [
+        "ev-2"
+      ]
+    },
+    {
+      "id": "living-doc",
+      "signal": "multi-unit-or-decision",
+      "status": "satisfied",
+      "evidence": [
+        "ev-5"
+      ]
+    },
+    {
+      "id": "contract-spec-and-test",
+      "signal": "public-contract",
+      "status": "satisfied",
+      "evidence": [
+        "ev-3"
+      ]
+    },
+    {
+      "id": "adr-impact-declaration",
+      "signal": "adr-or-quality-attribute",
+      "status": "satisfied",
+      "evidence": [
+        "ev-4"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "open-facts",
+      "status": "resolved",
+      "opened_turn": 30,
+      "answer": "todas las recomendadas (portada «Software hecho a medida», inglés igual; blog «El software, explicado» / «Software, in plain English»; legal «Aviso legal y privacidad» / «Legal notice and privacy» con metaTitle, miga y llms.txt siguiéndolo; webs en inglés «Web design with a CMS»; la 404 fuera, el test solo mira el sitemap)",
+      "source": "user",
+      "resolved_turn": 31
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-31T15:07:04.878Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+        "fitness": [
+          "run-16",
+          "run-17",
+          "run-18",
+          "run-19",
+          "run-20"
+        ]
+      }
+    },
+    {
+      "id": "ev-2",
+      "kind": "check-run",
+      "obligation": "checks-pass",
+      "recorded_at": "2026-10-31T15:12:33.053Z",
+      "detail": {
+        "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+        "runs": [
+          "run-21",
+          "run-22",
+          "run-23",
+          "run-24",
+          "run-25"
+        ]
+      }
+    },
+    {
+      "id": "ev-3",
+      "kind": "contract-spec-and-test",
+      "obligation": "contract-spec-and-test",
+      "recorded_at": "2026-10-31T15:12:33.053Z",
+      "detail": {
+        "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+        "check": "ev-2",
+        "documents": [
+          "DESIGN.md",
+          "src/i18n/en.ts",
+          "src/i18n/es.ts"
+        ],
+        "tests": [
+          "tests/e2e/blog.spec.ts",
+          "tests/e2e/legal.spec.ts",
+          "tests/e2e/motion.spec.ts",
+          "tests/e2e/service-pages.spec.ts",
+          "tests/e2e/site.spec.ts"
+        ]
+      }
+    },
+    {
+      "id": "ev-4",
+      "kind": "adr-impact-declaration",
+      "obligation": "adr-impact-declaration",
+      "recorded_at": "2026-10-31T15:12:33.053Z",
+      "detail": {
+        "refs": [
+          "adr:0001 conforms",
+          "adr:0004 conforms",
+          "adr:0005 conforms",
+          "adr:0008 conforms"
+        ],
+        "records": [],
+        "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+        "fitness": [
+          "run-26",
+          "run-27",
+          "run-28",
+          "run-29",
+          "run-30"
+        ]
+      }
+    },
+    {
+      "id": "ev-5",
+      "kind": "living-doc-current",
+      "obligation": "living-doc",
+      "recorded_at": "2026-10-31T15:12:33.106Z"
+    }
+  ],
+  "base": "977fd265fc1c9a5b751d4c0d2a86e212c082a429",
+  "runs": [
+    {
+      "id": "run-1",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:9e5c2c1950ace1a53104ea84495a758f1c82a0fc69ed8a5805b8fe05ff9fa668",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-2",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:1440da68030f37ef88e92a0f827d311f75371458fbf58187cda009b6a825eaa5",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-3",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:dec8e1b2d1760762d6111cd26a069b7525603c162353605e4af287bec5465212",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-4",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:d9d4d5759b6e0bd38da8e0e4a52e7e2a23dd3eea679e14586d8f2c8f46c7742d",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-5",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-6",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:4e94f9a40ef2e808132b07c96351d148fd65ef25fec1c43884fff3125462c6fd",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-7",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:ac7b985f8deca4e916b4bd5b366ac6f345ce0fdd92bd07cde25b0188d609f4f9",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-8",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:a5a50032e83022cdb26a21833954b834006a9a2a0eddb309b0d3d310367b3e85",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-9",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:714d72f89fd7901e07c577166ad6ef19bbd0a9afe42d3ec4e55f567f4c82f2fb",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-10",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:a26954e4e9da42f42327d7e76d10a5ef5353e3263a5d448e1ac30f2e860a602a",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:01:03.949Z"
+    },
+    {
+      "id": "run-11",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:3ebd970f56736192c86a5e4c6797d9cc8cc7c1b4d5e61cfd2c3d556983fff226",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-12",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:48144e379e84fdf36af33f3785310b0afeb50a30d51e26f8b993b125c2e5c761",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-13",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:27bf672032101a6747c3b67d7750991565e6ffa093ff4fb66c78dbaedf11a9d2",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-14",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 1,
+      "output_sha256": "sha256:4e79f7d307ef0ffdd8527ff0570d4d2aa22e5312f92c8e91d172a65bd2be8500",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-15",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-16",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:d9ff2d793f4bec6017061574078568dd8b3363f7c5e3e21fc26f8d5b7bb104d9",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-17",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:a62c1c87267d4a08b563eb9d6c59c90bc4007aa308890288e50b486634b7f717",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-18",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:c8dbb75b4033c7c242a115b7927e3b58f78c1501aabc8cd7593a8d2c6a648c1c",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-19",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:ef256cf239c0142eb42ed78e023f01872eb181289e8adce8fb8163f48ea57ba7",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-20",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:06f58e67a1b655730600eada4342f585496a5a9535acb3b9efbf35b4b9ef53ea",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:07:04.878Z"
+    },
+    {
+      "id": "run-21",
+      "purpose": "checks",
+      "name": "lint",
+      "command": "pnpm lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:b374abca63f7f6b65e4e042ca640e2bfad690356fa7afb920d5ddf59e93c64d1",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-22",
+      "purpose": "checks",
+      "name": "typecheck",
+      "command": "pnpm typecheck",
+      "exit_code": 0,
+      "output_sha256": "sha256:dd7a563a4d07c1b88af63a0aed4f63a917e195191e5a4be10f9ba66dc8c5b329",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-23",
+      "purpose": "checks",
+      "name": "test",
+      "command": "pnpm test",
+      "exit_code": 0,
+      "output_sha256": "sha256:84853782b35a8bf8c277e3b8ec59c8b07e6a1fd9ea158603ccbed11e0aa72691",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-24",
+      "purpose": "checks",
+      "name": "e2e",
+      "command": "pnpm test:e2e",
+      "exit_code": 0,
+      "output_sha256": "sha256:3a1dcbe855f9bacb745583dddca8e82a4bc4beef3b98369f9487ca3fb2aaee55",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-25",
+      "purpose": "checks",
+      "name": "design",
+      "command": "pnpm design:lint",
+      "exit_code": 0,
+      "output_sha256": "sha256:efd6203da64592f02981c3210fc16c6c7ea019b4aba6ff56aabdebae9e6661b5",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-26",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm test:e2e --grep \"ADR 0001\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:94f1228ef797f910acedeb85ee258006277a78deffe55435bbfe956039bef56a",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-27",
+      "purpose": "fitness",
+      "ref": "adr:0001",
+      "command": "pnpm build && node scripts/fitness.mjs js-budget",
+      "exit_code": 0,
+      "output_sha256": "sha256:1e0ca8e3edd7e58b8e23dc69f98514c66d00bc7da3295f20a9255484405ebf8f",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-28",
+      "purpose": "fitness",
+      "ref": "adr:0004",
+      "command": "pnpm build && pnpm exec lhci autorun",
+      "exit_code": 0,
+      "output_sha256": "sha256:80c351f58a18d7e17094161842f774ccd4a4be723c59cbddcce791102e864aac",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-29",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test tests/unit/i18n.test.ts tests/unit/seo.test.ts",
+      "exit_code": 0,
+      "output_sha256": "sha256:3b0f33d56b81e059ab6e6b70b48bffdbd2c70ed73a97d58091c57493a594c29d",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    },
+    {
+      "id": "run-30",
+      "purpose": "fitness",
+      "ref": "adr:0008",
+      "command": "pnpm test:e2e --grep \"ADR 0008\"",
+      "exit_code": 0,
+      "output_sha256": "sha256:b227bac5d114c96295450e45b34fb9c111250c27b87eea594c7914ccfb251087",
+      "tree": "sha256:30b8447cbfe464f9a9d208db2934a4a10d3818354eae76ee117cee36f78bf532",
+      "recorded_at": "2026-10-31T15:12:33.053Z"
+    }
+  ],
+  "closed_at": "2026-10-31T15:12:33.106Z"
+}
